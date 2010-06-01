@@ -50,7 +50,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 	
 	public double calculateMSMSFit() {
-		String peptideString = peptide.getSequence();
+		String peptideString = peptide.getAcidSequence();
 
 		int i;
 		boolean atLeastOneMatch = false;
@@ -152,7 +152,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 	
 	public double calculateHMM() {
-		HMMClass scorer = new HMMClass(peptide.getSequence(), spectrum);
+		HMMClass scorer = new HMMClass(peptide.getAcidSequence(), spectrum);
 		scoreHMM = scorer.score();
 		return scoreHMM;
 	}
@@ -286,7 +286,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 
 	public String toString() {
-		return peptide.getSequence() + " " + scoreMSMSFit + " " + peptide.getMass();
+		return peptide.getAcidSequence() + " " + scoreMSMSFit + " " + peptide.getMass();
 	}
 
 }

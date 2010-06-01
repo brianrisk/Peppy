@@ -76,7 +76,7 @@ public class ReliabilityTester {
 			//We're sorting so that if the peptide is in our list of matches, we know how highly it is ranked.
 			Collections.sort(spectrumMatches);
 			SpectrumPeptideMatch topMatch = spectrumMatches.get(0);
-			if (topMatch.getPeptide().getSequence().equals(correctPeptides.get(i).getSequence())) {
+			if (topMatch.getPeptide().getAcidSequence().equals(correctPeptides.get(i).getAcidSequence())) {
 				out++;
 			}
 		}
@@ -214,7 +214,7 @@ public class ReliabilityTester {
 			if (spectrumMatches.size() < maxIndex) maxIndex = spectrumMatches.size();
 			for (int spectrumIndex = 0; spectrumIndex < maxIndex; spectrumIndex++) {
 				SpectrumPeptideMatch topMatch = spectrumMatches.get(spectrumIndex);
-				if (topMatch.getPeptide().getSequence().equals(peptideString)) {
+				if (topMatch.getPeptide().getAcidSequence().equals(peptideString)) {
 					numberFound++;
 					rankTotals[spectrumIndex]++;
 					matchFound = true;
@@ -297,7 +297,7 @@ public class ReliabilityTester {
 			
 			boolean peptideFound = false;
 			for (int peptideIndex = 0; peptideIndex < peptides.size(); peptideIndex++) {
-				if (peptideString.equals(peptides.get(peptideIndex).getSequence())) {
+				if (peptideString.equals(peptides.get(peptideIndex).getAcidSequence())) {
 					peptideFound = true;
 					continue;
 				}
@@ -334,16 +334,37 @@ public class ReliabilityTester {
 			matches.addAll(JavaGFS.asynchronousDigestion(sequence, spectra));
 		}
 		try {
-			//append to existing file
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("tests/" + species + "/highScoringPeptides.txt")));
-
 			//loop through each sequence in the sequences ArrayList
 			for (int matchIndex = 0; matchIndex < matches.size(); matchIndex++) {
 				SpectrumPeptideMatch match = matches.get(matchIndex);		
-				pw.println(match.getPeptide().getSequence());
-				double mass1 = match.getPeptide().getMass();
-				double mass2 = match.getPeptide().calculateMass();
-				if (Math.abs(mass1 - mass2) > 0.0001) U.p(mass2 - mass1);
+				pw.println(match.getPeptide().getAcidSequence());
+			}
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void exportHighScoringPeptidesFromSwissProt(String species) {
+		//Load our spectra
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("tests/" + species + "/spectra");
+		U.p("loaded " +spectra.size() + " spectra.");
+		
+		//load SwissProt
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
+		
+		//keep the top 20 matches for each spectrum
+		Properties.maximumNumberOfMatchesForASpectrum = 20;
+		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("tests/" + species + "/highScoringPeptides.txt")));
+
+			//loop through each sequence in the sequences ArrayList
+			for (SpectrumPeptideMatch match: matches) {	
+				pw.println(match.getPeptide().getAcidSequence());
 			}
 			pw.flush();
 			pw.close();
@@ -399,8 +420,8 @@ public class ReliabilityTester {
 				int peptideIndex = ScoringThread.findFirstIndexWithGreaterMass(peptides, peptide.getMass() - .01);
 				double peptideMassButBigger = peptide.getMass() + .01;
 				for (int i = peptideIndex; i < peptides.size(); i++) {
-					if (peptide.getSequence().equals(peptides.get(i).getSequence())) {
-						pw.println(peptide.getSequence());
+					if (peptide.getAcidSequence().equals(peptides.get(i).getAcidSequence())) {
+						pw.println(peptide.getAcidSequence());
 						break;
 					}
 					if (peptides.get(i).getMass() > peptideMassButBigger) {
@@ -417,10 +438,15 @@ public class ReliabilityTester {
 		}
 	}
 	
-	private static ArrayList<Peptide> loadHighScoringPeptides(String species) {
+	public static ArrayList<Peptide> loadHighScoringPeptides(String species) {
+		File file = new File("tests/" + species + "/highScoringPeptides.txt");
+		return loadHighScoringPeptides(file);
+	}
+	
+	public static ArrayList<Peptide> loadHighScoringPeptides(File file) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("tests/" + species + "/highScoringPeptides.txt"));
+			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();
 			while (line != null) {
 				peptides.add(new Peptide(line));

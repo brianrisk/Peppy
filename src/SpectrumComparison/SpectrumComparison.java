@@ -119,12 +119,12 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 	}
 	
 	public boolean isEqual() {
-		return spectrumPeptidePair1.getPeptide().getSequence().equals(spectrumPeptidePair2.getPeptide().getSequence());
+		return spectrumPeptidePair1.getPeptide().getAcidSequence().equals(spectrumPeptidePair2.getPeptide().getAcidSequence());
 	}
 	
 	public double getDistance() {return distance;}
 	
-	public String toString() {return spectrumPeptidePair1.getPeptide().getSequence() + ", " + spectrumPeptidePair2.getPeptide().getSequence();}
+	public String toString() {return spectrumPeptidePair1.getPeptide().getAcidSequence() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequence();}
 
 
 	public int compareTo(SpectrumComparison o) {

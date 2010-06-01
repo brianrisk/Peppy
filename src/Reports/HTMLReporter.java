@@ -101,7 +101,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getPeptide().getSequence());
+				sb.append(match.getPeptide().getAcidSequence());
 				sb.append("</td>");
 				
 				sb.append("<td><nobr>");
@@ -310,7 +310,7 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append(match.getPeptide().getSequence());
+		sb.append(match.getPeptide().getAcidSequence());
 		sb.append("</td>");
 		
 		sb.append("<td><nobr>");
@@ -341,7 +341,7 @@ public class HTMLReporter {
 	}
 	
 
-	private void appendFile(PrintWriter pw, File file) {
+	public static void appendFile(PrintWriter pw, File file) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();

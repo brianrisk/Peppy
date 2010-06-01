@@ -37,7 +37,7 @@ public class Properties {
 	public static double bIonDifference = 1.0;
 	
 	//matches per spectrum
-	public static int maximumNumberOfMatchesForASpectrum = 5;
+	public static int maximumNumberOfMatchesForASpectrum = 1;
 	
 	//These Files could be directories or files.
 	public static File sequenceFile = new File("sequences");
@@ -45,6 +45,9 @@ public class Properties {
 	
 	//HMM Score
 	public static File HMMScoreParametersFile = new File("resources/HMMScore/ParamFiles");
+	
+	//where we store our reports
+	public static File reportDirectory = new File("reports");
 	
 
 }

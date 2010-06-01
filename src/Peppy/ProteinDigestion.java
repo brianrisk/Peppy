@@ -79,9 +79,9 @@ public class ProteinDigestion {
 		//getting all missed cleavages
 		for (int numberOfMissedCleavages = 1; numberOfMissedCleavages <= Properties.numberOfMissedCleavages; numberOfMissedCleavages++){
 			for (int i = 0; i < fragments.size() - numberOfMissedCleavages; i++) {
-				StringBuffer peptideString = new StringBuffer(fragments.get(i).getSequence());
+				StringBuffer peptideString = new StringBuffer(fragments.get(i).getAcidSequence());
 				for (int j = 1; j <= numberOfMissedCleavages; j++) {
-					peptideString.append(fragments.get(i + j).getSequence());
+					peptideString.append(fragments.get(i + j).getAcidSequence());
 				}
 				Peptide peptide = new Peptide(peptideString.toString(),  fragments.get(i).getIndex(), forwards, frame, parentSequence);
 				if (peptide.getMass() >= Properties.peptideMassThreshold) out.add(peptide);

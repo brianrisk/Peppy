@@ -51,23 +51,31 @@ public class TextReporter {
 			StringBuffer sb;
 			for (SpectrumPeptideMatch match: matches) {
 				if (match.getEValue() < 0.001) {
+					
 					sb = new StringBuffer();
 					sb.append(match.getSpectrum().getId());
-					
-					sb.append('\t');
-					sb.append(match.getSequence().getSequenceFile().getName());
+//					sb.append('\t');
+//					sb.append(match.getSequence().getSequenceFile().getName());
 	//				sb.append('\t');
 	//				sb.append(match.getPeptide().getIndex());
-					sb.append('\t');
-					sb.append(match.getScoreHMM());
+//					sb.append('\t');
+//					sb.append(match.getScoreHMM());
 					sb.append('\t');
 					sb.append(match.getScoreMSMSFit());
+//					sb.append('\t');
+//					sb.append(match.getMSMSFitScoreRatio());
+//					sb.append('\t');
+//					sb.append(match.getMSMSFitRank());
 					sb.append('\t');
-					sb.append(match.getMSMSFitRank());
+					sb.append(match.getSpectrum().getPrecursorMass());
+					sb.append('\t');
+					sb.append(match.getPeptide().getMass());
+					sb.append('\t');
+					sb.append(Math.abs(match.getPeptide().getMass() - match.getSpectrum().getPrecursorMass()));
 					sb.append('\t');
 					sb.append(match.getEValue());
 					sb.append('\t');
-					sb.append(match.getPeptide().getSequence());
+					sb.append(match.getPeptide().getAcidSequence());
 					sb.append('\t');
 					sb.append(match.getSpectrum().getFile().getName());
 					pw.println(sb);

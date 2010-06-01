@@ -28,11 +28,11 @@ public class JavaGFS {
 //		ReliabilityTester.testReliability("aurum");
 //		ReliabilityTester.testReliability("human");
 //		ReliabilityTester.testReliability("ecoli");
-//		ReliabilityTester.exportHighScoringPeptides("aurum");
+		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("human");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
 //		ReliabilityTester.makeSureWeAreProperlyDigestingTheGenome("ecoli");
-		new JavaGFS	(args);
+//		new JavaGFS	(args);
 //		testHMMScoreOnSwissProt();
 //		testWeights();
 //		exportPeptideList();
@@ -78,7 +78,8 @@ public class JavaGFS {
 		U.startStopwatch();
 		printGreeting();	
 
-		Properties.spectraFile = new File("spectra human677");
+//		Properties.spectraFile = new File("spectra human677");
+		Properties.spectraFile = new File("spectra USP");
 //		Properties.spectraFile = new File("spectra problem");
 		
 		//Load our spectra
@@ -133,9 +134,9 @@ public class JavaGFS {
 			matches.addAll(asynchronousDigestion(sequence, spectra));
 		}
 		
-		//calculate HMM scores
-		HMMScorer hmmScorer = new HMMScorer(matches);
-		hmmScorer.score();
+//		//calculate HMM scores
+//		HMMScorer hmmScorer = new HMMScorer(matches);
+//		hmmScorer.score();
 		
 		HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
 		report.generateFullReport();

@@ -88,7 +88,7 @@ public class Peptide implements Comparable<Peptide> {
 	/**
 	 * @return the sequence
 	 */
-	public String getSequence() {
+	public String getAcidSequence() {
 		return sequence;
 	}
 

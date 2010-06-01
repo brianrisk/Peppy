@@ -11,7 +11,7 @@ public class Peak implements Comparable<Peak>{
 	double mass;
 	double intensity;
 
-	Color color = Color.WHITE;
+	Color color = Color.gray;
 	
 	final int COMPARE_MASS = 0;
 	final int COMPARE_INTENSITY = 1;
