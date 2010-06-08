@@ -24,13 +24,14 @@ public class SavePeptidesToFile {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("UPS/extracted-proteins.txt"));
+		U.p("Saving peptides to file");
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("USP/extracted-proteins.txt"));
 		Collections.sort(peptides);
 		try {
 			//printing full peptide list
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("UPS/peptide-list.txt")));
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("USP/peptide-list.txt")));
 			for (Peptide peptide: peptides) {
-				pw.println(peptide.getMass() + "\t" + peptide.getAcidSequence());
+				pw.println(peptide.getAcidSequence());
 			}
 			
 			//closing our file
@@ -41,7 +42,7 @@ public class SavePeptidesToFile {
 			int listSize = peptides.size();
 			double previousMass = 0;
 			boolean justChanged = true;
-			PrintWriter redundantMassList = new PrintWriter(new BufferedWriter(new FileWriter("UPS/redundant-mass-list.txt")));
+			PrintWriter redundantMassList = new PrintWriter(new BufferedWriter(new FileWriter("USP/redundant-mass-list.txt")));
 			for (int i = 0; i < listSize; i++) {
 				Peptide pep = peptides.get(i);
 				if (pep.getMass() - previousMass < 0.01) {
@@ -62,9 +63,9 @@ public class SavePeptidesToFile {
 			}
 			
 			//printing unique mass peptide list
-			pw = new PrintWriter(new BufferedWriter(new FileWriter("UPS/peptide-unique-mass-list.txt")));
+			pw = new PrintWriter(new BufferedWriter(new FileWriter("USP/peptide-unique-mass-list.txt")));
 			for (Peptide peptide: peptides) {
-				pw.println(peptide.getMass() + "\t" + peptide.getAcidSequence());
+				pw.println(peptide.getAcidSequence());
 			}
 			
 			//closing our file

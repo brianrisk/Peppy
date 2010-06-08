@@ -1,5 +1,11 @@
 package Peppy;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import Utilities.U;
 
 /**
  * This is were property defaults are defined.
@@ -22,13 +28,15 @@ public class Properties {
 	public static boolean useMonoMass = true;
 	
 	//no fragments that weigh less than this will be admitted into the fragment list
-	public static double peptideMassThreshold = 500.0; //daltons
+	//units are daltons.
+	public static double peptideMassThreshold = 500.0;
 	
 	//number of Missed cleavages
 	public static int numberOfMissedCleavages = 2;
 	
 	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
-	public static double spectrumToPeptideMassError = 2.0; //daltons
+	//units are daltons.
+	public static double spectrumToPeptideMassError = 2.0;
 	
 	//MSMSFit
 	public static double peakDifferenceThreshold = 0.5;
@@ -39,15 +47,81 @@ public class Properties {
 	//matches per spectrum
 	public static int maximumNumberOfMatchesForASpectrum = 1;
 	
-	//These Files could be directories or files.
+	//This could be a directory or a file
 	public static File sequenceFile = new File("sequences");
+	
+	//This could be a directory or a file
 	public static File spectraFile = new File("spectra");
 	
-	//HMM Score
+	//FASTA files can be either DNA or amino acid sequences
+	public static boolean isSequenceFileDNA = true;
+	
+	//HMM Score parameter file folder
 	public static File HMMScoreParametersFile = new File("resources/HMMScore/ParamFiles");
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
+	
+	
+	/**
+	 * 
+	 * @param fileName the name of our properties file
+	 */
+	public static void loadProperties(String fileName) {
+		File file = new File(fileName);
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line = br.readLine();
+			while (line != null) {
+				setPropertyFromString(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			U.p("Could not find the properties file: " + fileName);
+			e.printStackTrace();
+		} catch (IOException e) {
+			U.p("Could not read the properties file: " + fileName);
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static void setPropertyFromString(String line) {
+		line = line.trim();
+		if (line.equals("")) return;
+		if (line.startsWith("//")) return;
+		if (line.startsWith("#")) return;
+		if (line.indexOf(" ") == -1) return;
+		String propertyName = line.substring(0, line.indexOf(" "));
+		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
+		if (propertyName.equals("numberOfThreads")) {
+			numberOfThreads = Integer.valueOf(propertyValue);
+		}
+		if (propertyName.equals("peptideMassThreshold")) {
+			peptideMassThreshold = Double.valueOf(propertyValue);
+		}
+		if (propertyName.equals("numberOfMissedCleavages")) {
+			numberOfMissedCleavages =Integer.valueOf(propertyValue);
+		}
+		if (propertyName.equals("maximumNumberOfMatchesForASpectrum")) {
+			maximumNumberOfMatchesForASpectrum = Integer.valueOf(propertyValue);
+		}
+		if (propertyName.equals("sequenceFile")) {
+			sequenceFile = new File(propertyValue);
+		}
+		if (propertyName.equals("spectraFile")) {
+			spectraFile = new File(propertyValue);
+		}
+		if (propertyName.equals("isSequenceFileDNA")) {
+			isSequenceFileDNA = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("reportDirectory")) {
+			reportDirectory = new File(propertyValue);
+		}
+		
+		
+	}
 	
 
 }

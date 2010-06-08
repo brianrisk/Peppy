@@ -1,0 +1,26 @@
+
+//how many processors does your computer have?  This number should be that number.
+numberOfThreads 16
+
+//no fragments that weigh less than this will be admitted into the fragment list
+//units are daltons.
+peptideMassThreshold 500.0
+
+numberOfMissedCleavages 2
+
+//This is per sequence file, so if this value is 5 and you use 7 FASTA files
+//it will produce (at most) 35 matches per spectrum
+maximumNumberOfMatchesForASpectrum 5
+
+//This could be a directory or a file
+//sequenceFile /Users/risk2/PeppyOverflow/sequences ecoli
+sequenceFile /Users/risk2/PeppyOverflow/tests/databases/ipi.HUMAN.v3.53.fasta
+
+//This could be a directory or a file
+spectraFile /Users/risk2/PeppyOverflow/spectra human677
+
+//FASTA files can be either DNA or amino acid sequences
+isSequenceFileDNA false
+
+//where we store our reports
+reportDirectory reports

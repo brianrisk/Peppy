@@ -1,9 +1,17 @@
 package Peppy;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
-import HMMScore.HMMClass;
-import Reports.*;
+import Reports.TextReporter;
 import Utilities.U;
 
 
@@ -23,53 +31,65 @@ public class JavaGFS {
 	
 	
 	public static void main(String [] args) {
-//		ReliabilityTester.runTheGamut("human");
+		System.setProperty("java.awt.headless", "true"); 
+		Properties.loadProperties("properties.txt");
+//		ReliabilityTester.runTheGamut("USP");
 //		ReliabilityTester.runTheGamut("ecoli");
 //		ReliabilityTester.testReliability("aurum");
 //		ReliabilityTester.testReliability("human");
 //		ReliabilityTester.testReliability("ecoli");
-		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
+//		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("human");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
 //		ReliabilityTester.makeSureWeAreProperlyDigestingTheGenome("ecoli");
-//		new JavaGFS	(args);
+		new JavaGFS	(args);
 //		testHMMScoreOnSwissProt();
-//		testWeights();
+//		runOnProteinDatabase(args);
 //		exportPeptideList();
 		U.p("done");
 	}
 	
-	public static void testWeights() {
-		String prefix = "spectra human677/spectra/";
-//		String peptideSequence = "LTYAYFAGGDAGDAFDGFDFGDDPSDK";
-		String peptideSequence = "ALVLIAFAQYLQQCPFEDHVK";
-		Peptide peptide = new Peptide(peptideSequence);
-//		Spectrum spectrum = new Spectrum(new File(prefix + "JNA-and-JGP-AAP-27Aug03_HUPO.2309.2309.2.dta"));
-		Spectrum spectrum = new Spectrum(new File(prefix + "JNA-and-JGP-AAP-27Aug03_HUPO.2991.2991.2.dta"));
+	/**
+	 * 
+	 * @param args an array of arguments.  Element 0 is the spectral directory; Element 1 is the FASTA database.
+	 */
+	public static void runOnProteinDatabase(String [] args) {
+		U.startStopwatch();
+		printGreeting();	
 		
-		//print mass calculations
-//		U.p(peptide.getMass());
-//		U.p(HMMClass.calculatePeptideMass(peptideSequence));
-//		U.p();
-		
-		//print all the peaks
-//		ArrayList<Peak> peaks = spectrum.getPeaks();
-//		for (Peak peak: peaks) {
-//			U.p(peak.getMass());
-//		}
-		
-		//MSMSFit
-		U.p();
-//		SpectrumPeptideMatch spm = new SpectrumPeptideMatch(spectrum, peptide, null);
-//		U.p(spm.getScore());
-//		U.p(spm.getPeptide().getSequence());
-		
-		//HMM score
-		HMMScore.HMMClass.HmmSetUp();
-		HMMClass scorer = new HMMClass(peptideSequence, spectrum);
-		U.p("HMM score is " + scorer.score());
-		
+		if (args[0] == null || args[0].equals("")) {
+			U.p();
+			U.p("Here is how to use it:");
+			U.p("All file paths can be absolute or relative to where this app is located.");
+			U.p("Arg 0: The file path directory to the folder which contains the spectra.");
+			U.p("Arg 1: The file path directory to the FASTA protein database file.");
+		} else {
+			Properties.spectraFile = new File(args[0]);
+			
+			//setting properties
+			Properties.maximumNumberOfMatchesForASpectrum = 1;
+			Properties.peakDifferenceThreshold = 0.25;
+			Properties.peakIntensityExponent = 0.3;
+			
+			//Load our spectra
+			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+			U.p("loaded " +spectra.size() + " spectra.");
+	
+	
+			//load the peptides from the database
+			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File(args[1]));
+			
+			
+			ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+			
+			TextReporter textReport = new TextReporter(matches, spectra, null);
+			textReport.generateFullReport();
+			
+			U.p();
+			U.stopStopwatch();
+		}
 	}
+	
 	
 	/**
 	 * This is just to test HMM score on swiss prot
@@ -82,6 +102,11 @@ public class JavaGFS {
 		Properties.spectraFile = new File("spectra USP");
 //		Properties.spectraFile = new File("spectra problem");
 		
+		//setting properties
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		Properties.peakDifferenceThreshold = 0.25;
+		Properties.peakIntensityExponent = 0.3;
+		
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
 		U.p("loaded " +spectra.size() + " spectra.");
@@ -90,7 +115,9 @@ public class JavaGFS {
 		HMMScore.HMMClass.HmmSetUp();
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
+//		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/ipi.HUMAN.v3.53.fasta"));
+		
 		
 		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
@@ -107,13 +134,11 @@ public class JavaGFS {
 		U.startStopwatch();
 		printGreeting();
 		
-		//setting spectra and sequence folders
-		Properties.sequenceFile = new File("sequences encode");
-		Properties.spectraFile = new File("spectra encode");
-//		Properties.sequenceFile = new File("sequences ecoli");
-//		Properties.spectraFile = new File("spectra ecoli579");
-//		Properties.spectraFile = new File("spectra ecoli");
-//		Properties.spectraFile = new File("spectra problem");
+		
+		//setting other properties
+//		Properties.maximumNumberOfMatchesForASpectrum = 1;
+//		Properties.peakDifferenceThreshold = 0.25;
+//		Properties.peakIntensityExponent = 0.3;
 		
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -126,7 +151,7 @@ public class JavaGFS {
 		ArrayList<SpectrumPeptideMatch> matches = new ArrayList<SpectrumPeptideMatch>();
 		
 		//set up HMM
-		HMMScore.HMMClass.HmmSetUp();
+//		HMMScore.HMMClass.HmmSetUp();
 		
 		//loop through each sequence in the sequences ArrayList
 		//for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
@@ -134,18 +159,59 @@ public class JavaGFS {
 			matches.addAll(asynchronousDigestion(sequence, spectra));
 		}
 		
-//		//calculate HMM scores
+		//calculate HMM scores
 //		HMMScorer hmmScorer = new HMMScorer(matches);
 //		hmmScorer.score();
 		
-		HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-		report.generateFullReport();
+//		HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+//		report.generateFullReport();
 		
 		TextReporter textReport = new TextReporter(matches, spectra, sequences);
 		textReport.generateFullReport();
 		
+//		saveBadSpectra(matches);
+		
 		U.p();
 		U.stopStopwatch();
+	}
+	
+	public static void saveBadSpectra(ArrayList<SpectrumPeptideMatch> matches) {
+		try {
+			File badSpectraFolder = new File("bad spectra");
+			badSpectraFolder.mkdirs();
+			File badPeptidesFile = new File("bad-peptides.txt");
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(badPeptidesFile)));
+			int fileIndex = 1;
+			for (int i = 0; i < matches.size(); i++) {
+				SpectrumPeptideMatch match = matches.get(i);
+				if (match.getScoreHMM() < 1) {
+					//copy spectrum file
+					InputStream in = new FileInputStream(match.getSpectrum().getFile());
+					File badSpectrum = new File(badSpectraFolder, fileIndex + ".dta");	
+					OutputStream out = new FileOutputStream(badSpectrum);
+					byte[] buf = new byte[1024];
+					int len;
+					while ((len = in.read(buf)) > 0) {
+						out.write(buf, 0, len);
+					}
+					in.close();
+					out.close();
+					fileIndex++;
+					
+					//save bad peptide
+					pw.println(match.getPeptide().getAcidSequence());
+				}
+				
+			}
+			pw.flush();
+			pw.close();
+		}
+		catch (FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -190,7 +256,12 @@ public class JavaGFS {
 			//This is where the big memory drain comes from.  We are extracting
 			//a list of peptides from the sequence file.
 			U.p("Digesting file: " +sequence.getSequenceFile().getName());
-			ArrayList<Peptide> peptides = sequence.extractPeptides();
+			ArrayList<Peptide> peptides;
+			if (Properties.isSequenceFileDNA) {
+				peptides = sequence.extractPeptides();
+			} else {
+				peptides = ProteinDigestion.getPeptidesFromProteinFile(sequence.getSequenceFile());
+			}
 			
 			return asynchronousDigestion(peptides, spectra, sequence);
 	}

@@ -50,7 +50,7 @@ public class TextReporter {
 			
 			StringBuffer sb;
 			for (SpectrumPeptideMatch match: matches) {
-				if (match.getEValue() < 0.001) {
+//				if (match.getScoreHMM() < 1) {
 					
 					sb = new StringBuffer();
 					sb.append(match.getSpectrum().getId());
@@ -66,12 +66,12 @@ public class TextReporter {
 //					sb.append(match.getMSMSFitScoreRatio());
 //					sb.append('\t');
 //					sb.append(match.getMSMSFitRank());
-					sb.append('\t');
-					sb.append(match.getSpectrum().getPrecursorMass());
-					sb.append('\t');
-					sb.append(match.getPeptide().getMass());
-					sb.append('\t');
-					sb.append(Math.abs(match.getPeptide().getMass() - match.getSpectrum().getPrecursorMass()));
+//					sb.append('\t');
+//					sb.append(match.getSpectrum().getPrecursorMass());
+//					sb.append('\t');
+//					sb.append(match.getPeptide().getMass());
+//					sb.append('\t');
+//					sb.append(Math.abs(match.getPeptide().getMass() - match.getSpectrum().getPrecursorMass()));
 					sb.append('\t');
 					sb.append(match.getEValue());
 					sb.append('\t');
@@ -79,7 +79,7 @@ public class TextReporter {
 					sb.append('\t');
 					sb.append(match.getSpectrum().getFile().getName());
 					pw.println(sb);
-				}
+//				}
 			}
 			
 

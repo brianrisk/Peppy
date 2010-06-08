@@ -12,11 +12,11 @@ import Peppy.JavaGFS;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
-import Peppy.ReliabilityTester;
 import Peppy.Sequence;
 import Peppy.Spectrum;
 import Peppy.SpectrumPeptideMatch;
 import Utilities.U;
+import Validate.ReliabilityTester;
 
 public class TuneMSMSFit {
 	
