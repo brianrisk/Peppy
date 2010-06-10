@@ -23,7 +23,7 @@ public class GenerateValidationReport {
 		File indexFile = new File(validationFolder, "index.html");
 		
 		//load the swis prot protein database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
 		
 		//set up which tests we will perfrom
 		ArrayList<String> tests = new ArrayList<String>();
@@ -37,7 +37,7 @@ public class GenerateValidationReport {
 			U.p("Getting matches for: " + test);
 			
 			//load spectra for this test
-			ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("tests/" + test + "/spectra");
+			ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + test + "/spectra");
 			U.p("loaded " +spectra.size() + " spectra.");
 			
 			//get the matches

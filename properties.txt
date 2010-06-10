@@ -14,10 +14,10 @@ maximumNumberOfMatchesForASpectrum 5
 
 //This could be a directory or a file
 //sequenceFile /Users/risk2/PeppyOverflow/sequences ecoli
-sequenceFile /Users/risk2/PeppyOverflow/tests/databases/ipi.HUMAN.v3.53.fasta
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/ipi.HUMAN.v3.53.fasta
 
 //This could be a directory or a file
-spectraFile /Users/risk2/PeppyOverflow/spectra human677
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
 
 //FASTA files can be either DNA or amino acid sequences
 isSequenceFileDNA false

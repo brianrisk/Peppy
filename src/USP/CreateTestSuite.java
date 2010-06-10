@@ -37,7 +37,7 @@ public class CreateTestSuite {
 		U.p("Creating the necessary files for our USP test suite");
 		
 		//set our properties
-		Properties.spectraFile = new File("spectra USP");
+		Properties.spectraDirectoryOrFile = new File("spectra USP");
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//Load our spectra

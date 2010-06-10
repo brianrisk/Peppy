@@ -26,13 +26,13 @@ import Utilities.U;
 
 public class SpectralVisualizer {
 	
-	static Color yIonColor = Color.green;
-	static Color bIonColor = Color.red;
+	static Color yIonColor = Color.yellow;
+	static Color bIonColor = Color.blue;
 	
 	public static void main(String args[]) {
 		U.printUserDirectory();
 		U.p("drawing images for spectra");
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("spectra");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(Properties.spectraDirectoryOrFile);
 		ArrayList<Peptide> peptides = loadPeptides("peptides.txt");
 		generateFullReport(spectra, peptides);
 	}

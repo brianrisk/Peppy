@@ -263,10 +263,10 @@ public class Spectrum implements Comparable<Spectrum>{
 	
 	public static ArrayList<Spectrum> loadSpectra() {
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
-		if (Properties.spectraFile.isFile()) {
-			spectra =  loadSpectra(Properties.spectraFile);
+		if (Properties.spectraDirectoryOrFile.isFile()) {
+			spectra =  loadSpectra(Properties.spectraDirectoryOrFile);
 		} else {
-			loadSpectraFromFolder(Properties.spectraFile, spectra );
+			loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra );
 		}
 		for (int i = 0; i < spectra.size(); i++) {
 			spectra.get(i).setId(i);

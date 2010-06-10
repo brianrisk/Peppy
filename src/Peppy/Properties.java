@@ -48,10 +48,10 @@ public class Properties {
 	public static int maximumNumberOfMatchesForASpectrum = 1;
 	
 	//This could be a directory or a file
-	public static File sequenceFile = new File("sequences");
+	public static File sequenceDirectoryOrFile = new File("sequences");
 	
 	//This could be a directory or a file
-	public static File spectraFile = new File("spectra");
+	public static File spectraDirectoryOrFile = new File("spectra");
 	
 	//FASTA files can be either DNA or amino acid sequences
 	public static boolean isSequenceFileDNA = true;
@@ -107,11 +107,11 @@ public class Properties {
 		if (propertyName.equals("maximumNumberOfMatchesForASpectrum")) {
 			maximumNumberOfMatchesForASpectrum = Integer.valueOf(propertyValue);
 		}
-		if (propertyName.equals("sequenceFile")) {
-			sequenceFile = new File(propertyValue);
+		if (propertyName.equals("sequenceDirectoryOrFile")) {
+			sequenceDirectoryOrFile = new File(propertyValue);
 		}
-		if (propertyName.equals("spectraFile")) {
-			spectraFile = new File(propertyValue);
+		if (propertyName.equals("spectraDirectoryOrFile")) {
+			spectraDirectoryOrFile = new File(propertyValue);
 		}
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);

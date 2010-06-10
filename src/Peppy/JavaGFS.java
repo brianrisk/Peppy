@@ -64,7 +64,7 @@ public class JavaGFS {
 			U.p("Arg 0: The file path directory to the folder which contains the spectra.");
 			U.p("Arg 1: The file path directory to the FASTA protein database file.");
 		} else {
-			Properties.spectraFile = new File(args[0]);
+			Properties.spectraDirectoryOrFile = new File(args[0]);
 			
 			//setting properties
 			Properties.maximumNumberOfMatchesForASpectrum = 1;
@@ -99,7 +99,7 @@ public class JavaGFS {
 		printGreeting();	
 
 //		Properties.spectraFile = new File("spectra human677");
-		Properties.spectraFile = new File("spectra USP");
+		Properties.spectraDirectoryOrFile = new File("spectra USP");
 //		Properties.spectraFile = new File("spectra problem");
 		
 		//setting properties
@@ -145,7 +145,7 @@ public class JavaGFS {
 		U.p("loaded " +spectra.size() + " spectra.");
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
 		ArrayList<SpectrumPeptideMatch> matches = new ArrayList<SpectrumPeptideMatch>();
@@ -293,7 +293,7 @@ public class JavaGFS {
 	@SuppressWarnings("unused")
 	private static void exportPeptideList() {
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
 		try {
 			//loop through each sequence in the sequences ArrayList
