@@ -2,10 +2,15 @@ package Utilities;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
@@ -119,5 +124,27 @@ public class U {
 	public static void p(int o) {System.out.println(o);}
 	public static void p(char o) {System.out.println(o);}
 	public static void p() {System.out.println();}
+	
+	public static void copyfile(File sourceFile, File destinationFile){
+	    try{
+	      InputStream in = new FileInputStream(sourceFile);
+	      OutputStream out = new FileOutputStream(destinationFile);
+
+	      byte[] buffer = new byte[1024];
+	      int len;
+	      while ((len = in.read(buffer)) > 0){
+	        out.write(buffer, 0, len);
+	      }
+	      in.close();
+	      out.close();
+	    }
+	    catch(FileNotFoundException ex){
+	      System.out.println(ex.getMessage() + " in the specified directory.");
+	      System.exit(0);
+	    }
+	    catch(IOException e){
+	      System.out.println(e.getMessage());      
+	    }
+	  }
 
 }

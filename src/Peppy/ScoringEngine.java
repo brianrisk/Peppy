@@ -24,7 +24,7 @@ public class ScoringEngine {
 	 * threads wait.  Let's not make them wait.  Let's let them do their work as fast as they
 	 * can and then merge all the match ArrayLists together at the end.
 	 */
-	ArrayList<ArrayList<SpectrumPeptideMatch>> matches;
+	ArrayList<ArrayList<Match>> matches;
 	
 	ArrayList<Thread> threads = new ArrayList<Thread>(Properties.numberOfThreads);
 	
@@ -41,7 +41,7 @@ public class ScoringEngine {
 	public ScoringEngine(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
 		this.spectra = spectra;	
 		this.sequence = sequence;
-		matches = new ArrayList<ArrayList<SpectrumPeptideMatch>>(spectra.size());
+		matches = new ArrayList<ArrayList<Match>>(spectra.size());
 		
 		//here we make sure we don't use more threads than we have spectra
 		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();
@@ -60,7 +60,7 @@ public class ScoringEngine {
 	 * @param matchesForOneSpectrum
 	 * @return the next Spectrum on the list.  Null if there are no more.
 	 */
-	public synchronized Spectrum getNextSpectrum(ArrayList<SpectrumPeptideMatch> matchesForOneSpectrum) {
+	public synchronized Spectrum getNextSpectrum(ArrayList<Match> matchesForOneSpectrum) {
 		matches.add(matchesForOneSpectrum);
 		Spectrum out =  null;
 		if (spectrumIndex < spectra.size()) {
@@ -88,7 +88,7 @@ public class ScoringEngine {
 	 * "Yo ScoringThreads, I'm happy for you and I'ma let you finish"
 	 * @return accumulated 
 	 */
-	public ArrayList<SpectrumPeptideMatch> getMatches() {
+	public ArrayList<Match> getMatches() {
 		boolean going = true;
 		while (going) {
 			for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
@@ -109,7 +109,7 @@ public class ScoringEngine {
 		int size = 0;
 		for (int i = 0; i < matches.size(); i++) {size += matches.get(i).size();}
 		//combine matches into result and return
-		ArrayList<SpectrumPeptideMatch> out = new ArrayList<SpectrumPeptideMatch>(size);
+		ArrayList<Match> out = new ArrayList<Match>(size);
 		for (int i = 0; i < matches.size(); i++) {
 			out.addAll(matches.get(i));
 		}

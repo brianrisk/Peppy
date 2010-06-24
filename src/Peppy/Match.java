@@ -3,14 +3,20 @@ package Peppy;
 import HMMScore.HMMClass;
 	import Utilities.U;
 
-public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
+/**
+ * An object which contains scoring mechanisms to evaluate a spectrum/peptide match.
+ * @author Brian Risk
+ *
+ */
+public class Match implements Comparable<Match>{
 	
 	private double score = 0.0;
-	private double scoreMSMSFit = 0.0;
-	private double MSMSFitScoreRatio = 0.0;
-	private int MSMSFitRank = -1;
+	private double scoreTandemFit = 0.0;
+	private double tandemFitScoreRatio = 0.0;
+	private int tandemFitRank = -1;
 	private double scoreHMM = 0.0;
 	private double eValue;
+	public int ionMatchTally = 0;
 	
 	private Spectrum spectrum;
 	private Peptide peptide;
@@ -18,9 +24,9 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	
 	final static double useAcidThreshold = 100.0;
 	
-	public final static int DEFAULT_SCORE_MSMS_FIT = 0;
+	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
 	public final static int DEFAULT_SCORE_HMM = 1;
-	private static int defaultScore = DEFAULT_SCORE_MSMS_FIT;
+	private static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
 //	private static int defaultScore = DEFAULT_SCORE_HMM;
 	
 	public final static int SORT_BY_DEFAULT = 0;
@@ -28,11 +34,11 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	public final static int SORT_BY_LOCUS = 2;
 	public final static int SORT_BY_SCORE_RATIO = 3;
 	public final static int SORT_BY_HMM = 4;
-	public final static int SORT_BY_MSMSFIT = 5;
+	public final static int SORT_BY_TANDEM_FIT = 5;
 	public final static int SORT_BY_E_VALUE = 6;
 	private static int sortParameter = SORT_BY_DEFAULT;
 	
-	public SpectrumPeptideMatch(Spectrum spectrum, Peptide peptide, Sequence sequence) {
+	public Match(Spectrum spectrum, Peptide peptide, Sequence sequence) {
 		this.spectrum = spectrum;
 		this.peptide = peptide;
 		this.sequence = sequence;
@@ -40,16 +46,15 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 	
 	public void calculateScore() {
-//		calculateMSMSFit();
-		if (defaultScore == DEFAULT_SCORE_MSMS_FIT) {
-			score = calculateMSMSFit();
+		if (defaultScore == DEFAULT_SCORE_TANDEM_FIT) {
+			score = calculateTandemFit();
 		} else
 		if (defaultScore == DEFAULT_SCORE_HMM) {
 			score = calculateHMM();
 		}
 	}
 	
-	public double calculateMSMSFit() {
+	public double calculateTandemFit() {
 		String peptideString = peptide.getAcidSequence();
 
 		int i;
@@ -103,7 +108,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 
 		//if 0 matches so far, just get out.
 		if (!atLeastOneMatch) {
-			scoreMSMSFit = 0.0;
+			scoreTandemFit = 0.0;
 			return 0.0;
 		}
 			
@@ -137,17 +142,31 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		
 		//if 0 matches so far, just get out.
 		if (!atLeastOneMatch) {
-			scoreMSMSFit = 0.0;
+			scoreTandemFit = 0.0;
 			return 0.0;
 		}
 		
 		//find out final tally
 		double score = 0.0;
+		boolean yIonTrue;
+		double amountToAdd;
 		for (i = 0; i < peptideString.length(); i++) {
-			if (yIonMatchesWithHighestIntensity[i] > 0.0) score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-			if (bIonMatchesWithHighestIntensity[i] > 0.0) score += Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+			yIonTrue = yIonMatchesWithHighestIntensity[i] > 0.0;
+			if (yIonTrue) {
+				score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				ionMatchTally++;
+			}
+			if (bIonMatchesWithHighestIntensity[i] > 0.0) {
+				//Let's try scaling the b ion weight by a bit
+				amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				//want to diminish this if this peak is already a yIon
+				if (yIonTrue) amountToAdd *= 1.2;
+				score += amountToAdd;
+				ionMatchTally++;
+			}
 		}
-		scoreMSMSFit = score;
+		
+		scoreTandemFit = score;
 		return score;
 	}
 	
@@ -157,23 +176,23 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		return scoreHMM;
 	}
 
-	public int compareTo(SpectrumPeptideMatch match) {
+	public int compareTo(Match match) {
 		if (sortParameter == SORT_BY_HMM) {
 			//want to sort from greatest to least
 			if (scoreHMM > match.getScoreHMM()) return -1;
 			if (scoreHMM < match.getScoreHMM()) return  1;
 			return 0;
 		} else
-		if (sortParameter == SORT_BY_MSMSFIT) {
+		if (sortParameter == SORT_BY_TANDEM_FIT) {
 			//want to sort from greatest to least
-			if (scoreMSMSFit > match.getScoreMSMSFit()) return -1;
-			if (scoreMSMSFit < match.getScoreMSMSFit()) return  1;
+			if (scoreTandemFit > match.getScoreTandemFit()) return -1;
+			if (scoreTandemFit < match.getScoreTandemFit()) return  1;
 			return 0;
 		} else
 		if (sortParameter == SORT_BY_SCORE_RATIO) {
 			//want to sort from greatest to least
-			if (MSMSFitScoreRatio > match.getMSMSFitScoreRatio()) return -1;
-			if (MSMSFitScoreRatio < match.getMSMSFitScoreRatio()) return  1;
+			if (tandemFitScoreRatio > match.getTandemFitScoreRatio()) return -1;
+			if (tandemFitScoreRatio < match.getTandemFitScoreRatio()) return  1;
 			return 0;
 		} else
 		if (sortParameter == SORT_BY_LOCUS) {
@@ -192,7 +211,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		if (sortParameter == SORT_BY_SPECTRUM_ID) {
 			if (spectrum.getId() < match.getSpectrum().getId()) return -1;
 			if (spectrum.getId() > match.getSpectrum().getId()) return  1;
-			//if spectrum is sorted, also sort by msmsfit
+			//if spectrum is sorted, also sort by tandemFit
 			if (score > match.getScore()) return -1;
 			if (score < match.getScore()) return  1;
 			return 0;
@@ -205,17 +224,17 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		}
 	}
 
-	public double getScoreMSMSFit() {
-		return scoreMSMSFit;
+	public double getScoreTandemFit() {
+		return scoreTandemFit;
 	}
 	
 	
 	/**
-	 * Returns the default score.  This could be MSMSFit or HMM.
+	 * Returns the default score.  This could be TandemFit or HMM.
 	 */
 	public double getScore() {
-		if (defaultScore == DEFAULT_SCORE_MSMS_FIT) {
-			return scoreMSMSFit;
+		if (defaultScore == DEFAULT_SCORE_TANDEM_FIT) {
+			return scoreTandemFit;
 		}
 		return scoreHMM;
 	}
@@ -231,8 +250,8 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		return spectrum;
 	}
 
-	public double getMSMSFitScoreRatio() {
-		return MSMSFitScoreRatio;
+	public double getTandemFitScoreRatio() {
+		return tandemFitScoreRatio;
 	}
 
 	/**
@@ -246,8 +265,8 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		return sequence;
 	}
 
-	public int getMSMSFitRank() {
-		return MSMSFitRank;
+	public int getTandemFitRank() {
+		return tandemFitRank;
 	}
 
 	public double getEValue() {
@@ -255,7 +274,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 
 	public static void setSortParameter(int sortParameter) {
-		SpectrumPeptideMatch.sortParameter = sortParameter;
+		Match.sortParameter = sortParameter;
 	}
 
 	/**
@@ -265,8 +284,8 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 		this.spectrum = spectrum;
 	}
 
-	public void setMSMSFitScoreRatio(double mSMSFitScoreRatio) {
-		MSMSFitScoreRatio = mSMSFitScoreRatio;
+	public void setTandemFitScoreRatio(double tandemFitScoreRatio) {
+		this.tandemFitScoreRatio = tandemFitScoreRatio;
 	}
 
 	/**
@@ -277,8 +296,8 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 
 	
-	public void setMSMSFitRank(int mSMSFitRank) {
-		MSMSFitRank = mSMSFitRank;
+	public void setTandemFitRank(int mSMSFitRank) {
+		tandemFitRank = mSMSFitRank;
 	}
 
 	public void setEValue(double eValue) {
@@ -286,7 +305,7 @@ public class SpectrumPeptideMatch implements Comparable<SpectrumPeptideMatch>{
 	}
 
 	public String toString() {
-		return peptide.getAcidSequence() + " " + scoreMSMSFit + " " + peptide.getMass();
+		return peptide.getAcidSequence() + " " + scoreTandemFit + " " + peptide.getMass();
 	}
 
 }

@@ -6,7 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import Peppy.SpectrumPeptideMatch;
+import Peppy.Peptide;
+import Peppy.Match;
 import Utilities.U;
 
 /**
@@ -20,13 +21,11 @@ import Utilities.U;
 public class MatchContainer implements Comparable<MatchContainer>{
 	
 	private boolean isTrue;
-	private SpectrumPeptideMatch match;
+	private Match match;
+	private String correctAcidSequence;
+	private Match trueMatch = null;
 	
-	public MatchContainer(SpectrumPeptideMatch match, boolean isTrue) {
-		this.isTrue = isTrue;
-		this.match = match;
-	}
-	
+
 	/**
 	 * This determines if it is true by going finding the spectrum file
 	 * for match and then locating the correct peptide sequence file.
@@ -36,7 +35,8 @@ public class MatchContainer implements Comparable<MatchContainer>{
 	 * 
 	 * @param match
 	 */
-	public MatchContainer(SpectrumPeptideMatch match) {
+	public MatchContainer(Match match) {
+		this.match = match;
 		//find the file for the correct peptide
 		File spectrumFile = match.getSpectrum().getFile();
 		File testFolder = spectrumFile.getParentFile().getParentFile();
@@ -44,6 +44,7 @@ public class MatchContainer implements Comparable<MatchContainer>{
 		File peptideFile = new File(peptideFolder, spectrumFile.getName());
 		
 		//load in the correct peptide string
+		boolean validPeptideFile = true;
 		String peptideString = "";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(peptideFile));
@@ -52,24 +53,36 @@ public class MatchContainer implements Comparable<MatchContainer>{
 			//close;
 			br.close();
 		} catch (FileNotFoundException e) {
+			validPeptideFile = false;
 			e.printStackTrace();
 		} catch (IOException e) {
+			validPeptideFile = false;
 			e.printStackTrace();
 		}
 		
 		//testing that we've got a valid peptide file
-		boolean haveAnswer = true;
 		if (peptideString == null) {
-			haveAnswer = false;
+			validPeptideFile = false;
 		}
 		peptideString = peptideString.trim();
 		if (peptideString.equals("")) {
-			haveAnswer = false;
+			validPeptideFile = false;
 		}
 		
 		//test equality
-		if (haveAnswer) {
-			isTrue = match.getPeptide().getAcidSequence().equals(peptideString);
+		if (validPeptideFile) {
+			correctAcidSequence = peptideString;
+			isTrue = match.getPeptide().equals(peptideString);
+			
+			//If this match is not the true match:
+			//this is in case the peptide is not present in the database
+			//also in the off case the score is equal
+			if(!isTrue) {
+				trueMatch = new Match(match.getSpectrum(), new Peptide(correctAcidSequence), null);
+				if (trueMatch.getScoreTandemFit() == match.getScoreTandemFit()) {
+					isTrue = true;
+				}
+			}
 		} else {
 			U.p("ERROR: there was not a valid peptide file at " + peptideFile.getName());
 		}
@@ -77,13 +90,19 @@ public class MatchContainer implements Comparable<MatchContainer>{
 	
 	public double getEValue() {return match.getEValue();}
 	
+	public Match getMatch() {return match;}
+	
+	public String getCorrectAcidSequence() {return correctAcidSequence;}
+	
 	public boolean isTrue() {return isTrue;}
+	
+	public Match getTrueMatch() {return trueMatch;}
 
 	public int compareTo(MatchContainer o) {
 		double difference = getEValue() - o.getEValue();
 		//we want to sort from least to greatest
-		if (difference > 0) return -1;
-		if (difference < 0) return  1;
+		if (difference > 0) return  1;
+		if (difference < 0) return -1;
 		return 0;
 	}
 	

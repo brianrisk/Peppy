@@ -16,7 +16,7 @@ import Utilities.U;
  */
 public class TextReporter {
 	
-	ArrayList<SpectrumPeptideMatch> matches;
+	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
 	ArrayList<Sequence> sequences;
 	
@@ -26,7 +26,7 @@ public class TextReporter {
 	 * @param spectra
 	 * @param sequences
 	 */
-	public TextReporter(ArrayList<SpectrumPeptideMatch> matches,
+	public TextReporter(ArrayList<Match> matches,
 			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
 		this.matches = matches;
 		this.spectra = spectra;
@@ -44,12 +44,12 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//sorting our matches by spectrum then score
-			SpectrumPeptideMatch.setSortParameter(SpectrumPeptideMatch.SORT_BY_E_VALUE);
+			Match.setSortParameter(Match.SORT_BY_E_VALUE);
 			Collections.sort(matches);
 			
 			
 			StringBuffer sb;
-			for (SpectrumPeptideMatch match: matches) {
+			for (Match match: matches) {
 //				if (match.getScoreHMM() < 1) {
 					
 					sb = new StringBuffer();
@@ -61,7 +61,7 @@ public class TextReporter {
 //					sb.append('\t');
 //					sb.append(match.getScoreHMM());
 					sb.append('\t');
-					sb.append(match.getScoreMSMSFit());
+					sb.append(match.getScoreTandemFit());
 //					sb.append('\t');
 //					sb.append(match.getMSMSFitScoreRatio());
 //					sb.append('\t');

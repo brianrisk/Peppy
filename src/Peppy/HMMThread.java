@@ -5,10 +5,10 @@ import java.util.Collections;
 
 public class HMMThread implements Runnable {
 	
-	SpectrumPeptideMatch match;
+	Match match;
 	HMMScorer scorer;
 	
-	public HMMThread(SpectrumPeptideMatch match, HMMScorer scorer) {
+	public HMMThread(Match match, HMMScorer scorer) {
 		this.match = match;
 		this.scorer = scorer;
 	}

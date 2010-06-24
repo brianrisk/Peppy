@@ -16,7 +16,7 @@ import Utilities.U;
  */
 public class HTMLReporter {
 	
-	ArrayList<SpectrumPeptideMatch> matches;
+	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
 	ArrayList<Sequence> sequences;
 	
@@ -26,7 +26,7 @@ public class HTMLReporter {
 	 * @param spectra
 	 * @param sequences
 	 */
-	public HTMLReporter(ArrayList<SpectrumPeptideMatch> matches,
+	public HTMLReporter(ArrayList<Match> matches,
 			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
 		this.matches = matches;
 		this.spectra = spectra;
@@ -47,7 +47,7 @@ public class HTMLReporter {
 			appendFile(pw, Properties.reportWebTableHeader);
 			
 			//sorting our matches by spectrum then score
-			SpectrumPeptideMatch.setSortParameter(SpectrumPeptideMatch.SORT_BY_SPECTRUM_ID);
+			Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID);
 			Collections.sort(matches);
 			
 			/*
@@ -56,15 +56,15 @@ public class HTMLReporter {
 			 * setting    rank
 			 * set HMM Score
 			 */
-			ArrayList<SpectrumPeptideMatch> bestMatches = new ArrayList<SpectrumPeptideMatch>(spectra.size());
+			ArrayList<Match> bestMatches = new ArrayList<Match>(spectra.size());
 			
-			SpectrumPeptideMatch match = matches.get(0);
+			Match match = matches.get(0);
 			int matchRank = 1;
 			int spectrumID = match.getSpectrum().getId();
 			if (matches.size() > 1) {
-				match.setMSMSFitScoreRatio(match.getScoreMSMSFit() / matches.get(1).getScoreMSMSFit());
+				match.setTandemFitScoreRatio(match.getScoreTandemFit() / matches.get(1).getScoreTandemFit());
 			}
-			match.setMSMSFitRank(matchRank);
+			match.setTandemFitRank(matchRank);
 			matchRank++;
 			bestMatches.add(match);
 			
@@ -75,15 +75,15 @@ public class HTMLReporter {
 					spectrumID = matches.get(i).getSpectrum().getId();
 					matchRank = 1;
 					if (i + 1 < matches.size()) {
-						match.setMSMSFitScoreRatio( match.getScoreMSMSFit() / matches.get(i + 1).getScoreMSMSFit());
+						match.setTandemFitScoreRatio( match.getScoreTandemFit() / matches.get(i + 1).getScoreTandemFit());
 					}
 				}
-				match.setMSMSFitRank(matchRank);
+				match.setTandemFitRank(matchRank);
 				matchRank++;
 			}
 			
 			//sort our best matches by score ratio
-			SpectrumPeptideMatch.setSortParameter(SpectrumPeptideMatch.SORT_BY_SCORE_RATIO);
+			Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
 			Collections.sort(bestMatches);
 			
 			for (int i = 0; i < bestMatches.size(); i++) {
@@ -127,7 +127,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getMSMSFitScoreRatio());
+				sb.append(match.getTandemFitScoreRatio());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -162,14 +162,14 @@ public class HTMLReporter {
 		}
 	}
 	
-	public void generateNeighborhoodReport(SpectrumPeptideMatch match, int index) {
+	public void generateNeighborhoodReport(Match match, int index) {
 		File neighborhoodDirectory = new File(Properties.reportDirectory, "neighborhoods");
 		File indexFile = new File(neighborhoodDirectory, index + Properties.reportWebSuffix);
 		
 		//find all matches that are from the same chromosome
-		ArrayList<SpectrumPeptideMatch> theseMatches = new ArrayList<SpectrumPeptideMatch>();
+		ArrayList<Match> theseMatches = new ArrayList<Match>();
 		for (int i = 0; i < matches.size(); i++) {
-			SpectrumPeptideMatch thisMatch = matches.get(i);
+			Match thisMatch = matches.get(i);
 			if (thisMatch.getSequence() != match.getSequence()) continue;
 			if (Math.abs(thisMatch.getPeptide().getIndex() - match.getPeptide().getIndex()) > Properties.locusNeighborhood) continue;
 			theseMatches.add(thisMatch);
@@ -210,7 +210,7 @@ public class HTMLReporter {
 		
 		File sequenceDirectory = new File(Properties.reportDirectory, "sequences");
 		File indexFile = new File(sequenceDirectory, sequence.getId() + Properties.reportWebSuffix);
-		ArrayList<SpectrumPeptideMatch> theseMatches = getMatchesWithSequence(sequence, matches);
+		ArrayList<Match> theseMatches = getMatchesWithSequence(sequence, matches);
 		try {
 			sequenceDirectory.mkdirs();
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
@@ -219,9 +219,9 @@ public class HTMLReporter {
 			//print the best match for each spectrum
 			pw.println("<h1>Best match for each spectrum in " + sequence.getSequenceFile().getName() + "</h1>");
 			appendFile(pw, Properties.reportWebTableHeader);
-			ArrayList<SpectrumPeptideMatch> bestMatches = new ArrayList<SpectrumPeptideMatch>();
+			ArrayList<Match> bestMatches = new ArrayList<Match>();
 			for (int i = 0; i < spectra.size(); i++) {
-				ArrayList<SpectrumPeptideMatch> specific = getMatchesWithSpectrum(spectra.get(i), theseMatches);
+				ArrayList<Match> specific = getMatchesWithSpectrum(spectra.get(i), theseMatches);
 				Collections.sort(specific);
 				if (specific.size() > 0)
 					bestMatches.add(specific.get(0));
@@ -247,7 +247,7 @@ public class HTMLReporter {
 	public void generateSpectrumReport(Spectrum spectrum) {
 		File sequenceDirectory = new File(Properties.reportDirectory, "spectra");
 		File indexFile = new File(sequenceDirectory, spectrum.getId() + Properties.reportWebSuffix);
-		ArrayList<SpectrumPeptideMatch> theseMatches = getMatchesWithSpectrum(spectrum, matches);
+		ArrayList<Match> theseMatches = getMatchesWithSpectrum(spectrum, matches);
 		try {
 			sequenceDirectory.mkdirs();
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
@@ -274,10 +274,10 @@ public class HTMLReporter {
 		}
 	}
 	
-	private ArrayList<SpectrumPeptideMatch> getMatchesWithSpectrum(Spectrum spectrum, ArrayList<SpectrumPeptideMatch> theseMatches) {
-		ArrayList<SpectrumPeptideMatch> out = new ArrayList<SpectrumPeptideMatch>();
+	private ArrayList<Match> getMatchesWithSpectrum(Spectrum spectrum, ArrayList<Match> theseMatches) {
+		ArrayList<Match> out = new ArrayList<Match>();
 		for (int i = 0; i < theseMatches.size(); i++) {
-			SpectrumPeptideMatch match = theseMatches.get(i);
+			Match match = theseMatches.get(i);
 			if (match.getSpectrum() == spectrum) {
 				out.add(match);
 			}
@@ -285,10 +285,10 @@ public class HTMLReporter {
 		return out;
 	}
 	
-	private ArrayList<SpectrumPeptideMatch> getMatchesWithSequence(Sequence sequence, ArrayList<SpectrumPeptideMatch> theseMatches) {
-		ArrayList<SpectrumPeptideMatch> out = new ArrayList<SpectrumPeptideMatch>();
+	private ArrayList<Match> getMatchesWithSequence(Sequence sequence, ArrayList<Match> theseMatches) {
+		ArrayList<Match> out = new ArrayList<Match>();
 		for (int i = 0; i < theseMatches.size(); i++) {
-			SpectrumPeptideMatch match = theseMatches.get(i);
+			Match match = theseMatches.get(i);
 			if (match.getSequence() == sequence) {
 				out.add(match);
 			}
@@ -296,7 +296,7 @@ public class HTMLReporter {
 		return out;
 	}
 
-	private String getTableRow(SpectrumPeptideMatch match, int index) {
+	private String getTableRow(Match match, int index) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<tr>");
 		
@@ -334,7 +334,7 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append(match.getMSMSFitRank());
+		sb.append(match.getTandemFitRank());
 		sb.append("</td>");
 		
 		return sb.toString();

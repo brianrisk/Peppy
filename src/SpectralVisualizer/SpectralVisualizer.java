@@ -27,7 +27,9 @@ import Utilities.U;
 public class SpectralVisualizer {
 	
 	static Color yIonColor = Color.yellow;
-	static Color bIonColor = Color.blue;
+	static Color bIonColor = Color.cyan;
+	static Color noIonColor = Color.gray;
+	static Color bothIonColor = Color.green;
 	
 	public static void main(String args[]) {
 		U.printUserDirectory();
@@ -105,7 +107,19 @@ public class SpectralVisualizer {
 		return peptides;
 	}
 	
+	/**
+	 * defaults to drawing the ion labels.
+	 * @param spectrum
+	 * @param width
+	 * @param height
+	 * @param dest
+	 * @throws IOException
+	 */
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest) throws IOException {
+		drawSpectrum(spectrum, width, height, dest, true);
+	}
+	
+	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels) throws IOException {
 		
 		int xLoc, yLoc;
 		
@@ -128,9 +142,9 @@ public class SpectralVisualizer {
 			xLoc = (int) (peak.getMass()  * width / maxValue);
 			yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
 			g.drawLine(xLoc, yLoc, xLoc, height);
-			if (!peak.getColor().equals(Color.gray)) {
+			if (drawLabels && !peak.getColor().equals(Color.gray)) {
 				if (yLoc < 10) yLoc += 10;
-				g.drawString("" + peak.getMass(), xLoc, yLoc);
+				g.drawString("" + peak.getIntensity(), xLoc, yLoc);
 			}
 		}
 		ImageIO.write(bdest,"JPG",dest);
@@ -140,6 +154,12 @@ public class SpectralVisualizer {
 	
 	public static void markMatchingIons(Spectrum spectrum, Peptide peptide) {
 		String peptideString = peptide.getAcidSequence();
+		
+		//initialize all peaks to be gray
+		ArrayList<Peak> peaks = spectrum.getPeaks();
+		for (Peak peak: peaks) {
+			peak.setColor(noIonColor);
+		}
 
 		int i;
 		double theoreticalPeakMass, peakMass;
@@ -208,7 +228,11 @@ public class SpectralVisualizer {
 			if (seqIndex == peptideLengthMinusOne) break;
 			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
 				if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
-					spectrum.getPeak(peakIndex).setColor(bIonColor);
+					if (spectrum.getPeak(peakIndex).getColor().equals(yIonColor)) {
+						spectrum.getPeak(peakIndex).setColor(bothIonColor);
+					} else {
+						spectrum.getPeak(peakIndex).setColor(bIonColor);
+					}
 				}
 			}
 			

@@ -47,9 +47,8 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 		double xMean = spectrum1.getCalculatedAverageIntensity();
 		double yMean = spectrum2.getCalculatedAverageIntensity();	
 		while (index1 < peaks1.size() && index2 < peaks2.size()) {
-			//making sure we're not out of bounds
-			if (index1 < peaks1.size()) peak1 = peaks1.get(index1);
-			if (index2 < peaks2.size()) peak2 = peaks2.get(index2);
+			peak1 = peaks1.get(index1);
+			peak2 = peaks2.get(index2);
 			
 			if (peak1.getMass() - peak2.getMass() < delta) {
 				if (peak1.getIntensity() > xMean && peak2.getIntensity() > yMean) peaksInCommon++;

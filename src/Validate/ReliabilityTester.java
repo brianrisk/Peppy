@@ -9,7 +9,7 @@ import Peppy.ProteinDigestion;
 import Peppy.ScoringThread;
 import Peppy.Sequence;
 import Peppy.Spectrum;
-import Peppy.SpectrumPeptideMatch;
+import Peppy.Match;
 import Utilities.U;
 
 
@@ -23,6 +23,21 @@ import Utilities.U;
  */
 public class ReliabilityTester {
 	
+	public static void main(String slwen[]) {
+		U.p("testing reliablity.");
+//		ReliabilityTester.runTheGamut("USP");
+//		ReliabilityTester.runTheGamut("ecoli");
+//		ReliabilityTester.testReliability("aurum");
+//		ReliabilityTester.testReliability("human");
+//		ReliabilityTester.testReliability("ecoli");
+		ReliabilityTester.testReliability("USP");
+//		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
+//		ReliabilityTester.exportPeptidesInCommonWithDatabase("human");
+//		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
+//		ReliabilityTester.makeSureWeAreProperlyDigestingTheGenome("ecoli");
+		U.p("done!");
+	}
+	
 	public static void runTheGamut(String species) {
 		U.startStopwatch();
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
@@ -30,46 +45,59 @@ public class ReliabilityTester {
 		ArrayList<Peptide> correctPeptides = new  ArrayList<Peptide>();
 		ArrayList<String> correctPeptideNames = new ArrayList<String>();
 		loadCorrectPeptides(species,correctPeptides,correctPeptideNames );
-		double increment = 0.02;
+		double increment = 0.05;
 		double thresholdMin = 0.2;
 		double thresholdMax = 0.7;
-		double powerMin = 0.0;
+		double powerMin = 0.2;
 		double powerMax = 0.5;
 		int score;
 		int bestScore = 0;
 		double bestPower = 0.0;
 		double bestThreshold = 0.0;
+		boolean bestHighIntensityCleaning = false;
+		boolean bestLocalMaximaCleaning = false;
 		for (double threshold = thresholdMin; threshold < thresholdMax; threshold += increment) {
 			U.p(threshold);
 			for (double power = powerMin; power < powerMax; power += increment) {
-				Properties.peakDifferenceThreshold = threshold;
-				Properties.peakIntensityExponent = power;
-				score = getNumberOfTopRankingMatches(species, spectra, peptides, correctPeptides, correctPeptideNames);
-				if (score > bestScore) {
-					bestScore = score;
-					bestPower = power;
-					bestThreshold = threshold;
+				for (int boolcount = 0; boolcount < 2; boolcount++) {
+					for (int boolcount2 = 0; boolcount2 < 2; boolcount2++) {
+						Properties.highIntensityCleaning = (boolcount == 0);
+						Properties.localMaximaCleaning = (boolcount2 == 0);
+						Properties.peakDifferenceThreshold = threshold;
+						Properties.peakIntensityExponent = power;
+						score = getNumberOfTopRankingMatches(species, spectra, peptides, correctPeptides, correctPeptideNames);
+						if (score > bestScore) {
+							bestScore = score;
+							bestPower = power;
+							bestThreshold = threshold;
+							bestHighIntensityCleaning = (boolcount == 0);
+							bestLocalMaximaCleaning = (boolcount2 == 0);
+						}
+					}
 				}
 			}	
 			U.p("SO FAR: Best Score: " + bestScore + " Best Threshold: " + bestThreshold + " Best Power: " + bestPower);
+			U.p("Cleaning: " + bestHighIntensityCleaning + ", " + bestLocalMaximaCleaning);
 			U.p("Percent remaining is: " + (threshold - thresholdMin)  * 100 / (thresholdMax - thresholdMin));
 		}
 		U.p("Best Score: " + bestScore);
 		U.p("Best Threshold: " + bestThreshold);
 		U.p("Best Power: " + bestPower);
+		U.p("Best bestHighIntensityCleaning:" + bestHighIntensityCleaning);
+		U.p("Best bestLocalMaximaCleaning:" + bestLocalMaximaCleaning);
 		U.stopStopwatch();
 	}
 	
 	public static int getNumberOfTopRankingMatches(String species, ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides, ArrayList<Peptide> correctPeptides, ArrayList<String> correctPeptideNames) {
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		int out = 0;
 		for (int i = 0; i < correctPeptides.size(); i++) {	
 			//We've loaded the string.  Now see if we have it as a match to the given spectrum
-			ArrayList<SpectrumPeptideMatch> spectrumMatches = getMatchesWithSpectrumName(correctPeptideNames.get(i), matches);
+			ArrayList<Match> spectrumMatches = getMatchesWithSpectrumName(correctPeptideNames.get(i), matches);
 			if (spectrumMatches.size() == 0) continue;
 			//We're sorting so that if the peptide is in our list of matches, we know how highly it is ranked.
 			Collections.sort(spectrumMatches);
-			SpectrumPeptideMatch topMatch = spectrumMatches.get(0);
+			Match topMatch = spectrumMatches.get(0);
 			if (topMatch.getPeptide().getAcidSequence().equals(correctPeptides.get(i).getAcidSequence())) {
 				out++;
 			}
@@ -132,20 +160,20 @@ public class ReliabilityTester {
 		//loading peptides from a protein database
 //		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
 		
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		//Initialize HMM Score
-		U.p("testing HMM here!");
-		HMMScore.HMMClass.HmmSetUp();
-		for (SpectrumPeptideMatch match: matches) {
-			match.calculateHMM();
-		}
-		SpectrumPeptideMatch.setSortParameter(SpectrumPeptideMatch.SORT_BY_HMM);
-		
-		Collections.sort(matches);
-		for (SpectrumPeptideMatch match: matches) {
-			U.p(match.getScoreHMM());
-		}
+//		U.p("testing HMM here!");
+//		HMMScore.HMMClass.HmmSetUp();
+//		for (SpectrumPeptideMatch match: matches) {
+//			match.calculateHMM();
+//		}
+//		SpectrumPeptideMatch.setSortParameter(SpectrumPeptideMatch.SORT_BY_HMM);
+//		
+//		Collections.sort(matches);
+//		for (SpectrumPeptideMatch match: matches) {
+//			U.p(match.getScoreHMM());
+//		}
 		
 		//go through each file in our peptides folder
 		File peptideFolder = new File("/Users/risk2/PeppyOverflow/tests/" + species + "/peptides");
@@ -194,20 +222,20 @@ public class ReliabilityTester {
 			//This assumes only one spectrum per file, but that should be the case with these test cases.
 			Spectrum spectrum = Spectrum.loadSpectra(spectrumFile).get(0);
 			Sequence sequence = new Sequence(new File("not important")); 
-			SpectrumPeptideMatch realMatch = new SpectrumPeptideMatch(spectrum, peptide, sequence);
+			Match realMatch = new Match(spectrum, peptide, sequence);
 //			realMatch.calculateHMM();
 			matches.add(realMatch);
 			
 
 			//We've loaded the string.  Now see if we have it as a match to the given spectrum
-			ArrayList<SpectrumPeptideMatch> spectrumMatches = getMatchesWithSpectrumName(peptideFiles[peptideFileIndex].getName(), matches);
+			ArrayList<Match> spectrumMatches = getMatchesWithSpectrumName(peptideFiles[peptideFileIndex].getName(), matches);
 			//We're sorting so that if the peptide is in our list of matches, we know how highly it is ranked.
 			Collections.sort(spectrumMatches);
 			boolean matchFound = false;
 			int maxIndex = Properties.maximumNumberOfMatchesForASpectrum;
 			if (spectrumMatches.size() < maxIndex) maxIndex = spectrumMatches.size();
 			for (int spectrumIndex = 0; spectrumIndex < maxIndex; spectrumIndex++) {
-				SpectrumPeptideMatch topMatch = spectrumMatches.get(spectrumIndex);
+				Match topMatch = spectrumMatches.get(spectrumIndex);
 				if (topMatch.getPeptide().getAcidSequence().equals(peptideString)) {
 					numberFound++;
 					rankTotals[spectrumIndex]++;
@@ -237,10 +265,10 @@ public class ReliabilityTester {
 	}
 	
 	
-	private static ArrayList<SpectrumPeptideMatch> getMatchesWithSpectrumName(String spectrumName, ArrayList<SpectrumPeptideMatch> theseMatches) {
-		ArrayList<SpectrumPeptideMatch> out = new ArrayList<SpectrumPeptideMatch>();
+	private static ArrayList<Match> getMatchesWithSpectrumName(String spectrumName, ArrayList<Match> theseMatches) {
+		ArrayList<Match> out = new ArrayList<Match>();
 		for (int i = 0; i < theseMatches.size(); i++) {
-			SpectrumPeptideMatch match = theseMatches.get(i);
+			Match match = theseMatches.get(i);
 			if (match.getSpectrum().getFile().getName().equals(spectrumName)) {
 				out.add(match);
 			}
@@ -312,6 +340,7 @@ public class ReliabilityTester {
 	 * @param species
 	 */
 	public static void exportHighScoringPeptides(String species) {
+		U.p("finding high scoring peptides");
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
 		U.p("loaded " +spectra.size() + " spectra.");
@@ -320,7 +349,7 @@ public class ReliabilityTester {
 		ArrayList<Sequence> sequences = Sequence.loadSequences(new File("/Users/risk2/PeppyOverflow/tests/" + species + "/sequences"));
 		
 		//initialize our ArrayList of matches
-		ArrayList<SpectrumPeptideMatch> matches = new ArrayList<SpectrumPeptideMatch>();
+		ArrayList<Match> matches = new ArrayList<Match>();
 
 		//loop through each sequence in the sequences ArrayList
 		for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
@@ -331,7 +360,7 @@ public class ReliabilityTester {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/Users/risk2/PeppyOverflow/tests/" + species + "/highScoringPeptides.txt")));
 			//loop through each sequence in the sequences ArrayList
 			for (int matchIndex = 0; matchIndex < matches.size(); matchIndex++) {
-				SpectrumPeptideMatch match = matches.get(matchIndex);		
+				Match match = matches.get(matchIndex);		
 				pw.println(match.getPeptide().getAcidSequence());
 			}
 			pw.flush();
@@ -342,6 +371,7 @@ public class ReliabilityTester {
 	}
 	
 	public static void exportHighScoringPeptidesFromSwissProt(String species) {
+		U.p("finding high scoring peptides from swiss prot");
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
 		U.p("loaded " +spectra.size() + " spectra.");
@@ -351,13 +381,13 @@ public class ReliabilityTester {
 		
 		//keep the top 20 matches for each spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 20;
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/Users/risk2/PeppyOverflow/tests/" + species + "/highScoringPeptides.txt")));
 
 			//loop through each sequence in the sequences ArrayList
-			for (SpectrumPeptideMatch match: matches) {	
+			for (Match match: matches) {	
 				pw.println(match.getPeptide().getAcidSequence());
 			}
 			pw.flush();

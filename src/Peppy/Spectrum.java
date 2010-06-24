@@ -358,8 +358,12 @@ public class Spectrum implements Comparable<Spectrum>{
 	 * @return
 	 */
 	public static ArrayList<Spectrum> loadSpectraFromFolder(String fileName) {
-		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
 		File inFile = new File(fileName);
+		return loadSpectraFromFolder(inFile);
+	}
+	
+	public static ArrayList<Spectrum> loadSpectraFromFolder(File inFile) {
+		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
 		loadSpectraFromFolder(inFile, spectra);
 		return spectra;
 	}

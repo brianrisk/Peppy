@@ -12,7 +12,7 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.Spectrum;
-import Peppy.SpectrumPeptideMatch;
+import Peppy.Match;
 import Utilities.U;
 
 public class CreateTestSuite {
@@ -35,9 +35,63 @@ public class CreateTestSuite {
 	public static void main(String[] args) {
 		//Opening message
 		U.p("Creating the necessary files for our USP test suite");
+//		createSuiteFromUSPDatabase();
+		createSuiteFromTopFive();
 		
+		U.p("Done!");
+	}
+	
+	/**
+	 * finds five peptide matches for each spectrum.  Goes through and finds which
+	 * of these matches have peptides from the USP 50 database.  Those go into our
+	 * test set.
+	 */
+	public static void createSuiteFromTopFive() {
 		//set our properties
-		Properties.spectraDirectoryOrFile = new File("spectra USP");
+		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
+		Properties.maximumNumberOfMatchesForASpectrum = 5;
+		
+		//Load our spectra
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+
+		//load the peptides from the database
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		
+		//load the correct peptide set
+		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		
+		//Get the matches
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		
+		//save to appropriate files
+		for (Match match: matches) {
+			try {
+				for (Peptide peptide: correctPeptides) {
+					if (match.getPeptide().getAcidSequence().equals(peptide.getAcidSequence())) {
+						File peptideFile = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/" + match.getSpectrum().getFile().getName());
+						PrintWriter pw;
+						pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
+						pw.println(match.getPeptide().getAcidSequence());
+						pw.flush();
+						pw.close();
+						
+						//copy the spectrum file
+						File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
+						File spectraFile = new File(spectraFolder, match.getSpectrum().getFile().getName());
+						spectraFolder.mkdirs();
+						U.copyfile(match.getSpectrum().getFile(), spectraFile);
+					}
+				}					
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void createSuiteFromUSPDatabase() {
+		//set our properties
+		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//Load our spectra
@@ -45,27 +99,30 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		//save to appropriate files
-		for (SpectrumPeptideMatch match: matches) {
-			File peptideFile = new File("tests/USP/peptides/" + match.getSpectrum().getFile().getName());
-			PrintWriter pw;
+		for (Match match: matches) {
 			try {
+				File peptideFile = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/" + match.getSpectrum().getFile().getName());
+				PrintWriter pw;
 				pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
 				pw.println(match.getPeptide().getAcidSequence());
 				pw.flush();
 				pw.close();
+				
+				//copy the spectrum file
+				File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
+				File spectraFile = new File(spectraFolder, match.getSpectrum().getFile().getName());
+				spectraFolder.mkdirs();
+				U.copyfile(match.getSpectrum().getFile(), spectraFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		U.p("Done!");
-
 	}
 
 }

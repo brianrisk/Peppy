@@ -14,7 +14,7 @@ import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.Sequence;
 import Peppy.Spectrum;
-import Peppy.SpectrumPeptideMatch;
+import Peppy.Match;
 import Utilities.U;
 import Validate.ReliabilityTester;
 
@@ -36,11 +36,11 @@ public class TuneMSMSFit {
 		//Go through each spectra and find the best matches
 		Properties.peakDifferenceThreshold = 0.25;
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		//go through each of the best matches and find how many of them exist in the correct peptide set
 		int hits = 0;
-		for (SpectrumPeptideMatch match: matches) {
+		for (Match match: matches) {
 			for (Peptide peptide: correctPeptides) {
 				if (match.getPeptide().getAcidSequence().equals(peptide.getAcidSequence())) {
 					hits++;

@@ -4,12 +4,12 @@ import java.util.*;
 
 public class HMMScorer {
 
-	private ArrayList<SpectrumPeptideMatch> matches;
+	private ArrayList<Match> matches;
 	private int numberOfThreads = Properties.numberOfThreads;
 	private int matchIndex = 0;
 	private ArrayList<Thread> threads = new ArrayList<Thread>(Properties.numberOfThreads);
 	
-	public HMMScorer(ArrayList<SpectrumPeptideMatch> matches) {
+	public HMMScorer(ArrayList<Match> matches) {
 		this.matches = matches;
 		
 		//here we make sure we don't use more threads than we have matches
@@ -34,8 +34,8 @@ public class HMMScorer {
 		}
 	}
 
-	public synchronized SpectrumPeptideMatch getNextMatch() {
-		SpectrumPeptideMatch out =  null;
+	public synchronized Match getNextMatch() {
+		Match out =  null;
 		if (matchIndex < matches.size()) {
 			out = matches.get(matchIndex);
 			matchIndex++;

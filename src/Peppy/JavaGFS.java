@@ -33,15 +33,6 @@ public class JavaGFS {
 	public static void main(String [] args) {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties("properties.txt");
-//		ReliabilityTester.runTheGamut("USP");
-//		ReliabilityTester.runTheGamut("ecoli");
-//		ReliabilityTester.testReliability("aurum");
-//		ReliabilityTester.testReliability("human");
-//		ReliabilityTester.testReliability("ecoli");
-//		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
-//		ReliabilityTester.exportPeptidesInCommonWithDatabase("human");
-//		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
-//		ReliabilityTester.makeSureWeAreProperlyDigestingTheGenome("ecoli");
 		new JavaGFS	(args);
 //		testHMMScoreOnSwissProt();
 //		runOnProteinDatabase(args);
@@ -80,7 +71,7 @@ public class JavaGFS {
 			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File(args[1]));
 			
 			
-			ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+			ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 			
 			TextReporter textReport = new TextReporter(matches, spectra, null);
 			textReport.generateFullReport();
@@ -119,7 +110,7 @@ public class JavaGFS {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/ipi.HUMAN.v3.53.fasta"));
 		
 		
-		ArrayList<SpectrumPeptideMatch> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		TextReporter textReport = new TextReporter(matches, spectra, null);
 		textReport.generateFullReport();
@@ -148,7 +139,7 @@ public class JavaGFS {
 		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
-		ArrayList<SpectrumPeptideMatch> matches = new ArrayList<SpectrumPeptideMatch>();
+		ArrayList<Match> matches = new ArrayList<Match>();
 		
 		//set up HMM
 //		HMMScore.HMMClass.HmmSetUp();
@@ -175,7 +166,7 @@ public class JavaGFS {
 		U.stopStopwatch();
 	}
 	
-	public static void saveBadSpectra(ArrayList<SpectrumPeptideMatch> matches) {
+	public static void saveBadSpectra(ArrayList<Match> matches) {
 		try {
 			File badSpectraFolder = new File("bad spectra");
 			badSpectraFolder.mkdirs();
@@ -183,7 +174,7 @@ public class JavaGFS {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(badPeptidesFile)));
 			int fileIndex = 1;
 			for (int i = 0; i < matches.size(); i++) {
-				SpectrumPeptideMatch match = matches.get(i);
+				Match match = matches.get(i);
 				if (match.getScoreHMM() < 1) {
 					//copy spectrum file
 					InputStream in = new FileInputStream(match.getSpectrum().getFile());
@@ -222,8 +213,8 @@ public class JavaGFS {
 	 * the genome in pieces.  One reading frame at a time.  Once with missed cleavages
 	 * and once without.
 	 */
-	public static ArrayList<SpectrumPeptideMatch> synchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
-		ArrayList<SpectrumPeptideMatch> matches = new ArrayList<SpectrumPeptideMatch>();
+	public static ArrayList<Match> synchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
+		ArrayList<Match> matches = new ArrayList<Match>();
 		ArrayList<NucleotideSequence> nucleotideSequences = sequence.getNucleotideSequences();
 		
 		//ArrayList<Peptide> peptides = sequence.extractPeptides();
@@ -252,7 +243,7 @@ public class JavaGFS {
 	 * takes full advantage of the SequenceDigestionThread.  However, this 
 	 * method requires much more memory.
 	 */
-	public static ArrayList<SpectrumPeptideMatch> asynchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
+	public static ArrayList<Match> asynchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
 			//This is where the big memory drain comes from.  We are extracting
 			//a list of peptides from the sequence file.
 			U.p("Digesting file: " +sequence.getSequenceFile().getName());
@@ -270,13 +261,13 @@ public class JavaGFS {
 	 * takes full advantage of the SequenceDigestionThread.  However, this 
 	 * method requires much more memory.
 	 */
-	public static ArrayList<SpectrumPeptideMatch> asynchronousDigestion(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
+	public static ArrayList<Match> asynchronousDigestion(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
 
 			//This is where the bulk of the processing in long jobs takes
 			ScoringEngine engine = new ScoringEngine(peptides, spectra, sequence);
 			
 			//harvest the results
-			ArrayList<SpectrumPeptideMatch> matches =  engine.getMatches();
+			ArrayList<Match> matches =  engine.getMatches();
 			
 			//I know Java doesn't need memory management and all that, but let's just be sure
 			peptides = null;
@@ -317,9 +308,10 @@ public class JavaGFS {
 	}
 	
 	private static void printGreeting() {
-		U.p("Welcome to JavaGFS");
-		U.p("Genome-based peptide fingerprint scanning");
+		U.p("Welcome to Peppy");
+		U.p("Proteogenomic mapping software.");
 		U.p("Developed 2010 by the Giddings Lab");
+		U.p();
 	}
 	
 

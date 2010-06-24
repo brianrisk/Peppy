@@ -12,7 +12,7 @@ package Peppy;
  */
 public class Peptide implements Comparable<Peptide> {
 	
-	private String sequence;
+	private String acidSequence;
 	private double mass;
 	private int index;
 	private boolean forward;
@@ -27,7 +27,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param forward
 	 */
 	public Peptide(String sequence, double mass, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
-		this.sequence = sequence;
+		this.acidSequence = sequence;
 		this.mass = mass;
 		this.index = index;
 		this.forward = forward;
@@ -40,7 +40,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this.sequence = sequence;
+		this.acidSequence = sequence;
 		this.mass = calculateMass();
 		this.index = 0;
 		this.forward = true;
@@ -55,7 +55,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param forward
 	 */
 	public Peptide(String sequence, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
-		this.sequence = sequence;
+		this.acidSequence = sequence;
 		this.mass = calculateMass();
 		this.index = index;
 		this.forward = forward;
@@ -74,7 +74,7 @@ public class Peptide implements Comparable<Peptide> {
 //				+ sequence;
 		int outFrame = readingFrame + 1;
 		if (!forward) outFrame *= -1;
-		return mass + "\t" + sequence + "\t" + index + "\t" + outFrame;
+		return mass + "\t" + acidSequence + "\t" + index + "\t" + outFrame;
 	}
 
 
@@ -83,13 +83,45 @@ public class Peptide implements Comparable<Peptide> {
 		if (mass < o.getMass()) return -1;
 		return 0;
 	}
+	
+	/**
+	 * Okay, this equals is not in line with the way things work for compareTo.
+	 * this compares acid sequences for equality.  compareTo compares masses.
+	 * 
+	 * the real trick for equality is ignoring any trailing stop (".") codon
+	 */
+	public boolean equals(String otherAcidSequence) {
+		String us = acidSequence.toUpperCase();
+		if (acidSequence.endsWith(".")) {
+			us = us.substring(0, us.indexOf('.'));
+		}
+		
+		String them = otherAcidSequence.toUpperCase();
+		if (otherAcidSequence.endsWith(".")) {
+			them = them.substring(0, them.indexOf('.'));
+		}
+		
+		if (us.length() != them.length()) return false;
+		
+		//go through each amino acid and, if they weigh the same, they are considered equal
+		boolean equal = true;
+		
+		for (int i = 0; i < us.length(); i++) {
+			if (Definitions.getAminoAcidWeightMono(us.charAt(i)) != Definitions.getAminoAcidWeightMono(them.charAt(i))) {
+				equal = false;
+				break;
+			}
+		}
+		return equal;
+			
+	}
 
 
 	/**
 	 * @return the sequence
 	 */
 	public String getAcidSequence() {
-		return sequence;
+		return acidSequence;
 	}
 
 
@@ -140,13 +172,13 @@ public class Peptide implements Comparable<Peptide> {
 	public double calculateMass() {
 		double mass = 0.0;
 		if (Properties.useMonoMass) {
-			for (int i = 0; i < sequence.length(); i++) {
-				mass += Definitions.getAminoAcidWeightMono(sequence.charAt(i));
+			for (int i = 0; i < acidSequence.length(); i++) {
+				mass += Definitions.getAminoAcidWeightMono(acidSequence.charAt(i));
 			}
 			mass += Definitions.WATER_MONO;
 		} else {
-			for (int i = 0; i < sequence.length(); i++) {
-				mass += Definitions.getAminoAcidWeightAverage(sequence.charAt(i));
+			for (int i = 0; i < acidSequence.length(); i++) {
+				mass += Definitions.getAminoAcidWeightAverage(acidSequence.charAt(i));
 			}
 			mass += Definitions.WATER_AVERAGE;
 		}

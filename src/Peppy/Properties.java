@@ -45,7 +45,7 @@ public class Properties {
 	public static double bIonDifference = 1.0;
 	
 	//matches per spectrum
-	public static int maximumNumberOfMatchesForASpectrum = 1;
+	public static int maximumNumberOfMatchesForASpectrum = 5;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");

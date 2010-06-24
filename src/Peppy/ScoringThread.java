@@ -35,7 +35,7 @@ public class ScoringThread implements Runnable {
 		
 		while (spectrum != null) {
 			
-			ArrayList<SpectrumPeptideMatch> matchesForOneSpectrum = new ArrayList<SpectrumPeptideMatch>();
+			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			double lowestPeptideMassToConsider = spectrum.getPrecursorMass() - Properties.spectrumToPeptideMassError;
@@ -48,7 +48,7 @@ public class ScoringThread implements Runnable {
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
-				SpectrumPeptideMatch match = new SpectrumPeptideMatch(spectrum, peptide, sequence);
+				Match match = new Match(spectrum, peptide, sequence);
 				if (match.getScore() == 0.0) {
 					continue;
 				}
@@ -57,7 +57,7 @@ public class ScoringThread implements Runnable {
 			
 			//collect the top maximumNumberOfMatchesForASpectrum
 			Collections.sort(matchesForOneSpectrum);
-			ArrayList<SpectrumPeptideMatch> topMatches = new ArrayList<SpectrumPeptideMatch>();
+			ArrayList<Match> topMatches = new ArrayList<Match>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
 			for (int i = 0; i < max; i++) {
@@ -66,7 +66,7 @@ public class ScoringThread implements Runnable {
 			
 			//assign E values to top Matches:
 			if (matchesForOneSpectrum.size() == 0) {
-				//U.p("There were zero matches for this spectrum file: " + spectrum.getFile().getName());
+				U.p("There were zero matches for this spectrum file: " + spectrum.getFile().getName());
 			} else {
 				calculateEValues(matchesForOneSpectrum, topMatches);
 			}
@@ -78,16 +78,16 @@ public class ScoringThread implements Runnable {
 	
 	/**
 	 * This method assumes that matchesForOneSpectrum is already sorted from highest score to lowest.
+	 * Calculates e values for each of the top matches
 	 * @param matchesForOneSpectrum
 	 * @param topMatches
 	 */
-	private void calculateEValues(ArrayList<SpectrumPeptideMatch> matchesForOneSpectrum, ArrayList<SpectrumPeptideMatch> topMatches) {
+	private void calculateEValues(ArrayList<Match> matchesForOneSpectrum, ArrayList<Match> topMatches) {
 		/*
 		 * find expected value (aka "e value") for top matches
 		 */
 		//setting up the histogram paramaters
 		double highScore = matchesForOneSpectrum.get(0).getScore();
-//		double lowScore = matchesForOneSpectrum.get(matchesForOneSpectrum.size() - 1).getScoreMSMSFit();
 		double lowScore = 0;
 		double barWidth = (highScore - lowScore) / numberOfHistogramBars;
 		
@@ -99,7 +99,7 @@ public class ScoringThread implements Runnable {
 
 		//populate the histogram
 		int bin;
-		for (SpectrumPeptideMatch match: matchesForOneSpectrum) {
+		for (Match match: matchesForOneSpectrum) {
 			bin = (int) Math.floor((match.getScore() - lowScore) / barWidth);
 			if (bin == numberOfHistogramBars) bin = numberOfHistogramBars - 1;
 			histogram[bin]++;
@@ -144,10 +144,12 @@ public class ScoringThread implements Runnable {
 		//using our m and be to derive e values for all top matches
 		double eValue;
 		int peptideCount = matchesForOneSpectrum.size();
-		for (SpectrumPeptideMatch match: topMatches) {
+		for (Match match: topMatches) {
 			eValue = m * match.getScore() + b;
 			eValue = Math.exp(eValue);
 			eValue *= peptideCount;
+			//setting to -1 if eValue is Nan
+			if (eValue <= 1 == eValue >= 1) eValue = -1.0;
 			match.setEValue(eValue);
 		}
 	}

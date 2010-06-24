@@ -25,9 +25,9 @@ public class ComparisonTester {
 	public ComparisonTester(String species, double delta) {
 		ArrayList<SpectrumPeptidePair> spectrumPeptidePairs = new ArrayList<SpectrumPeptidePair>();
 		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("tests/" + species + "/spectra");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
 		//go through each file in our peptides folder
-		File peptideFolder = new File("tests/" + species + "/peptides");
+		File peptideFolder = new File("/Users/risk2/PeppyOverflow/tests/" + species + "/peptides");
 		File [] peptideFiles = peptideFolder.listFiles();
 		for (int peptideFileIndex = 0; peptideFileIndex < peptideFiles.length; peptideFileIndex++) {
 			//only want visible files
@@ -57,16 +57,14 @@ public class ComparisonTester {
 			if (peptideString.equals("")) continue;
 			
 			//make sure this peptide has a corresponding spectrum file
-			File spectrumFile = new File("tests/" + species + "/spectra/" + peptideFiles[peptideFileIndex].getName());
+			File spectrumFile = new File("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra/" + peptideFiles[peptideFileIndex].getName());
 			if (!spectrumFile.exists()) continue;
 			
 			/*
 			 * Here we include the peptide we know to be correct and see how it would score	
 			 */
 			Peptide peptide = new Peptide(peptideString);
-			//This assumes only one spectrum per file, but that should be the case with these test cases.
-			Spectrum spectrum = Spectrum.loadSpectra(spectrumFile).get(0);
-			
+			Spectrum spectrum = new Spectrum(spectrumFile);//Spectrum.loadSpectra(spectrumFile).get(0);
 			spectrumPeptidePairs.add(new SpectrumPeptidePair(spectrum, peptide));		
 		}
 		
