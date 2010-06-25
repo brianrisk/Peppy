@@ -1,7 +1,6 @@
 package Peppy;
 
 import HMMScore.HMMClass;
-	import Utilities.U;
 
 /**
  * An object which contains scoring mechanisms to evaluate a spectrum/peptide match.
@@ -24,11 +23,6 @@ public class Match implements Comparable<Match>{
 	
 	final static double useAcidThreshold = 100.0;
 	
-	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
-	public final static int DEFAULT_SCORE_HMM = 1;
-	private static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
-//	private static int defaultScore = DEFAULT_SCORE_HMM;
-	
 	public final static int SORT_BY_DEFAULT = 0;
 	public final static int SORT_BY_SPECTRUM_ID = 1;
 	public final static int SORT_BY_LOCUS = 2;
@@ -46,10 +40,10 @@ public class Match implements Comparable<Match>{
 	}
 	
 	public void calculateScore() {
-		if (defaultScore == DEFAULT_SCORE_TANDEM_FIT) {
+		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
 			score = calculateTandemFit();
 		} else
-		if (defaultScore == DEFAULT_SCORE_HMM) {
+		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
 			score = calculateHMM();
 		}
 	}
@@ -233,7 +227,7 @@ public class Match implements Comparable<Match>{
 	 * Returns the default score.  This could be TandemFit or HMM.
 	 */
 	public double getScore() {
-		if (defaultScore == DEFAULT_SCORE_TANDEM_FIT) {
+		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
 			return scoreTandemFit;
 		}
 		return scoreHMM;
@@ -296,8 +290,8 @@ public class Match implements Comparable<Match>{
 	}
 
 	
-	public void setTandemFitRank(int mSMSFitRank) {
-		tandemFitRank = mSMSFitRank;
+	public void setTandemFitRank(int tandemFitRank) {
+		this.tandemFitRank = tandemFitRank;
 	}
 
 	public void setEValue(double eValue) {

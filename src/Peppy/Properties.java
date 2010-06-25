@@ -18,6 +18,11 @@ public class Properties {
 	
 	//how many processors does your computer have?  This number should be that number.
 	public static int numberOfThreads = 16;
+	
+	//which scoring mechanism to use?
+	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
+	public final static int DEFAULT_SCORE_HMM = 1;
+	public static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
 
 	//properties for spectral cleaning
 	public static boolean localMaximaCleaning = false;
@@ -38,7 +43,7 @@ public class Properties {
 	//units are daltons.
 	public static double spectrumToPeptideMassError = 2.0;
 	
-	//MSMSFit
+	//TandemFit
 	public static double peakDifferenceThreshold = 0.5;
 	public static double peakIntensityExponent = 0.33333333;
 	public static double yIonDifference = 1.0;
@@ -116,8 +121,12 @@ public class Properties {
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
-		if (propertyName.equals("reportDirectory")) {
-			reportDirectory = new File(propertyValue);
+		if (propertyName.equals("defaultScore")) {
+			//Default to tandemFit:
+			defaultScore = DEFAULT_SCORE_TANDEM_FIT;
+			if (propertyValue.equals("HMM_Score")) {
+				defaultScore = DEFAULT_SCORE_HMM;
+			}
 		}
 		
 		

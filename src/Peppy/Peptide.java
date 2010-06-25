@@ -115,6 +115,10 @@ public class Peptide implements Comparable<Peptide> {
 		return equal;
 			
 	}
+	
+	public boolean equals(Peptide peptide) {
+		return equals(peptide.getAcidSequence());
+	}
 
 
 	/**

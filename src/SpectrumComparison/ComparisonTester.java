@@ -24,8 +24,7 @@ public class ComparisonTester {
 	
 	public ComparisonTester(String species, double delta) {
 		ArrayList<SpectrumPeptidePair> spectrumPeptidePairs = new ArrayList<SpectrumPeptidePair>();
-		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
+
 		//go through each file in our peptides folder
 		File peptideFolder = new File("/Users/risk2/PeppyOverflow/tests/" + species + "/peptides");
 		File [] peptideFiles = peptideFolder.listFiles();
@@ -64,18 +63,22 @@ public class ComparisonTester {
 			 * Here we include the peptide we know to be correct and see how it would score	
 			 */
 			Peptide peptide = new Peptide(peptideString);
-			Spectrum spectrum = new Spectrum(spectrumFile);//Spectrum.loadSpectra(spectrumFile).get(0);
+			//when we load the spectrum we set the flag to    normalize the peaks
+			Spectrum spectrum = new Spectrum(spectrumFile, true);
 			spectrumPeptidePairs.add(new SpectrumPeptidePair(spectrum, peptide));		
 		}
 		
 		ArrayList<SpectrumComparison> spectrumComparisons = new ArrayList<SpectrumComparison>();
 		for (int i = 0; i < spectrumPeptidePairs.size() - 1; i++) {
-//			U.p(i + 1 + " of " + spectrumPeptidePairs.size());
+			SpectrumPeptidePair spp1 = spectrumPeptidePairs.get(i);
 			for (int j = i + 1; j < spectrumPeptidePairs.size(); j++) {
-//				U.p("sub: " + j);
-				SpectrumComparison comparison = new SpectrumComparison(spectrumPeptidePairs.get(i), spectrumPeptidePairs.get(j), delta);
-				comparison.computeDistance();
-				spectrumComparisons.add(comparison);
+				SpectrumPeptidePair spp2 = spectrumPeptidePairs.get(j);
+				double precursorDifference = Math.abs(spp1.getSpectrum().getPrecursorMass() - spp2.getSpectrum().getPrecursorMass());
+				if (precursorDifference < 2.0 ) {
+					SpectrumComparison comparison = new SpectrumComparison(spp1,spp2, delta);
+					comparison.computeDistance();
+					spectrumComparisons.add(comparison);
+				}
 			}
 		}
 		U.p("There are this many compariosns: " + spectrumComparisons.size());

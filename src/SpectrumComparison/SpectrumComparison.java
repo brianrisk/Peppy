@@ -1,8 +1,10 @@
 package SpectrumComparison;
 
 import java.util.ArrayList;
+
 import Peppy.Peak;
 import Peppy.Spectrum;
+import Utilities.U;
 
 
 public class SpectrumComparison implements Comparable<SpectrumComparison> {
@@ -41,31 +43,63 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 		ArrayList<Peak> peaks2 = spectrum2.getPeaks();
 		int index1 = 0; 
 		int index2 = 0;
-		Peak peak1 = peaks1.get(0);
-		Peak peak2 = peaks2.get(0);
+		Peak peak1;
+		Peak peak2;
 		int peaksInCommon = 0;
 		double xMean = spectrum1.getCalculatedAverageIntensity();
 		double yMean = spectrum2.getCalculatedAverageIntensity();	
+		double presentMassDelta;
+		double presentIntensityDelta;
+		// the minimum delta should never be less than zero.  It's a distance.  Duh!
+		double minimumIntensityDelta = -1;
+		double summedSquaredDistance = 0.0;
 		while (index1 < peaks1.size() && index2 < peaks2.size()) {
 			peak1 = peaks1.get(index1);
-			peak2 = peaks2.get(index2);
-			
-			if (peak1.getMass() - peak2.getMass() < delta) {
-				if (peak1.getIntensity() > xMean && peak2.getIntensity() > yMean) peaksInCommon++;
-				index1++;
-				index2++;
-			} else {
-				if (peak1.getMass() < peak2.getMass()) {
-					if (index1 < peaks1.size()) {
-						index1++;
+//			if (peak1.getIntensity() > yMean) {
+				peak2 = peaks2.get(index2);
+				presentMassDelta = Math.abs(peak1.getMass() - peak2.getMass());
+				if (presentMassDelta < delta) {
+					presentIntensityDelta = Math.abs(peak1.getIntensity() - peak2.getIntensity());
+					//if minimumIntensityDelta has yet to be initialized
+					//or it is greater than the present delta
+					if (minimumIntensityDelta < 0) {
+						peaksInCommon++;
+						minimumIntensityDelta = presentIntensityDelta;
+					} else {
+						if (minimumIntensityDelta > presentIntensityDelta) {
+							minimumIntensityDelta = presentIntensityDelta;
+						}
 					}
-				} else {
+					/*
+					 * I'm advancing the second index.  In this way I am comparing spectrum
+					 * 2 to spectrum 1.  It is not the same as comparing spectrum 1 to spectrum 2.
+					 * 
+					 * Ideally the two would be the same.  also what would be nice is when a delta range
+					 * is entered then we search for the two largest peaks between the two spectra.
+					 * perhaps later we'll see how that works.
+					 */
 					index2++;
+				} else {
+					//if minimumIntensityDelta is not -1 then that means the 
+					//we just now left the delta range
+					if (minimumIntensityDelta >= 0) {
+						summedSquaredDistance += minimumIntensityDelta * minimumIntensityDelta;
+					}
+					// making sure this is initialized
+					minimumIntensityDelta = -1; 
+					if (peak1.getMass() < peak2.getMass()) {
+						index1++;
+					} else {
+						index2++;
+					}
 				}
-			}
+//			}
 		}
-		//distance = (double) peaksInCommon / (xMean * yMean * (peaks1.size() + peaks2.size()));
-		distance = (double) peaksInCommon / (peaks1.size() + peaks2.size());
+		if (peaksInCommon == 0) {
+			distance = Double.MAX_VALUE;
+		} else {
+			distance = summedSquaredDistance / peaksInCommon;
+		}
 		return distance;
 	}
 	
@@ -118,22 +152,24 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 	}
 	
 	public boolean isEqual() {
-		return spectrumPeptidePair1.getPeptide().getAcidSequence().equals(spectrumPeptidePair2.getPeptide().getAcidSequence());
+		return spectrumPeptidePair1.getPeptide().equals(spectrumPeptidePair2.getPeptide());
 	}
 	
 	public double getDistance() {return distance;}
 	
-	public String toString() {return spectrumPeptidePair1.getPeptide().getAcidSequence() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequence();}
+	public String toString() {
+		return spectrumPeptidePair1.getPeptide().getAcidSequence() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequence() + ": " + distance;
+		}
 
 
 	public int compareTo(SpectrumComparison o) {
 		//sorting largest to smallest
-		if (distance > o.getDistance()) return -1;
-		if (distance < o.getDistance()) return  1;
+//		if (distance > o.getDistance()) return -1;
+//		if (distance < o.getDistance()) return  1;
 		
 		//sorting smallest to largest
-//		if (distance < o.getDistance()) return -1;
-//		if (distance > o.getDistance()) return  1;
+		if (distance < o.getDistance()) return -1;
+		if (distance > o.getDistance()) return  1;
 		return 0;
 	}
 	
