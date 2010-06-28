@@ -80,7 +80,7 @@ public class SequenceDigestionThread implements Runnable {
 				
 				//determine if we're in an open reading frame
 				if (previousAminoAcid == '.') {
-					if (inOpenReadingFrame) {
+					if (inOpenReadingFrame || !Properties.onlyUsePeptidesInOpenReadingFrames) {
 						proteinString = proteinUnderConstruction.toString();
 						peptides.addAll(ProteinDigestion.getPeptidesFromProteinString(proteinString, peptideStartIndex, forwards, frame, nucleotideSequence.getParentSequence()));
 					}
@@ -94,7 +94,7 @@ public class SequenceDigestionThread implements Runnable {
 					if (!forwards) {peptideStartIndex += 1;}
 				}
 				
-				if (inOpenReadingFrame) {proteinUnderConstruction.append(aminoAcid);}
+				if (inOpenReadingFrame || !Properties.onlyUsePeptidesInOpenReadingFrames) {proteinUnderConstruction.append(aminoAcid);}
 				//peptideMass += Definitions.aminoAcidMassesAverage[aminoAcidIndex];
 				previousAminoAcid = aminoAcid;
 			}

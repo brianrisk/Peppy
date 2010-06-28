@@ -36,8 +36,9 @@ public class Properties {
 	//units are daltons.
 	public static double peptideMassThreshold = 500.0;
 	
-	//number of Missed cleavages
+	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
+	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	
 	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
 	//units are daltons.
@@ -120,6 +121,9 @@ public class Properties {
 		}
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) {
+			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
 		}
 		if (propertyName.equals("defaultScore")) {
 			//Default to tandemFit:

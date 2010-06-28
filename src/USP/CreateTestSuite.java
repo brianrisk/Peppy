@@ -49,7 +49,7 @@ public class CreateTestSuite {
 	public static void createSuiteFromTopFive() {
 		//set our properties
 		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
-		Properties.maximumNumberOfMatchesForASpectrum = 5;
+		Properties.maximumNumberOfMatchesForASpectrum = 10;
 		
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -65,11 +65,15 @@ public class CreateTestSuite {
 		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
 		
 		//save to appropriate files
+		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
+		peptideDir.mkdirs();
+		File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
+		spectraFolder.mkdirs();
 		for (Match match: matches) {
 			try {
 				for (Peptide peptide: correctPeptides) {
 					if (match.getPeptide().getAcidSequence().equals(peptide.getAcidSequence())) {
-						File peptideFile = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/" + match.getSpectrum().getFile().getName());
+						File peptideFile = new File(peptideDir, match.getSpectrum().getFile().getName());
 						PrintWriter pw;
 						pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
 						pw.println(match.getPeptide().getAcidSequence());
@@ -77,7 +81,6 @@ public class CreateTestSuite {
 						pw.close();
 						
 						//copy the spectrum file
-						File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
 						File spectraFile = new File(spectraFolder, match.getSpectrum().getFile().getName());
 						spectraFolder.mkdirs();
 						U.copyfile(match.getSpectrum().getFile(), spectraFile);

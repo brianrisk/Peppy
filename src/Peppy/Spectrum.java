@@ -45,7 +45,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		Spectrum spectrum = loadSpectra(file).get(0); 
 		peaks = spectrum.getPeaks();
 		precursorMass = spectrum.getPrecursorMass();
-		normalizePeaks();
+		if (normalizePeaks) normalizePeaks();
 	}
 	
 	public Spectrum(String line, File file) {
@@ -265,7 +265,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void normalizePeaks() {
 		double maxIntensity = getCalculatedMaxIntensity();
 		for (Peak peak: peaks) {
-			peak.setIntensity(peak.getIntensity() / maxIntensity);
+			peak.setIntensity(peak.getIntensity() * 100.0 / maxIntensity);
 		}
 	}
 	

@@ -25,6 +25,8 @@ import Peppy.Match;
 import Utilities.U;
 
 public class GenerateValidationReport {
+	
+	public static boolean checkToSeeIfPeptideIsInDatabase = false;
 
 	/**
 	 * @param args
@@ -39,7 +41,7 @@ public class GenerateValidationReport {
 		File indexFile = new File(validationFolder, "index.html");
 		
 		//We only want one match per spectrum
-		Properties.maximumNumberOfMatchesForASpectrum = 5;
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
@@ -55,7 +57,8 @@ public class GenerateValidationReport {
 //		tests.add("human");
 //		tests.add("ecoli");
 //		tests.add("aurum");
-		tests.add("USP");
+//		tests.add("USP");
+		tests.add("decided against these");
 		
 		
 		//get the matches for each of our tests
@@ -155,8 +158,10 @@ public class GenerateValidationReport {
 					pw.println("<br>");
 					pw.println("Spectrum file name: " + ourMatch.getSpectrum().getFile().getName());
 					pw.println("<br>");
-					pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide,peptides));
-					pw.println("<br>");
+					if (checkToSeeIfPeptideIsInDatabase) {
+						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide,peptides));
+						pw.println("<br>");
+					}
 					pw.println("our score: " + ourMatch.ionMatchTally + ", " + ourMatch.getScoreTandemFit());
 					pw.println("<br>");
 					pw.println("their score: " + trueMatch.ionMatchTally + ", " + trueMatch.getScoreTandemFit());

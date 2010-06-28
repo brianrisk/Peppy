@@ -55,45 +55,43 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 		double summedSquaredDistance = 0.0;
 		while (index1 < peaks1.size() && index2 < peaks2.size()) {
 			peak1 = peaks1.get(index1);
-//			if (peak1.getIntensity() > yMean) {
-				peak2 = peaks2.get(index2);
-				presentMassDelta = Math.abs(peak1.getMass() - peak2.getMass());
-				if (presentMassDelta < delta) {
-					presentIntensityDelta = Math.abs(peak1.getIntensity() - peak2.getIntensity());
-					//if minimumIntensityDelta has yet to be initialized
-					//or it is greater than the present delta
-					if (minimumIntensityDelta < 0) {
-						peaksInCommon++;
-						minimumIntensityDelta = presentIntensityDelta;
-					} else {
-						if (minimumIntensityDelta > presentIntensityDelta) {
-							minimumIntensityDelta = presentIntensityDelta;
-						}
-					}
-					/*
-					 * I'm advancing the second index.  In this way I am comparing spectrum
-					 * 2 to spectrum 1.  It is not the same as comparing spectrum 1 to spectrum 2.
-					 * 
-					 * Ideally the two would be the same.  also what would be nice is when a delta range
-					 * is entered then we search for the two largest peaks between the two spectra.
-					 * perhaps later we'll see how that works.
-					 */
-					index2++;
+			peak2 = peaks2.get(index2);
+			presentMassDelta = Math.abs(peak1.getMass() - peak2.getMass());
+			if (presentMassDelta < delta ) {
+				presentIntensityDelta = Math.abs(peak1.getIntensity() - peak2.getIntensity());
+				//if minimumIntensityDelta has yet to be initialized
+				//or it is greater than the present delta
+				if (minimumIntensityDelta < 0) {
+					peaksInCommon++;
+					minimumIntensityDelta = presentIntensityDelta;
 				} else {
-					//if minimumIntensityDelta is not -1 then that means the 
-					//we just now left the delta range
-					if (minimumIntensityDelta >= 0) {
-						summedSquaredDistance += minimumIntensityDelta * minimumIntensityDelta;
-					}
-					// making sure this is initialized
-					minimumIntensityDelta = -1; 
-					if (peak1.getMass() < peak2.getMass()) {
-						index1++;
-					} else {
-						index2++;
+					if (minimumIntensityDelta > presentIntensityDelta) {
+						minimumIntensityDelta = presentIntensityDelta;
 					}
 				}
-//			}
+				/*
+				 * I'm advancing the second index.  In this way I am comparing spectrum
+				 * 2 to spectrum 1.  It is not the same as comparing spectrum 1 to spectrum 2.
+				 * 
+				 * Ideally the two would be the same.  also what would be nice is when a delta range
+				 * is entered then we search for the two largest peaks between the two spectra.
+				 * perhaps later we'll see how that works.
+				 */
+				index2++;
+			} else {
+				//if minimumIntensityDelta is not -1 then that means the 
+				//we just now left the delta range
+				if (minimumIntensityDelta >= 0) {
+					summedSquaredDistance += minimumIntensityDelta * minimumIntensityDelta;
+				}
+				// making sure this is initialized
+				minimumIntensityDelta = -1; 
+				if (peak1.getMass() < peak2.getMass()) {
+					index1++;
+				} else {
+					index2++;
+				}
+			}
 		}
 		if (peaksInCommon == 0) {
 			distance = Double.MAX_VALUE;
@@ -160,6 +158,11 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 	public String toString() {
 		return spectrumPeptidePair1.getPeptide().getAcidSequence() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequence() + ": " + distance;
 		}
+	
+	public Spectrum getSpectrumA() {return spectrum1;}
+	public Spectrum getSpectrumB() {return spectrum2;}
+	public SpectrumPeptidePair getSpectrumPeptidePairA() { return spectrumPeptidePair1;}
+	public SpectrumPeptidePair getSpectrumPeptidePairB() { return spectrumPeptidePair2;}
 
 
 	public int compareTo(SpectrumComparison o) {

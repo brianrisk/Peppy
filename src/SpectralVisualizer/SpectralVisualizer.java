@@ -132,7 +132,8 @@ public class SpectralVisualizer {
 		g.fillRect(0,0,width,height);
 		
 		//getting maximum spectrum value and intensity
-		double maxValue = spectrum.getMaxMass();
+		//double maxValue = spectrum.getMaxMass();
+		double maxValue = 1500;
 		double maxIntensity = spectrum.getCalculatedMaxIntensity();
 		
 		//draw the lines for our spectra

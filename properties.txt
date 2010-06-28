@@ -24,3 +24,9 @@ isSequenceFileDNA false
 
 //where we store our reports
 reportDirectory reports
+
+//can be "HMM_Score" or "TandemFit"
+defaultScore TandemFit;
+
+//digest only inside ORFs?
+onlyUsePeptidesInOpenReadingFrames true
