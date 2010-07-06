@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import Peppy.JavaGFS;
+import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
@@ -62,7 +62,7 @@ public class CreateTestSuite {
 		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 		
 		//save to appropriate files
 		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
@@ -105,7 +105,7 @@ public class CreateTestSuite {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 		
 		//save to appropriate files
 		for (Match match: matches) {

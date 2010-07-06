@@ -1,9 +1,15 @@
 package Peppy;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import Utilities.U;
+import Validate.MatchContainer;
 
 
 public class ScoringThread implements Runnable {
@@ -75,6 +81,8 @@ public class ScoringThread implements Runnable {
 			spectrum = scoringEngine.getNextSpectrum(topMatches);
 		}
 	}
+	
+
 	
 	/**
 	 * This method assumes that matchesForOneSpectrum is already sorted from highest score to lowest.

@@ -7,7 +7,6 @@ public class SequenceDigestionThread implements Runnable {
 	NucleotideSequence nucleotideSequence;
 	byte frame;
 	boolean forwards;
-	boolean missedCleavage;
 
 	public void run() {
 		//go through each character in the line, skipping ahead "frame" characters
@@ -23,21 +22,26 @@ public class SequenceDigestionThread implements Runnable {
 	 * @param nucleotideSequence
 	 * @param frame
 	 * @param forwards
-	 * @param missedCleavage
 	 */
 	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
-			byte frame, boolean forwards, boolean missedCleavage) {
+			byte frame, boolean forwards) {
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
 		this.forwards = forwards;
-		this.missedCleavage = missedCleavage;
 	}
 
 	public ArrayList<Peptide> getPeptides( ) {
+		if (peptides.size() == 0) {
+			if (forwards) {
+				digest(frame, nucleotideSequence.getSequence().length());
+			} else {
+				digest(nucleotideSequence.getSequence().length() - frame - 1, 0);	
+			}
+		}
 		return peptides;
 	}
 	
-	private void digest(int startIndex, int stopIndex) {
+	public void digest(int startIndex, int stopIndex) {
 		//a codon is a set of 3 nucleotide characters
 		char [] codon = new char[3];
 		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
@@ -79,6 +83,8 @@ public class SequenceDigestionThread implements Runnable {
 				
 				
 				//determine if we're in an open reading frame
+				
+				//if previous amino is stop, we may want to dump the created protein into the protein digester
 				if (previousAminoAcid == '.') {
 					if (inOpenReadingFrame || !Properties.onlyUsePeptidesInOpenReadingFrames) {
 						proteinString = proteinUnderConstruction.toString();

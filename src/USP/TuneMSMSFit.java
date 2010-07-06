@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Peppy.JavaGFS;
+import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
@@ -36,7 +36,7 @@ public class TuneMSMSFit {
 		//Go through each spectra and find the best matches
 		Properties.peakDifferenceThreshold = 0.25;
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 		
 		//go through each of the best matches and find how many of them exist in the correct peptide set
 		int hits = 0;

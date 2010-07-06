@@ -212,13 +212,7 @@ public class HTMLReporter {
 		File indexFile = new File(sequenceDirectory, sequence.getId() + Properties.reportWebSuffix);
 		ArrayList<Match> theseMatches = getMatchesWithSequence(sequence, matches);
 		try {
-			sequenceDirectory.mkdirs();
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-			appendFile(pw, Properties.reportWebHeaderSubFile);
-			
-			//print the best match for each spectrum
-			pw.println("<h1>Best match for each spectrum in " + sequence.getSequenceFile().getName() + "</h1>");
-			appendFile(pw, Properties.reportWebTableHeader);
+			//collect the best matches
 			ArrayList<Match> bestMatches = new ArrayList<Match>();
 			for (int i = 0; i < spectra.size(); i++) {
 				ArrayList<Match> specific = getMatchesWithSpectrum(spectra.get(i), theseMatches);
@@ -227,6 +221,19 @@ public class HTMLReporter {
 					bestMatches.add(specific.get(0));
 			}
 			Collections.sort(bestMatches);
+			
+			
+			sequenceDirectory.mkdirs();
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
+			appendFile(pw, Properties.reportWebHeaderSubFile);
+			
+			//region report
+			insertSequenceRegionReport(theseMatches, sequenceDirectory, pw, sequence);
+			
+			//print the best match for each spectrum
+			pw.println("<h1>Best match for each spectrum in " + sequence.getSequenceFile().getName() + "</h1>");
+			appendFile(pw, Properties.reportWebTableHeader);
+			
 			for (int i = 0; i < bestMatches.size(); i++) {
 				pw.println(getTableRow(bestMatches.get(i), i));
 			}
@@ -242,6 +249,13 @@ public class HTMLReporter {
 			U.p("could not read file: " + indexFile.getName());
 			e.printStackTrace();
 		}
+	}
+	
+	private void insertSequenceRegionReport(ArrayList<Match> theseMatches, File sequenceDirectory, PrintWriter pw, Sequence sequence) {
+		pw.println();
+		//create sequence regions
+		ArrayList<SequenceRegion> regions;
+		sequence.getNucleotideSequences().size();
 	}
 	
 	public void generateSpectrumReport(Spectrum spectrum) {

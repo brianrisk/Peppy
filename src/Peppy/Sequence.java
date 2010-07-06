@@ -19,6 +19,7 @@ import Utilities.U;
 public class Sequence {
 	private File sequenceFile;
 	private int id;
+	private ArrayList<NucleotideSequence> nucleotideSequences = null;
 	
 	public Sequence(File sequenceFile) {
 		this.sequenceFile = sequenceFile;
@@ -42,14 +43,10 @@ public class Sequence {
 			//Create our SequenceDigestionThread ArrayList
 			ArrayList<SequenceDigestionThread> digestors = new ArrayList<SequenceDigestionThread>();
 			for (byte frame = 0; frame < 3; frame++) {
-				digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true, false));
-				digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false, false));
-				//digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true, true));
-				//digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false, true));
+				digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true));
+				digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false));
 			}
 			
-			//Putting the thread ArrayList here gives us a max of 12 threads.
-			//put it outside the other "for" if you have multiple sequences
 			ArrayList<Thread> threads = new ArrayList<Thread>();
 			for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
 				Thread thread = new Thread(digestors.get(digestorIndex));
@@ -91,11 +88,11 @@ public class Sequence {
 	 * @param missedCleavage
 	 * @return an sorted ArrayList of amino acid sequence fragments from the given nucleotide sequence
 	 */
-	public ArrayList<Peptide> extractPeptides(ArrayList<NucleotideSequence> nucleotideSequences, byte frame, boolean forwards, boolean missedCleavage) {
+	public ArrayList<Peptide> extractPeptides(ArrayList<NucleotideSequence> nucleotideSequences, byte frame, boolean forwards) {
 		ArrayList<Peptide> peptides = null;
 		for (int sequenceIndex = 0; sequenceIndex < nucleotideSequences.size(); sequenceIndex++) {
 			NucleotideSequence nucleotideSequence = nucleotideSequences.get(sequenceIndex);
-			SequenceDigestionThread digestor = new SequenceDigestionThread(nucleotideSequence, frame, forwards, missedCleavage);
+			SequenceDigestionThread digestor = new SequenceDigestionThread(nucleotideSequence, frame, forwards);
 			Thread thread = new Thread(digestor);
 			thread.start();
 			try {
@@ -142,43 +139,47 @@ public class Sequence {
 	 * @return
 	 */
 	public ArrayList<NucleotideSequence> getNucleotideSequences() {
-		ArrayList<NucleotideSequence> out = new ArrayList<NucleotideSequence>();
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(sequenceFile));
-			String line = br.readLine();
-			//lines beginning with ">" name the sequence
-			String sequenceDescription = null;
-			StringBuffer sequence = new StringBuffer();
-			while (line != null) {
-				//lines that begin with ">" are comments which name the sequence
-				if (line.startsWith(">")) {
-					//if sequenceDescription has not been defined, that means it is the first in the file
-					if (sequenceDescription != null) {
-						out.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
-						sequence = new StringBuffer();
+		if (nucleotideSequences == null) {
+			nucleotideSequences = new ArrayList<NucleotideSequence>();
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(sequenceFile));
+				String line = br.readLine();
+				//lines beginning with ">" name the sequence
+				String sequenceDescription = null;
+				StringBuffer sequence = new StringBuffer();
+				while (line != null) {
+					//lines that begin with ">" are comments which name the sequence
+					if (line.startsWith(">")) {
+						//if sequenceDescription has not been defined, that means it is the first in the file
+						if (sequenceDescription != null) {
+							nucleotideSequences.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
+							sequence = new StringBuffer();
+						}
+						sequenceDescription = line;
+						line = br.readLine(); 
+						continue;	
 					}
-					sequenceDescription = line;
-					line = br.readLine(); 
-					continue;	
+					//lines that begin with ";" are comments which should be ignored
+					if (line.startsWith(";")) {
+						line = br.readLine(); 
+						continue;	
+					}
+					sequence.append(line);
+					line = br.readLine();
 				}
-				//lines that begin with ";" are comments which should be ignored
-				if (line.startsWith(";")) {
-					line = br.readLine(); 
-					continue;	
-				}
-				sequence.append(line);
-				line = br.readLine();
+				nucleotideSequences.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
+				
+				//close out our stream.  It's the courteous thing to do!
+				br.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			out.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
-			
-			//close out our stream.  It's the courteous thing to do!
-			br.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			return nucleotideSequences;
+		} else {
+			return nucleotideSequences;
 		}
-		return out;
 	}
 
 	public File getSequenceFile() {

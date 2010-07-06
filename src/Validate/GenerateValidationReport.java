@@ -14,7 +14,7 @@ import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
-import Peppy.JavaGFS;
+import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
@@ -32,6 +32,7 @@ public class GenerateValidationReport {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		U.startStopwatch();
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
 		
@@ -46,6 +47,11 @@ public class GenerateValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
 		
+		//What scoring mechanism?
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+		HMMScore.HMMClass.HmmSetUp();
+		
 		//load the swis prot protein database
 //		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot20100614.fasta"));
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
@@ -57,8 +63,8 @@ public class GenerateValidationReport {
 //		tests.add("human");
 //		tests.add("ecoli");
 //		tests.add("aurum");
-//		tests.add("USP");
-		tests.add("decided against these");
+		tests.add("USP");
+//		tests.add("decided against these");
 		
 		
 		//get the matches for each of our tests
@@ -71,7 +77,7 @@ public class GenerateValidationReport {
 			U.p("loaded " +spectra.size() + " spectra.");
 			
 			//get the matches
-			ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+			ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 			
 			//See which of these matches are true
 			ArrayList<MatchContainer> testedMatches = new ArrayList<MatchContainer>(matches.size());
@@ -97,13 +103,14 @@ public class GenerateValidationReport {
 					if (!firstFalseFound) {
 						firstFalseFound = true;
 						firstFalseEValue = match.getEValue();
-						U.p("First fasle found at this e Value: " + firstFalseEValue);
+						U.p("First false found at this e Value: " + firstFalseEValue);
 					}
 				}
 				if (!onePercenThresholdHasBeenReached) {
 					if ((double) falseTally / testedMatches.size() >= 0.01) {
 						onePercenThresholdHasBeenReached = true;
 						U.p("Number at one percent error rate: " + trueTally);
+						U.p("percent at this point: " +  (double) trueTally / testedMatches.size());
 						U.p("E value at this rate is: " + match.getEValue());
 					}
 				}
@@ -113,13 +120,58 @@ public class GenerateValidationReport {
 			U.p();
 			
 			generateWrongReport(test, testedMatches, peptides);
+			generateRightReport(test, testedMatches, peptides);
 			
 			
 //			generateReport(test, testedMatches);
 		}
 		 
 		//get all the matches		
-
+		U.stopStopwatch();
+	}
+	
+	public static void generateRightReport(String test, ArrayList<MatchContainer> testedMatches, ArrayList<Peptide> peptides) {
+		File testFileFolder = new File(Properties.reportDirectory, test);
+		testFileFolder.mkdirs();
+		File testFile = new File(testFileFolder, "right.html");
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(testFile)));
+			
+			//print the header of the file
+			pw.println("<html><body><table>");
+			pw.println("<tr><th>acid</th><th>e value</th><th>score</th>");
+			
+			for (MatchContainer matchContainer: testedMatches) {
+				if (matchContainer.isTrue()) {
+					Match ourMatch = matchContainer.getMatch();
+					
+					pw.println("<tr>");
+					
+					pw.println("<td>");
+					pw.println(ourMatch.getPeptide().getAcidSequence());
+					pw.println("</td>");
+					
+					pw.println("<td>");
+					pw.println(ourMatch.getEValue());
+					pw.println("</td>");
+					
+					pw.println("<td>");
+					pw.println(ourMatch.getScore());
+					pw.println("</td>");
+					
+					pw.println("</tr>");
+					pw.println();
+					
+				}
+			}
+			
+			//print the footer and close out
+			pw.println("</table></body></html>");
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void generateWrongReport(String test, ArrayList<MatchContainer> testedMatches, ArrayList<Peptide> peptides) {
@@ -144,13 +196,7 @@ public class GenerateValidationReport {
 			for (MatchContainer matchContainer: testedMatches) {
 				if (!matchContainer.isTrue()) {
 					Peptide correctPeptide = null;
-					try {
 					correctPeptide = new Peptide(matchContainer.getCorrectAcidSequence());
-					} catch (Exception e) {
-						U.p("Exception!");
-						U.p("is acidSequence null? answer: " + matchContainer.getCorrectAcidSequence() == null);
-						U.p("spectrum file: " + matchContainer.getMatch().getSpectrum().getFile().getName());
-					}
 					Match ourMatch = matchContainer.getMatch();
 					Match trueMatch = matchContainer.getTrueMatch();
 					pw.println("<p>");

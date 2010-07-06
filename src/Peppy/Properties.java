@@ -32,13 +32,10 @@ public class Properties {
 	//when it comes to calculating theortical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
 	
-	//no fragments that weigh less than this will be admitted into the fragment list
-	//units are daltons.
-	public static double peptideMassThreshold = 500.0;
-	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
+	public static double peptideMassThreshold = 500.0;
 	
 	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
 	//units are daltons.
@@ -104,12 +101,26 @@ public class Properties {
 		if (propertyName.equals("numberOfThreads")) {
 			numberOfThreads = Integer.valueOf(propertyValue);
 		}
-		if (propertyName.equals("peptideMassThreshold")) {
-			peptideMassThreshold = Double.valueOf(propertyValue);
-		}
+		
+		//sequence digestion
 		if (propertyName.equals("numberOfMissedCleavages")) {
 			numberOfMissedCleavages =Integer.valueOf(propertyValue);
 		}
+		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) {
+			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("peptideMassThreshold")) {
+			peptideMassThreshold = Double.valueOf(propertyValue);
+		}
+		
+		//spectrum cleaning
+		if (propertyName.equals("localMaximaCleaning")) {
+			localMaximaCleaning = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("highIntensityCleaning")) {
+			highIntensityCleaning = Boolean.valueOf(propertyValue);
+		}
+		
 		if (propertyName.equals("maximumNumberOfMatchesForASpectrum")) {
 			maximumNumberOfMatchesForASpectrum = Integer.valueOf(propertyValue);
 		}
@@ -122,9 +133,7 @@ public class Properties {
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
-		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) {
-			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
-		}
+		
 		if (propertyName.equals("defaultScore")) {
 			//Default to tandemFit:
 			defaultScore = DEFAULT_SCORE_TANDEM_FIT;

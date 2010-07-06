@@ -71,18 +71,18 @@ public class MatchContainer implements Comparable<MatchContainer>{
 		
 		//test equality
 		if (validPeptideFile) {
-			correctAcidSequence = peptideString;
+			this.correctAcidSequence = peptideString;
 			isTrue = match.getPeptide().equals(peptideString);
 			
 			//If this match is not the true match:
 			//this is in case the peptide is not present in the database
 			//also in the off case the score is equal
-			if(!isTrue) {
-				trueMatch = new Match(match.getSpectrum(), new Peptide(correctAcidSequence), null);
-				if (trueMatch.getScoreTandemFit() == match.getScoreTandemFit()) {
-					isTrue = true;
-				}
-			}
+//			if(!isTrue) {
+//				trueMatch = new Match(match.getSpectrum(), new Peptide(this.correctAcidSequence), null);
+//				if (trueMatch.getScore() == match.getScore()) {
+//					isTrue = true;
+//				}
+//			}
 		} else {
 			U.p("ERROR: there was not a valid peptide file at " + peptideFile.getName());
 		}

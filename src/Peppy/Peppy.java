@@ -1,16 +1,12 @@
 package Peppy;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import Reports.HTMLReporter;
 import Reports.TextReporter;
 import Utilities.U;
 
@@ -27,17 +23,62 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class JavaGFS {
+public class Peppy {
 	
 	
 	public static void main(String [] args) {
-		System.setProperty("java.awt.headless", "true"); 
-		Properties.loadProperties("properties.txt");
-		new JavaGFS	(args);
+		init();
+		new Peppy	(args);
 //		testHMMScoreOnSwissProt();
 //		runOnProteinDatabase(args);
 //		exportPeptideList();
 		U.p("done");
+	}
+	
+	public Peppy(String [] args) {
+			U.startStopwatch();
+			printGreeting();
+			
+			
+			//setting other properties
+	//		Properties.maximumNumberOfMatchesForASpectrum = 1;
+	//		Properties.peakDifferenceThreshold = 0.25;
+	//		Properties.peakIntensityExponent = 0.3;
+			
+			//Load our spectra
+			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+			U.p("loaded " +spectra.size() + " spectra.");
+			
+			//Get references to our sequence files -- no nucleotide data is loaded at this point
+			ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+			
+			//initialize our ArrayList of matches
+			ArrayList<Match> matches = new ArrayList<Match>();
+			
+			//loop through each sequence in the sequences ArrayList
+			//for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
+			for (Sequence sequence: sequences) {		
+				matches.addAll(asynchronousDigestion(sequence, spectra));
+			}
+			
+			//calculate HMM scores
+	//		HMMScorer hmmScorer = new HMMScorer(matches);
+	//		hmmScorer.score();
+			
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			report.generateFullReport();
+			
+			TextReporter textReport = new TextReporter(matches, spectra, sequences);
+			textReport.generateFullReport();
+			
+			U.p();
+			U.stopStopwatch();
+		}
+
+	public static void init() {
+		System.setProperty("java.awt.headless", "true"); 
+		Properties.loadProperties("properties.txt");
+		HMMScore.HMMClass.HmmSetUp();
 	}
 	
 	/**
@@ -71,7 +112,7 @@ public class JavaGFS {
 			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File(args[1]));
 			
 			
-			ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+			ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 			
 			TextReporter textReport = new TextReporter(matches, spectra, null);
 			textReport.generateFullReport();
@@ -110,7 +151,7 @@ public class JavaGFS {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/ipi.HUMAN.v3.53.fasta"));
 		
 		
-		ArrayList<Match> matches = JavaGFS.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
 		
 		TextReporter textReport = new TextReporter(matches, spectra, null);
 		textReport.generateFullReport();
@@ -120,91 +161,6 @@ public class JavaGFS {
 	}
 	
 	
-	
-	public JavaGFS(String [] args) {
-		U.startStopwatch();
-		printGreeting();
-		
-		
-		//setting other properties
-//		Properties.maximumNumberOfMatchesForASpectrum = 1;
-//		Properties.peakDifferenceThreshold = 0.25;
-//		Properties.peakIntensityExponent = 0.3;
-		
-		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-		
-		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		
-		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
-		
-		//set up HMM
-//		HMMScore.HMMClass.HmmSetUp();
-		
-		//loop through each sequence in the sequences ArrayList
-		//for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
-		for (Sequence sequence: sequences) {		
-			matches.addAll(asynchronousDigestion(sequence, spectra));
-		}
-		
-		//calculate HMM scores
-//		HMMScorer hmmScorer = new HMMScorer(matches);
-//		hmmScorer.score();
-		
-//		HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-//		report.generateFullReport();
-		
-		TextReporter textReport = new TextReporter(matches, spectra, sequences);
-		textReport.generateFullReport();
-		
-//		saveBadSpectra(matches);
-		
-		U.p();
-		U.stopStopwatch();
-	}
-	
-	public static void saveBadSpectra(ArrayList<Match> matches) {
-		try {
-			File badSpectraFolder = new File("bad spectra");
-			badSpectraFolder.mkdirs();
-			File badPeptidesFile = new File("bad-peptides.txt");
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(badPeptidesFile)));
-			int fileIndex = 1;
-			for (int i = 0; i < matches.size(); i++) {
-				Match match = matches.get(i);
-				if (match.getScoreHMM() < 1) {
-					//copy spectrum file
-					InputStream in = new FileInputStream(match.getSpectrum().getFile());
-					File badSpectrum = new File(badSpectraFolder, fileIndex + ".dta");	
-					OutputStream out = new FileOutputStream(badSpectrum);
-					byte[] buf = new byte[1024];
-					int len;
-					while ((len = in.read(buf)) > 0) {
-						out.write(buf, 0, len);
-					}
-					in.close();
-					out.close();
-					fileIndex++;
-					
-					//save bad peptide
-					pw.println(match.getPeptide().getAcidSequence());
-				}
-				
-			}
-			pw.flush();
-			pw.close();
-		}
-		catch (FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	/**
 	 * For the sake of a lower memory footprint we will not extract
 	 * every reading frame, every missed and non-missed cleavages combination
@@ -213,31 +169,31 @@ public class JavaGFS {
 	 * the genome in pieces.  One reading frame at a time.  Once with missed cleavages
 	 * and once without.
 	 */
-	public static ArrayList<Match> synchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
-		ArrayList<Match> matches = new ArrayList<Match>();
-		ArrayList<NucleotideSequence> nucleotideSequences = sequence.getNucleotideSequences();
-		
-		//ArrayList<Peptide> peptides = sequence.extractPeptides();
-		for (byte frame = 0; frame < 3; frame++) {
-			for (int forwards = 0; forwards < 2; forwards++) {
-				for (int missedCleavage = 0; missedCleavage < 2; missedCleavage++) {
-					//we extract our list of peptides
-					ArrayList<Peptide> peptides = sequence.extractPeptides(nucleotideSequences, frame, forwards == 0, missedCleavage == 0);
-					
-					//This is where the bulk of the processing in long jobs takes
-					ScoringEngine engine = new ScoringEngine(peptides, spectra, sequence);
-					
-					//harvest the results
-					matches.addAll(engine.getMatches());
-					
-					//I know Java doesn't need memory management and all that, but this is a lot of memory we're talkin' about here
-					peptides = null;
-					System.gc();
-				}
-			}
-		}
-		return matches;
-	}
+//	public static ArrayList<Match> synchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
+//		ArrayList<Match> matches = new ArrayList<Match>();
+//		ArrayList<NucleotideSequence> nucleotideSequences = sequence.getNucleotideSequences();
+//		
+//		//ArrayList<Peptide> peptides = sequence.extractPeptides();
+//		for (byte frame = 0; frame < 3; frame++) {
+//			for (int forwards = 0; forwards < 2; forwards++) {
+//				for (int missedCleavage = 0; missedCleavage < 2; missedCleavage++) {
+//					//we extract our list of peptides
+//					ArrayList<Peptide> peptides = sequence.extractPeptides(nucleotideSequences, frame, forwards == 0, missedCleavage == 0);
+//					
+//					//This is where the bulk of the processing in long jobs takes
+//					ScoringEngine engine = new ScoringEngine(peptides, spectra, sequence);
+//					
+//					//harvest the results
+//					matches.addAll(engine.getMatches());
+//					
+//					//I know Java doesn't need memory management and all that, but this is a lot of memory we're talkin' about here
+//					peptides = null;
+//					System.gc();
+//				}
+//			}
+//		}
+//		return matches;
+//	}
 	
 	/**
 	 * takes full advantage of the SequenceDigestionThread.  However, this 
