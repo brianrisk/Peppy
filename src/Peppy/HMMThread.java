@@ -1,7 +1,5 @@
 package Peppy;
 
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class HMMThread implements Runnable {
 	

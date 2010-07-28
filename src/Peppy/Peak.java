@@ -12,7 +12,16 @@ public class Peak implements Comparable<Peak>{
 	double intensity;
 
 	Color color = Color.gray;
+	boolean hilighted = false;
 	
+	public boolean isHilighted() {
+		return hilighted;
+	}
+
+	public void setHilighted(boolean hilighted) {
+		this.hilighted = hilighted;
+	}
+
 	final int COMPARE_MASS = 0;
 	final int COMPARE_INTENSITY = 1;
 	int compareBy = COMPARE_MASS;

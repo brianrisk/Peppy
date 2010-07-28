@@ -1,19 +1,23 @@
 package Peppy;
 import java.util.ArrayList;
 
+import Utilities.U;
+
 public class SequenceDigestionThread implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 	NucleotideSequence nucleotideSequence;
 	byte frame;
 	boolean forwards;
+	int startIndex;
+	int stopIndex;
 
 	public void run() {
 		//go through each character in the line, skipping ahead "frame" characters
 		if (forwards) {
-			digest(frame, nucleotideSequence.getSequence().length());
+			digest(startIndex + frame, stopIndex);
 		} else {
-			digest(nucleotideSequence.getSequence().length() - frame - 1, 0);	
+			digest(stopIndex - frame - 1, startIndex);	
 		}
 	}
 	
@@ -24,10 +28,26 @@ public class SequenceDigestionThread implements Runnable {
 	 * @param forwards
 	 */
 	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
+			byte frame, boolean forwards, int startIndex, int stopIndex) {
+		this.nucleotideSequence = nucleotideSequence;
+		this.frame = frame;
+		this.forwards = forwards;
+		this.startIndex = startIndex;
+		this.stopIndex = stopIndex;
+	}
+	
+	/**
+	 * @param nucleotideSequence
+	 * @param frame
+	 * @param forwards
+	 */
+	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
 			byte frame, boolean forwards) {
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
 		this.forwards = forwards;
+		this.startIndex = 0;
+		this.stopIndex = nucleotideSequence.getSequence().length();
 	}
 
 	public ArrayList<Peptide> getPeptides( ) {
@@ -42,6 +62,96 @@ public class SequenceDigestionThread implements Runnable {
 	}
 	
 	public void digest(int startIndex, int stopIndex) {
+		//a codon is a set of 3 nucleotide characters
+		char [] codon = new char[3];
+		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
+		int codonIndex = 0;
+		//the amino acid is the translation of the codon
+		char aminoAcid = 'x';
+		//Where we store all of our forming peptides
+		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+		
+		final int codonIncrement;
+		if (forwards) {codonIncrement = 1;}
+		else {codonIncrement = -1;}
+		
+		int nucleotideIndex = startIndex;
+		//acidIndex points to the beginning of where the acid is coded
+		int acidIndex = startIndex;
+		//so we don't have to keep doing this calculation
+		int startIndexPlusThree = startIndex + (3 * codonIncrement);
+		while (nucleotideIndex != stopIndex) {
+			
+			
+			//if codonIndex is 3 that means our codon is full and we can determine the amino acid
+			if (codonIndex == 3) {
+				codonIndex = 0;
+				
+				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwards)];
+				
+				//if this is the beginning, start a peptide
+				if (nucleotideIndex == startIndexPlusThree) {
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
+				} else {
+					//add this amino acid to all peptides under construction
+					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+						puc.addAminoAcid(aminoAcid);
+					}
+				}
+				
+				
+				if (aminoAcid == 'M') {
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
+					//sometimes the M is not added, so we're accounting for this here
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + (3 * codonIncrement)));
+				} else {
+					if (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R') {
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + (3 * codonIncrement)));
+						//add all peptides
+						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+							Peptide peptide = new Peptide(puc.getSequence(), acidIndex, forwards, frame,  nucleotideSequence.getParentSequence());
+							if (peptide.getMass() >= Properties.peptideMassThreshold) peptides.add(peptide);
+						}
+					}
+				}
+				
+				//if stop, then clear out
+				if (aminoAcid == '.') {
+					peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+				}
+				
+				//remove all peptide under construction that have reached their maximum break count
+				int size = peptidesUnderConstruction.size();
+				for (int i = 0; i < size; i++) {
+					PeptideUnderConstruction puc = peptidesUnderConstruction.get(i);
+					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
+						peptidesUnderConstruction.remove(i);
+						i--;
+						size--;
+					}
+				}
+				
+				//our acid index can now move forward
+				acidIndex += (3 * codonIncrement);
+			}
+			
+			codon[codonIndex] = nucleotideSequence.getSequence().charAt(nucleotideIndex);	
+			codonIndex++;
+			nucleotideIndex += codonIncrement;	
+		}	
+		//adding all the remaining peptides under construction
+		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+			Peptide peptide = new Peptide(puc.getSequence(), nucleotideIndex, forwards, frame,  nucleotideSequence.getParentSequence());
+			if (peptide.getMass() >= Properties.peptideMassThreshold) peptides.add(peptide);
+		}
+	}
+	
+	/**
+	 * The original digestion.  Can be deleted when you see fit.
+	 * @param startIndex
+	 * @param stopIndex
+	 */
+	public void digestORIGINAL(int startIndex, int stopIndex) {
 		//a codon is a set of 3 nucleotide characters
 		char [] codon = new char[3];
 		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
@@ -79,8 +189,6 @@ public class SequenceDigestionThread implements Runnable {
 				codonIndex = 0;
 				aminoAcidIndex = indexForCodonArray(codon, forwards);
 				aminoAcid = Definitions.aminoAcidList[aminoAcidIndex];
-				//if (nucleotideIndex >= 2901329 && nucleotideIndex <= 2901399) {System.out.print(aminoAcid);}
-				
 				
 				//determine if we're in an open reading frame
 				
@@ -112,8 +220,6 @@ public class SequenceDigestionThread implements Runnable {
 			codonIndex++;
 			nucleotideIndex += codonIncrement;	
 		}
-		
-
 		
 		
 	}

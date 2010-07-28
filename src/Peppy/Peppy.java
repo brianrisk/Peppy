@@ -14,8 +14,8 @@ import Utilities.U;
 
 
 /**
- * JavaGFS
- * A very stripped down Java version of Morgan Gidding's GFS.
+ * Peppy
+ * A very stripped down Java version of the MS/MS to genome mapping of Morgan Gidding's GFS.
  * Designed with the following goals:
  * 1) More simple code to promote open source development
  * 2) Takes advantage of Java's popularity over Objective-C
@@ -28,7 +28,7 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init();
-		new Peppy	(args);
+		new Peppy(args);
 //		testHMMScoreOnSwissProt();
 //		runOnProteinDatabase(args);
 //		exportPeptideList();
@@ -61,6 +61,8 @@ public class Peppy {
 				matches.addAll(asynchronousDigestion(sequence, spectra));
 			}
 			
+			U.p("peptide tally: " + peptideTally);
+			
 			//calculate HMM scores
 	//		HMMScorer hmmScorer = new HMMScorer(matches);
 	//		hmmScorer.score();
@@ -78,7 +80,7 @@ public class Peppy {
 	public static void init() {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties("properties.txt");
-		HMMScore.HMMClass.HmmSetUp();
+//		HMMScore.HMMClass.HmmSetUp();
 	}
 	
 	/**
@@ -199,18 +201,27 @@ public class Peppy {
 	 * takes full advantage of the SequenceDigestionThread.  However, this 
 	 * method requires much more memory.
 	 */
+	static int peptideTally = 0;
 	public static ArrayList<Match> asynchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
 			//This is where the big memory drain comes from.  We are extracting
 			//a list of peptides from the sequence file.
-			U.p("Digesting file: " +sequence.getSequenceFile().getName());
+			U.p("Working on sequence: " +sequence.getSequenceFile().getName());
+			ArrayList<Match> matches = new ArrayList<Match>() ;
 			ArrayList<Peptide> peptides;
 			if (Properties.isSequenceFileDNA) {
 				peptides = sequence.extractPeptides();
+				while (peptides != null) {
+					peptideTally += peptides.size();
+					matches.addAll(asynchronousDigestion(peptides, spectra, sequence));
+					peptides = sequence.extractPeptides();
+					//free up the memory of the old peptide arraylist
+					System.gc();
+				}
 			} else {
 				peptides = ProteinDigestion.getPeptidesFromProteinFile(sequence.getSequenceFile());
+				matches = asynchronousDigestion(peptides, spectra, sequence);
 			}
-			
-			return asynchronousDigestion(peptides, spectra, sequence);
+			return matches;
 	}
 	
 	/**

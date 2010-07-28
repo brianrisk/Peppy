@@ -1,7 +1,5 @@
 package HMMScore;
 
-import java.io.*;
-import java.util.*;
 
 public class HMM_SCORE {
 	public static double[] AAMasses = new double[200];

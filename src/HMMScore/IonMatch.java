@@ -1,6 +1,5 @@
 package HMMScore;
 
-import Peppy.Sequence;
 
 public class IonMatch {
 	private int ionName, ionIndex;

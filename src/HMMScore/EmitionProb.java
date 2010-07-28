@@ -1,12 +1,9 @@
 package HMMScore;
 
-import java.util.*;
-import java.lang.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.Vector;
 
 import Peppy.Peak;
-import Peppy.Sequence;
-import Peppy.Definitions;
 
 public class EmitionProb {
 

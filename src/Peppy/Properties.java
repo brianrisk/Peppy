@@ -82,7 +82,7 @@ public class Properties {
 			br.close();
 		} catch (FileNotFoundException e) {
 			U.p("Could not find the properties file: " + fileName);
-			e.printStackTrace();
+			U.p("Using default properties...");
 		} catch (IOException e) {
 			U.p("Could not read the properties file: " + fileName);
 			e.printStackTrace();

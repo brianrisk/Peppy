@@ -1,15 +1,8 @@
 package Peppy;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Collections;
 
 import Utilities.U;
-import Validate.MatchContainer;
 
 
 public class ScoringThread implements Runnable {
