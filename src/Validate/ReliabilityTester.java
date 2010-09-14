@@ -6,6 +6,7 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
+import Peppy.ScoringEngine;
 import Peppy.ScoringThread;
 import Peppy.Sequence;
 import Peppy.Spectrum;
@@ -28,9 +29,11 @@ public class ReliabilityTester {
 //		ReliabilityTester.runTheGamut("USP");
 //		ReliabilityTester.runTheGamut("ecoli");
 //		ReliabilityTester.testReliability("aurum");
-//		ReliabilityTester.testReliability("human");
+		Properties.leftIonDifference += 0.06591731345432421;
+		Properties.rightIonDifference += 0.10782993451209233;
+		ReliabilityTester.testReliability("human");
 //		ReliabilityTester.testReliability("ecoli");
-		ReliabilityTester.testReliability("USP");
+//		ReliabilityTester.testReliability("USP");
 //		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("human");
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
@@ -89,7 +92,7 @@ public class ReliabilityTester {
 	}
 	
 	public static int getNumberOfTopRankingMatches(String species, ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides, ArrayList<Peptide> correctPeptides, ArrayList<String> correctPeptideNames) {
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		int out = 0;
 		for (int i = 0; i < correctPeptides.size(); i++) {	
 			//We've loaded the string.  Now see if we have it as a match to the given spectrum
@@ -160,7 +163,7 @@ public class ReliabilityTester {
 		//loading peptides from a protein database
 //		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
 		
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		//Initialize HMM Score
 //		U.p("testing HMM here!");
@@ -280,7 +283,7 @@ public class ReliabilityTester {
 		U.startStopwatch();
 		ArrayList<Sequence> sequences = Sequence.loadSequences(new File("/Users/risk2/PeppyOverflow/tests/" + species + "/sequences"));
 		//load peptides to see if we are properly extracting
-		ArrayList<Peptide> peptides = sequences.get(0).extractPeptides();
+		ArrayList<Peptide> peptides = sequences.get(0).extractMorePeptides();
 		
 		//go through each file in our peptides folder
 		File peptideFolder = new File("/Users/risk2/PeppyOverflow/tests/" + species + "/peptides");
@@ -354,7 +357,7 @@ public class ReliabilityTester {
 		//loop through each sequence in the sequences ArrayList
 		for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
 			Sequence sequence = sequences.get(sequenceIndex);		
-			matches.addAll(Peppy.asynchronousDigestion(sequence, spectra));
+			matches.addAll(Peppy.getMatches(sequence, spectra));
 		}
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/Users/risk2/PeppyOverflow/tests/" + species + "/highScoringPeptides.txt")));
@@ -381,7 +384,7 @@ public class ReliabilityTester {
 		
 		//keep the top 20 matches for each spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 20;
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/Users/risk2/PeppyOverflow/tests/" + species + "/highScoringPeptides.txt")));

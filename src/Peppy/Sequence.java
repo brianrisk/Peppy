@@ -24,6 +24,11 @@ public class Sequence {
 	private int stopIndex = 0;
 	private int digestionWindowSize = 25000000;
 	private int nucleotideSequenceIndex = 0;
+	//length of the first sequence.  not logical if sequence file contains more than one sequence.
+	private int sequenceLength = 0;
+	//To avoid missing some peptides when digestion in discrete windows we
+	//are allowing for some overlap
+	private final int digestionFrameOverlap = 999; //divisible by three
 	
 	public Sequence(File sequenceFile) {
 		this.sequenceFile = sequenceFile;
@@ -37,11 +42,16 @@ public class Sequence {
 	 * The amount of peptides produced by a sequence may be huge.
 	 * therefore, this method is set up so that it should be called
 	 * multiple times, each time it is called it returns another portion of the
-	 * database of peptides.
+	 * database of peptides.  When there are no more peptides from that sequence
+	 * then null is returned.
 	 * @return a sorted ArrayList of amino acid sequence fragments from the given sequence file
 	 */
-	public ArrayList<Peptide> extractPeptides() {
+	public ArrayList<Peptide> extractMorePeptides() {
+		//if we have yet to read in all the ATGC data, do that now
 		if (nucleotideSequences == null) getNucleotideSequences();
+		
+		//Get whatever sequence we're working on.  There will most often only be
+		//one sequence in nucleotideSequences, but sometimes more
 		NucleotideSequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 		
 		//if this is the first time we've tried to extract peptides
@@ -72,10 +82,11 @@ public class Sequence {
 		//Create our SequenceDigestionThread ArrayList
 		ArrayList<SequenceDigestionThread> digestors = new ArrayList<SequenceDigestionThread>();
 		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true, startIndex, stopIndex));
-			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false, startIndex, stopIndex));
+			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex));
+			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false, startIndex, stopIndex - digestionFrameOverlap));
 		}
 		
+		//create the threads and start them engines!
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
 			Thread thread = new Thread(digestors.get(digestorIndex));
@@ -84,8 +95,7 @@ public class Sequence {
 		}
 		
 		//Wait for them all to finish
-		for (int threadIndex = 0; threadIndex < threads.size(); threadIndex++) {
-			Thread thread = threads.get(threadIndex);
+		for (Thread thread: threads) {
 			try {
 				thread.join();
 			} catch (InterruptedException e) {
@@ -101,6 +111,16 @@ public class Sequence {
 		}
 			
 		Collections.sort(peptides);
+		return peptides;
+	}
+	
+	public ArrayList<Peptide> extractAllPeptides() {
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		ArrayList<Peptide> peptidesToAdd = extractMorePeptides();
+		while (peptidesToAdd != null) {
+			peptides.addAll(peptidesToAdd);
+			peptidesToAdd = extractMorePeptides();
+		}
 		return peptides;
 	}
 	
@@ -149,7 +169,9 @@ public class Sequence {
 					if (line.startsWith(">")) {
 						//if sequenceDescription has not been defined, that means it is the first in the file
 						if (sequenceDescription != null) {
-							nucleotideSequences.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
+							String acidSequence = sequence.toString().toUpperCase();
+							nucleotideSequences.add(new NucleotideSequence(sequenceDescription, acidSequence, this));
+							if (sequenceLength == 0) sequenceLength = acidSequence.length();
 							sequence = new StringBuffer();
 						}
 						sequenceDescription = line;
@@ -162,9 +184,11 @@ public class Sequence {
 						continue;	
 					}
 					sequence.append(line);
-					line = br.readLine().toUpperCase();
+					line = br.readLine();
 				}
-				nucleotideSequences.add(new NucleotideSequence(sequenceDescription, new String(sequence), this));
+				String acidSequence = sequence.toString().toUpperCase();
+				nucleotideSequences.add(new NucleotideSequence(sequenceDescription, acidSequence, this));
+				if (sequenceLength == 0) sequenceLength = acidSequence.length();
 				
 				//close out our stream.  It's the courteous thing to do!
 				br.close();
@@ -203,16 +227,11 @@ public class Sequence {
 	 * 
 	 */
 	public int getSequenceLength() {
-		if (nucleotideSequences == null) {
-			return 0;
-		} else {
-			if (nucleotideSequences.size() == 0) {
-				return 0;
-			} else {
-				NucleotideSequence ns = nucleotideSequences.get(0);
-				return ns.getSequence().length();
-			}
-		}
+		return sequenceLength;
+	}
+	
+	public void clearNucleotideData() {
+		nucleotideSequences.clear();
 	}
 
 }

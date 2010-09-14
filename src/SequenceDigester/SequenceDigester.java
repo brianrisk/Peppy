@@ -42,7 +42,7 @@ public class SequenceDigester {
 				NucleotideSequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 				for (byte frame = 0; frame < 3; frame++) {
 					for (int forwards = 0; forwards <=1; forwards++) {
-						SequenceDigestionThread sdt =  new SequenceDigestionThread(nucleotideSequence, frame, forwards == 0);
+						SequenceDigestionThread sdt =  new SequenceDigestionThread(nucleotideSequence, frame, forwards == 0, 0, nucleotideSequence.getSequence().length());
 						peptides = sdt.getPeptides();
 						File peptideFile = new File(digestedSequenceFolder, "" + sequenceIndex + "-" + nucleotideSequenceIndex + "-frame:" + frame + "-" + forwards + ".txt");
 						try {

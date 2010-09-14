@@ -16,12 +16,11 @@ public class Match implements Comparable<Match>{
 	private double scoreHMM = 0.0;
 	private double eValue;
 	public int ionMatchTally = 0;
+	private double rank = Integer.MAX_VALUE;
 	
 	private Spectrum spectrum;
 	private Peptide peptide;
 	private Sequence sequence;
-	
-	final static double useAcidThreshold = 100.0;
 	
 	public final static int SORT_BY_DEFAULT = 0;
 	public final static int SORT_BY_SPECTRUM_ID = 1;
@@ -30,6 +29,9 @@ public class Match implements Comparable<Match>{
 	public final static int SORT_BY_HMM = 4;
 	public final static int SORT_BY_TANDEM_FIT = 5;
 	public final static int SORT_BY_E_VALUE = 6;
+	public final static int SORT_BY_RANK_THEN_E_VALUE = 7;
+	public final static int SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE = 8;
+	
 	private static int sortParameter = SORT_BY_DEFAULT;
 	
 	public Match(Spectrum spectrum, Peptide peptide, Sequence sequence) {
@@ -74,7 +76,7 @@ public class Match implements Comparable<Match>{
 		
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = peptide.getMass() + Properties.yIonDifference;
+		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
@@ -108,7 +110,7 @@ public class Match implements Comparable<Match>{
 			
 		
 		/* b-ion  */
-		theoreticalPeakMass = Properties.bIonDifference;
+		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
@@ -142,24 +144,33 @@ public class Match implements Comparable<Match>{
 		
 		//find out final tally
 		double score = 0.0;
-		boolean yIonTrue;
+		boolean yIonTrue, bIonTrue;
 		double amountToAdd;
 		for (i = 0; i < peptideString.length(); i++) {
 			yIonTrue = yIonMatchesWithHighestIntensity[i] > 0.0;
+			bIonTrue = bIonMatchesWithHighestIntensity[i] > 0.0;
 			if (yIonTrue) {
-				score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+//				score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				if (bIonTrue) {
+					amountToAdd =  1.17 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				} else {
+					amountToAdd =  1.43 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				}
+//				amountToAdd *=  1.3;
+				score += amountToAdd;
 				ionMatchTally++;
 			}
-			if (bIonMatchesWithHighestIntensity[i] > 0.0) {
-				//Let's try scaling the b ion weight by a bit
-				amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-				//want to diminish this if this peak is already a yIon
-				if (yIonTrue) amountToAdd *= 1.2;
+			if (bIonTrue) {
+				//count b-ions less if not y-ion present, more if present
+				if (yIonTrue) {
+					amountToAdd =  1.1 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				} else {
+					amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+				}
 				score += amountToAdd;
 				ionMatchTally++;
 			}
 		}
-		
 		scoreTandemFit = score;
 		return score;
 	}
@@ -168,6 +179,13 @@ public class Match implements Comparable<Match>{
 		HMMClass scorer = new HMMClass(peptide.getAcidSequence(), spectrum);
 		scoreHMM = scorer.score();
 		return scoreHMM;
+	}
+	
+	public boolean equals(Match match) {
+		if (getScore() == match.getScore()) {
+			if (peptide.equals(match.getPeptide())) return true;
+		}
+		return false;
 	}
 
 	public int compareTo(Match match) {
@@ -209,13 +227,40 @@ public class Match implements Comparable<Match>{
 			if (score > match.getScore()) return -1;
 			if (score < match.getScore()) return  1;
 			return 0;
-		} else {
+		} else
+		if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
+			//we want to sort from greatest to least great
+			//so -1 is returned where 1 usually is
+			if (rank > match.getRank()) return -1;
+			if (rank < match.getRank()) return  1;
+			if (score > match.getScore()) return -1;
+			if (score < match.getScore()) return  1;
+			return 0;
+		} else 
+		if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
+			//i'm putting this calculation in here as this is a not-often-used sort
+			//so calculating and storing this for every match is unnecessary
+			double myDifference = spectrum.getPrecursorMass() - peptide.getMass();
+			double theirDifference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
+			if (myDifference > theirDifference) return -1;
+			if (myDifference < theirDifference) return  1;
+			return 0;
+		} else 
+		{
 			//we want to sort from greatest to least great
 			//so -1 is returned where 1 usually is
 			if (score > match.getScore()) return -1;
 			if (score < match.getScore()) return  1;
 			return 0;
 		}
+	}
+
+	public double getRank() {
+		return rank;
+	}
+
+	public void setRank(double rank) {
+		this.rank = rank;
 	}
 
 	public double getScoreTandemFit() {
@@ -300,6 +345,10 @@ public class Match implements Comparable<Match>{
 
 	public String toString() {
 		return peptide.getAcidSequence() + " " + scoreTandemFit + " " + peptide.getMass();
+	}
+	
+	public void calculateEValue() {
+		eValue = spectrum.getEValue(getScore());
 	}
 
 }

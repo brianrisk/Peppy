@@ -2,6 +2,7 @@ package SpectralVisualizer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -51,7 +52,7 @@ public class SpectralVisualizer {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//print headers
-			HTMLReporter.appendFile(pw, Reports.Properties.reportWebHeaderFile);
+			U.appendFile(pw, Reports.Properties.reportWebHeaderFile);
 			
 			StringBuffer sb;
 			for (int i = 0 ; i <spectra.size(); i++) {
@@ -70,7 +71,7 @@ public class SpectralVisualizer {
 			}
 			
 			//print headers
-			HTMLReporter.appendFile(pw, Reports.Properties.reportWebHeaderFile);
+			U.appendFile(pw, Reports.Properties.reportWebHeaderFile);
 
 			pw.flush();
 			pw.close();
@@ -116,10 +117,14 @@ public class SpectralVisualizer {
 	 * @throws IOException
 	 */
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest) throws IOException {
-		drawSpectrum(spectrum, width, height, dest, true);
+		drawSpectrum(spectrum, width, height, dest, true, "", "");
 	}
 	
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels) throws IOException {
+		drawSpectrum(spectrum, width, height, dest, drawLabels, "", "");
+	}
+	
+	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels, String message1, String message2) throws IOException {
 		
 		int xLoc, yLoc;
 		
@@ -132,8 +137,8 @@ public class SpectralVisualizer {
 		g.fillRect(0,0,width,height);
 		
 		//getting maximum spectrum value and intensity
-		//double maxValue = spectrum.getMaxMass();
-		double maxValue = 1500;
+		double maxValue = spectrum.getMaxMass();
+//		double maxValue = 1500;
 		double maxIntensity = spectrum.getCalculatedMaxIntensity();
 		
 		//draw the lines for our spectra
@@ -147,7 +152,24 @@ public class SpectralVisualizer {
 				if (yLoc < 10) yLoc += 10;
 				g.drawString("" + peak.getIntensity(), xLoc, yLoc);
 			}
+			//if peak is hilighted, draw a little triangle above it
+			if (peak.isHilighted()) {
+				if (yLoc < 10) yLoc += 10;
+				g.setColor(Color.yellow);
+				Polygon polygon = new Polygon();
+				polygon.addPoint(xLoc - 10, yLoc - 10);
+				polygon.addPoint(xLoc - 10, yLoc + 10);
+				polygon.addPoint(xLoc, yLoc);
+				g.fillPolygon(polygon);
+			}
 		}
+		
+		//draw messages
+		g.setColor(Color.lightGray);
+		g.drawString(message1, 10, 20);
+		g.drawString(message2, 10, 40);
+		
+		//save the image
 		ImageIO.write(bdest,"JPG",dest);
 	}
 	
@@ -184,7 +206,7 @@ public class SpectralVisualizer {
 		
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = peptide.getMass() + Properties.yIonDifference;
+		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
@@ -211,7 +233,7 @@ public class SpectralVisualizer {
 			
 		
 		/* b-ion  */
-		theoreticalPeakMass = Properties.bIonDifference;
+		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;

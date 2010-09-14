@@ -33,10 +33,11 @@ public class U {
 		startTimeMilliseconds = System.currentTimeMillis();
 	}
 	
-	public static void stopStopwatch() {
+	public static long stopStopwatch() {
 		stopTimeMilliseconds = System.currentTimeMillis();
 		long timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
 		U.p("Time Elapsed: " + U.millisecondsToString(timeElapsed));
+		return timeElapsed;
 	}
 	
 	public static void printTimeRemaining(double amountComplete) {
@@ -146,5 +147,80 @@ public class U {
 	      System.out.println(e.getMessage());      
 	    }
 	  }
+	
+	
+	public static void appendFile(PrintWriter pw, File file) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line = br.readLine();
+			while (line != null) {
+				pw.println(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			U.p("could not append file: " + file.getName());
+			e.printStackTrace();
+		} catch (IOException e) {
+			U.p("could not read file: " + file.getName());
+			e.printStackTrace();
+		}
+	}
+	
+	public static double log(double base, double of) {
+		return Math.log(of) / Math.log(base);
+	}
+	
+	public static double calculateM(double [] xValues, double [] yValues, int start, int stop) {
+		double numerator1, numerator2, denomenator1, denomenator2;
+		double numerator = 0.0, denomenator = 0.0;
+		double temp1 = 0.0, temp2 = 0.0, temp = 0.0;
+		double parameterM;
+		int i;
+		for (i = start; i < stop; i++) {
+			temp += (xValues[i] * yValues[i]);
+		}
+		numerator1 = (stop - start) * (temp);
+		for (i = start; i < stop; i++) {
+			temp1 += xValues[i];
+		}
+		for (i = start; i < stop; i++) {
+			temp2 += yValues[i];
+		}
+		numerator2 = temp1 * temp2;
+		numerator = numerator1 - numerator2;
+		temp1 = temp2 = 0.0;
+		for (i = start; i < stop; i++) {
+			temp1 = xValues[i];
+			temp2 += (temp1 * temp1);
+		}
+		denomenator1 = (stop - start) * temp2;
+
+		temp1 = 0.0; 
+		for (i = start; i < stop; i++) {
+			temp1 += xValues[i];
+		}
+		denomenator2 = (temp1 * temp1);
+		denomenator = denomenator1 - denomenator2;
+		parameterM = numerator / denomenator;
+		return parameterM;
+	}
+	
+	public static double calculateB(double [] xValues, double [] yValues, int start, int stop, double m) {
+		double parameterB;
+		double temp1, temp2;
+		int i;
+
+		temp1 = temp2 = 0.0;
+		for (i = start; i < stop; i++) {
+			temp1 += xValues[i];
+		}
+
+		for (i = start; i < stop; i++) {
+			temp2 += yValues[i];
+		}
+		parameterB = (1.0 / (stop - start)) * (temp2 - m * temp1);
+		return parameterB;
+	}
 
 }

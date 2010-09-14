@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import Peppy.Peak;
 import Peppy.Spectrum;
-import Utilities.U;
 
 
 public class SpectrumComparison implements Comparable<SpectrumComparison> {

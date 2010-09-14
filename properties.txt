@@ -10,7 +10,7 @@ numberOfMissedCleavages 2
 
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
 //it will produce (at most) 35 matches per spectrum
-maximumNumberOfMatchesForASpectrum 5
+maximumNumberOfMatchesForASpectrum 2
 
 //This could be a directory or a file
 sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
@@ -18,8 +18,9 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 
 //This could be a directory or a file
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
 
 //FASTA files can be either DNA or amino acid sequences
 isSequenceFileDNA true
@@ -28,7 +29,7 @@ isSequenceFileDNA true
 reportDirectory reports
 
 //can be "HMM_Score" or "TandemFit"
-defaultScore TandemFit;
+defaultScore TandemFit
 
 //digest only inside ORFs?
 onlyUsePeptidesInOpenReadingFrames true
@@ -36,3 +37,12 @@ onlyUsePeptidesInOpenReadingFrames true
 //spectrum cleaning
 localMaximaCleaning false
 highIntensityCleaning false
+
+//how to calculate our ion masses
+leftIonDifference 1.0
+rightIonDifference 1.0
+
+//limit returned matches by confidence
+eValueCutOff 0.01
+
+

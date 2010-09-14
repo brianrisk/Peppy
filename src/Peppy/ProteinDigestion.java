@@ -33,6 +33,36 @@ public class ProteinDigestion {
 		return out;
 	}
 	
+	public static ArrayList<Peptide> getReversePeptidesFromProteinFile(File proteinFile) {
+		U.p("loading reverse protein file: " + proteinFile.getName());
+		ArrayList<Peptide> out = new ArrayList<Peptide>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
+			String line = br.readLine();
+			StringBuffer buffy = new StringBuffer();
+			while (line != null) {
+				if (line.startsWith(">")) {
+					String forwards = buffy.toString();
+					StringBuffer reverseBuffer = new StringBuffer();
+					for (int i = forwards.length() - 1; i >=0; i--) {
+						reverseBuffer.append(forwards.charAt(i));
+					}
+					out.addAll(getPeptidesFromProteinString(reverseBuffer.toString(), 0, true, (byte) 0, null));
+					buffy = new StringBuffer(); 
+				} else {
+					buffy.append(line);
+				}
+				line = br.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Collections.sort(out);
+		return out;
+	}
+	
 	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, int startIndex, boolean forwards, byte frame, Sequence parentSequence) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		if (proteinString.length() == 0) return out;

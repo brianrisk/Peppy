@@ -1,4 +1,9 @@
 package Peppy;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import Utilities.U;
@@ -29,6 +34,7 @@ public class SequenceDigestionThread implements Runnable {
 	 */
 	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
 			byte frame, boolean forwards, int startIndex, int stopIndex) {
+		if (startIndex < 0) startIndex = 0;
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
 		this.forwards = forwards;
@@ -36,30 +42,10 @@ public class SequenceDigestionThread implements Runnable {
 		this.stopIndex = stopIndex;
 	}
 	
-	/**
-	 * @param nucleotideSequence
-	 * @param frame
-	 * @param forwards
-	 */
-	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
-			byte frame, boolean forwards) {
-		this.nucleotideSequence = nucleotideSequence;
-		this.frame = frame;
-		this.forwards = forwards;
-		this.startIndex = 0;
-		this.stopIndex = nucleotideSequence.getSequence().length();
-	}
-
 	public ArrayList<Peptide> getPeptides( ) {
-		if (peptides.size() == 0) {
-			if (forwards) {
-				digest(frame, nucleotideSequence.getSequence().length());
-			} else {
-				digest(nucleotideSequence.getSequence().length() - frame - 1, 0);	
-			}
-		}
 		return peptides;
 	}
+	
 	
 	public void digest(int startIndex, int stopIndex) {
 		//a codon is a set of 3 nucleotide characters
@@ -75,11 +61,17 @@ public class SequenceDigestionThread implements Runnable {
 		if (forwards) {codonIncrement = 1;}
 		else {codonIncrement = -1;}
 		
+		int threeTimesCodonIncrement = (3 * codonIncrement);
+		
+		//account for digestionFrameOverlap making startIndex < 0
+		if (startIndex < 0) startIndex = 0;
 		int nucleotideIndex = startIndex;
 		//acidIndex points to the beginning of where the acid is coded
 		int acidIndex = startIndex;
 		//so we don't have to keep doing this calculation
-		int startIndexPlusThree = startIndex + (3 * codonIncrement);
+		int startIndexPlusThree = startIndex + threeTimesCodonIncrement;
+		
+		
 		while (nucleotideIndex != stopIndex) {
 			
 			
@@ -103,13 +95,13 @@ public class SequenceDigestionThread implements Runnable {
 				if (aminoAcid == 'M') {
 					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
 					//sometimes the M is not added, so we're accounting for this here
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + (3 * codonIncrement)));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 				} else {
 					if (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R') {
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + (3 * codonIncrement)));
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 						//add all peptides
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-							Peptide peptide = new Peptide(puc.getSequence(), acidIndex, forwards, frame,  nucleotideSequence.getParentSequence());
+							Peptide peptide = new Peptide(puc.getSequence(), acidIndex, forwards, (byte) (acidIndex % 3),  nucleotideSequence.getParentSequence());
 							if (peptide.getMass() >= Properties.peptideMassThreshold) peptides.add(peptide);
 						}
 					}
@@ -132,7 +124,7 @@ public class SequenceDigestionThread implements Runnable {
 				}
 				
 				//our acid index can now move forward
-				acidIndex += (3 * codonIncrement);
+				acidIndex += threeTimesCodonIncrement;
 			}
 			
 			codon[codonIndex] = nucleotideSequence.getSequence().charAt(nucleotideIndex);	
@@ -146,83 +138,7 @@ public class SequenceDigestionThread implements Runnable {
 		}
 	}
 	
-	/**
-	 * The original digestion.  Can be deleted when you see fit.
-	 * @param startIndex
-	 * @param stopIndex
-	 */
-	public void digestORIGINAL(int startIndex, int stopIndex) {
-		//a codon is a set of 3 nucleotide characters
-		char [] codon = new char[3];
-		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
-		int codonIndex = 0;
-		//the amino acid is the translation of the codon
-		char aminoAcid = 'x';
-		//need to keep track of the last amino acid for trypsin reasons.
-		//filling it with a nonsense value to start.
-		char previousAminoAcid = 'x';
-		//the index of our amino acid defined by the nucleotide codon
-		int aminoAcidIndex;
-		//peptide is the chain of amino acids we are building in the open reading frame
-		StringBuffer proteinUnderConstruction = new StringBuffer();
-		int peptideStartIndex = startIndex;
-		String proteinString = "";
-		
-
-		
-		//since we only want peptides in open reading frames (between a START and a STOP)
-		boolean inOpenReadingFrame = false;
-		
-		final int codonIncrement;
-		if (forwards) {codonIncrement = 1;}
-		else {codonIncrement = -1;}
-		
-		
-		//go through each character in the line, skipping ahead "frame" characters
-		//this while loop is necessary (rather than a "for") to accommodate reading forwards/backwards
-		int nucleotideIndex = startIndex;
-		while (nucleotideIndex != stopIndex) {
-			
-			
-			//if codonIndex is 3 that means our codon is full and we can determine the amino acid
-			if (codonIndex == 3) {
-				codonIndex = 0;
-				aminoAcidIndex = indexForCodonArray(codon, forwards);
-				aminoAcid = Definitions.aminoAcidList[aminoAcidIndex];
-				
-				//determine if we're in an open reading frame
-				
-				//if previous amino is stop, we may want to dump the created protein into the protein digester
-				if (previousAminoAcid == '.') {
-					if (inOpenReadingFrame || !Properties.onlyUsePeptidesInOpenReadingFrames) {
-						proteinString = proteinUnderConstruction.toString();
-						peptides.addAll(ProteinDigestion.getPeptidesFromProteinString(proteinString, peptideStartIndex, forwards, frame, nucleotideSequence.getParentSequence()));
-					}
-					inOpenReadingFrame = false;
-				}
-				if (previousAminoAcid == 'M' && !inOpenReadingFrame) {
-					inOpenReadingFrame = true;
-					proteinUnderConstruction = new StringBuffer();
-					peptideStartIndex = nucleotideIndex;
-					//shifting to correspond with GFS
-					if (!forwards) {peptideStartIndex += 1;}
-				}
-				
-				if (inOpenReadingFrame || !Properties.onlyUsePeptidesInOpenReadingFrames) {proteinUnderConstruction.append(aminoAcid);}
-				//peptideMass += Definitions.aminoAcidMassesAverage[aminoAcidIndex];
-				previousAminoAcid = aminoAcid;
-			}
-			
-//			proteinString = proteinUnderConstruction.toString();
-//			peptides.addAll(ProteinDigestion.getPeptidesFromProteinString(proteinString, peptideStartIndex, forwards, frame, nucleotideSequence.getParentSequence()));
-			
-			codon[codonIndex] = nucleotideSequence.getSequence().charAt(nucleotideIndex);	
-			codonIndex++;
-			nucleotideIndex += codonIncrement;	
-		}
-		
-		
-	}
+	
 	
 
 

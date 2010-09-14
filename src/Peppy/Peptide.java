@@ -117,7 +117,11 @@ public class Peptide implements Comparable<Peptide> {
 	}
 	
 	public boolean equals(Peptide peptide) {
-		return equals(peptide.getAcidSequence());
+		if (mass == peptide.getMass()) {
+			return equals(peptide.getAcidSequence());
+		} else {
+			return false;
+		}
 	}
 
 

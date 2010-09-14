@@ -29,7 +29,7 @@ public class Properties {
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
 	
-	//when it comes to calculating theortical peptide mass, we can use mono or average
+	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
 	
 	//Sequence digestion
@@ -44,11 +44,14 @@ public class Properties {
 	//TandemFit
 	public static double peakDifferenceThreshold = 0.5;
 	public static double peakIntensityExponent = 0.33333333;
-	public static double yIonDifference = 1.0;
-	public static double bIonDifference = 1.0;
+	public static double rightIonDifference = 1.0; //x, y, z ion
+	public static double leftIonDifference = 1.0;  //a, b, c ion
 	
 	//matches per spectrum
 	public static int maximumNumberOfMatchesForASpectrum = 5;
+	
+	//e value cut off
+	public static double eValueCutOff = 0.01;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -64,6 +67,11 @@ public class Properties {
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
+	
+	//where we put our validation report
+	public static File validationDirectory = new File("validation");
+	
+	public static boolean reduceDuplicateMatches = false;
 	
 	
 	/**
@@ -140,6 +148,17 @@ public class Properties {
 			if (propertyValue.equals("HMM_Score")) {
 				defaultScore = DEFAULT_SCORE_HMM;
 			}
+		}
+		
+		if (propertyName.equals("leftIonDifference")) {
+			leftIonDifference = Double.valueOf(propertyValue);
+		}
+		if (propertyName.equals("rightIonDifference")) {
+			rightIonDifference = Double.valueOf(propertyValue);
+		}
+		
+		if (propertyName.equals("eValueCutOff")) {
+			eValueCutOff = Double.valueOf(propertyValue);
 		}
 		
 		

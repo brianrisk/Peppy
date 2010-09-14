@@ -25,6 +25,18 @@ public class Spectrum implements Comparable<Spectrum>{
 	private int charge = 0;
 	private File file;
 	
+	//E-Values:  allocating histogram variables
+	private final int numberOfHistogramBars = 100;
+	private int [] histogram = new int[numberOfHistogramBars];
+	private double [] scoreProbabilities = new double[numberOfHistogramBars];
+	private double [] survivability = new double[numberOfHistogramBars];
+	private double [] xValues = new double[numberOfHistogramBars];
+	private double highScore = -1.0;
+	private double lowScore = 0.0;
+	private double barWidth;
+	private double m, b;
+	private int peptideCount;
+	
 	//in reality these values should never be less than a positive number
 	private double averageIntensity = -1; 
 	private double maxIntensity = -1; 
@@ -33,6 +45,10 @@ public class Spectrum implements Comparable<Spectrum>{
 	
 	public Spectrum() {
 		peaks = new ArrayList<Peak>();
+	}
+	
+	public Spectrum (String s) {
+		this(new File(s));
 	}
 	
 	public Spectrum(File file) {
@@ -67,14 +83,14 @@ public class Spectrum implements Comparable<Spectrum>{
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
 		precursorMass = Double.parseDouble(chunks[0]);
+		precursorMass -= Definitions.HYDROGEN_MONO;
 		if (file.getName().endsWith(".dta")) {
 			charge = Integer.parseInt(chunks[1]);
-			precursorMass -= Definitions.HYDROGEN_MONO;
 		}
 		//assumes txt files are really pkl
 		if (file.getName().endsWith(".pkl") || file.getName().endsWith(".txt")) {
 			charge = Integer.parseInt(chunks[2]);
-			precursorMass = charge * (precursorMass - Definitions.HYDROGEN_MONO);
+			precursorMass *= charge;
 		}
 	}
 	
@@ -390,8 +406,119 @@ public class Spectrum implements Comparable<Spectrum>{
 		if (precursorMass > spectrum.getPrecursorMass())  return 1;
 		return  0;
 	}
+	
+	
+	/**
+	 * find the e value for just one given score
+	 * @param score
+	 * @return
+	 */
+	public double getEValue(double score) {
+		double eValue = m * score + b;
+		eValue = Math.exp(eValue);
+		eValue *= peptideCount;
+		//setting to Double.MAX_VALUE if eValue is Nan
+		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
+		return eValue;
+	}
+	
+	public int [] getHistogram() {return histogram;}
+	
 
+	/**
+	 * find expected value (a.k.a. "e value") for top matches
+	 * 
+	 * This method assumes that matchesForOneSpectrum is already sorted from highest score to lowest.
+	 * Calculates e values for each of the top matches
+	 * @param matchesForOneSpectrum
+	 * @param topMatches
+	 */
+	public void calculateEValues(ArrayList<Match> matchesForOneSpectrum, ArrayList<Match> topMatches) {
+		//Set these values if this is our first time calculating e value
+		if (highScore < 0) {
+			//setting up the histogram parameters
+			highScore = matchesForOneSpectrum.get(0).getScore();
+			barWidth = (highScore - lowScore) / numberOfHistogramBars;
+			
+			//initializing histograms and xValues
+			for (int i = 0; i < numberOfHistogramBars; i++) {
+				histogram[i] = 0;
+				xValues[i] = lowScore + (i * barWidth);
+			}
+		}
 
+		//populate the histogram
+		int bin;
+		for (Match match: matchesForOneSpectrum) {
+			bin = (int) Math.floor((match.getScore() - lowScore) / barWidth);
+			if (bin < numberOfHistogramBars) {
+				histogram[bin]++;
+			} else {
+				histogram[numberOfHistogramBars - 1]++;
+			}
+		}
+		
+		//find score probabilities
+		for (int i = 0; i < numberOfHistogramBars; i++) {
+			scoreProbabilities[i] = (double) histogram[i] / matchesForOneSpectrum.size();
+		}
+		
+		//find survivability values
+		survivability[numberOfHistogramBars - 1] = scoreProbabilities[numberOfHistogramBars - 1];
+		for (int i = numberOfHistogramBars - 2; i >= 0; i--) {
+			survivability[i] = survivability[i + 1] + scoreProbabilities[i];
+		}
+		
+		//find index survivability values at 0.1 or less
+		int chopIndex;
+		for (chopIndex = 0; chopIndex < numberOfHistogramBars; chopIndex++) {
+			if (survivability[chopIndex] <= 0.1) break;
+		}
+		
+		//find first 0 above chopIndex
+		int topIndex;
+		for (topIndex = chopIndex; topIndex < numberOfHistogramBars; topIndex++) {
+			if (histogram[topIndex] == 0) break;
+		}
+		//if we don't want to use topIndex....
+//		topIndex = numberOfHistogramBars;
+		
+		//taking the log of each of the survivability.  Only concerned
+		//about values at and above chopIndex
+		for (int i = chopIndex; i < topIndex; i++) {
+			survivability[i] = Math.log(survivability[i]);
+		}
+		
+		//finding the least squares fit for that region
+		// y = m * x + b
+		m = U.calculateM(xValues, survivability, chopIndex, topIndex);
+		b = U.calculateB(xValues, survivability, chopIndex, topIndex, m);
+		
+		//using our m and b to derive e values for all top matches
+		double eValue;
+		peptideCount += matchesForOneSpectrum.size();
+		for (Match match: topMatches) {
+			eValue = m * match.getScore() + b;
+			eValue = Math.exp(eValue);
+			eValue *= peptideCount;
+			//setting to -1 if eValue is Nan
+			if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
+			match.setEValue(eValue);
+		}
+		
+//		//ha ha, jump in here and standard deviation distance
+//		double variance = 0.0;
+//		for (int i = 0; i < numberOfHistogramBars; i++) {
+//			variance += xValues[i] * xValues[i] * histogram[i];
+//		}
+//		variance /= peptideCount;
+//		double standard_deviation = Math.sqrt(variance);
+//		for (Match match: topMatches) {
+//			match.setEValue(standard_deviation / match.getScore());
+//		}
+	}
+	
+	
 
 }
 

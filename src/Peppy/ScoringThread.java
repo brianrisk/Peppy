@@ -12,13 +12,6 @@ public class ScoringThread implements Runnable {
 	ScoringEngine scoringEngine;
 	Sequence sequence;
 	
-	//E-Values:  allocating histogram variables
-	int numberOfHistogramBars = 50;
-	int [] histogram = new int[numberOfHistogramBars];
-	double [] scoreProbabilities = new double[numberOfHistogramBars];
-	double [] survivability = new double[numberOfHistogramBars];
-	double [] xValues = new double[numberOfHistogramBars];
-	
 	/**
 	 * @param peptides
 	 * @param spectrum
@@ -54,158 +47,58 @@ public class ScoringThread implements Runnable {
 				matchesForOneSpectrum.add(match);
 			}
 			
+//			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
+//				U.p("first index: " + firstPeptideIndex);
+//				U.p("last index: " + lastPeptideIndex);
+//				U.p("precuror = " + spectrum.getPrecursorMass());
+//				U.p ("lowestPeptideMassToConsider: " + lowestPeptideMassToConsider);
+//				U.p ("highestPeptideMassToConsider: " + highestPeptideMassToConsider);
+//				U.p("peptide mass = " + (new Peptide("VVSMDENFHPLNELIPLVYIQDPK")).getMass());
+//			}
+			
 			//collect the top maximumNumberOfMatchesForASpectrum
+			Match.setSortParameter(Match.SORT_BY_DEFAULT);
 			Collections.sort(matchesForOneSpectrum);
 			ArrayList<Match> topMatches = new ArrayList<Match>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
-			for (int i = 0; i < max; i++) {
-				topMatches.add(matchesForOneSpectrum.get(i));
+			//We may want to reduce the number of duplicate matches
+			if (Properties.reduceDuplicateMatches) {
+				Match previousMatch = null;
+				for (int i = 0; i < max; i++) {
+					Match topMatch = matchesForOneSpectrum.get(i);
+					if (i >= 1) {
+						if (!topMatch.equals(previousMatch)) {
+							topMatches.add(topMatch);
+						}else {
+							if (max < matchesForOneSpectrum.size()) max++;
+						}
+					} else {
+						topMatches.add(topMatch);
+					}
+					previousMatch = topMatch;
+				}
+			} else {
+				for (int i = 0; i < max; i++) {
+					topMatches.add(matchesForOneSpectrum.get(i));
+				}
+			}
+			//set rank -- NOTE: this might not be true rank if multiple chromosomes, multiple digestion windows
+			for (int i = 0; i < topMatches.size(); i++) {
+				Match topMatch = topMatches.get(i);
+				topMatch.setRank(i);
 			}
 			
 			//assign E values to top Matches:
-			if (matchesForOneSpectrum.size() == 0) {
-				U.p("There were zero matches for this spectrum file: " + spectrum.getFile().getName());
-			} else {
-				calculateEValues(matchesForOneSpectrum, topMatches);
+			if (matchesForOneSpectrum.size() != 0) {
+				spectrum.calculateEValues(matchesForOneSpectrum, topMatches);
 			}
 			
 			//return results, get new task
 			spectrum = scoringEngine.getNextSpectrum(topMatches);
 		}
 	}
-	
 
-	
-	/**
-	 * This method assumes that matchesForOneSpectrum is already sorted from highest score to lowest.
-	 * Calculates e values for each of the top matches
-	 * @param matchesForOneSpectrum
-	 * @param topMatches
-	 */
-	private void calculateEValues(ArrayList<Match> matchesForOneSpectrum, ArrayList<Match> topMatches) {
-		/*
-		 * find expected value (aka "e value") for top matches
-		 */
-		//setting up the histogram paramaters
-		double highScore = matchesForOneSpectrum.get(0).getScore();
-		double lowScore = 0;
-		double barWidth = (highScore - lowScore) / numberOfHistogramBars;
-		
-		//initializing histograms and xValues
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			histogram[i] = 0;
-			xValues[i] = lowScore + (i * barWidth);
-		}
-
-		//populate the histogram
-		int bin;
-		for (Match match: matchesForOneSpectrum) {
-			bin = (int) Math.floor((match.getScore() - lowScore) / barWidth);
-			if (bin == numberOfHistogramBars) bin = numberOfHistogramBars - 1;
-			histogram[bin]++;
-		}
-		
-		//find score probabilities
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) histogram[i] / matchesForOneSpectrum.size();
-		}
-		
-		//find survivability values
-		survivability[numberOfHistogramBars - 1] = scoreProbabilities[numberOfHistogramBars - 1];
-		for (int i = numberOfHistogramBars - 2; i >= 0; i--) {
-			survivability[i] = survivability[i + 1] + scoreProbabilities[i];
-		}
-		
-		//find index survivability values at 0.1 or less
-		int chopIndex;
-		for (chopIndex = 0; chopIndex < numberOfHistogramBars; chopIndex++) {
-			if (survivability[chopIndex] <= 0.1) break;
-		}
-		
-		//find first 0 above chopIndex
-		int topIndex;
-		for (topIndex = chopIndex; topIndex < numberOfHistogramBars; topIndex++) {
-			if (histogram[topIndex] == 0) break;
-		}
-		//if we don't want to use topIndex....
-//		topIndex = numberOfHistogramBars;
-		
-		//taking the log of each of the survivability.  Only concerned
-		//about values at and above chopIndex
-		for (int i = chopIndex; i < topIndex; i++) {
-			survivability[i] = Math.log(survivability[i]);
-		}
-		
-		//finding the least squares fit for that region
-		// y = m * x + b
-		double m = calculateM(xValues, survivability, chopIndex, topIndex);
-		double b = calculateB(xValues, survivability, chopIndex, topIndex, m);
-		
-		//using our m and be to derive e values for all top matches
-		double eValue;
-		int peptideCount = matchesForOneSpectrum.size();
-		for (Match match: topMatches) {
-			eValue = m * match.getScore() + b;
-			eValue = Math.exp(eValue);
-			eValue *= peptideCount;
-			//setting to -1 if eValue is Nan
-			if (eValue <= 1 == eValue >= 1) eValue = -1.0;
-			match.setEValue(eValue);
-		}
-	}
-	
-	private double calculateM(double [] xValues, double [] yValues, int start, int stop) {
-		double numerator1, numerator2, denomenator1, denomenator2;
-		double numerator = 0.0, denomenator = 0.0;
-		double temp1 = 0.0, temp2 = 0.0, temp = 0.0;
-		double parameterM;
-		int i;
-		for (i = start; i < stop; i++) {
-			temp += (xValues[i] * yValues[i]);
-		}
-		numerator1 = (stop - start) * (temp);
-		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
-		}
-		for (i = start; i < stop; i++) {
-			temp2 += yValues[i];
-		}
-		numerator2 = temp1 * temp2;
-		numerator = numerator1 - numerator2;
-		temp1 = temp2 = 0.0;
-		for (i = start; i < stop; i++) {
-			temp1 = xValues[i];
-			temp2 += (temp1 * temp1);
-		}
-		denomenator1 = (stop - start) * temp2;
-
-		temp1 = 0.0; 
-		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
-		}
-		denomenator2 = (temp1 * temp1);
-		denomenator = denomenator1 - denomenator2;
-		parameterM = numerator / denomenator;
-		return parameterM;
-	}
-	
-	private double calculateB(double [] xValues, double [] yValues, int start, int stop, double m) {
-		double parameterB;
-		double temp1, temp2;
-		int i;
-
-		temp1 = temp2 = 0.0;
-		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
-		}
-
-		for (i = start; i < stop; i++) {
-			temp2 += yValues[i];
-		}
-		parameterB = (1.0 / (stop - start)) * (temp2 - m * temp1);
-		return parameterB;
-	}
 	
 	/**
 	 * Boolean search to locate the first peptide in the SORTED list of peptides that has
@@ -220,19 +113,6 @@ public class ScoringThread implements Runnable {
 		int increment = index / 2;
 		while (increment > 0) {
 			peptide = peptides.get(index);
-			if (peptide.getMass() > mass) {index -= increment;}
-			else {index += increment;}
-			increment /= 2;
-		}
-		return index;
-	}
-	
-	public static int findFirstIndexWithGreaterMass(Peptide [] peptides, double mass) {
-		Peptide peptide;
-		int index = peptides.length / 2;
-		int increment = index / 2;
-		while (increment > 0) {
-			peptide = peptides[index];
 			if (peptide.getMass() > mass) {index -= increment;}
 			else {index += increment;}
 			increment /= 2;

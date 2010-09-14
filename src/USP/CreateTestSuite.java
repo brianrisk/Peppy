@@ -11,6 +11,7 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
+import Peppy.ScoringEngine;
 import Peppy.Spectrum;
 import Peppy.Match;
 import Utilities.U;
@@ -61,8 +62,11 @@ public class CreateTestSuite {
 		//load the correct peptide set
 		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
+		//restrict the precursors since they should be pretty accurate
+		Properties.spectrumToPeptideMassError = 0.01;
+		
 		//Get the matches
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		//save to appropriate files
 		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
@@ -105,7 +109,7 @@ public class CreateTestSuite {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		//save to appropriate files
 		for (Match match: matches) {

@@ -45,11 +45,11 @@ public class MatchContainer implements Comparable<MatchContainer>{
 		
 		//load in the correct peptide string
 		boolean validPeptideFile = true;
-		String peptideString = "";
+		String correctAcidSequence = "";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(peptideFile));
 			//read the first line;
-			peptideString = br.readLine();
+			correctAcidSequence = br.readLine();
 			//close;
 			br.close();
 		} catch (FileNotFoundException e) {
@@ -61,28 +61,35 @@ public class MatchContainer implements Comparable<MatchContainer>{
 		}
 		
 		//testing that we've got a valid peptide file
-		if (peptideString == null) {
+		if (correctAcidSequence == null) {
 			validPeptideFile = false;
 		}
-		peptideString = peptideString.trim();
-		if (peptideString.equals("")) {
+		correctAcidSequence = correctAcidSequence.trim();
+		if (correctAcidSequence.equals("")) {
 			validPeptideFile = false;
 		}
 		
 		//test equality
 		if (validPeptideFile) {
-			this.correctAcidSequence = peptideString;
-			isTrue = match.getPeptide().equals(peptideString);
+			this.correctAcidSequence = correctAcidSequence;
+			isTrue = match.getPeptide().equals(correctAcidSequence);
 			
 			//If this match is not the true match:
-			//this is in case the peptide is not present in the database
-			//also in the off case the score is equal
-//			if(!isTrue) {
-//				trueMatch = new Match(match.getSpectrum(), new Peptide(this.correctAcidSequence), null);
+			if(!isTrue) {
+				trueMatch = new Match(match.getSpectrum(), new Peptide(this.correctAcidSequence), null);
+				double trueEValue = match.getSpectrum().getEValue(trueMatch.getScore());
+				trueMatch.setEValue(trueEValue);
+				
+				//if not in database
+//				if (trueMatch.getScore() > match.getScore()) {
+//					isTrue = true;
+//					match = trueMatch;
+//				}
+				//in case the scores are equal
 //				if (trueMatch.getScore() == match.getScore()) {
 //					isTrue = true;
 //				}
-//			}
+			}
 		} else {
 			U.p("ERROR: there was not a valid peptide file at " + peptideFile.getName());
 		}
@@ -99,10 +106,10 @@ public class MatchContainer implements Comparable<MatchContainer>{
 	public Match getTrueMatch() {return trueMatch;}
 
 	public int compareTo(MatchContainer o) {
-		double difference = getEValue() - o.getEValue();
-		//we want to sort from least to greatest
-		if (difference > 0) return  1;
-		if (difference < 0) return -1;
+//		if (match.getRank() < o.getMatch().getRank()) return -1;
+//		if (match.getRank() > o.getMatch().getRank()) return  1;
+		if (getEValue() < o.getEValue()) return -1;
+		if (getEValue() > o.getEValue()) return  1;
 		return 0;
 	}
 	

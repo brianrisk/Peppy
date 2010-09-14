@@ -25,6 +25,8 @@ import Utilities.U;
  */
 public class Peppy {
 	
+	//So that we may report the total amount of peptides found
+	static int peptideTally = 0;
 	
 	public static void main(String [] args) {
 		init();
@@ -41,11 +43,13 @@ public class Peppy {
 			
 			
 			//setting other properties
-	//		Properties.maximumNumberOfMatchesForASpectrum = 1;
+			Properties.maximumNumberOfMatchesForASpectrum = 2;
+			Properties.reduceDuplicateMatches = false;
 	//		Properties.peakDifferenceThreshold = 0.25;
 	//		Properties.peakIntensityExponent = 0.3;
 			
 			//Load our spectra
+			U.p("loading spectra...");
 			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
 			U.p("loaded " +spectra.size() + " spectra.");
 			
@@ -58,10 +62,17 @@ public class Peppy {
 			//loop through each sequence in the sequences ArrayList
 			//for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
 			for (Sequence sequence: sequences) {		
-				matches.addAll(asynchronousDigestion(sequence, spectra));
+				matches.addAll(getMatches(sequence, spectra));
+				sequence.clearNucleotideData();
 			}
 			
 			U.p("peptide tally: " + peptideTally);
+			
+			//recalculate e values now that all peptides are in for the count
+			U.p("calculating final e values");
+			for (Match match: matches) {
+				match.calculateEValue();
+			}
 			
 			//calculate HMM scores
 	//		HMMScorer hmmScorer = new HMMScorer(matches);
@@ -114,7 +125,7 @@ public class Peppy {
 			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File(args[1]));
 			
 			
-			ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+			ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 			
 			TextReporter textReport = new TextReporter(matches, spectra, null);
 			textReport.generateFullReport();
@@ -153,7 +164,7 @@ public class Peppy {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/ipi.HUMAN.v3.53.fasta"));
 		
 		
-		ArrayList<Match> matches = Peppy.asynchronousDigestion(peptides, spectra, null);
+		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		TextReporter textReport = new TextReporter(matches, spectra, null);
 		textReport.generateFullReport();
@@ -163,83 +174,31 @@ public class Peppy {
 	}
 	
 	
-	/**
-	 * For the sake of a lower memory footprint we will not extract
-	 * every reading frame, every missed and non-missed cleavages combination
-	 * all at once.  For decent sized chromosomes this would require many gigabytes
-	 * of memory.  Many users will not have enough.  To that end we will process
-	 * the genome in pieces.  One reading frame at a time.  Once with missed cleavages
-	 * and once without.
-	 */
-//	public static ArrayList<Match> synchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
-//		ArrayList<Match> matches = new ArrayList<Match>();
-//		ArrayList<NucleotideSequence> nucleotideSequences = sequence.getNucleotideSequences();
-//		
-//		//ArrayList<Peptide> peptides = sequence.extractPeptides();
-//		for (byte frame = 0; frame < 3; frame++) {
-//			for (int forwards = 0; forwards < 2; forwards++) {
-//				for (int missedCleavage = 0; missedCleavage < 2; missedCleavage++) {
-//					//we extract our list of peptides
-//					ArrayList<Peptide> peptides = sequence.extractPeptides(nucleotideSequences, frame, forwards == 0, missedCleavage == 0);
-//					
-//					//This is where the bulk of the processing in long jobs takes
-//					ScoringEngine engine = new ScoringEngine(peptides, spectra, sequence);
-//					
-//					//harvest the results
-//					matches.addAll(engine.getMatches());
-//					
-//					//I know Java doesn't need memory management and all that, but this is a lot of memory we're talkin' about here
-//					peptides = null;
-//					System.gc();
-//				}
-//			}
-//		}
-//		return matches;
-//	}
-	
-	/**
-	 * takes full advantage of the SequenceDigestionThread.  However, this 
-	 * method requires much more memory.
-	 */
-	static int peptideTally = 0;
-	public static ArrayList<Match> asynchronousDigestion(Sequence sequence, ArrayList<Spectrum> spectra) {
-			//This is where the big memory drain comes from.  We are extracting
-			//a list of peptides from the sequence file.
+	public static ArrayList<Match> getMatches(Sequence sequence, ArrayList<Spectrum> spectra) {
 			U.p("Working on sequence: " +sequence.getSequenceFile().getName());
 			ArrayList<Match> matches = new ArrayList<Match>() ;
 			ArrayList<Peptide> peptides;
 			if (Properties.isSequenceFileDNA) {
-				peptides = sequence.extractPeptides();
+				peptides = sequence.extractMorePeptides();
+				//continually extract peptides from the sequence until there aren't anymore
 				while (peptides != null) {
 					peptideTally += peptides.size();
-					matches.addAll(asynchronousDigestion(peptides, spectra, sequence));
-					peptides = sequence.extractPeptides();
+					//This is where the bulk of the processing in long jobs takes
+					ArrayList<Match> newMatches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
+					//Add only matches with a decent e value
+					for (Match match: newMatches) {
+						if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+					}
+//					matches.addAll(newMatches);
 					//free up the memory of the old peptide arraylist
+					peptides.clear();
 					System.gc();
+					peptides = sequence.extractMorePeptides();
 				}
 			} else {
 				peptides = ProteinDigestion.getPeptidesFromProteinFile(sequence.getSequenceFile());
-				matches = asynchronousDigestion(peptides, spectra, sequence);
+				matches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
 			}
-			return matches;
-	}
-	
-	/**
-	 * takes full advantage of the SequenceDigestionThread.  However, this 
-	 * method requires much more memory.
-	 */
-	public static ArrayList<Match> asynchronousDigestion(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
-
-			//This is where the bulk of the processing in long jobs takes
-			ScoringEngine engine = new ScoringEngine(peptides, spectra, sequence);
-			
-			//harvest the results
-			ArrayList<Match> matches =  engine.getMatches();
-			
-			//I know Java doesn't need memory management and all that, but let's just be sure
-			peptides = null;
-			System.gc();
-			
 			return matches;
 	}
 	
@@ -259,7 +218,7 @@ public class Peppy {
 				Sequence sequence = sequences.get(sequenceIndex);
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("peptides/" + sequence.getSequenceFile().getName())));
 				
-				ArrayList<Peptide> peptides = sequence.extractPeptides();
+				ArrayList<Peptide> peptides = sequence.extractMorePeptides();
 				for (int i = 1; i < peptides.size(); i++) {
 					pw.println(peptides.get(i));
 				}
