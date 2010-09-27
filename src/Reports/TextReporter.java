@@ -58,9 +58,11 @@ public class TextReporter {
 			
 			
 			StringBuffer sb;
-			for (Match match: matches) {
+			for (Match match: matches) {;
 				sb = new StringBuffer();
 				sb.append(match.getSpectrum().getId());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getMD5());
 				sb.append('\t');
 				sb.append(match.getSpectrum().getFile().getName());
 				sb.append('\t');
@@ -75,7 +77,9 @@ public class TextReporter {
 				if (Peppy.Properties.isSequenceFileDNA) {
 					sb.append(match.getSequence().getSequenceFile().getName());
 					sb.append('\t');
-					sb.append(match.getPeptide().getIndex());
+					sb.append(match.getPeptide().getSTART());
+					sb.append('\t');
+					sb.append(match.getPeptide().getSTOP());
 					sb.append('\t');
 					sb.append(match.getPeptide().isForward());
 				} else {
@@ -83,8 +87,7 @@ public class TextReporter {
 				}
 				sb.append('\t');
 				sb.append(match.getRank());
-				sb.append('\t');
-				sb.append(match.getPeptide().getIndexStop());
+				
 				pw.println(sb);
 			}
 			

@@ -149,13 +149,24 @@ public class Peptide implements Comparable<Peptide> {
 		return index;
 	}
 	
-	//TODO this could be improved, needs validation
-	public int getIndexStop() {
-		int out = index;
-		int length = acidSequence.length();
-		if (!forward) length *= -1;
-		out += length;
-		return out;
+	/**
+	 * This returns the start position.  For reporting purposes.  Conforms to standards.
+	 * @return
+	 */
+	public int getSTART() {
+		if (forward) {
+			return index;
+		} else {
+			return index + 1 - (acidSequence.length() * 3);
+		}
+	}
+	
+	public int getSTOP() {
+		if (forward) {
+			return index + (acidSequence.length() * 3);
+		} else {
+			return index + 1;
+		}
 	}
 
 

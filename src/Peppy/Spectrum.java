@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import Utilities.U;
 
@@ -24,6 +27,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	private int id;
 	private int charge = 0;
 	private File file;
+	private String MD5 = null;
 	
 	//E-Values:  allocating histogram variables
 	private final int numberOfHistogramBars = 100;
@@ -533,6 +537,43 @@ public class Spectrum implements Comparable<Spectrum>{
 	public double getStandardDeviaitonAmount(double score) {
 		//inverted so lower numbers are better
 		return score_standard_deviation / (score - score_mean);
+	}
+	
+	public String getMD5() {
+		if (MD5 != null) {
+			return MD5;
+		} else {
+			String hashtext = null;
+			String spectrumString = toString();
+			MessageDigest md5;
+			try {
+				md5 = MessageDigest.getInstance("MD5");
+				md5.reset();
+				md5.update(spectrumString.getBytes());
+				byte[] digest = md5.digest();
+				BigInteger bigInt = new BigInteger(1,digest);
+				hashtext = bigInt.toString(16);
+				// Now we need to zero pad it if you actually want the full 32 chars.
+				while(hashtext.length() < 32 ){
+					hashtext = "0"+hashtext;
+				}
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+			MD5 = hashtext;
+			return MD5;
+		}
+	}
+	
+	public String toString() {
+		StringBuffer out = new StringBuffer();
+		for (Peak peak: peaks) {
+			out.append(peak.getMass());
+			out.append("\t");
+			out.append(peak.getIntensity());
+			out.append("\r");
+		}
+		return out.toString();
 	}
 	
 	
