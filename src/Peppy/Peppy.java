@@ -30,13 +30,38 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init();
-		new Peppy(args);
-//		testHMMScoreOnSwissProt();
+//		new Peppy(args);
+		testHMMScore();
+//		ProteinDigestion.convertDATtoFASTA(Properties.sequenceDirectoryOrFile);
 //		runOnProteinDatabase(args);
 //		exportPeptideList();
 		U.p("done");
 	}
 	
+	/**
+	 * This is just to test HMM score
+	 */
+	public static void testHMMScore() {
+		//set up HMM Score
+		HMMScore.HMMClass.HmmSetUp();
+		
+		//Set up peptide, spectra matches;
+		ArrayList<Match> matches = new ArrayList<Match>();
+		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1263.5822_6.txt", "MMDVIQEIER"));
+		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1952.9525_8.txt", "ELGLDQAIAEAAEAIPDAR"));
+		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1642.7903_7.txt", "LYYVVQMTAQAAER"));
+		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1911.8491_5.txt", "ALNSVEASQPHQDQMEK"));
+		
+		//calculate HMM scores for the spectrum/peptide pairs
+		HMMScorer hmmScorer = new HMMScorer(matches);
+		hmmScorer.score();
+		
+		//display the scores
+		for (Match match: matches) {
+			U.p(match.getPeptide().getAcidSequence() + ": " + match.getScoreHMM());
+		}
+	}
+
 	public Peppy(String [] args) {
 			U.startStopwatch();
 			printGreeting();
@@ -47,6 +72,9 @@ public class Peppy {
 			Properties.reduceDuplicateMatches = false;
 	//		Properties.peakDifferenceThreshold = 0.25;
 	//		Properties.peakIntensityExponent = 0.3;
+//			Properties.spectrumToPeptideMassError = 0.01;
+			Properties.spectrumToPeptideMassError = 0.1;
+			Properties.peakDifferenceThreshold = 0.8;
 			
 			//Load our spectra
 			U.p("loading spectra...");
@@ -60,26 +88,35 @@ public class Peppy {
 			ArrayList<Match> matches = new ArrayList<Match>();
 			
 			//loop through each sequence in the sequences ArrayList
-			//for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
 			for (Sequence sequence: sequences) {		
 				matches.addAll(getMatches(sequence, spectra));
-				sequence.clearNucleotideData();
 			}
-			
 			U.p("peptide tally: " + peptideTally);
-			
+
 			//recalculate e values now that all peptides are in for the count
 			U.p("calculating final e values");
 			for (Match match: matches) {
 				match.calculateEValue();
 			}
 			
-			//calculate HMM scores
-	//		HMMScorer hmmScorer = new HMMScorer(matches);
-	//		hmmScorer.score();
+			ArrayList<Match> specificMatches =  new ArrayList<Match>();
+			for (Match match: matches) {
+				int index = match.getPeptide().getIndex();
+				if (index >= 31862431 && index <= 38471004) {
+					specificMatches.add(match);
+				}
+			}
+			matches = specificMatches;
 			
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-			report.generateFullReport();
+			//calculate HMM scores
+//			HMMScorer hmmScorer = new HMMScorer(matches);
+//			hmmScorer.score();
+			
+			U.p("Creating reports");
+//			if (Properties.isSequenceFileDNA) {
+				HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+				report.generateFullReport();
+//			}
 			
 			TextReporter textReport = new TextReporter(matches, spectra, sequences);
 			textReport.generateFullReport();
@@ -91,7 +128,7 @@ public class Peppy {
 	public static void init() {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties("properties.txt");
-//		HMMScore.HMMClass.HmmSetUp();
+		HMMScore.HMMClass.HmmSetUp();
 	}
 	
 	/**
@@ -112,7 +149,7 @@ public class Peppy {
 			Properties.spectraDirectoryOrFile = new File(args[0]);
 			
 			//setting properties
-			Properties.maximumNumberOfMatchesForASpectrum = 1;
+			Properties.maximumNumberOfMatchesForASpectrum = 2;
 			Properties.peakDifferenceThreshold = 0.25;
 			Properties.peakIntensityExponent = 0.3;
 			
@@ -122,7 +159,7 @@ public class Peppy {
 	
 	
 			//load the peptides from the database
-			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File(args[1]));
+			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File(args[1]));
 			
 			
 			ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
@@ -133,44 +170,6 @@ public class Peppy {
 			U.p();
 			U.stopStopwatch();
 		}
-	}
-	
-	
-	/**
-	 * This is just to test HMM score on swiss prot
-	 */
-	public static void testHMMScoreOnSwissProt() {
-		U.startStopwatch();
-		printGreeting();	
-
-//		Properties.spectraFile = new File("spectra human677");
-		Properties.spectraDirectoryOrFile = new File("spectra USP");
-//		Properties.spectraFile = new File("spectra problem");
-		
-		//setting properties
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		Properties.peakDifferenceThreshold = 0.25;
-		Properties.peakIntensityExponent = 0.3;
-		
-		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-
-		//set up HMM
-		HMMScore.HMMClass.HmmSetUp();
-
-		//load the peptides from the database
-//		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/ipi.HUMAN.v3.53.fasta"));
-		
-		
-		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
-		
-		TextReporter textReport = new TextReporter(matches, spectra, null);
-		textReport.generateFullReport();
-		
-		U.p();
-		U.stopStopwatch();
 	}
 	
 	
@@ -195,9 +194,17 @@ public class Peppy {
 					System.gc();
 					peptides = sequence.extractMorePeptides();
 				}
+				sequence.clearNucleotideData();
 			} else {
-				peptides = ProteinDigestion.getPeptidesFromProteinFile(sequence.getSequenceFile());
-				matches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
+				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
+				peptideTally += peptides.size();
+				//This is where the bulk of the processing in long jobs takes
+				ArrayList<Match> newMatches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
+				//Add only matches with a decent e value
+				for (Match match: newMatches) {
+					if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+				}
+//				matches.addAll(newMatches);
 			}
 			return matches;
 	}
@@ -214,11 +221,19 @@ public class Peppy {
 		
 		try {
 			//loop through each sequence in the sequences ArrayList
+			File peptidesFolder = new File ("peptides");
+			peptidesFolder.mkdir();
 			for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
 				Sequence sequence = sequences.get(sequenceIndex);
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("peptides/" + sequence.getSequenceFile().getName())));
+				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
 				
-				ArrayList<Peptide> peptides = sequence.extractMorePeptides();
+				ArrayList<Peptide> peptides = null;
+				if (Properties.isSequenceFileDNA) {
+					//
+				} else {
+					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
+				}
+				
 				for (int i = 1; i < peptides.size(); i++) {
 					pw.println(peptides.get(i));
 				}

@@ -18,22 +18,8 @@ public class Peptide implements Comparable<Peptide> {
 	private boolean forward;
 	private byte readingFrame;
 	private Sequence parentSequence;
+	private String proteinName;
 	
-
-	/**
-	 * @param sequence
-	 * @param mass
-	 * @param index
-	 * @param forward
-	 */
-	public Peptide(String sequence, double mass, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
-		this.acidSequence = sequence;
-		this.mass = mass;
-		this.index = index;
-		this.forward = forward;
-		this.readingFrame = readingFrame;
-		this.parentSequence = parentSequence;
-	}
 	
 	/**
 	 * just gets an amino acid sequence.
@@ -50,19 +36,34 @@ public class Peptide implements Comparable<Peptide> {
 	
 	/**
 	 * A version of the constructor which calculates the mass from the given sequence.
-	 * @param sequence
+	 * @param acidSequence
 	 * @param index
 	 * @param forward
 	 */
-	public Peptide(String sequence, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
-		this.acidSequence = sequence;
+	public Peptide(String acidSequence, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
+		this.acidSequence = acidSequence;
 		this.mass = calculateMass();
 		this.index = index;
 		this.forward = forward;
 		this.readingFrame = readingFrame;
 		this.parentSequence = parentSequence;
 	}
+	
+	/**
+	 * A constructor for if our peptide comes from a protein database, not from digested DNA
+	 * @param acidSequence
+	 * @param proteinName
+	 */
+	public Peptide(String acidSequence, String proteinName) {
+		this.acidSequence = acidSequence;
+		this.mass = calculateMass();
+		this.proteinName = proteinName;
+	}
 
+
+	public String getProteinName() {
+		return proteinName;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -74,7 +75,7 @@ public class Peptide implements Comparable<Peptide> {
 //				+ sequence;
 		int outFrame = readingFrame + 1;
 		if (!forward) outFrame *= -1;
-		return mass + "\t" + acidSequence + "\t" + index + "\t" + outFrame;
+		return mass + "\t" + acidSequence + "\t" + index + "\t" + outFrame + "\t" + proteinName;
 	}
 
 
@@ -146,6 +147,15 @@ public class Peptide implements Comparable<Peptide> {
 	 */
 	public int getIndex() {
 		return index;
+	}
+	
+	//TODO this could be improved, needs validation
+	public int getIndexStop() {
+		int out = index;
+		int length = acidSequence.length();
+		if (!forward) length *= -1;
+		out += length;
+		return out;
 	}
 
 

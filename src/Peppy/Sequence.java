@@ -56,7 +56,7 @@ public class Sequence {
 		
 		//if this is the first time we've tried to extract peptides
 		if (stopIndex == 0) {
-			stopIndex = digestionWindowSize;
+			stopIndex = startIndex + digestionWindowSize;
 		} else {
 		
 			//if we've reached the end of the nucleotide sequence
@@ -134,7 +134,12 @@ public class Sequence {
 			for (int i = 0; i < files.length; i++) {
 				if (files[i].isHidden()) continue;
 				String fileName = files[i].getName().toLowerCase();
-				if (fileName.endsWith(".fasta") || fileName.endsWith(".fa") || fileName.endsWith(".fsa") || fileName.endsWith(".txt")) {
+				if (
+						fileName.endsWith(".fasta") || 
+						fileName.endsWith(".fa") || 
+						fileName.endsWith(".fsa") || 
+						fileName.endsWith(".dat") || 
+						fileName.endsWith(".txt")) {
 					sequences.add(new Sequence(files[i]));
 				}
 			}
@@ -231,7 +236,9 @@ public class Sequence {
 	}
 	
 	public void clearNucleotideData() {
-		nucleotideSequences.clear();
+		if (nucleotideSequences != null) {
+			nucleotideSequences.clear();
+		}
 	}
 
 }

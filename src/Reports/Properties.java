@@ -14,6 +14,6 @@ public class Properties {
 	
 	//the number of nucleotides away from a specific location on a chromosome for it to be
 	//considered part of the "neighborhood"
-	public static int locusNeighborhood = 50000;
+	public static int locusNeighborhood = 3000;
 
 }

@@ -20,7 +20,7 @@ public class TuneMSMSFit {
 		U.p("Hello!  We're tuning up MSMS Fit for the USP data!");
 		
 		//load the correct peptide set
-		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromProteinFile(new File("USP/extracted-proteins.txt"));
+		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromFASTA(new File("USP/extracted-proteins.txt"));
 		
 		//load the high scoring peptide set
 		ArrayList<Peptide> peptides = ReliabilityTester.loadHighScoringPeptides("USP");

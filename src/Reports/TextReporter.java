@@ -1,8 +1,17 @@
 package Reports;
 
-import java.io.*;
-import java.util.*;
-import Peppy.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import Peppy.Match;
+import Peppy.Sequence;
+import Peppy.Spectrum;
 import Utilities.U;
 
 
@@ -50,36 +59,33 @@ public class TextReporter {
 			
 			StringBuffer sb;
 			for (Match match: matches) {
-//				if (match.getScoreHMM() < 1) {
-					
-					sb = new StringBuffer();
-					sb.append(match.getSpectrum().getId());
-//					sb.append('\t');
-//					sb.append(match.getSequence().getSequenceFile().getName());
-	//				sb.append('\t');
-	//				sb.append(match.getPeptide().getIndex());
-//					sb.append('\t');
-//					sb.append(match.getScoreHMM());
+				sb = new StringBuffer();
+				sb.append(match.getSpectrum().getId());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getFile().getName());
+				sb.append('\t');
+				sb.append(match.getScoreTandemFit());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getPrecursorMass());
+				sb.append('\t');
+				sb.append(match.getEValue());
+				sb.append('\t');
+				sb.append(match.getPeptide().getAcidSequence());
+				sb.append('\t');
+				if (Peppy.Properties.isSequenceFileDNA) {
+					sb.append(match.getSequence().getSequenceFile().getName());
 					sb.append('\t');
-					sb.append(match.getScoreTandemFit());
-//					sb.append('\t');
-//					sb.append(match.getMSMSFitScoreRatio());
-//					sb.append('\t');
-//					sb.append(match.getMSMSFitRank());
-//					sb.append('\t');
-//					sb.append(match.getSpectrum().getPrecursorMass());
-//					sb.append('\t');
-//					sb.append(match.getPeptide().getMass());
-//					sb.append('\t');
-//					sb.append(Math.abs(match.getPeptide().getMass() - match.getSpectrum().getPrecursorMass()));
+					sb.append(match.getPeptide().getIndex());
 					sb.append('\t');
-					sb.append(match.getEValue());
-					sb.append('\t');
-					sb.append(match.getPeptide().getAcidSequence());
-					sb.append('\t');
-					sb.append(match.getSpectrum().getFile().getName());
-					pw.println(sb);
-//				}
+					sb.append(match.getPeptide().isForward());
+				} else {
+					sb.append(match.getPeptide().getProteinName());
+				}
+				sb.append('\t');
+				sb.append(match.getRank());
+				sb.append('\t');
+				sb.append(match.getPeptide().getIndexStop());
+				pw.println(sb);
 			}
 			
 

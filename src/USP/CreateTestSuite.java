@@ -37,35 +37,35 @@ public class CreateTestSuite {
 		//Opening message
 		U.p("Creating the necessary files for our USP test suite");
 //		createSuiteFromUSPDatabase();
-		createSuiteFromTopFive();
+		createSuiteFromTopX(10);
 		
 		U.p("Done!");
 	}
 	
 	/**
-	 * finds five peptide matches for each spectrum.  Goes through and finds which
+	 * finds X peptide matches for each spectrum.  Goes through and finds which
 	 * of these matches have peptides from the USP 50 database.  Those go into our
 	 * test set.
 	 */
-	public static void createSuiteFromTopFive() {
+	public static void createSuiteFromTopX(int x) {
 		//set our properties
 		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
-		Properties.maximumNumberOfMatchesForASpectrum = 10;
+		Properties.maximumNumberOfMatchesForASpectrum = x;
 		
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
 		
 		//load the correct peptide set
-		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//restrict the precursors since they should be pretty accurate
 		Properties.spectrumToPeptideMassError = 0.01;
 		
-		//Get the matches
+		//Get the  matches
 		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
 		
 		//save to appropriate files
@@ -106,7 +106,7 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
 		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();

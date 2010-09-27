@@ -380,7 +380,7 @@ public class ReliabilityTester {
 		U.p("loaded " +spectra.size() + " spectra.");
 		
 		//load SwissProt
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
 		
 		//keep the top 20 matches for each spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 20;
@@ -402,7 +402,7 @@ public class ReliabilityTester {
 	
 	public static void exportPeptidesInCommonWithDatabase(String species) {
 		//loading peptides from a protein database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
 		
 		try {
 			//Set up our output file

@@ -35,7 +35,13 @@ public class Spectrum implements Comparable<Spectrum>{
 	private double lowScore = 0.0;
 	private double barWidth;
 	private double m, b;
-	private int peptideCount;
+	private int numberOfMatches = 0;
+	
+	//standard deviation
+	private double score_total = -1.0;
+	private double score_mean = -1.0;
+	private double score_variance = -1.0;
+	private double score_standard_deviation = -1.0;
 	
 	//in reality these values should never be less than a positive number
 	private double averageIntensity = -1; 
@@ -408,20 +414,6 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 	
-	/**
-	 * find the e value for just one given score
-	 * @param score
-	 * @return
-	 */
-	public double getEValue(double score) {
-		double eValue = m * score + b;
-		eValue = Math.exp(eValue);
-		eValue *= peptideCount;
-		//setting to Double.MAX_VALUE if eValue is Nan
-		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
-		return eValue;
-	}
-	
 	public int [] getHistogram() {return histogram;}
 	
 
@@ -438,6 +430,8 @@ public class Spectrum implements Comparable<Spectrum>{
 		if (highScore < 0) {
 			//setting up the histogram parameters
 			highScore = matchesForOneSpectrum.get(0).getScore();
+			//multiplying high score by 2 as there may be higher scores in other chromsomes
+			highScore *= 2;
 			barWidth = (highScore - lowScore) / numberOfHistogramBars;
 			
 			//initializing histograms and xValues
@@ -446,6 +440,9 @@ public class Spectrum implements Comparable<Spectrum>{
 				xValues[i] = lowScore + (i * barWidth);
 			}
 		}
+		
+		//add to our tally of matches we've observed
+		numberOfMatches += matchesForOneSpectrum.size();
 
 		//populate the histogram
 		int bin;
@@ -460,7 +457,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		
 		//find score probabilities
 		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) histogram[i] / matchesForOneSpectrum.size();
+			scoreProbabilities[i] = (double) histogram[i] / numberOfMatches;
 		}
 		
 		//find survivability values
@@ -496,26 +493,46 @@ public class Spectrum implements Comparable<Spectrum>{
 		
 		//using our m and b to derive e values for all top matches
 		double eValue;
-		peptideCount += matchesForOneSpectrum.size();
 		for (Match match: topMatches) {
-			eValue = m * match.getScore() + b;
-			eValue = Math.exp(eValue);
-			eValue *= peptideCount;
-			//setting to -1 if eValue is Nan
-			if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
+			eValue = getEValue(match.getScore());
 			match.setEValue(eValue);
 		}
 		
-//		//ha ha, jump in here and standard deviation distance
-//		double variance = 0.0;
+		//ha ha, jump in here and find standard deviation distance
+//		peptideCount += matchesForOneSpectrum.size();
+//		for (Match match: matchesForOneSpectrum) {
+//			score_total += match.getScore();
+//		}
+//		score_mean = score_total / peptideCount;
+//		double difference;
 //		for (int i = 0; i < numberOfHistogramBars; i++) {
-//			variance += xValues[i] * xValues[i] * histogram[i];
+//			difference = (score_mean - xValues[i]);
+//			score_variance +=  difference * difference * histogram[i];
 //		}
-//		variance /= peptideCount;
-//		double standard_deviation = Math.sqrt(variance);
+//		score_standard_deviation = Math.sqrt(score_variance);
 //		for (Match match: topMatches) {
-//			match.setEValue(standard_deviation / match.getScore());
+//			match.setEValue(getStandardDeviaitonAmount(match.getScore()));
 //		}
+	}
+
+	/**
+	 * find the e value for just one given score
+	 * @param score
+	 * @return
+	 */
+	public double getEValue(double score) {
+		double eValue = m * score + b;
+		eValue = Math.exp(eValue);
+		eValue *= numberOfMatches;
+		//setting to Double.MAX_VALUE if eValue is Nan
+		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
+		return eValue;
+//		return getStandardDeviaitonAmount(score);
+	}
+	
+	public double getStandardDeviaitonAmount(double score) {
+		//inverted so lower numbers are better
+		return score_standard_deviation / (score - score_mean);
 	}
 	
 	

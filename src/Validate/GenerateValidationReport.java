@@ -21,12 +21,12 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.ScoringThread;
+import Peppy.Sequence;
 import Utilities.U;
 
 public class GenerateValidationReport {
 	
 	public static ArrayList<TestSet> tests;
-	public static long timeElapsed;
 	public static File databaseFile;
 	public static PrintWriter indexWriter;
 
@@ -36,22 +36,10 @@ public class GenerateValidationReport {
 	 */
 	public static void main(String[] args) {	
 		setUp();
-		U.startStopwatch();
-//		forwards();
-//		reverse();
-		//Visualize the ion matches for all incorrect matches
-		//load the peptides
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(databaseFile);
-		for (TestSet test: tests) {
-			test.findPositiveMatches(peptides);
-			generateWrongReport(test);
-		}
-		U.p();
-		timeElapsed = U.stopStopwatch();
-//		createReport();
+		forwards();
+		reverse();
+		createReport();
 	}
-	
 	
 	public static void setUp() {
 		//Hello, world!
@@ -72,25 +60,18 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-//		HMMScore.HMMClass.HmmSetUp();
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+		HMMScore.HMMClass.HmmSetUp();
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 		
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 
-//		U.p("Getting matches for: ecoli");
-//		tests.add(new TestSet("ecoli"));
-//		
-//		U.p("Getting matches for: human");
-//		tests.add(new TestSet("human"));
-//	
-//		U.p("Getting matches for: aurum");
-//		tests.add(new TestSet("aurum"));
-		
-		U.p("Getting matches for: USP");
+		tests.add(new TestSet("ecoli"));
+		tests.add(new TestSet("human"));
+		tests.add(new TestSet("aurum"));	
 		tests.add(new TestSet("USP"));
 	}
 	
@@ -101,24 +82,25 @@ public class GenerateValidationReport {
 	public static void forwards() {
 		Properties.maximumNumberOfMatchesForASpectrum = 50;
 		//load the peptides
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(databaseFile);
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
+//		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
+//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides();
 
 		for (TestSet test: tests) {
-			U.p("Getting false matches for: " + test.getName());
-			test.findFalsePositiveMatches(peptides);
+			U.p("Getting matches for: " + test.getName());
+			test.findPositiveMatches(peptides);
 		}	
 	}
 	
-	
+	/**
+	 * Get the reverse of the database.  Should produce a database of about the same size but
+	 * with, most likely, nearly no correct matches.
+	 */
 	public static void reverse() {
-		//5, 25, 75, 95
-		U.p("now for the reverse database...");
 		//We only want one match per spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		//Get the reverse of the database.  Should produce a database of about the same size but
-		//with, most likely, nearly no correct matches.
-		ArrayList<Peptide> peptides = ProteinDigestion.getReversePeptidesFromProteinFile(databaseFile);
+		ArrayList<Peptide> peptides = ProteinDigestion.getReversePeptidesFromFASTA(databaseFile);
 		
 		for (TestSet test: tests) {
 			U.p("Getting false matches for: " + test.getName());
@@ -128,67 +110,216 @@ public class GenerateValidationReport {
 	
 	public static void createReport() {
 		U.p("Data collected, now generating the report...");
-		
-		
-		//Finding basic stats
-		for (TestSet test: tests) {
-			int trueTally = 0;
-			int falseTally = 0;
-			int trueTallyAtOnePercentError = -1;
-			double eValueAtOnePercentError = -1;
-			ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
-			boolean onePercenThresholdHasBeenReached = false;
-			for (MatchContainer match: testedMatches) {
-				if (match.isTrue()) {
-					trueTally++;
-				} else {
-					falseTally++;
-				}
-				if (!onePercenThresholdHasBeenReached) {
-					if ((double) falseTally / test.getSetSize() >= 0.01) {
-						onePercenThresholdHasBeenReached = true;
-						trueTallyAtOnePercentError =  trueTally;
-						eValueAtOnePercentError = match.getEValue();
-					}
-				}
+
+		try {
+			File indexFile = new File(Properties.validationDirectory, "index.html");
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
+			
+			pw.println("<html>");
+			pw.println("<body>");
+			pw.println("<h1>Validation Report</h1>");
+			pw.println("<h2>Basic performance metrics</h2>");
+			pw.println("<table border=1>");
+			
+			
+			//headers
+			pw.println("<tr>");
+			pw.println("<td>Metric</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getName() + "</td>");
 			}
 			
+			//# spectra in the set
+			pw.println("<tr>");
+			pw.println("<td># spectra in the set</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getSetSize() + "</td>");
+			}
+			
+			//Time to complete
+			pw.println("<tr>");
+			pw.println("<td>Time to complete</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getTimeToComplete() + "</td>");
+			}
+			
+			//Milliseconds per spectrum
+			pw.println("<tr>");
+			pw.println("<td>Milliseconds per spectrum</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getMilisecondsPerSpectrum() + "</td>");
+			}
+			
+			//E value at 1% FPR
+			pw.println("<tr>");
+			pw.println("<td>E value at 1% FPR</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtOnePercentError() + "</td>");
+			}
+			
+			//# found at 1% FPR
+			pw.println("<tr>");
+			pw.println("<td># found at 1% FPR</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getTrueTallyAtOnePercentError() + "</td>");
+			}
+			
+			//% of total found at 1% FPR
+			pw.println("<tr>");
+			pw.println("<td>% of total found at 1% FPR</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getPercentAtOnePercentError() + "</td>");
+			}
+			
+			//# of correct TPs
+			pw.println("<tr>");
+			pw.println("<td># of correct TPs</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getTrueTally() + "</td>");
+			}
+			
+			//% of correct TPs
+			pw.println("<tr>");
+			pw.println("<td>% of correct TPs</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + ((double) testSet.getTrueTally() / testSet.getSetSize()) + "</td>");
+			}
+			
+			//PR Curve
+			pw.println("<tr>");
+			pw.println("<td>Precision-recall curve</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td><img src=\"" + testSet.getFileNameForPRCurve() + "\" width=200></td>");
+			}
+			
+			//Area under PR Curve
+			pw.println("<tr>");
+			pw.println("<td>Area under PR Curve</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getAreaUnderPRCurve() + "</td>");
+			}
+			
+			
+			
+			
+			pw.println("</table>");
+			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
+			pw.println("<table border=1>");
+			
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 5% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 25% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 50% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 75% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 95% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
+			}
+			
+			//REVERSE
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 5% (reverse)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 25% (reverse)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 50% (reverse)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 75% (reverse)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 95% (reverse)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
+			}
 
+
+			
+			pw.println("</table>");
+			pw.println("</body>");
+			pw.println("</html>");
+			
+			pw.flush();
+			pw.close();
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		//Precision recall
-		for (TestSet test: tests) {
-			generatePrecisionRecallCurve(test, 300, 300);
-		}
-		
-		//Visualize the ion matches for all incorrect matches
-		for (TestSet test: tests) {
-			generateWrongReport(test);
-		}
-		
-		
-		//Report on reverse database
-		for (TestSet test: tests) {
-			U.p();
-			U.p(test.getName());
-			ArrayList<Match> falsePositiveMatches = test.getFalsePositiveMatches();
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
-			Collections.sort(falsePositiveMatches);
-			int testSize = falsePositiveMatches.size();
-			int level05 = (int) (testSize * 0.05);
-			int level25 = (int) (testSize * 0.25);
-			int level50 = (int) (testSize * 0.50);
-			int level75 = (int) (testSize * 0.75);
-			int level95 = (int) (testSize * 0.95);
-			U.p(" 5%: "+ falsePositiveMatches.get(level05).getEValue());
-			U.p("25%: "+ falsePositiveMatches.get(level25).getEValue());
-			U.p("50%: "+ falsePositiveMatches.get(level50).getEValue());
-			U.p("75%: "+ falsePositiveMatches.get(level75).getEValue());
-			U.p("95%: "+ falsePositiveMatches.get(level95).getEValue());
-		}
+//		//Visualize the ion matches for all incorrect matches
+//		for (TestSet test: tests) {
+//			generateWrongReport(test);
+//		}
+//		
+//		
+//		//Report on reverse database
+//		for (TestSet test: tests) {
+//			U.p();
+//			U.p(test.getName());
+//			ArrayList<Match> falsePositiveMatches = test.getFalsePositiveMatches();
+//			Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//			Collections.sort(falsePositiveMatches);
+//			int testSize = falsePositiveMatches.size();
+//			int level05 = (int) (testSize * 0.05);
+//			int level25 = (int) (testSize * 0.25);
+//			int level50 = (int) (testSize * 0.50);
+//			int level75 = (int) (testSize * 0.75);
+//			int level95 = (int) (testSize * 0.95);
+//			U.p(" 5%: "+ falsePositiveMatches.get(level05).getEValue());
+//			U.p("25%: "+ falsePositiveMatches.get(level25).getEValue());
+//			U.p("50%: "+ falsePositiveMatches.get(level50).getEValue());
+//			U.p("75%: "+ falsePositiveMatches.get(level75).getEValue());
+//			U.p("95%: "+ falsePositiveMatches.get(level95).getEValue());
+//		}
 	}
 	
 	
+	/**
+	 * Used to validate our test set.  We want visualizations of
+	 * what the "wrong" peptide aligned with the spectrum compared
+	 * to the "right" one.
+	 */
+	public static void makeOnlyWrongReport() {
+		setUp();
+		U.startStopwatch();
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(databaseFile);
+		for (TestSet test: tests) {
+			test.findPositiveMatches(peptides);
+			generateWrongReport(test);
+		}
+		U.p();
+		U.stopStopwatch();
+	}
+
 	public static void generateRightReport(TestSet test) {
 		String testName = test.getName();
 		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
@@ -319,78 +450,7 @@ public class GenerateValidationReport {
 		
 	}
 	
-	public static void generatePrecisionRecallCurve(TestSet test, int width, int height) {
-		String testName = test.getName();
-		ArrayList<MatchContainer>testedMatches = test.getTestedMatches();
 
-		//setting up Graphics context
-		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = bdest.createGraphics();
-		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
-		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
-		g.setColor(Color.white);
-		g.fillRect(0,0,width,height);
-		
-		//setting the line color
-		g.setColor(Color.red);
-		
-		int x1 = 0;
-		int x2 = 0;
-		int y1 = 0;
-		int y2 = 0;
-		int trueCount = 0;
-		double precision = 0; 
-		double recall = 0;
-		double recallPrevious = 0;
-		double area = 0;
-		for(int i = 0; i < testedMatches.size(); i++) {
-			MatchContainer match = testedMatches.get(i);
-			if (match.isTrue()) {
-				trueCount++;
-			}
-			//advancing
-			x1 = x2 + 1;
-			y1 = y2;
-			
-			precision = (double) trueCount / (i + 1);
-			recallPrevious = recall;
-			recall = (double) trueCount / test.getSetSize();	
-			
-			area += (recall - recallPrevious) * precision;
-			
-			x2 = (int) (recall * width);
-			y2 = (int) ((1.0 - precision) * height);
-			
-			//in case we are moving so little we are not advancing
-			if (x1 <= x2) {
-				continue;
-			} else {
-//				U.p(trueCount + ", " + precision);
-				g.setColor(Color.red);
-				g.setStroke(new BasicStroke(2.0f));
-				g.drawLine(x1, y1, x2, y2);
-				//let's fill in the area under the line, yes?
-				Polygon polygon = new Polygon();
-				polygon.addPoint(x1, y1);
-				polygon.addPoint(x2, y2);
-				polygon.addPoint(x2, height);
-				polygon.addPoint(x1, height);
-				g.setColor(new Color(256,0,0,128));
-				g.fillPolygon(polygon);
-			}
-			
-		}
-		
-		U.p("The area is: " + area);
-		
-//		g.drawLine(x2, y2, width, height);
-		
-		try {
-			ImageIO.write(bdest,"JPG",new File(Properties.validationDirectory, testName + "-precision-recall.jpg"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public static int isPeptidePresentInList(Peptide peptide, ArrayList<Peptide> peptides) {
 		int peptideIndex = ScoringThread.findFirstIndexWithGreaterMass(peptides, peptide.getMass() - .01);

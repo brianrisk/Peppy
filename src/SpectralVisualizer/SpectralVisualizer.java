@@ -141,26 +141,49 @@ public class SpectralVisualizer {
 //		double maxValue = 1500;
 		double maxIntensity = spectrum.getCalculatedMaxIntensity();
 		
-		//draw the lines for our spectra
+		//first draw the non-important lines
 		ArrayList<Peak> peaks = spectrum.getPeaks();
+		g.setColor(Color.gray);
 		for (Peak peak: peaks) {
-			g.setColor(peak.getColor());
-			xLoc = (int) (peak.getMass()  * width / maxValue);
-			yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
-			g.drawLine(xLoc, yLoc, xLoc, height);
-			if (drawLabels && !peak.getColor().equals(Color.gray)) {
-				if (yLoc < 10) yLoc += 10;
-				g.drawString("" + peak.getIntensity(), xLoc, yLoc);
+			if (peak.getColor().equals(Color.gray)) {
+				xLoc = (int) (peak.getMass()  * width / maxValue);
+				yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
+				g.drawLine(xLoc, yLoc, xLoc, height);
+				
+				//if peak is hilighted, draw a little triangle above it
+				if (peak.isHilighted()) {
+					if (yLoc < 10) yLoc += 10;
+					g.setColor(Color.yellow);
+					Polygon polygon = new Polygon();
+					polygon.addPoint(xLoc - 10, yLoc - 10);
+					polygon.addPoint(xLoc - 10, yLoc + 10);
+					polygon.addPoint(xLoc, yLoc);
+					g.fillPolygon(polygon);
+				}
 			}
-			//if peak is hilighted, draw a little triangle above it
-			if (peak.isHilighted()) {
-				if (yLoc < 10) yLoc += 10;
-				g.setColor(Color.yellow);
-				Polygon polygon = new Polygon();
-				polygon.addPoint(xLoc - 10, yLoc - 10);
-				polygon.addPoint(xLoc - 10, yLoc + 10);
-				polygon.addPoint(xLoc, yLoc);
-				g.fillPolygon(polygon);
+		}
+		
+		//draw the colored peaks
+		for (Peak peak: peaks) {
+			if (!peak.getColor().equals(Color.gray)) {
+				g.setColor(peak.getColor());
+				xLoc = (int) (peak.getMass()  * width / maxValue);
+				yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
+				g.drawLine(xLoc, yLoc, xLoc, height);
+				if (drawLabels && !peak.getColor().equals(Color.gray)) {
+					if (yLoc < 10) yLoc += 10;
+					g.drawString("" + peak.getIntensity(), xLoc, yLoc);
+				}
+				//if peak is hilighted, draw a little triangle above it
+				if (peak.isHilighted()) {
+					if (yLoc < 10) yLoc += 10;
+					g.setColor(Color.yellow);
+					Polygon polygon = new Polygon();
+					polygon.addPoint(xLoc - 10, yLoc - 10);
+					polygon.addPoint(xLoc - 10, yLoc + 10);
+					polygon.addPoint(xLoc, yLoc);
+					g.fillPolygon(polygon);
+				}
 			}
 		}
 		
