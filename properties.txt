@@ -20,21 +20,21 @@ isSequenceFileDNA true
 //This could be a directory or a file
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
 
 
 
 //This could be a directory or a file
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 
 //where we store our reports
 reportDirectory reports
