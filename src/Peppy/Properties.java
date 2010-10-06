@@ -36,6 +36,7 @@ public class Properties {
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
+	public static int digestionWindowSize = 25000000;
 	
 	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
 	//units are daltons.
@@ -52,6 +53,7 @@ public class Properties {
 	
 	//e value cut off
 	public static double eValueCutOff = 0.01;
+	public static boolean useEValueCutOff = true;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -120,6 +122,10 @@ public class Properties {
 		if (propertyName.equals("peptideMassThreshold")) {
 			peptideMassThreshold = Double.valueOf(propertyValue);
 		}
+		if (propertyName.equals("digestionWindowSize")) {
+			digestionWindowSize =Integer.valueOf(propertyValue);
+		}
+		
 		
 		//spectrum cleaning
 		if (propertyName.equals("localMaximaCleaning")) {
@@ -157,9 +163,19 @@ public class Properties {
 			rightIonDifference = Double.valueOf(propertyValue);
 		}
 		
+		//e value
 		if (propertyName.equals("eValueCutOff")) {
 			eValueCutOff = Double.valueOf(propertyValue);
 		}
+		if (propertyName.equals("useEValueCutOff")) {
+			useEValueCutOff = Boolean.valueOf(propertyValue);
+		}
+		
+		//matches
+		if (propertyName.equals("spectrumToPeptideMassError")) {
+			spectrumToPeptideMassError = Double.valueOf(propertyValue);
+		}
+		
 		
 		
 	}

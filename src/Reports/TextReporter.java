@@ -66,7 +66,7 @@ public class TextReporter {
 				sb.append('\t');
 				sb.append(match.getSpectrum().getFile().getName());
 				sb.append('\t');
-				sb.append(match.getScoreTandemFit());
+				sb.append(match.getScore());
 				sb.append('\t');
 				sb.append(match.getSpectrum().getPrecursorMass());
 				sb.append('\t');

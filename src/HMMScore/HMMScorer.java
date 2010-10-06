@@ -1,6 +1,9 @@
-package Peppy;
+package HMMScore;
 
 import java.util.*;
+
+import Peppy.Match;
+import Peppy.Properties;
 
 public class HMMScorer {
 

@@ -71,6 +71,9 @@ public class SequenceDigestionThread implements Runnable {
 		//so we don't have to keep doing this calculation
 		int startIndexPlusThree = startIndex + threeTimesCodonIncrement;
 		
+		//if we are interested in ORFs (Open Reading Frames)
+		boolean inORF = false;
+		
 		
 		while (nucleotideIndex != stopIndex) {
 			
@@ -96,15 +99,25 @@ public class SequenceDigestionThread implements Runnable {
 					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
 					//sometimes the M is not added, so we're accounting for this here
 					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
+					inORF = true;
 				} else {
 					if (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R') {
 						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 						//add all peptides
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 							Peptide peptide = new Peptide(puc.getSequence(), acidIndex, forwards, (byte) (acidIndex % 3),  nucleotideSequence.getParentSequence());
-							if (peptide.getMass() >= Properties.peptideMassThreshold) peptides.add(peptide);
+							if (peptide.getMass() >= Properties.peptideMassThreshold) {
+								if (Properties.onlyUsePeptidesInOpenReadingFrames) {
+									if (inORF) {
+										peptides.add(peptide);
+									}
+								} else {
+									peptides.add(peptide);
+								}
+							}
 						}
 					}
+					if (aminoAcid == '.') inORF = false;
 				}
 				
 				//if stop, then clear out
@@ -134,7 +147,15 @@ public class SequenceDigestionThread implements Runnable {
 		//adding all the remaining peptides under construction
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 			Peptide peptide = new Peptide(puc.getSequence(), nucleotideIndex, forwards, frame,  nucleotideSequence.getParentSequence());
-			if (peptide.getMass() >= Properties.peptideMassThreshold) peptides.add(peptide);
+			if (peptide.getMass() >= Properties.peptideMassThreshold) {
+				if (Properties.onlyUsePeptidesInOpenReadingFrames) {
+					if (inORF) {
+						peptides.add(peptide);
+					}
+				} else {
+					peptides.add(peptide);
+				}
+			}
 		}
 	}
 	

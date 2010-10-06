@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import HMMScore.HMMScorer;
 import Reports.HTMLReporter;
 import Reports.TextReporter;
 import Utilities.U;
@@ -33,8 +34,8 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init();
-//		new Peppy(args);
-		testHMMScore();
+		new Peppy(args);
+//		testHMMScore();
 //		ProteinDigestion.convertDATtoFASTA(Properties.sequenceDirectoryOrFile);
 //		runOnProteinDatabase(args);
 //		exportPeptideList();
@@ -78,8 +79,8 @@ public class Peppy {
 	//		Properties.peakDifferenceThreshold = 0.25;
 	//		Properties.peakIntensityExponent = 0.3;
 //			Properties.spectrumToPeptideMassError = 0.01;
-			Properties.spectrumToPeptideMassError = 0.1;
-			Properties.peakDifferenceThreshold = 0.8;
+			Properties.spectrumToPeptideMassError = 2;
+//			Properties.peakDifferenceThreshold = 0.8;
 			
 			//Load our spectra
 			U.p("loading spectra...");
@@ -104,18 +105,14 @@ public class Peppy {
 				match.calculateEValue();
 			}
 			
-			ArrayList<Match> specificMatches =  new ArrayList<Match>();
-			for (Match match: matches) {
-				int index = match.getPeptide().getIndex();
-				if (index >= 31862431 && index <= 38471004) {
-					specificMatches.add(match);
-				}
-			}
-			matches = specificMatches;
-			
-			//calculate HMM scores
-//			HMMScorer hmmScorer = new HMMScorer(matches);
-//			hmmScorer.score();
+//			ArrayList<Match> specificMatches =  new ArrayList<Match>();
+//			for (Match match: matches) {
+//				int index = match.getPeptide().getIndex();
+//				if (index >= 31862431 && index <= 38471004) {
+//					specificMatches.add(match);
+//				}
+//			}
+//			matches = specificMatches;
 			
 			U.p("Creating reports");
 //			if (Properties.isSequenceFileDNA) {
@@ -167,7 +164,7 @@ public class Peppy {
 			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File(args[1]));
 			
 			
-			ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+			ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 			
 			TextReporter textReport = new TextReporter(matches, spectra, null);
 			textReport.generateFullReport();
@@ -188,12 +185,15 @@ public class Peppy {
 				while (peptides != null) {
 					peptideTally += peptides.size();
 					//This is where the bulk of the processing in long jobs takes
-					ArrayList<Match> newMatches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
-					//Add only matches with a decent e value
-					for (Match match: newMatches) {
-						if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
+					//Possible to add only matches with a decent e value
+					if (Properties.useEValueCutOff) {
+						for (Match match: newMatches) {
+							if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+						}
+					} else {
+						matches.addAll(newMatches);
 					}
-//					matches.addAll(newMatches);
 					//free up the memory of the old peptide arraylist
 					peptides.clear();
 					System.gc();
@@ -204,7 +204,7 @@ public class Peppy {
 				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				peptideTally += peptides.size();
 				//This is where the bulk of the processing in long jobs takes
-				ArrayList<Match> newMatches = (new ScoringEngine(peptides, spectra, sequence)).getMatches();
+				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
 				//Add only matches with a decent e value
 				for (Match match: newMatches) {
 					if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);

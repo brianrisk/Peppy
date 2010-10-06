@@ -22,7 +22,6 @@ public class Sequence {
 	private ArrayList<NucleotideSequence> nucleotideSequences = null;
 	private int startIndex = 0;
 	private int stopIndex = 0;
-	private int digestionWindowSize = 25000000;
 	private int nucleotideSequenceIndex = 0;
 	//length of the first sequence.  not logical if sequence file contains more than one sequence.
 	private int sequenceLength = 0;
@@ -56,7 +55,7 @@ public class Sequence {
 		
 		//if this is the first time we've tried to extract peptides
 		if (stopIndex == 0) {
-			stopIndex = startIndex + digestionWindowSize;
+			stopIndex = startIndex + Properties.digestionWindowSize;
 		} else {
 		
 			//if we've reached the end of the nucleotide sequence
@@ -65,10 +64,10 @@ public class Sequence {
 				if (nucleotideSequenceIndex >= nucleotideSequences.size()) return null;
 				nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 				startIndex = 0;
-				stopIndex = digestionWindowSize;
+				stopIndex = Properties.digestionWindowSize;
 			} else {
-				startIndex += digestionWindowSize;
-				stopIndex += digestionWindowSize;
+				startIndex += Properties.digestionWindowSize;
+				stopIndex += Properties.digestionWindowSize;
 			}
 		}
 		//overshoot correction
@@ -114,6 +113,11 @@ public class Sequence {
 		return peptides;
 	}
 	
+	/**
+	 * Runs extractMorePeptides() until there are no more peptides
+	 * to extract.  Returns the full list.
+	 * @return
+	 */
 	public ArrayList<Peptide> extractAllPeptides() {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		ArrayList<Peptide> peptidesToAdd = extractMorePeptides();

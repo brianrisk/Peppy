@@ -9,17 +9,17 @@ public class ScoringThread implements Runnable {
 	
 	ArrayList<Peptide> peptides;
 	Spectrum spectrum;
-	ScoringEngine scoringEngine;
+	ScoringThreadServer scoringThreadServer;
 	Sequence sequence;
 	
 	/**
 	 * @param peptides
 	 * @param spectrum
 	 */
-	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringEngine scoringEngine, Sequence sequence) {
+	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer, Sequence sequence) {
 		this.spectrum = spectrum;
 		this.peptides = peptides;
-		this.scoringEngine = scoringEngine;
+		this.scoringThreadServer = scoringThreadServer;
 		this.sequence = sequence;
 	}
 
@@ -50,7 +50,7 @@ public class ScoringThread implements Runnable {
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
 //				U.p("first index: " + firstPeptideIndex);
 //				U.p("last index: " + lastPeptideIndex);
-//				U.p("precuror = " + spectrum.getPrecursorMass());
+//				U.p("precursor = " + spectrum.getPrecursorMass());
 //				U.p ("lowestPeptideMassToConsider: " + lowestPeptideMassToConsider);
 //				U.p ("highestPeptideMassToConsider: " + highestPeptideMassToConsider);
 //				U.p("peptide mass = " + (new Peptide("VVSMDENFHPLNELIPLVYIQDPK")).getMass());
@@ -62,32 +62,57 @@ public class ScoringThread implements Runnable {
 			ArrayList<Match> topMatches = new ArrayList<Match>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
+			
+				
+//				//make sure adjacent matches aren't repeated
+//				Match topMatch = matchesForOneSpectrum.get(0);
+//				Match presentMatch;
+//				Match previousMatch = matchesForOneSpectrum.get(0);
+//				topMatches.add(matchesForOneSpectrum.get(0));
+//				for (int i = 1; i < max; i++) {
+//					presentMatch = matchesForOneSpectrum.get(i);
+//					if (!presentMatch.equals(previousMatch)) {
+//						topMatches.add(presentMatch);
+//					}else {
+//						//since we're skipping one we are increasing the upper bound	
+//						if (max < matchesForOneSpectrum.size()) max++;
+//					}
+//					previousMatch = presentMatch;
+//				}
+
+			for (int i = 0; i < max; i++) {
+				topMatches.add(matchesForOneSpectrum.get(i));
+			}
+			
 			//We may want to reduce the number of duplicate matches
-			if (Properties.reduceDuplicateMatches) {
-				Match previousMatch = null;
-				for (int i = 0; i < max; i++) {
-					Match topMatch = matchesForOneSpectrum.get(i);
-					if (i >= 1) {
-						if (!topMatch.equals(previousMatch)) {
-							topMatches.add(topMatch);
-						}else {
-							if (max < matchesForOneSpectrum.size()) max++;
+			if (Properties.reduceDuplicateMatches && max > 1) {
+				for (int i = 0; i < topMatches.size(); i++) {
+					Match matchA = topMatches.get(i);
+					for (int j = i + 1; j < topMatches.size(); j++) {
+						Match matchB = topMatches.get(j);
+						if (matchA.equals(matchB)) {
+							topMatches.remove(j);
+							j--;
 						}
-					} else {
-						topMatches.add(topMatch);
 					}
-					previousMatch = topMatch;
-				}
-			} else {
-				for (int i = 0; i < max; i++) {
-					topMatches.add(matchesForOneSpectrum.get(i));
 				}
 			}
+
 			//set rank -- NOTE: this might not be true rank if multiple chromosomes, multiple digestion windows
 			for (int i = 0; i < topMatches.size(); i++) {
 				Match topMatch = topMatches.get(i);
 				topMatch.setRank(i);
 			}
+			for (int i = 1; i < topMatches.size(); i++) {
+				Match thisMatch = topMatches.get(i);
+				Match previousMatch = topMatches.get(i - 1);
+				if (thisMatch.getPeptide().equals(previousMatch.getPeptide())) {
+					U.p("two of the same peptide!");
+					U.p(thisMatch);
+					U.p(previousMatch);
+				}
+			}
+			
 			
 			//assign E values to top Matches:
 			if (matchesForOneSpectrum.size() != 0) {
@@ -95,7 +120,7 @@ public class ScoringThread implements Runnable {
 			}
 			
 			//return results, get new task
-			spectrum = scoringEngine.getNextSpectrum(topMatches);
+			spectrum = scoringThreadServer.getNextSpectrum(topMatches);
 		}
 	}
 

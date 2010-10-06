@@ -73,8 +73,11 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-					if (match.getEValue() < Peppy.Properties.eValueCutOff) {
-//					if (match.getEValue() < 0.25) {
+					if (Peppy.Properties.useEValueCutOff) {
+						if (match.getEValue() < Peppy.Properties.eValueCutOff) {
+							bestMatches.add(match);
+						}
+					} else {
 						bestMatches.add(match);
 					}
 				} else {
@@ -146,7 +149,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getScoreTandemFit());
+				sb.append(match.getScore());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -375,7 +378,7 @@ public class HTMLReporter {
 			pw.println("<h2>E value histogram for spectrum " + spectrum.getId() + "</h2>");
 			pw.println("<p>");
 			File histogramFile = new File(sequenceDirectory, spectrum.getId() + "-hist.jpg");
-			HistogramVisualizer.drawHistogram(spectrum.getHistogram(), 300, 300, histogramFile);
+			HistogramVisualizer.drawHistogram(spectrum.getEValueContainer().getHistogram(), 300, 300, histogramFile);
 			pw.println("<img src=\"" + histogramFile.getName() + "\">");
 			pw.println("</p>");
 			
@@ -473,7 +476,7 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append(match.getScoreTandemFit());
+		sb.append(match.getScore());
 		sb.append("</td>");
 		
 		sb.append("<td>");

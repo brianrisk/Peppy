@@ -6,7 +6,7 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
-import Peppy.ScoringEngine;
+import Peppy.ScoringThreadServer;
 import Peppy.ScoringThread;
 import Peppy.Sequence;
 import Peppy.Spectrum;
@@ -15,6 +15,8 @@ import Utilities.U;
 
 
 /**
+ * CAUTION: not designed to be user friendly
+ * 
  * The purpose of this class is to have a series of
  * quality control tests.  If any changes are made to any of the
  * scoring mechanisms of JavaGFS, then these tests should
@@ -92,7 +94,7 @@ public class ReliabilityTester {
 	}
 	
 	public static int getNumberOfTopRankingMatches(String species, ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides, ArrayList<Peptide> correctPeptides, ArrayList<String> correctPeptideNames) {
-		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		int out = 0;
 		for (int i = 0; i < correctPeptides.size(); i++) {	
 			//We've loaded the string.  Now see if we have it as a match to the given spectrum
@@ -163,7 +165,7 @@ public class ReliabilityTester {
 		//loading peptides from a protein database
 //		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromProteinFile(new File("tests/databases/uniprot_sprot.fasta"));
 		
-		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
 		//Initialize HMM Score
 //		U.p("testing HMM here!");
@@ -384,7 +386,7 @@ public class ReliabilityTester {
 		
 		//keep the top 20 matches for each spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 20;
-		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/Users/risk2/PeppyOverflow/tests/" + species + "/highScoringPeptides.txt")));

@@ -8,7 +8,7 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
-import Peppy.ScoringEngine;
+import Peppy.ScoringThreadServer;
 import Peppy.Spectrum;
 import Utilities.U;
 import Validate.ReliabilityTester;
@@ -31,7 +31,7 @@ public class TuneMSMSFit {
 		//Go through each spectra and find the best matches
 		Properties.peakDifferenceThreshold = 0.25;
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		ArrayList<Match> matches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
 		//go through each of the best matches and find how many of them exist in the correct peptide set
 		int hits = 0;

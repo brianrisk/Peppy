@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Statistics.EValueCalculator;
 import Utilities.U;
 
 /**
@@ -29,23 +30,8 @@ public class Spectrum implements Comparable<Spectrum>{
 	private File file;
 	private String MD5 = null;
 	
-	//E-Values:  allocating histogram variables
-	private final int numberOfHistogramBars = 100;
-	private int [] histogram = new int[numberOfHistogramBars];
-	private double [] scoreProbabilities = new double[numberOfHistogramBars];
-	private double [] survivability = new double[numberOfHistogramBars];
-	private double [] xValues = new double[numberOfHistogramBars];
-	private double highScore = -1.0;
-	private double lowScore = 0.0;
-	private double barWidth;
-	private double m, b;
-	private int numberOfMatches = 0;
-	
-	//standard deviation
-	private double score_total = -1.0;
-	private double score_mean = -1.0;
-	private double score_variance = -1.0;
-	private double score_standard_deviation = -1.0;
+	//E-Values
+	private EValueCalculator eValueCalculator;
 	
 	//in reality these values should never be less than a positive number
 	private double averageIntensity = -1; 
@@ -231,6 +217,10 @@ public class Spectrum implements Comparable<Spectrum>{
 		return file;
 	}
 
+	public EValueCalculator getEValueContainer() {
+		return eValueCalculator;
+	}
+
 	public void setAllPeaksToColor(Color c) {
 		for (int i = 0; i < getPeakCount(); i++) {getPeak(i).setColor(c);}
 	}
@@ -391,6 +381,10 @@ public class Spectrum implements Comparable<Spectrum>{
 				spectra.addAll(loadSpectra(files[i]));
 			}
 		}
+		//giving all spectra an ID
+		for (int i = 0; i < spectra.size(); i++) {
+			spectra.get(i).setId(i);
+		}
 	}
 	
 	/**
@@ -417,134 +411,25 @@ public class Spectrum implements Comparable<Spectrum>{
 		return  0;
 	}
 	
-	
-	public int [] getHistogram() {return histogram;}
-	
-
-	/**
-	 * find expected value (a.k.a. "e value") for top matches
-	 * 
-	 * This method assumes that matchesForOneSpectrum is already sorted from highest score to lowest.
-	 * Calculates e values for each of the top matches
-	 * @param matchesForOneSpectrum
-	 * @param topMatches
-	 */
-	public void calculateEValues(ArrayList<Match> matchesForOneSpectrum, ArrayList<Match> topMatches) {
-		//Set these values if this is our first time calculating e value
-		if (highScore < 0) {
-			//setting up the histogram parameters
-			highScore = matchesForOneSpectrum.get(0).getScore();
-			//multiplying high score by 2 as there may be higher scores in other chromsomes
-			highScore *= 2;
-			barWidth = (highScore - lowScore) / numberOfHistogramBars;
-			
-			//initializing histograms and xValues
-			for (int i = 0; i < numberOfHistogramBars; i++) {
-				histogram[i] = 0;
-				xValues[i] = lowScore + (i * barWidth);
-			}
+	public void calculateEValues(ArrayList<Match> matches, ArrayList<Match> topMatches) {
+		if (eValueCalculator == null) {
+			eValueCalculator = new EValueCalculator(matches, topMatches);
+		} else {
+			eValueCalculator.addScores(matches, topMatches);
 		}
-		
-		//add to our tally of matches we've observed
-		numberOfMatches += matchesForOneSpectrum.size();
-
-		//populate the histogram
-		int bin;
-		for (Match match: matchesForOneSpectrum) {
-			bin = (int) Math.floor((match.getScore() - lowScore) / barWidth);
-			if (bin < numberOfHistogramBars) {
-				histogram[bin]++;
-			} else {
-				histogram[numberOfHistogramBars - 1]++;
-			}
-		}
-		
-		//find score probabilities
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) histogram[i] / numberOfMatches;
-		}
-		
-		//find survivability values
-		survivability[numberOfHistogramBars - 1] = scoreProbabilities[numberOfHistogramBars - 1];
-		for (int i = numberOfHistogramBars - 2; i >= 0; i--) {
-			survivability[i] = survivability[i + 1] + scoreProbabilities[i];
-		}
-		
-		//find index survivability values at 0.1 or less
-		int chopIndex;
-		for (chopIndex = 0; chopIndex < numberOfHistogramBars; chopIndex++) {
-			if (survivability[chopIndex] <= 0.1) break;
-		}
-		
-		//find first 0 above chopIndex
-		int topIndex;
-		for (topIndex = chopIndex; topIndex < numberOfHistogramBars; topIndex++) {
-			if (histogram[topIndex] == 0) break;
-		}
-		//if we don't want to use topIndex....
-//		topIndex = numberOfHistogramBars;
-		
-		//taking the log of each of the survivability.  Only concerned
-		//about values at and above chopIndex
-		for (int i = chopIndex; i < topIndex; i++) {
-			survivability[i] = Math.log(survivability[i]);
-		}
-		
-		//finding the least squares fit for that region
-		// y = m * x + b
-		m = U.calculateM(xValues, survivability, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, chopIndex, topIndex, m);
-		
-		//using our m and b to derive e values for all top matches
-		double eValue;
-		for (Match match: topMatches) {
-			eValue = getEValue(match.getScore());
-			match.setEValue(eValue);
-		}
-		
-		//ha ha, jump in here and find standard deviation distance
-//		peptideCount += matchesForOneSpectrum.size();
-//		for (Match match: matchesForOneSpectrum) {
-//			score_total += match.getScore();
-//		}
-//		score_mean = score_total / peptideCount;
-//		double difference;
-//		for (int i = 0; i < numberOfHistogramBars; i++) {
-//			difference = (score_mean - xValues[i]);
-//			score_variance +=  difference * difference * histogram[i];
-//		}
-//		score_standard_deviation = Math.sqrt(score_variance);
-//		for (Match match: topMatches) {
-//			match.setEValue(getStandardDeviaitonAmount(match.getScore()));
-//		}
 	}
-
-	/**
-	 * find the e value for just one given score
-	 * @param score
-	 * @return
-	 */
+	
 	public double getEValue(double score) {
-		double eValue = m * score + b;
-		eValue = Math.exp(eValue);
-		eValue *= numberOfMatches;
-		//setting to Double.MAX_VALUE if eValue is Nan
-		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
-		return eValue;
-//		return getStandardDeviaitonAmount(score);
+		return eValueCalculator.getEValue(score);
 	}
 	
-	public double getStandardDeviaitonAmount(double score) {
-		//inverted so lower numbers are better
-		return score_standard_deviation / (score - score_mean);
-	}
 	
 	public String getMD5() {
 		if (MD5 != null) {
 			return MD5;
 		} else {
 			String hashtext = null;
-			String spectrumString = toString();
+			String spectrumString = toStringForMD5();
 			MessageDigest md5;
 			try {
 				md5 = MessageDigest.getInstance("MD5");
@@ -565,7 +450,14 @@ public class Spectrum implements Comparable<Spectrum>{
 		}
 	}
 	
-	public String toString() {
+	/**
+	 * EXTREME CAUTION
+	 * You'd better have a great reason to change this because
+	 * even the slightest change will totally alter all future
+	 * MD5 output
+	 * @return
+	 */
+	public String toStringForMD5() {
 		StringBuffer out = new StringBuffer();
 		for (Peak peak: peaks) {
 			out.append(peak.getMass());

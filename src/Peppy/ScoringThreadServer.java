@@ -12,7 +12,7 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class ScoringEngine {
+public class ScoringThreadServer {
 	
 	ArrayList<Spectrum> spectra;
 	Sequence sequence;
@@ -38,7 +38,7 @@ public class ScoringEngine {
 	 * @param spectra
 	 * @param matches the ArrayList where we store the best matches
 	 */
-	public ScoringEngine(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
+	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
 		this.spectra = spectra;	
 		this.sequence = sequence;
 		matches = new ArrayList<ArrayList<Match>>(spectra.size());

@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.ScoringEngine;
+import Peppy.ScoringThreadServer;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -26,9 +26,9 @@ public class TestSet {
 	
 	private String testName;
 	private ArrayList<Spectrum> spectra;
-	private ArrayList<Match> topPositiveMatches = null;
+	private ArrayList<Match> topForwardsMatches = null;
 	private ArrayList<Match> positiveMatches = null;
-	private ArrayList<Match> falsePositiveMatches = null;
+	private ArrayList<Match> topReverseMatches = null;
 	private ArrayList<Match> correctMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
 	private int setSize = -1;
@@ -77,7 +77,7 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();
-		positiveMatches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
 		timeToComplete = U.millisecondsToString(timeElapsed);
@@ -97,10 +97,10 @@ public class TestSet {
 		Collections.sort(testedMatches);
 		
 		//find the #1 ranked match for each spectrum
-		topPositiveMatches = new ArrayList<Match>();
+		topForwardsMatches = new ArrayList<Match>();
 		for (Match match: positiveMatches) {
 			if (match.getRank() == 0) {
-				topPositiveMatches.add(match);
+				topForwardsMatches.add(match);
 			}
 		}
 			
@@ -119,11 +119,11 @@ public class TestSet {
 	public void findFalsePositiveMatches(ArrayList<Peptide> peptides) {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		//get the matches
-		falsePositiveMatches = (new ScoringEngine(peptides, spectra, null)).getMatches();
+		topReverseMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
 		//Sort matches by e value	
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		Collections.sort(falsePositiveMatches);
+		Collections.sort(topReverseMatches);
 		
 	}
 	
@@ -381,16 +381,16 @@ public class TestSet {
 	
 	public double getEValueAtPercentForwards(double percent) {
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		Collections.sort(positiveMatches);
-		int level = (int) (positiveMatches.size() * percent);
-		return positiveMatches.get(level).getEValue();
+		Collections.sort(topForwardsMatches);
+		int level = (int) (topForwardsMatches.size() * percent);
+		return topForwardsMatches.get(level).getEValue();
 	}
 	
 	public double getEValueAtPercentReverse(double percent) {
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		Collections.sort(falsePositiveMatches);
-		int level = (int) (falsePositiveMatches.size() * percent);
-		return falsePositiveMatches.get(level).getEValue();
+		Collections.sort(topReverseMatches);
+		int level = (int) (topReverseMatches.size() * percent);
+		return topReverseMatches.get(level).getEValue();
 	}
 
 

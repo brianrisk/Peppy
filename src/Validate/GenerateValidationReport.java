@@ -39,6 +39,7 @@ public class GenerateValidationReport {
 		forwards();
 //		reverse();
 		createReport();
+		U.p("done.");
 	}
 	
 	public static void setUp() {
@@ -60,20 +61,21 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
-		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-		HMMScore.HMMClass.HmmSetUp();
-		Properties.highIntensityCleaning = true;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+//		HMMScore.HMMClass.HmmSetUp();
+//		Properties.highIntensityCleaning = true;
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 		
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 
-//		tests.add(new TestSet("ecoli"));
-//		tests.add(new TestSet("human"));
-//		tests.add(new TestSet("aurum"));	
+		tests.add(new TestSet("ecoli"));
+		tests.add(new TestSet("human"));
+		tests.add(new TestSet("aurum"));	
 		tests.add(new TestSet("USP"));
+
 	}
 	
 	
@@ -81,7 +83,7 @@ public class GenerateValidationReport {
 	 * Completes a search on all test sets in our list using the correct (forward) digestion of our protein database.
 	 */
 	public static void forwards() {
-		Properties.maximumNumberOfMatchesForASpectrum = 50;
+		Properties.maximumNumberOfMatchesForASpectrum = 10;
 		//load the peptides
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
@@ -174,14 +176,14 @@ public class GenerateValidationReport {
 			
 			//# of correct TPs
 			pw.println("<tr>");
-			pw.println("<td># of correct TPs</td>");
+			pw.println("<td># of true positives</td>");
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + testSet.getTrueTally() + "</td>");
 			}
 			
 			//% of correct TPs
 			pw.println("<tr>");
-			pw.println("<td>% of correct TPs</td>");
+			pw.println("<td>% of true positives</td>");
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + ((double) testSet.getTrueTally() / testSet.getSetSize()) + "</td>");
 			}
@@ -402,9 +404,9 @@ public class GenerateValidationReport {
 //						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
 //						pw.println("<br>");
 //					}
-					pw.println("our score: " + ourMatch.ionMatchTally + ", " + ourMatch.getScoreTandemFit());
+					pw.println("our score: " + ourMatch.ionMatchTally + ", " + ourMatch.getScore());
 					pw.println("<br>");
-					pw.println("their score: " + trueMatch.ionMatchTally + ", " + trueMatch.getScoreTandemFit());
+					pw.println("their score: " + trueMatch.ionMatchTally + ", " + trueMatch.getScore());
 					pw.println("<br>");
 					
 					//creating the image of our match

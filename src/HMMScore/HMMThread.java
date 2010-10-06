@@ -1,4 +1,6 @@
-package Peppy;
+package HMMScore;
+
+import Peppy.Match;
 
 
 public class HMMThread implements Runnable {

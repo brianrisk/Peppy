@@ -14,10 +14,10 @@ maximumNumberOfMatchesForASpectrum 2
 
 
 
-//FASTA files can be either DNA or amino acid sequences
+##FASTA files can be either DNA or amino acid sequences
 isSequenceFileDNA true
 
-//This could be a directory or a file
+##This could be a directory or a file
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
@@ -43,7 +43,7 @@ reportDirectory reports
 defaultScore TandemFit
 
 //digest only inside ORFs?
-onlyUsePeptidesInOpenReadingFrames true
+onlyUsePeptidesInOpenReadingFrames false
 
 //spectrum cleaning
 localMaximaCleaning false
@@ -55,5 +55,9 @@ rightIonDifference 1.0
 
 //limit returned matches by confidence
 eValueCutOff 0.01
+useEValueCutOff false
+
+digestionWindowSize 25000000
+spectrumToPeptideMassError 2.0
 
 

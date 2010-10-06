@@ -104,6 +104,28 @@ public class Peptide implements Comparable<Peptide> {
 		
 		if (us.length() != them.length()) return false;
 		
+		return us.equals(them);
+			
+	}
+	
+	/**
+	 * Equals if, by mass, each amino acid is equal
+	 * 
+	 * the real trick for equality is ignoring any trailing stop (".") codon
+	 */
+	public boolean equalsByAcidMasses(String otherAcidSequence) {
+		String us = acidSequence.toUpperCase();
+		if (acidSequence.endsWith(".")) {
+			us = us.substring(0, us.indexOf('.'));
+		}
+		
+		String them = otherAcidSequence.toUpperCase();
+		if (otherAcidSequence.endsWith(".")) {
+			them = them.substring(0, them.indexOf('.'));
+		}
+		
+		if (us.length() != them.length()) return false;
+		
 		//go through each amino acid and, if they weigh the same, they are considered equal
 		boolean equal = true;
 		

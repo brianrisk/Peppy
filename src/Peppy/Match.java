@@ -1,13 +1,14 @@
 package Peppy;
 
 import HMMScore.HMMClass;
+import Statistics.HasEValue;
 
 /**
  * An object which contains scoring mechanisms to evaluate a spectrum/peptide match.
  * @author Brian Risk
  *
  */
-public class Match implements Comparable<Match>{
+public class Match implements Comparable<Match>, HasEValue{
 	
 	private double score = 0.0;
 	private double scoreTandemFit = 0.0;
@@ -240,8 +241,8 @@ public class Match implements Comparable<Match>{
 			//so -1 is returned where 1 usually is
 			if (rank > match.getRank()) return -1;
 			if (rank < match.getRank()) return  1;
-			if (score > match.getScore()) return -1;
-			if (score < match.getScore()) return  1;
+			if (score > match.getEValue()) return -1;
+			if (score < match.getEValue()) return  1;
 			return 0;
 		} else 
 		if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
@@ -351,7 +352,7 @@ public class Match implements Comparable<Match>{
 	}
 
 	public String toString() {
-		return peptide.getAcidSequence() + " " + scoreTandemFit + " " + peptide.getMass();
+		return spectrum.getId() + "\t" + peptide.getAcidSequence()  + "\t" + getScore();
 	}
 	
 	public void calculateEValue() {
