@@ -411,6 +411,10 @@ public class Spectrum implements Comparable<Spectrum>{
 		return  0;
 	}
 	
+	public void clearEValues() {
+		eValueCalculator = null;
+	}
+	
 	public void calculateEValues(ArrayList<Match> matches, ArrayList<Match> topMatches) {
 		if (eValueCalculator == null) {
 			eValueCalculator = new EValueCalculator(matches, topMatches);

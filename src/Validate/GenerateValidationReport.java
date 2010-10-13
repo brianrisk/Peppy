@@ -54,6 +54,8 @@ public class GenerateValidationReport {
 			e.printStackTrace();
 		}
 		
+//		Properties.peakDifferenceThreshold = 0.3;
+		
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
 		
@@ -71,9 +73,9 @@ public class GenerateValidationReport {
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 
-		tests.add(new TestSet("ecoli"));
-		tests.add(new TestSet("human"));
-		tests.add(new TestSet("aurum"));	
+//		tests.add(new TestSet("ecoli"));
+//		tests.add(new TestSet("human"));
+//		tests.add(new TestSet("aurum"));	
 		tests.add(new TestSet("USP"));
 
 	}
@@ -153,11 +155,19 @@ public class GenerateValidationReport {
 				pw.println("<td>" + testSet.getMilisecondsPerSpectrum() + "</td>");
 			}
 			
-			//E value at 1% FPR
+			
+			//# of correct TPs
 			pw.println("<tr>");
-			pw.println("<td>E value at 1% FPR</td>");
+			pw.println("<td># of true positives</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtOnePercentError() + "</td>");
+				pw.println("<td>" + testSet.getTrueTally() + "</td>");
+			}
+			
+			//% of correct TPs
+			pw.println("<tr>");
+			pw.println("<td>% of true positives</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + ((double) testSet.getTrueTally() / testSet.getSetSize()) + "</td>");
 			}
 			
 			//# found at 1% FPR
@@ -173,19 +183,11 @@ public class GenerateValidationReport {
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + testSet.getPercentAtOnePercentError() + "</td>");
 			}
-			
-			//# of correct TPs
+			//E value at 1% FPR
 			pw.println("<tr>");
-			pw.println("<td># of true positives</td>");
+			pw.println("<td>E value at 1% FPR</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getTrueTally() + "</td>");
-			}
-			
-			//% of correct TPs
-			pw.println("<tr>");
-			pw.println("<td>% of true positives</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + ((double) testSet.getTrueTally() / testSet.getSetSize()) + "</td>");
+				pw.println("<td>" + testSet.getEValueAtOnePercentError() + "</td>");
 			}
 			
 			//PR Curve
@@ -204,38 +206,42 @@ public class GenerateValidationReport {
 			
 			
 			
-			
-			pw.println("</table>");
-			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
-			pw.println("<table border=1>");
-			
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
-			}
-			
-			//REVERSE
+//			
+//			pw.println("</table>");
+//			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
+//			
+//			pw.println("<h3>Forwards</h3>");
+//			pw.println("<table border=1>");
+//			pw.println("<tr>");
+//			pw.println("<td>E value marking top 5% (forwards)</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
+//			}
+//			pw.println("<tr>");
+//			pw.println("<td>E value marking top 25% (forwards)</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
+//			}
+//			pw.println("<tr>");
+//			pw.println("<td>E value marking top 50% (forwards)</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
+//			}
+//			pw.println("<tr>");
+//			pw.println("<td>E value marking top 75% (forwards)</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
+//			}
+//			pw.println("<tr>");
+//			pw.println("<td>E value marking top 95% (forwards)</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
+//			}
+//			pw.println("</table>");
+//			
+//			//REVERSE
+//			pw.println("<h3>Reverse</h3>");
+//			pw.println("<table border=1>");
 //			pw.println("<tr>");
 //			pw.println("<td>E value marking top 5% (reverse)</td>");
 //			for (TestSet testSet: tests) {
@@ -261,6 +267,7 @@ public class GenerateValidationReport {
 //			for (TestSet testSet: tests) {
 //				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
 //			}
+//			pw.println("</table>");
 
 
 			

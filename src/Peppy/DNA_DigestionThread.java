@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 import Utilities.U;
 
-public class SequenceDigestionThread implements Runnable {
+public class DNA_DigestionThread implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-	NucleotideSequence nucleotideSequence;
+	DNA_Sequence nucleotideSequence;
 	byte frame;
 	boolean forwards;
 	int startIndex;
@@ -32,7 +32,7 @@ public class SequenceDigestionThread implements Runnable {
 	 * @param frame
 	 * @param forwards
 	 */
-	public SequenceDigestionThread(NucleotideSequence nucleotideSequence,
+	public DNA_DigestionThread(DNA_Sequence nucleotideSequence,
 			byte frame, boolean forwards, int startIndex, int stopIndex) {
 		if (startIndex < 0) startIndex = 0;
 		this.nucleotideSequence = nucleotideSequence;
@@ -54,6 +54,7 @@ public class SequenceDigestionThread implements Runnable {
 		int codonIndex = 0;
 		//the amino acid is the translation of the codon
 		char aminoAcid = 'x';
+		char previousAminoAcid = 'x';
 		//Where we store all of our forming peptides
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
 		
@@ -94,18 +95,36 @@ public class SequenceDigestionThread implements Runnable {
 					}
 				}
 				
+				if ((aminoAcid == 'M') ||  // start a new peptide at M
+					(previousAminoAcid == 'M' && aminoAcid != 'M') || // handle possible N-terminal methionine truncation products
+					(isBreak(previousAminoAcid) && aminoAcid != 'M'))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+				{		
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
+				}
+
 				
+				//Events which might start a new peptide
 				if (aminoAcid == 'M') {
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
-					//sometimes the M is not added, so we're accounting for this here
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
+//					/*
+//					 * This if is included to avoid repeated peptides
+//					 * e.g. MMADK would produce MMADK, MADK and the next step would produce MADK, ADK
+//					 * and MADK would be repeated twice.
+//					 * 
+//					 * This problem also comes in if previous amino acid is a break point
+//					 */
+//					if (previousAminoAcid != 'M' && !isBreak(previousAminoAcid)) {
+//						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
+//					}
+//					
+//					//sometimes the M is not added, so we're accounting for this here
+//					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 					inORF = true;
 				} else {
-					if (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R') {
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
+					if (isBreak(aminoAcid)) {
+//						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 						//add all peptides
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-							Peptide peptide = new Peptide(puc.getSequence(), acidIndex, forwards, (byte) (acidIndex % 3),  nucleotideSequence.getParentSequence());
+							Peptide peptide = new Peptide(puc.getSequence(), puc.getSequenceIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
 							if (peptide.getMass() >= Properties.peptideMassThreshold) {
 								if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 									if (inORF) {
@@ -138,6 +157,7 @@ public class SequenceDigestionThread implements Runnable {
 				
 				//our acid index can now move forward
 				acidIndex += threeTimesCodonIncrement;
+				previousAminoAcid = aminoAcid;
 			}
 			
 			codon[codonIndex] = nucleotideSequence.getSequence().charAt(nucleotideIndex);	
@@ -146,7 +166,7 @@ public class SequenceDigestionThread implements Runnable {
 		}	
 		//adding all the remaining peptides under construction
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			Peptide peptide = new Peptide(puc.getSequence(), nucleotideIndex, forwards, frame,  nucleotideSequence.getParentSequence());
+			Peptide peptide = new Peptide(puc.getSequence(), puc.getSequenceIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
 			if (peptide.getMass() >= Properties.peptideMassThreshold) {
 				if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 					if (inORF) {
@@ -157,6 +177,10 @@ public class SequenceDigestionThread implements Runnable {
 				}
 			}
 		}
+	}
+	
+	private boolean isBreak(char aminoAcid) {
+		return (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R');
 	}
 	
 	

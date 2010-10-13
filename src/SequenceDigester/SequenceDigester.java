@@ -8,11 +8,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import Peppy.Peppy;
-import Peppy.NucleotideSequence;
+import Peppy.DNA_Sequence;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.SequenceDigestionThread;
+import Peppy.DNA_DigestionThread;
 import Utilities.U;
 
 public class SequenceDigester {
@@ -36,13 +36,13 @@ public class SequenceDigester {
 		for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++)  {
 			Sequence sequence = sequences.get(sequenceIndex);
 			U.p("digesting sequence: " + sequence.getSequenceFile().getName());
-			ArrayList<NucleotideSequence> nucleotideSequences = sequence.getNucleotideSequences();
+			ArrayList<DNA_Sequence> nucleotideSequences = sequence.getNucleotideSequences();
 			ArrayList<Peptide> peptides;
 			for (int nucleotideSequenceIndex = 0; nucleotideSequenceIndex < nucleotideSequences.size(); nucleotideSequenceIndex++) {
-				NucleotideSequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+				DNA_Sequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 				for (byte frame = 0; frame < 3; frame++) {
 					for (int forwards = 0; forwards <=1; forwards++) {
-						SequenceDigestionThread sdt =  new SequenceDigestionThread(nucleotideSequence, frame, forwards == 0, 0, nucleotideSequence.getSequence().length());
+						DNA_DigestionThread sdt =  new DNA_DigestionThread(nucleotideSequence, frame, forwards == 0, 0, nucleotideSequence.getSequence().length());
 						peptides = sdt.getPeptides();
 						File peptideFile = new File(digestedSequenceFolder, "" + sequenceIndex + "-" + nucleotideSequenceIndex + "-frame:" + frame + "-" + forwards + ".txt");
 						try {

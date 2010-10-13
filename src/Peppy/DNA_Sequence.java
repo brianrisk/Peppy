@@ -5,17 +5,20 @@ package Peppy;
  * @author Brian Risk
  *
  */
-public class NucleotideSequence {
+public class DNA_Sequence {
 	
 	private String sequenceDescription;
 	private String sequence;
 	private Sequence parentSequence;
 	
-	public NucleotideSequence(String sequenceDescription, String sequence, Sequence parentSequence) {
+
+	
+	public DNA_Sequence(String sequenceDescription, String sequence, Sequence parentSequence) {
 		this.sequenceDescription = sequenceDescription;
 		this.sequence = sequence;
 		this.parentSequence = parentSequence;
 	}
+	
 
 	public String getSequenceDescription() {
 		return sequenceDescription;

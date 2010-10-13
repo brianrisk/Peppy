@@ -19,7 +19,7 @@ import Utilities.U;
 public class Sequence {
 	private File sequenceFile;
 	private int id;
-	private ArrayList<NucleotideSequence> nucleotideSequences = null;
+	private ArrayList<DNA_Sequence> nucleotideSequences = null;
 	private int startIndex = 0;
 	private int stopIndex = 0;
 	private int nucleotideSequenceIndex = 0;
@@ -51,7 +51,7 @@ public class Sequence {
 		
 		//Get whatever sequence we're working on.  There will most often only be
 		//one sequence in nucleotideSequences, but sometimes more
-		NucleotideSequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+		DNA_Sequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 		
 		//if this is the first time we've tried to extract peptides
 		if (stopIndex == 0) {
@@ -79,10 +79,10 @@ public class Sequence {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		
 		//Create our SequenceDigestionThread ArrayList
-		ArrayList<SequenceDigestionThread> digestors = new ArrayList<SequenceDigestionThread>();
+		ArrayList<DNA_DigestionThread> digestors = new ArrayList<DNA_DigestionThread>();
 		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex));
-			digestors.add(new SequenceDigestionThread(nucleotideSequence, frame, false, startIndex, stopIndex - digestionFrameOverlap));
+			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex));
+			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, false, startIndex, stopIndex - digestionFrameOverlap));
 		}
 		
 		//create the threads and start them engines!
@@ -105,7 +105,7 @@ public class Sequence {
 		
 		//harvest all digested peptides
 		for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
-			SequenceDigestionThread digestor = digestors.get(digestorIndex);
+			DNA_DigestionThread digestor = digestors.get(digestorIndex);
 			peptides.addAll(digestor.getPeptides());
 		}
 			
@@ -164,9 +164,9 @@ public class Sequence {
 	 * this method returns a ArrayList containing all of the sequences
 	 * @return
 	 */
-	public ArrayList<NucleotideSequence> getNucleotideSequences() {
+	public ArrayList<DNA_Sequence> getNucleotideSequences() {
 		if (nucleotideSequences == null) {
-			nucleotideSequences = new ArrayList<NucleotideSequence>();
+			nucleotideSequences = new ArrayList<DNA_Sequence>();
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(sequenceFile));
 				String line = br.readLine();
@@ -178,9 +178,8 @@ public class Sequence {
 					if (line.startsWith(">")) {
 						//if sequenceDescription has not been defined, that means it is the first in the file
 						if (sequenceDescription != null) {
-							String acidSequence = sequence.toString().toUpperCase();
-							nucleotideSequences.add(new NucleotideSequence(sequenceDescription, acidSequence, this));
-							if (sequenceLength == 0) sequenceLength = acidSequence.length();
+							nucleotideSequences.add(new DNA_Sequence(sequenceDescription, sequence.toString().toUpperCase(), this));
+							if (sequenceLength == 0) sequenceLength = sequence.length();
 							sequence = new StringBuffer();
 						}
 						sequenceDescription = line;
@@ -196,7 +195,7 @@ public class Sequence {
 					line = br.readLine();
 				}
 				String acidSequence = sequence.toString().toUpperCase();
-				nucleotideSequences.add(new NucleotideSequence(sequenceDescription, acidSequence, this));
+				nucleotideSequences.add(new DNA_Sequence(sequenceDescription, acidSequence, this));
 				if (sequenceLength == 0) sequenceLength = acidSequence.length();
 				
 				//close out our stream.  It's the courteous thing to do!

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
+import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Spectrum;
 import Utilities.U;
@@ -77,11 +78,13 @@ public class TextReporter {
 				if (Peppy.Properties.isSequenceFileDNA) {
 					sb.append(match.getSequence().getSequenceFile().getName());
 					sb.append('\t');
-					sb.append(match.getPeptide().getSTART());
+					sb.append(match.getPeptide().getStartIndex());
 					sb.append('\t');
-					sb.append(match.getPeptide().getSTOP());
+					sb.append(match.getPeptide().getStopIndex());
 					sb.append('\t');
-					sb.append(match.getPeptide().isForward());
+					sb.append(match.getPeptide().isForward() ? "+" : "-");
+					sb.append('\t');
+					sb.append(match.getPeptide().isSpliced());
 				} else {
 					sb.append(match.getPeptide().getProteinName());
 				}

@@ -30,7 +30,7 @@ public class ScoringThreadServer {
 	
 	//this is how we keep track of which Spectrum to give out next
 	private int spectrumIndex = 0;
-	private int numberOfThreads = Properties.numberOfThreads;
+	private int numberOfThreads;
 	
 	/**
 	 * 
@@ -44,6 +44,7 @@ public class ScoringThreadServer {
 		matches = new ArrayList<ArrayList<Match>>(spectra.size());
 		
 		//here we make sure we don't use more threads than we have spectra
+		numberOfThreads = Properties.numberOfThreads;
 		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();
 		
 		//spawn new threads as needed
@@ -62,12 +63,7 @@ public class ScoringThreadServer {
 	 */
 	public synchronized Spectrum getNextSpectrum(ArrayList<Match> matchesForOneSpectrum) {
 		matches.add(matchesForOneSpectrum);
-		Spectrum out =  null;
-		if (spectrumIndex < spectra.size()) {
-			out = spectra.get(spectrumIndex);
-			spectrumIndex++;
-		}
-		return out;
+		return getNextSpectrum();
 	}
 	
 	/**

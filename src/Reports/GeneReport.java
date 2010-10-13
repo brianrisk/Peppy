@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import Peppy.Match;
+import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.SequenceRegion;
 import Utilities.U;
@@ -45,7 +45,7 @@ public class GeneReport {
 		int score, peptideIndex;
 		for (Match match: matches) {
 			score = (int) Math.round(Math.abs(Math.log(match.getEValue())));
-			peptideIndex = match.getPeptide().getIndex();
+			peptideIndex = match.getPeptide().getStartIndex();
 			indexScores[peptideIndex] += score;	
 		}
 	}
@@ -93,7 +93,7 @@ public class GeneReport {
 		int matchIndex;
 		SequenceRegion topSequenceRegion = new SequenceRegion(bestWindowIndex, geneWindowSize);
 		for (Match match: theseMatches) {
-			matchIndex = match.getPeptide().getIndex();
+			matchIndex = match.getPeptide().getStartIndex();
 			if (matchIndex >= bestWindowIndex && matchIndex <= bestWindowIndexTop) {
 				topSequenceRegion.addHit(match);
 			}

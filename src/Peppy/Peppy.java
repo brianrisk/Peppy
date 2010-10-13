@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import HMMScore.HMMScorer;
@@ -34,7 +31,10 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init();
-		new Peppy(args);
+//		splice();
+//		new Peppy(args);
+		cnv();
+//		bigJob(args);
 //		testHMMScore();
 //		ProteinDigestion.convertDATtoFASTA(Properties.sequenceDirectoryOrFile);
 //		runOnProteinDatabase(args);
@@ -42,7 +42,57 @@ public class Peppy {
 		U.p("done");
 	}
 	
-
+	public static void splice() {
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		for (Sequence sequence: sequences) {
+//			RNA_Sequence rna = new RNA_Sequence(sequence.getNucleotideSequences().get(0), 0, sequence.getSequenceLength());
+			RNA_Sequence rna = new RNA_Sequence(sequence.getNucleotideSequences().get(0), 35160417, 35253949);
+//			rna.printStats();
+//			rna.checkCD44Sites();
+			U.p("Digesting...");
+			RNA_Digestor digestor = new RNA_Digestor(rna);
+			U.p(digestor.getPeptides().size());
+		}
+	}
+	
+	public static void bigJob(String [] args) {
+		String database, error, job;
+		for (int i = 0; i < 1; i++) {
+			if (i == 0) {
+				database = "Genome";
+				Properties.isSequenceFileDNA = true;
+				Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences HG19");
+			} else {
+				database = "UniProt";
+				Properties.isSequenceFileDNA = false;
+				Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat");
+			}
+			for (int j = 0; j < 1; j++) {
+				if (j == 0) {
+					job = "GO_mem_FASP";
+					Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
+				} else {
+					job = "SDS";
+					Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/SDS");
+				}
+				for (int k = 0; k < 2; k++) {
+					if (k == 0) {
+						error = "01";
+						Properties.spectrumToPeptideMassError = 0.01;
+					} else {
+						error = "20";
+						Properties.spectrumToPeptideMassError = 0.20;
+					}
+					
+					//file:///Volumes/encode/Chris
+					Properties.reportDirectory = new File("/Volumes/encode/Chris/report" + "-" + job + "-" + database + "-" + error);
+					U.p(Properties.reportDirectory.getName());
+					new Peppy(args);
+					U.p();
+				}
+			}
+		}
+	}
 	
 	/**
 	 * This is just to test HMM score
@@ -67,44 +117,94 @@ public class Peppy {
 			U.p(match.getPeptide().getAcidSequence() + ": " + match.getScoreHMM());
 		}
 	}
+	
+	public static void cnv() {
+		U.startStopwatch();
+		printGreeting();
+		
+		U.p("CNV report");
+		
+		//setting other properties
+		Properties.maximumNumberOfMatchesForASpectrum = 2;
+
+		//Load our spectra
+		U.p("loading spectra...");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+		
+		//Get references to our sequence files -- no nucleotide data is loaded at this point
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		
+		//initialize our ArrayList of matches
+		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		//get sequence, rna, peptides and matches
+		Sequence chr11 = sequences.get(0);
+		RNA_Sequence rna = new RNA_Sequence(chr11.getNucleotideSequences().get(0), 35160417, 35253949);
+		
+		U.p("digesting...");
+		RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
+		ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
+		U.p("peptide tally: " + peptides.size());
+		
+		U.p("getting matches...");
+		matches = getMatches(peptides, spectra, chr11);
+
+		U.p("calculating final e values");
+		for (Match match: matches) {
+			match.calculateEValue();
+		}
+		
+		U.p("creating text report");
+		TextReporter textReport = new TextReporter(matches, spectra, sequences);
+		textReport.generateFullReport();
+		
+		U.p("creating HTML reports");
+		if (Properties.isSequenceFileDNA) {
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			report.generateFullReport();
+		}
+
+		U.p();
+		U.stopStopwatch();
+	}
 
 	public Peppy(String [] args) {
-			U.startStopwatch();
-			printGreeting();
-			
-			
-			//setting other properties
-			Properties.maximumNumberOfMatchesForASpectrum = 2;
-			Properties.reduceDuplicateMatches = false;
-	//		Properties.peakDifferenceThreshold = 0.25;
-	//		Properties.peakIntensityExponent = 0.3;
+		U.startStopwatch();
+		printGreeting();
+		peptideTally = 0;
+		
+		
+		//setting other properties
+		Properties.maximumNumberOfMatchesForASpectrum = 2;
+//		Properties.peakDifferenceThreshold = 0.25;
+//		Properties.peakIntensityExponent = 0.3;
 //			Properties.spectrumToPeptideMassError = 0.01;
-			Properties.spectrumToPeptideMassError = 2;
+//			Properties.spectrumToPeptideMassError = 2;
 //			Properties.peakDifferenceThreshold = 0.8;
-			
-			//Load our spectra
-			U.p("loading spectra...");
-			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-			U.p("loaded " +spectra.size() + " spectra.");
-			
-			//Get references to our sequence files -- no nucleotide data is loaded at this point
-			ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-			
-			//initialize our ArrayList of matches
-			ArrayList<Match> matches = new ArrayList<Match>();
-			
-			//loop through each sequence in the sequences ArrayList
-			for (Sequence sequence: sequences) {		
-				matches.addAll(getMatches(sequence, spectra));
-			}
-			U.p("peptide tally: " + peptideTally);
+		
+		//Load our spectra
+		U.p("loading spectra...");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+		
+		//Get references to our sequence files -- no nucleotide data is loaded at this point
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		
+		//initialize our ArrayList of matches
+		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		//loop through each sequence in the sequences ArrayList
+		for (Sequence sequence: sequences) {		
+			matches.addAll(getMatches(sequence, spectra));
+		}
+		U.p("peptide tally: " + peptideTally);
 
-			//recalculate e values now that all peptides are in for the count
-			U.p("calculating final e values");
-			for (Match match: matches) {
-				match.calculateEValue();
-			}
-			
+		U.p("calculating final e values");
+		for (Match match: matches) {
+			match.calculateEValue();
+		}
+		
 //			ArrayList<Match> specificMatches =  new ArrayList<Match>();
 //			for (Match match: matches) {
 //				int index = match.getPeptide().getIndex();
@@ -113,19 +213,19 @@ public class Peppy {
 //				}
 //			}
 //			matches = specificMatches;
-			
-			U.p("Creating reports");
+		
+		U.p("Creating reports");
 //			if (Properties.isSequenceFileDNA) {
-				HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-				report.generateFullReport();
+//				HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+//				report.generateFullReport();
 //			}
-			
-			TextReporter textReport = new TextReporter(matches, spectra, sequences);
-			textReport.generateFullReport();
-			
-			U.p();
-			U.stopStopwatch();
-		}
+		
+		TextReporter textReport = new TextReporter(matches, spectra, sequences);
+		textReport.generateFullReport();
+		
+		U.p();
+		U.stopStopwatch();
+	}
 
 	public static void init() {
 		System.setProperty("java.awt.headless", "true"); 
@@ -206,13 +306,34 @@ public class Peppy {
 				//This is where the bulk of the processing in long jobs takes
 				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
 				//Add only matches with a decent e value
-				for (Match match: newMatches) {
-					if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+				if (Properties.useEValueCutOff) {
+					for (Match match: newMatches) {
+						if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+					}
+				} else {
+					matches.addAll(newMatches);
 				}
 //				matches.addAll(newMatches);
 			}
 			return matches;
 	}
+	
+	public static ArrayList<Match> getMatches(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
+		ArrayList<Match> matches = new ArrayList<Match>() ;
+		peptideTally += peptides.size();
+		//This is where the bulk of the processing in long jobs takes
+		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
+		//Add only matches with a decent e value
+		if (Properties.useEValueCutOff) {
+			for (Match match: newMatches) {
+//				if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+				if (match.getScore() >= 40.0) matches.add(match);
+			}
+		} else {
+			matches.addAll(newMatches);
+		}
+		return matches;
+}
 	
 	
 	/**

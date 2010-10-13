@@ -1,8 +1,18 @@
 package Reports;
 
-import java.io.*;
-import java.util.*;
-import Peppy.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import Peppy.Match;
+import Peppy.Properties;
+import Peppy.Sequence;
+import Peppy.Spectrum;
 import Utilities.U;
 
 
@@ -64,7 +74,7 @@ public class BEDReporter {
 				chrom = chromFileName.substring(0, chromFileName.indexOf('.'));
 				
 				//chromStart
-				chromStart = match.getPeptide().getIndex();
+				chromStart = match.getPeptide().getStartIndex();
 				
 				//chromEnd
 				if (match.getPeptide().isForward()) {

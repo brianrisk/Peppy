@@ -17,7 +17,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double scoreHMM = 0.0;
 	private double eValue;
 	public int ionMatchTally = 0;
-	private double rank = Integer.MAX_VALUE;
+	private int rank = Integer.MAX_VALUE;
 	
 	private Spectrum spectrum;
 	private Peptide peptide;
@@ -219,8 +219,8 @@ public class Match implements Comparable<Match>, HasEValue{
 			if (sequence.getId() < match.getSequence().getId()) return -1;
 			if (sequence.getId() > match.getSequence().getId()) return  1;
 			//in case sequences equal, compare index
-			if(peptide.getIndex() < match.getPeptide().getIndex()) return -1;
-			if(peptide.getIndex() > match.getPeptide().getIndex()) return  	1;
+			if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+			if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  	1;
 			return 0;
 		} else
 		if (sortParameter == SORT_BY_E_VALUE) {
@@ -263,11 +263,11 @@ public class Match implements Comparable<Match>, HasEValue{
 		}
 	}
 
-	public double getRank() {
+	public int getRank() {
 		return rank;
 	}
 
-	public void setRank(double rank) {
+	public void setRank(int rank) {
 		this.rank = rank;
 	}
 

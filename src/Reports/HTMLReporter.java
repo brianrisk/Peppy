@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
+import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.SequenceRegion;
 import Peppy.Spectrum;
 import SpectralVisualizer.SpectralVisualizer;
 import Utilities.U;
@@ -46,10 +46,10 @@ public class HTMLReporter {
 
 
 	public void generateFullReport() {
-		File indexFile = new File(Properties.reportDirectory, "index" + Properties.reportWebSuffix);
+		File indexFile = new File(Peppy.Properties.reportDirectory, "index" + Properties.reportWebSuffix);
 		try {
 			//create our report directory
-			Properties.reportDirectory.mkdirs();
+			Peppy.Properties.reportDirectory.mkdirs();
 			
 			
 			//sorting our matches by spectrum then score
@@ -144,8 +144,18 @@ public class HTMLReporter {
 				sb.append(i);
 				sb.append(Properties.reportWebSuffix);
 				sb.append("\">");
-				sb.append(match.getPeptide().getIndex());
+				sb.append(match.getPeptide().getStartIndex());
 				sb.append("</a>");
+				sb.append("</td>");
+				
+				sb.append("<td>");
+				sb.append(match.getPeptide().isForward() ? "+" : "-");
+				sb.append("</td>");
+				
+				
+				
+				sb.append("<td>");
+				sb.append(match.getPeptide().isSpliced());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -164,20 +174,22 @@ public class HTMLReporter {
 				pw.println(sb);
 				
 				//generate neighborhood reports
-				if (Peppy.Properties.isSequenceFileDNA) {
-					generateNeighborhoodReport(bestMatches.get(i), i);
-				}
+//				if (Peppy.Properties.isSequenceFileDNA) {
+//					generateNeighborhoodReport(bestMatches.get(i), i);
+//				}
 			}
 			
 			U.appendFile(pw, Properties.reportWebFooterFile);
 			pw.flush();
 			pw.close();
 			
-			if (Peppy.Properties.isSequenceFileDNA) {
-				for (int i = 0; i < sequences.size(); i++) {
-					generateSequenceReport(sequences.get(i));
-				}
-			}
+//			U.p("creating sequence report");
+//			if (Peppy.Properties.isSequenceFileDNA) {
+//				for (int i = 0; i < sequences.size(); i++) {
+//					generateSequenceReport(sequences.get(i));
+//				}
+//			}
+			U.p("creating spectrum report");
 			for (Match match: bestMatches) {
 				generateSpectrumReport(match.getSpectrum());
 			}
@@ -192,7 +204,7 @@ public class HTMLReporter {
 	}
 	
 	public void generateNeighborhoodReport(Match match, int index) {
-		File neighborhoodDirectory = new File(Properties.reportDirectory, "neighborhoods");
+		File neighborhoodDirectory = new File(Peppy.Properties.reportDirectory, "neighborhoods");
 		File indexFile = new File(neighborhoodDirectory, index + Properties.reportWebSuffix);
 		
 		//find all matches that are from the same chromosome
@@ -200,7 +212,7 @@ public class HTMLReporter {
 		for (int i = 0; i < matches.size(); i++) {
 			Match thisMatch = matches.get(i);
 			if (thisMatch.getSequence() != match.getSequence()) continue;
-			if (Math.abs(thisMatch.getPeptide().getIndex() - match.getPeptide().getIndex()) > Properties.locusNeighborhood) continue;
+			if (Math.abs(thisMatch.getPeptide().getStartIndex() - match.getPeptide().getStartIndex()) > Properties.locusNeighborhood) continue;
 			theseMatches.add(thisMatch);
 		}
 
@@ -210,7 +222,7 @@ public class HTMLReporter {
 			U.appendFile(pw, Properties.reportWebHeaderSubFile);
 			
 			//print the best match for each spectrum
-			pw.println("<h1>Matches in the neighborhood of " + match.getPeptide().getIndex() + "</h1>");
+			pw.println("<h1>Matches in the neighborhood of " + match.getPeptide().getStartIndex() + "</h1>");
 			U.appendFile(pw, Properties.reportWebTableHeader);
 			Collections.sort(theseMatches);
 			for (int i = 0; i < theseMatches.size(); i++) {
@@ -238,7 +250,7 @@ public class HTMLReporter {
 		 */
 		
 		
-		File sequenceReportDirectory = new File(Properties.reportDirectory, "sequences");
+		File sequenceReportDirectory = new File(Peppy.Properties.reportDirectory, "sequences");
 		sequenceReportDirectory.mkdirs();
 		File indexFile = new File(sequenceReportDirectory, sequence.getId() + Properties.reportWebSuffix);
 		ArrayList<Match> theseMatches = getMatchesWithSequence(sequence, matches);
@@ -472,7 +484,7 @@ public class HTMLReporter {
 		sb.append("</nobr></td>");
 		
 		sb.append("<td>");
-		sb.append(match.getPeptide().getIndex());
+		sb.append(match.getPeptide().getStartIndex());
 		sb.append("</td>");
 		
 		sb.append("<td>");

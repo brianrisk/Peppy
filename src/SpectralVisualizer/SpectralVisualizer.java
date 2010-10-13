@@ -22,7 +22,6 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
-import Reports.HTMLReporter;
 import Utilities.U;
 
 public class SpectralVisualizer {
@@ -52,7 +51,7 @@ public class SpectralVisualizer {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//print headers
-			U.appendFile(pw, Reports.Properties.reportWebHeaderFile);
+			U.appendFile(pw, Properties.reportWebHeaderFile);
 			
 			StringBuffer sb;
 			for (int i = 0 ; i <spectra.size(); i++) {
@@ -71,7 +70,7 @@ public class SpectralVisualizer {
 			}
 			
 			//print headers
-			U.appendFile(pw, Reports.Properties.reportWebHeaderFile);
+			U.appendFile(pw, Properties.reportWebHeaderFile);
 
 			pw.flush();
 			pw.close();

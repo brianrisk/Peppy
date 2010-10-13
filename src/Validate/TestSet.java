@@ -26,6 +26,7 @@ public class TestSet {
 	
 	private String testName;
 	private ArrayList<Spectrum> spectra;
+	private ArrayList<MatchContainer> topForwardsTestedMatches = null;
 	private ArrayList<Match> topForwardsMatches = null;
 	private ArrayList<Match> positiveMatches = null;
 	private ArrayList<Match> topReverseMatches = null;
@@ -98,11 +99,16 @@ public class TestSet {
 		
 		//find the #1 ranked match for each spectrum
 		topForwardsMatches = new ArrayList<Match>();
+		topForwardsTestedMatches = new ArrayList<MatchContainer>();
 		for (Match match: positiveMatches) {
 			if (match.getRank() == 0) {
 				topForwardsMatches.add(match);
+				topForwardsTestedMatches.add(new MatchContainer(match));
 			}
 		}
+		//should already be ordered, but what the hell, right?
+		Collections.sort(topForwardsMatches);
+		Collections.sort(topForwardsTestedMatches);
 			
 		
 		
@@ -118,12 +124,28 @@ public class TestSet {
 	 */
 	public void findFalsePositiveMatches(ArrayList<Peptide> peptides) {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		
+		//clear E values
+		for (Spectrum spectrum: spectra) {
+			spectrum.clearEValues();
+		}
 		//get the matches
 		topReverseMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
 		//Sort matches by e value	
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 		Collections.sort(topReverseMatches);
+		
+		//see if any are actually true!
+		int trueTally = 0;
+		for (Match match: topReverseMatches) {
+			MatchContainer mc = new MatchContainer(match);
+			if (mc.isTrue()) {
+				trueTally++;
+				U.p(match);
+			}
+		}
+		if (trueTally > 0) U.p("Some are correct in reverse database! This many: " + trueTally);
 		
 	}
 	
@@ -133,7 +155,7 @@ public class TestSet {
 	private void calculateStastics() {
 		//stats for tested matches
 		boolean onePercenThresholdHasBeenReached = false;
-		for (MatchContainer match: testedMatches) {
+		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
 				trueTally++;
 			} else {

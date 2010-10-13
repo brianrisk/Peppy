@@ -14,11 +14,15 @@ public class Peptide implements Comparable<Peptide> {
 	
 	private String acidSequence;
 	private double mass;
-	private int index;
+	private int startIndex;
+	private int stopIndex;
+	private int intronStartIndex;
+	private int intronStopIndex;
 	private boolean forward;
 	private byte readingFrame;
 	private Sequence parentSequence;
 	private String proteinName;
+	private boolean isSpliced;
 	
 	
 	/**
@@ -28,25 +32,44 @@ public class Peptide implements Comparable<Peptide> {
 	public Peptide(String sequence) {
 		this.acidSequence = sequence;
 		this.mass = calculateMass();
-		this.index = 0;
+		this.startIndex = 0;
 		this.forward = true;
 		this.readingFrame = (byte) 0;
 		this.parentSequence = null;
+		this.isSpliced = false;
 	}
 	
 	/**
 	 * A version of the constructor which calculates the mass from the given sequence.
 	 * @param acidSequence
-	 * @param index
+	 * @param startIndex
 	 * @param forward
 	 */
-	public Peptide(String acidSequence, int index, boolean forward, byte readingFrame, Sequence parentSequence) {
+	public Peptide(String acidSequence, int startIndex, boolean forward, byte readingFrame, Sequence parentSequence) {
 		this.acidSequence = acidSequence;
 		this.mass = calculateMass();
-		this.index = index;
+		this.startIndex = startIndex;
 		this.forward = forward;
 		this.readingFrame = readingFrame;
 		this.parentSequence = parentSequence;
+		this.isSpliced = false;
+	}
+	
+	/**
+	 * For spliced peptides
+	 * @param acidSequence
+	 * @param startIndex
+	 * @param forward
+	 */
+	public Peptide(String acidSequence, int startIndex, int stopIndex, boolean forward, byte readingFrame, Sequence parentSequence, boolean isSpliced) {
+		this.acidSequence = acidSequence;
+		this.mass = calculateMass();
+		this.startIndex = startIndex;
+		this.stopIndex = stopIndex;
+		this.forward = forward;
+		this.readingFrame = readingFrame;
+		this.parentSequence = parentSequence;
+		this.isSpliced = isSpliced;
 	}
 	
 	/**
@@ -75,7 +98,7 @@ public class Peptide implements Comparable<Peptide> {
 //				+ sequence;
 		int outFrame = readingFrame + 1;
 		if (!forward) outFrame *= -1;
-		return mass + "\t" + acidSequence + "\t" + index + "\t" + outFrame + "\t" + proteinName;
+		return mass + "\t" + acidSequence + "\t" + startIndex + "\t" + outFrame + "\t" + proteinName;
 	}
 
 
@@ -167,29 +190,41 @@ public class Peptide implements Comparable<Peptide> {
 	/**
 	 * @return the index
 	 */
-	public int getIndex() {
-		return index;
+	public int getStartIndex() {
+		return startIndex;
 	}
 	
-	/**
-	 * This returns the start position.  For reporting purposes.  Conforms to standards.
-	 * @return
-	 */
-	public int getSTART() {
-		if (forward) {
-			return index;
-		} else {
-			return index + 1 - (acidSequence.length() * 3);
-		}
+	public int getStopIndex() {
+		return stopIndex;
 	}
-	
-	public int getSTOP() {
-		if (forward) {
-			return index + (acidSequence.length() * 3);
-		} else {
-			return index + 1;
-		}
+
+	public int getIntronStartIndex() {
+		return intronStartIndex;
 	}
+
+	public int getIntronStopIndex() {
+		return intronStopIndex;
+	}
+
+//	/**
+//	 * This returns the start position.  For reporting purposes.  Conforms to standards.
+//	 * @return
+//	 */
+//	public int getSTART() {
+//		if (forward) {
+//			return startIndex;
+//		} else {
+//			return startIndex + 1 - (acidSequence.length() * 3);
+//		}
+//	}
+//	
+//	public int getSTOP() {
+//		if (forward) {
+//			return startIndex + (acidSequence.length() * 3);
+//		} else {
+//			return startIndex + 1;
+//		}
+//	}
 
 
 	/**
@@ -199,6 +234,10 @@ public class Peptide implements Comparable<Peptide> {
 		return forward;
 	}
 
+
+	public boolean isSpliced() {
+		return isSpliced;
+	}
 
 	/**
 	 * @return the readingFrame

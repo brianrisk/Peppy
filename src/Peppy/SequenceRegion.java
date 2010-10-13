@@ -1,5 +1,11 @@
 package Peppy;
 
+/**
+ * A class to help detect possible gene locations
+ * EXPERIMENTAL at the moment
+ * @author Brian Risk
+ *
+ */
 public class SequenceRegion implements Comparable<SequenceRegion>{
 	
 	int startIndex;
@@ -19,7 +25,7 @@ public class SequenceRegion implements Comparable<SequenceRegion>{
 	}
 	
 	public void addHit(Match match) {
-		int matchIndex = match.getPeptide().getIndex();
+		int matchIndex = match.getPeptide().getStartIndex();
 		
 		//multiply by 3 because there are three nucleotides for each amino acid
 		//TODO:  make this calculation part of Peptide?

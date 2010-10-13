@@ -103,15 +103,6 @@ public class ScoringThread implements Runnable {
 				Match topMatch = topMatches.get(i);
 				topMatch.setRank(i);
 			}
-			for (int i = 1; i < topMatches.size(); i++) {
-				Match thisMatch = topMatches.get(i);
-				Match previousMatch = topMatches.get(i - 1);
-				if (thisMatch.getPeptide().equals(previousMatch.getPeptide())) {
-					U.p("two of the same peptide!");
-					U.p(thisMatch);
-					U.p(previousMatch);
-				}
-			}
 			
 			
 			//assign E values to top Matches:
