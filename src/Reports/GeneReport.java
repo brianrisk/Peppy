@@ -26,6 +26,7 @@ public class GeneReport {
 	private double [] survivability = new double[numberOfHistogramBars];
 	private double [] xValues = new double[numberOfHistogramBars];
 	private double barWidth;
+	@SuppressWarnings("unused")
 	private double m, b;
 	
 	public GeneReport(Sequence sequence, ArrayList<Match> matches, int geneRegionSize) {
@@ -74,9 +75,9 @@ public class GeneReport {
 	
 	public void insertSequenceRegionReport(ArrayList<Match> theseMatches, File sequenceReportDirectory, PrintWriter pw) throws IOException {
 		//initialize our variables
-		int numberOfTopRegions = 10;
+//		int numberOfTopRegions = 10;
 		int histogramHeight = 200;
-		int sequenceLength = sequence.getSequenceLength();
+//		int sequenceLength = sequence.getSequenceLength();
 		
 		int bestWindowIndex = 0; 
 		int bestWindowValue = 0;

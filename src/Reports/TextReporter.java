@@ -82,6 +82,10 @@ public class TextReporter {
 					sb.append('\t');
 					sb.append(match.getPeptide().getStopIndex());
 					sb.append('\t');
+					sb.append(match.getPeptide().getIntronStartIndex());
+					sb.append('\t');
+					sb.append(match.getPeptide().getIntronStopIndex());
+					sb.append('\t');
 					sb.append(match.getPeptide().isForward() ? "+" : "-");
 					sb.append('\t');
 					sb.append(match.getPeptide().isSpliced());

@@ -53,7 +53,6 @@ public class SpectralVisualizer {
 			//print headers
 			U.appendFile(pw, Properties.reportWebHeaderFile);
 			
-			StringBuffer sb;
 			for (int i = 0 ; i <spectra.size(); i++) {
 				//mark potential peptide peaks
 				markMatchingIons(spectra.get(i), peptides.get(i));

@@ -36,7 +36,7 @@ public class PeptideUnderConstruction {
 		return buffer.toString();
 	}
 	
-	public int getSequenceIndex() {
+	public int getCodeChunkIndex() {
 		return sequenceIndex;
 	}
 

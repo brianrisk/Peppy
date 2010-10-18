@@ -1,7 +1,7 @@
 package HMMScore;
 
-import java.util.*;
-import java.lang.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class CleavageProb {
 

@@ -49,6 +49,11 @@ public class Peptide implements Comparable<Peptide> {
 		this.acidSequence = acidSequence;
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
+		if (forward) {
+			this.stopIndex = startIndex + (acidSequence.length() * 3);
+		} else {
+			this.stopIndex = startIndex - (acidSequence.length() * 3);
+		}
 		this.forward = forward;
 		this.readingFrame = readingFrame;
 		this.parentSequence = parentSequence;
@@ -66,6 +71,19 @@ public class Peptide implements Comparable<Peptide> {
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
+		this.forward = forward;
+		this.readingFrame = readingFrame;
+		this.parentSequence = parentSequence;
+		this.isSpliced = isSpliced;
+	}
+	
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, byte readingFrame, Sequence parentSequence, boolean isSpliced) {
+		this.acidSequence = acidSequence;
+		this.mass = calculateMass();
+		this.startIndex = startIndex;
+		this.stopIndex = stopIndex;
+		this.intronStartIndex = intronStartIndex;
+		this.intronStopIndex = intronStopIndex;
 		this.forward = forward;
 		this.readingFrame = readingFrame;
 		this.parentSequence = parentSequence;
@@ -191,11 +209,19 @@ public class Peptide implements Comparable<Peptide> {
 	 * @return the index
 	 */
 	public int getStartIndex() {
-		return startIndex;
+		if (forward) {
+			return startIndex;
+		} else {
+			return stopIndex + 1;
+		}
 	}
 	
 	public int getStopIndex() {
-		return stopIndex;
+		if (forward) {
+			return stopIndex;
+		} else {
+			return startIndex + 1;
+		}
 	}
 
 	public int getIntronStartIndex() {

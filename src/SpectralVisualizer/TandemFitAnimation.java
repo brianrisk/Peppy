@@ -10,7 +10,6 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
-import Utilities.U;
 
 public class TandemFitAnimation {
 	

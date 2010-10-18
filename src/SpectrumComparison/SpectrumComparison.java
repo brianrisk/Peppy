@@ -15,12 +15,7 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 	private double delta;
 	private double distance = 0.0;
 	
-	/*
-	 * If we happen to know the sequences that begat the spectra
-	 * (eg. we are performing a test on our comparison algorithm)
-	 */
-	private String sequence1 = "";
-	private String sequence2 = "";
+
 	
 	/**
 	 * @param spectrum1
@@ -45,8 +40,6 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 		Peak peak1;
 		Peak peak2;
 		int peaksInCommon = 0;
-		double xMean = spectrum1.getCalculatedAverageIntensity();
-		double yMean = spectrum2.getCalculatedAverageIntensity();	
 		double presentMassDelta;
 		double presentIntensityDelta;
 		// the minimum delta should never be less than zero.  It's a distance.  Duh!

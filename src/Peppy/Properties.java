@@ -76,6 +76,7 @@ public class Properties {
 	public static boolean reduceDuplicateMatches = false;
 	
 	//Report related
+	public static boolean createHTMLReport = true;
 	public static String reportWebSuffix = ".html";
 	public static File reportWebHeaderFile = new File("resources/reports/header.txt");
 	public static File reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
@@ -191,6 +192,10 @@ public class Properties {
 		}
 		
 		
+		//reports
+		if (propertyName.equals("createHTMLReport")) {
+			createHTMLReport = Boolean.valueOf(propertyValue);
+		}
 		
 		
 		

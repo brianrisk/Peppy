@@ -11,12 +11,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
 import Utilities.U;
-import Validate.MatchContainer;
 
 public class ComparisonTester {
 

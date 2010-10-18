@@ -32,9 +32,11 @@ public class Peppy {
 	public static void main(String [] args) {
 		init();
 //		splice();
-//		new Peppy(args);
-		cnv();
+		new  Peppy(args);
+//		cnv();
 //		bigJob(args);
+//		cnvPeptideMassList();
+//		bigHMM(args);
 //		testHMMScore();
 //		ProteinDigestion.convertDATtoFASTA(Properties.sequenceDirectoryOrFile);
 //		runOnProteinDatabase(args);
@@ -94,6 +96,67 @@ public class Peppy {
 		}
 	}
 	
+	public static void cnvPeptideMassList() {
+		//Get references to our sequence files -- no nucleotide data is loaded at this point
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		
+		//get sequence, rna, peptides and matches
+		Sequence chr11 = sequences.get(0);
+		RNA_Sequence rna = new RNA_Sequence(chr11.getNucleotideSequences().get(0), 35160417, 35253949);
+		
+		U.p("digesting...");
+		RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
+		ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
+		U.p("peptide tally: " + peptides.size());
+		
+		File file = new File("CD44-peptides.txt");
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter (new FileWriter(file)));
+			int lineTally = 0;
+			double previousMass = 0;
+			for (Peptide peptide: peptides) {
+				if (peptide.getMass() != previousMass) {
+					pw.println(peptide.getMass());
+					previousMass = peptide.getMass();
+					lineTally++;
+				}
+			}
+			U.p("number of unique masses: " + lineTally);
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static void bigHMM(String [] args) {
+		String database, error, job;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+		error = "01";
+		Properties.spectrumToPeptideMassError = 0.1;
+
+		database = "UniProt";
+		Properties.isSequenceFileDNA = false;
+		Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat");
+
+		for (int j = 0; j < 1; j++) {
+			if (j == 0) {
+				job = "GO_mem_FASP";
+				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
+			} else {
+				job = "SDS";
+				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/SDS");
+			}
+
+			Properties.reportDirectory = new File("/Volumes/encode/Chris/HMM" + "-" + job + "-" + database + "-" + error);
+			U.p(Properties.reportDirectory.getName());
+			new Peppy(args);
+			U.p();
+		}
+
+	}
+	
 	/**
 	 * This is just to test HMM score
 	 */
@@ -135,9 +198,6 @@ public class Peppy {
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
-		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
-		
 		//get sequence, rna, peptides and matches
 		Sequence chr11 = sequences.get(0);
 		RNA_Sequence rna = new RNA_Sequence(chr11.getNucleotideSequences().get(0), 35160417, 35253949);
@@ -148,6 +208,7 @@ public class Peppy {
 		U.p("peptide tally: " + peptides.size());
 		
 		U.p("getting matches...");
+		ArrayList<Match> matches = new ArrayList<Match>();
 		matches = getMatches(peptides, spectra, chr11);
 
 		U.p("calculating final e values");
@@ -174,15 +235,6 @@ public class Peppy {
 		printGreeting();
 		peptideTally = 0;
 		
-		
-		//setting other properties
-		Properties.maximumNumberOfMatchesForASpectrum = 2;
-//		Properties.peakDifferenceThreshold = 0.25;
-//		Properties.peakIntensityExponent = 0.3;
-//			Properties.spectrumToPeptideMassError = 0.01;
-//			Properties.spectrumToPeptideMassError = 2;
-//			Properties.peakDifferenceThreshold = 0.8;
-		
 		//Load our spectra
 		U.p("loading spectra...");
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -205,21 +257,13 @@ public class Peppy {
 			match.calculateEValue();
 		}
 		
-//			ArrayList<Match> specificMatches =  new ArrayList<Match>();
-//			for (Match match: matches) {
-//				int index = match.getPeptide().getIndex();
-//				if (index >= 31862431 && index <= 38471004) {
-//					specificMatches.add(match);
-//				}
-//			}
-//			matches = specificMatches;
+		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
+			U.p("creating HTML reports");
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			report.generateFullReport();
+		}
 		
-		U.p("Creating reports");
-//			if (Properties.isSequenceFileDNA) {
-//				HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-//				report.generateFullReport();
-//			}
-		
+		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences);
 		textReport.generateFullReport();
 		
@@ -249,11 +293,6 @@ public class Peppy {
 			U.p("Arg 1: The file path directory to the FASTA protein database file.");
 		} else {
 			Properties.spectraDirectoryOrFile = new File(args[0]);
-			
-			//setting properties
-			Properties.maximumNumberOfMatchesForASpectrum = 2;
-			Properties.peakDifferenceThreshold = 0.25;
-			Properties.peakIntensityExponent = 0.3;
 			
 			//Load our spectra
 			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -326,8 +365,8 @@ public class Peppy {
 		//Add only matches with a decent e value
 		if (Properties.useEValueCutOff) {
 			for (Match match: newMatches) {
-//				if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
-				if (match.getScore() >= 40.0) matches.add(match);
+				if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+//				if (match.getScore() >= 40.0) matches.add(match);
 			}
 		} else {
 			matches.addAll(newMatches);

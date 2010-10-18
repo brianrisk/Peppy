@@ -192,6 +192,7 @@ public class ProteinDigestion {
 		return out;
 	}
 	
+	//TODO this code needs to reflect DNA digestion e.g. have peptides that both do and don't start with M
 	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		if (proteinString.length() == 0) return out;

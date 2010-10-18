@@ -1,3 +1,9 @@
+package Statistics;
+
+public class StandardDeviation {
+	
+}
+
 //package Statistics;
 //
 //import java.util.ArrayList;

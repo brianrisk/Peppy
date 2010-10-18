@@ -3,8 +3,6 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Utilities.U;
-
 public class RNA_Digestor {
 	
 	RNA_Sequence rna;
@@ -22,7 +20,44 @@ public class RNA_Digestor {
 		fullDigest();
 	}
 	
-	private ArrayList<Peptide> digest(int startIndex, int stopIndex, boolean isForward, byte [] code, int spliceLocation, int beginLocus, int intronLength) {
+	
+	public ArrayList<Peptide> getPeptides() {
+		return peptides;
+	}
+
+
+	private ArrayList<Peptide> digest(
+			int startIndex, 
+			int stopIndex, 
+			boolean isForward, 
+			byte [] code
+			) {
+		
+		return digest(startIndex, stopIndex, isForward, code, -1, rna.getStart(), length, null);
+	}
+	
+	/**
+	 * 
+	 * @param startIndex
+	 * @param stopIndex
+	 * @param isForward
+	 * @param codeChunk
+	 * @param spliceLocation -1 if not a spliced sequence
+	 * @param beginLocus
+	 * @param intronLength
+	 * @return
+	 */
+	private ArrayList<Peptide> digest(
+			int startIndex, 
+			int stopIndex, 
+			boolean isForward, 
+			byte [] codeChunk, 
+			int spliceLocation, 
+			int beginLocus, 
+			int intronLength,
+			int [] absoluteIndicies
+			) {
+		
 		//init peptide list
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		//a codon is a set of 3 nucleotide characters
@@ -90,20 +125,35 @@ public class RNA_Digestor {
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 							//TODO add more info (start, stop, etc.) for peptide
 							Peptide peptide = null;
-							if ((spliceLocation == -1) ||
-									(puc.getSequenceIndex() <= spliceLocation && acidIndex > spliceLocation)){
-								int peptideStartIndex, peptideStopIndex;
-								if (isForward) {
-									peptideStartIndex = beginLocus + puc.getSequenceIndex();
-									peptideStopIndex = beginLocus + intronLength + acidIndex;
+							if (
+									(spliceLocation == -1) ||
+									(puc.getCodeChunkIndex() <= spliceLocation && acidIndex > spliceLocation)
+									){
+								//O, God!  keeping track of start and stop locations!  The madness consumes me!!!
+								//all values initially set to -1 as that is not a valid index.  If you see a -1,
+								//that means that value was never set -- which may be the case for the intron
+								//indices.
+								int peptideStartIndex = -1, peptideStopIndex = -1, intronStartIndex = -1, intronStopIndex = -1;
+								if (spliceLocation == -1) {
+									if (isForward) {
+										peptideStartIndex = beginLocus + puc.getCodeChunkIndex();
+										peptideStopIndex = beginLocus + acidIndex;
+									} else {
+										peptideStartIndex = beginLocus + codeChunk.length - puc.getCodeChunkIndex();
+										peptideStopIndex = beginLocus + codeChunk.length - acidIndex;
+									}	
 								} else {
-									peptideStartIndex = 0;
-									peptideStopIndex = 0;
+									peptideStartIndex = absoluteIndicies[puc.getCodeChunkIndex()];
+									peptideStopIndex = absoluteIndicies[acidIndex];
+									intronStartIndex = absoluteIndicies[spliceLocation];
+									intronStopIndex = absoluteIndicies[spliceLocation + 1];
 								}
 								peptide = new Peptide(
 										puc.getSequence(),
 										peptideStartIndex,
 										peptideStopIndex,
+										intronStartIndex,
+										intronStopIndex,
 										isForward,
 										(byte) (beginLocus % 3),
 										null,
@@ -147,22 +197,35 @@ public class RNA_Digestor {
 				previousAminoAcid = aminoAcid;
 			}
 			
-			codon[codonIndex] = code[nucleotideIndex];	
+			codon[codonIndex] = codeChunk[nucleotideIndex];	
 			codonIndex++;
 			nucleotideIndex += codonIncrement;	
 		}	
 		//adding all the remaining peptides under construction
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			//TODO add more info (start, stop, etc.) for peptide
 			Peptide peptide = null;
 			if ((spliceLocation == -1) ||
-					(puc.getSequenceIndex() <= spliceLocation && acidIndex > spliceLocation)){
-				int peptideStartIndex = beginLocus + puc.getSequenceIndex();
-				int peptideStopIndex = beginLocus + intronLength + acidIndex;
+					(puc.getCodeChunkIndex() <= spliceLocation && acidIndex > spliceLocation)){
+				//TODO any way I can avoid exactly repeating the code from above?
+				int peptideStartIndex = -1, peptideStopIndex = -1, intronStartIndex = -1, intronStopIndex = -1;
+				if (spliceLocation == -1) {
+					if (isForward) {
+						peptideStartIndex = beginLocus + puc.getCodeChunkIndex();
+						peptideStopIndex = beginLocus + acidIndex;
+					} else {
+						peptideStartIndex = beginLocus + codeChunk.length - puc.getCodeChunkIndex();
+						peptideStopIndex = beginLocus + codeChunk.length - acidIndex;
+					}	
+				} else {
+					peptideStartIndex = absoluteIndicies[puc.getCodeChunkIndex()];
+					peptideStartIndex = absoluteIndicies[acidIndex];
+				}
 				peptide = new Peptide(
 						puc.getSequence(),
 						peptideStartIndex,
 						peptideStopIndex,
+						intronStartIndex,
+						intronStopIndex,
 						isForward,
 						(byte) (beginLocus % 3),
 						null,
@@ -188,12 +251,12 @@ public class RNA_Digestor {
 	//does both normal and spliced digestion
 	private void fullDigest() {
 		//normal digestion
-		peptides.addAll(digest(0,length, true, rna.getRNA_5to3(), -1, rna.getStart(), length));
-		peptides.addAll(digest(1,length, true, rna.getRNA_5to3(), -1, rna.getStart(), length));
-		peptides.addAll(digest(2,length, true, rna.getRNA_5to3(), -1, rna.getStart(), length));
-		peptides.addAll(digest(0,length, true, rna.getRNA_3to5(), -1, rna.getStart(), length));
-		peptides.addAll(digest(1,length, true, rna.getRNA_3to5(), -1, rna.getStart(), length));
-		peptides.addAll(digest(2,length, true, rna.getRNA_3to5(), -1, rna.getStart(), length));
+		peptides.addAll(digest(0,length, true, rna.getRNA_5to3()));
+		peptides.addAll(digest(1,length, true, rna.getRNA_5to3()));
+		peptides.addAll(digest(2,length, true, rna.getRNA_5to3()));
+		peptides.addAll(digest(0,length, true, rna.getRNA_3to5()));
+		peptides.addAll(digest(1,length, true, rna.getRNA_3to5()));
+		peptides.addAll(digest(2,length, true, rna.getRNA_3to5()));
 		
 		//finding splices
 		digestSplices(rna.getRNA_5to3(), true, rna.getForwardsStartLocations(), rna.getForwardsStopLocations());	
@@ -203,12 +266,18 @@ public class RNA_Digestor {
 		
 	}
 	
-	public void digestSplices(byte [] code, boolean isForward, boolean[] starts, boolean[] stops) {
+	private void digestSplices(byte [] code, boolean isForward, boolean[] starts, boolean[] stops) {
 		byte [] splice = new byte[windowSize];
+		int [] absoluteIndicies = new int[windowSize];
 		for (int i = halfWindowSize; i < length - halfWindowSize; i++) {
 			if (starts[i]) {
 				for (int x = 0; x < halfWindowSize; x++) {
 					splice[x] = code[i - halfWindowSize + x];
+					if (isForward) {
+						absoluteIndicies[x] = rna.getStart() + i - halfWindowSize + x;
+					} else {
+						absoluteIndicies[x] = rna.getStart() + length - (i - halfWindowSize + x);
+					}
 				}
 				int jStop = i + maximumIntronLength;
 				if (jStop > length - halfWindowSize) jStop = length - halfWindowSize;
@@ -216,11 +285,16 @@ public class RNA_Digestor {
 					if (stops[j]) {
 						for (int x = 0; x < halfWindowSize; x++) {
 							splice[x + halfWindowSize] = code[j + x + 1];
+							if (isForward) {
+								absoluteIndicies[x + halfWindowSize] = rna.getStart() + j + x + 1;
+							} else {
+								absoluteIndicies[x + halfWindowSize] = rna.getStart() + length - (j + x + 1);
+							}
 						}
 						//TODO starts and stops not handled correctly for 3to5
-						peptides.addAll(digest(0, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i));
-						peptides.addAll(digest(1, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i));
-						peptides.addAll(digest(2, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i));
+						peptides.addAll(digest(0, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
+						peptides.addAll(digest(1, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
+						peptides.addAll(digest(2, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
 					}
 				}
 			}
@@ -231,10 +305,6 @@ public class RNA_Digestor {
 	
 	
 
-
-	public ArrayList<Peptide> getPeptides() {
-		return peptides;
-	}
 
 	/*
 	 * TODO this method needs to make sure that if any unknown characters are found then 

@@ -149,10 +149,12 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getPeptide().isForward() ? "+" : "-");
+				sb.append(match.getPeptide().getStopIndex());
 				sb.append("</td>");
 				
-				
+				sb.append("<td>");
+				sb.append(match.getPeptide().isForward() ? "+" : "-");
+				sb.append("</td>");
 				
 				sb.append("<td>");
 				sb.append(match.getPeptide().isSpliced());
@@ -483,8 +485,21 @@ public class HTMLReporter {
 		sb.append(match.getPeptide().getReadingFrame());
 		sb.append("</nobr></td>");
 		
+		
 		sb.append("<td>");
 		sb.append(match.getPeptide().getStartIndex());
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append(match.getPeptide().getStopIndex());
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append(match.getPeptide().isForward() ? "+" : "-");
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append(match.getPeptide().isSpliced());
 		sb.append("</td>");
 		
 		sb.append("<td>");

@@ -1,12 +1,5 @@
 package Peppy;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-
-import Utilities.U;
 
 public class DNA_DigestionThread implements Runnable {
 	
@@ -124,7 +117,7 @@ public class DNA_DigestionThread implements Runnable {
 //						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 						//add all peptides
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-							Peptide peptide = new Peptide(puc.getSequence(), puc.getSequenceIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
+							Peptide peptide = new Peptide(puc.getSequence(), puc.getCodeChunkIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
 							if (peptide.getMass() >= Properties.peptideMassThreshold) {
 								if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 									if (inORF) {
@@ -166,7 +159,7 @@ public class DNA_DigestionThread implements Runnable {
 		}	
 		//adding all the remaining peptides under construction
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			Peptide peptide = new Peptide(puc.getSequence(), puc.getSequenceIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
+			Peptide peptide = new Peptide(puc.getSequence(), puc.getCodeChunkIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
 			if (peptide.getMass() >= Properties.peptideMassThreshold) {
 				if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 					if (inORF) {
