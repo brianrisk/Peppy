@@ -4,7 +4,7 @@ isSequenceFileDNA true
 ##This could be a directory or a file
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
@@ -13,7 +13,7 @@ isSequenceFileDNA true
 
 
 //This could be a directory or a file
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
@@ -31,7 +31,7 @@ onlyUsePeptidesInOpenReadingFrames false
 
 //spectrum cleaning
 localMaximaCleaning false
-highIntensityCleaning false
+highIntensityCleaning true
 
 //how to calculate our ion masses
 leftIonDifference 1.0
@@ -45,7 +45,7 @@ useEValueCutOff true
 digestionWindowSize 25000000
 
 //how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 0.2
+spectrumToPeptideMassError 0.1
 
 //TandemFit property
 peakDifferenceThreshold 0.3

@@ -176,24 +176,24 @@ public class HTMLReporter {
 				pw.println(sb);
 				
 				//generate neighborhood reports
-//				if (Peppy.Properties.isSequenceFileDNA) {
-//					generateNeighborhoodReport(bestMatches.get(i), i);
-//				}
+				if (Peppy.Properties.isSequenceFileDNA && Properties.generateNeighborhoodReport) {
+					generateNeighborhoodReport(bestMatches.get(i), i);
+				}
 			}
 			
 			U.appendFile(pw, Properties.reportWebFooterFile);
 			pw.flush();
 			pw.close();
 			
-//			U.p("creating sequence report");
-//			if (Peppy.Properties.isSequenceFileDNA) {
-//				for (int i = 0; i < sequences.size(); i++) {
-//					generateSequenceReport(sequences.get(i));
-//				}
-//			}
-			U.p("creating spectrum report");
-			for (Match match: bestMatches) {
-				generateSpectrumReport(match.getSpectrum());
+			if (Peppy.Properties.isSequenceFileDNA &&  Properties.generateSequenceReport) {
+				for (int i = 0; i < sequences.size(); i++) {
+					generateSequenceReport(sequences.get(i));
+				}
+			}
+			if (Properties.generateSpectrumReport) {
+				for (Match match: bestMatches) {
+					generateSpectrumReport(match.getSpectrum());
+				}
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -461,12 +461,16 @@ public class HTMLReporter {
 		sb.append("<tr>");
 		
 		sb.append("<td>");
-		sb.append("<a href=\"../spectra/");
+		if (Properties.generateSpectrumReport) {
+			sb.append("<a href=\"../spectra/");
+			sb.append(match.getSpectrum().getId());
+			sb.append(Properties.reportWebSuffix);
+			sb.append("\">");
+		}
 		sb.append(match.getSpectrum().getId());
-		sb.append(Properties.reportWebSuffix);
-		sb.append("\">");
-		sb.append(match.getSpectrum().getId());
-		sb.append("</a>");
+		if (Properties.generateSpectrumReport) {
+			sb.append("</a>");
+		}
 		sb.append("</td>");
 		
 		sb.append("<td>");
@@ -474,12 +478,16 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td><nobr>");
-		sb.append("<a href=\"../sequences/");
-		sb.append(match.getSequence().getId());
-		sb.append(Properties.reportWebSuffix);
-		sb.append("\">");
+		if (Properties.generateSequenceReport) {
+			sb.append("<a href=\"../sequences/");
+			sb.append(match.getSequence().getId());
+			sb.append(Properties.reportWebSuffix);
+			sb.append("\">");
+		}
 		sb.append(match.getSequence().getSequenceFile().getName ());
-		sb.append("</a>");
+		if (Properties.generateSequenceReport) {
+			sb.append("</a>");
+		}
 		if (match.getPeptide().isForward()) {sb.append(" forward ");}
 		else {sb.append(" reverse ");}
 		sb.append(match.getPeptide().getReadingFrame());

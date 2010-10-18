@@ -32,7 +32,7 @@ public class Peppy {
 	public static void main(String [] args) {
 		init();
 //		splice();
-		new  Peppy(args);
+		new Peppy(args);
 //		cnv();
 //		bigJob(args);
 //		cnvPeptideMassList();
@@ -142,11 +142,12 @@ public class Peppy {
 
 		for (int j = 0; j < 1; j++) {
 			if (j == 0) {
-				job = "GO_mem_FASP";
-				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
-			} else {
 				job = "SDS";
 				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/SDS");
+				
+			} else {
+				job = "GO_mem_FASP";
+				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
 			}
 
 			Properties.reportDirectory = new File("/Volumes/encode/Chris/HMM" + "-" + job + "-" + database + "-" + error);
@@ -166,10 +167,12 @@ public class Peppy {
 		
 		//Set up peptide, spectra matches;
 		ArrayList<Match> matches = new ArrayList<Match>();
-		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1263.5822_6.txt", "MMDVIQEIER"));
-		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1952.9525_8.txt", "ELGLDQAIAEAAEAIPDAR"));
-		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1642.7903_7.txt", "LYYVVQMTAQAAER"));
-		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1911.8491_5.txt", "ALNSVEASQPHQDQMEK"));
+		
+		matches.add(new Match("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628/020810_M6_FASP_ziptip.dta/020810_M6_FASP_ziptip.9662.9662.2.dta", "ELAEDGYSGVEVR"));
+//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1263.5822_6.txt", "MMDVIQEIER"));
+//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1952.9525_8.txt", "ELGLDQAIAEAAEAIPDAR"));
+//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1642.7903_7.txt", "LYYVVQMTAQAAER"));
+//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1911.8491_5.txt", "ALNSVEASQPHQDQMEK"));
 		
 		//calculate HMM scores for the spectrum/peptide pairs
 		HMMScorer hmmScorer = new HMMScorer(matches);

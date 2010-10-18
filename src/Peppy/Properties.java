@@ -77,6 +77,10 @@ public class Properties {
 	
 	//Report related
 	public static boolean createHTMLReport = true;
+	public static boolean generateNeighborhoodReport = false;
+	public static boolean generateSequenceReport = false;
+	public static boolean generateSpectrumReport = true;
+	
 	public static String reportWebSuffix = ".html";
 	public static File reportWebHeaderFile = new File("resources/reports/header.txt");
 	public static File reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
@@ -196,7 +200,15 @@ public class Properties {
 		if (propertyName.equals("createHTMLReport")) {
 			createHTMLReport = Boolean.valueOf(propertyValue);
 		}
-		
+		if (propertyName.equals("generateNeighborhoodReport")) {
+			generateNeighborhoodReport = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("generateSequenceReport")) {
+			generateSequenceReport = Boolean.valueOf(propertyValue);
+		}
+		if (propertyName.equals("generateSpectrumReport")) {
+			generateSpectrumReport = Boolean.valueOf(propertyValue);
+		}
 		
 		
 	}

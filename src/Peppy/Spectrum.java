@@ -226,6 +226,9 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 
 	public void cleanPeaks() {
+		//before we mess with the peak data, let's make sure we have the MD5
+		MD5 = getMD5();
+		
 		if (Properties.highIntensityCleaning) 
 			cleanPeaksKeepingHighIntensity();
 		if (Properties.localMaximaCleaning) 
