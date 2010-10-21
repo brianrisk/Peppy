@@ -1,27 +1,17 @@
 package Validate;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import javax.imageio.ImageIO;
 
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.ScoringThread;
-import Peppy.Sequence;
 import Utilities.U;
 
 public class GenerateValidationReport {

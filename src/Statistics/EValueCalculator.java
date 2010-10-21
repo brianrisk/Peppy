@@ -33,6 +33,10 @@ public class EValueCalculator {
 		addScores(values, topValues);
 	}
 	
+	public EValueCalculator(int [] histogram) {
+		this.histogram = histogram;
+	}
+	
 	/**
 	 * find expected value (a.k.a. "e value") for top matches
 	 * 
@@ -132,5 +136,9 @@ public class EValueCalculator {
 
 
 	public int [] getHistogram() {return histogram;}
+	
+	public void setHistogram(int[] histogram) {
+		this.histogram = histogram;
+	}
 
 }

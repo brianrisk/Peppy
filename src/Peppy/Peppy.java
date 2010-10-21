@@ -44,6 +44,47 @@ public class Peppy {
 		U.p("done");
 	}
 	
+	public Peppy(String [] args) {
+		U.startStopwatch();
+		printGreeting();
+		peptideTally = 0;
+		
+		//Load our spectra
+		U.p("loading spectra...");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+		
+		//Get references to our sequence files -- no nucleotide data is loaded at this point
+		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		
+		//initialize our ArrayList of matches
+		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		//loop through each sequence in the sequences ArrayList
+		for (Sequence sequence: sequences) {		
+			matches.addAll(getMatches(sequence, spectra));
+		}
+		U.p("peptide tally: " + peptideTally);
+	
+		U.p("calculating final e values");
+		for (Match match: matches) {
+			match.calculateEValue();
+		}
+		
+		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
+			U.p("creating HTML reports");
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			report.generateFullReport();
+		}
+		
+		U.p("creating text reports");
+		TextReporter textReport = new TextReporter(matches, spectra, sequences);
+		textReport.generateFullReport();
+		
+		U.p();
+		U.stopStopwatch();
+	}
+
 	public static void splice() {
 		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		for (Sequence sequence: sequences) {
@@ -130,34 +171,6 @@ public class Peppy {
 		
 	}
 	
-	public static void bigHMM(String [] args) {
-		String database, error, job;
-		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-		error = "01";
-		Properties.spectrumToPeptideMassError = 0.1;
-
-		database = "UniProt";
-		Properties.isSequenceFileDNA = false;
-		Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat");
-
-		for (int j = 0; j < 1; j++) {
-			if (j == 0) {
-				job = "SDS";
-				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/SDS");
-				
-			} else {
-				job = "GO_mem_FASP";
-				Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
-			}
-
-			Properties.reportDirectory = new File("/Volumes/encode/Chris/HMM" + "-" + job + "-" + database + "-" + error);
-			U.p(Properties.reportDirectory.getName());
-			new Peppy(args);
-			U.p();
-		}
-
-	}
-	
 	/**
 	 * This is just to test HMM score
 	 */
@@ -232,88 +245,12 @@ public class Peppy {
 		U.p();
 		U.stopStopwatch();
 	}
-
-	public Peppy(String [] args) {
-		U.startStopwatch();
-		printGreeting();
-		peptideTally = 0;
-		
-		//Load our spectra
-		U.p("loading spectra...");
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-		
-		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		
-		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
-		
-		//loop through each sequence in the sequences ArrayList
-		for (Sequence sequence: sequences) {		
-			matches.addAll(getMatches(sequence, spectra));
-		}
-		U.p("peptide tally: " + peptideTally);
-
-		U.p("calculating final e values");
-		for (Match match: matches) {
-			match.calculateEValue();
-		}
-		
-		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
-			U.p("creating HTML reports");
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
-			report.generateFullReport();
-		}
-		
-		U.p("creating text reports");
-		TextReporter textReport = new TextReporter(matches, spectra, sequences);
-		textReport.generateFullReport();
-		
-		U.p();
-		U.stopStopwatch();
-	}
+	
 
 	public static void init() {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties("properties.txt");
 		HMMScore.HMMClass.HmmSetUp();
-	}
-	
-	/**
-	 * 
-	 * @param args an array of arguments.  Element 0 is the spectral directory; Element 1 is the FASTA database.
-	 */
-	public static void runOnProteinDatabase(String [] args) {
-		U.startStopwatch();
-		printGreeting();	
-		
-		if (args[0] == null || args[0].equals("")) {
-			U.p();
-			U.p("Here is how to use it:");
-			U.p("All file paths can be absolute or relative to where this app is located.");
-			U.p("Arg 0: The file path directory to the folder which contains the spectra.");
-			U.p("Arg 1: The file path directory to the FASTA protein database file.");
-		} else {
-			Properties.spectraDirectoryOrFile = new File(args[0]);
-			
-			//Load our spectra
-			ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-			U.p("loaded " +spectra.size() + " spectra.");
-	
-	
-			//load the peptides from the database
-			ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File(args[1]));
-			
-			
-			ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
-			
-			TextReporter textReport = new TextReporter(matches, spectra, null);
-			textReport.generateFullReport();
-			
-			U.p();
-			U.stopStopwatch();
-		}
 	}
 	
 	
@@ -360,6 +297,13 @@ public class Peppy {
 			return matches;
 	}
 	
+	/**
+	 * Gets matches where a list of peptides is already derived
+	 * @param peptides
+	 * @param spectra
+	 * @param sequence
+	 * @return
+	 */
 	public static ArrayList<Match> getMatches(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
 		ArrayList<Match> matches = new ArrayList<Match>() ;
 		peptideTally += peptides.size();

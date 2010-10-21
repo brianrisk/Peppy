@@ -45,38 +45,12 @@ public class ScoringThread implements Runnable {
 				matchesForOneSpectrum.add(match);
 			}
 			
-//			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
-//				U.p("first index: " + firstPeptideIndex);
-//				U.p("last index: " + lastPeptideIndex);
-//				U.p("precursor = " + spectrum.getPrecursorMass());
-//				U.p ("lowestPeptideMassToConsider: " + lowestPeptideMassToConsider);
-//				U.p ("highestPeptideMassToConsider: " + highestPeptideMassToConsider);
-//				U.p("peptide mass = " + (new Peptide("VVSMDENFHPLNELIPLVYIQDPK")).getMass());
-//			}
-			
 			//collect the top maximumNumberOfMatchesForASpectrum
 			Match.setSortParameter(Match.SORT_BY_DEFAULT);
 			Collections.sort(matchesForOneSpectrum);
 			ArrayList<Match> topMatches = new ArrayList<Match>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
-			
-				
-//				//make sure adjacent matches aren't repeated
-//				Match topMatch = matchesForOneSpectrum.get(0);
-//				Match presentMatch;
-//				Match previousMatch = matchesForOneSpectrum.get(0);
-//				topMatches.add(matchesForOneSpectrum.get(0));
-//				for (int i = 1; i < max; i++) {
-//					presentMatch = matchesForOneSpectrum.get(i);
-//					if (!presentMatch.equals(previousMatch)) {
-//						topMatches.add(presentMatch);
-//					}else {
-//						//since we're skipping one we are increasing the upper bound	
-//						if (max < matchesForOneSpectrum.size()) max++;
-//					}
-//					previousMatch = presentMatch;
-//				}
 
 			for (int i = 0; i < max; i++) {
 				topMatches.add(matchesForOneSpectrum.get(i));
