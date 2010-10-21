@@ -59,6 +59,46 @@ public class TextReporter {
 			
 			
 			StringBuffer sb;
+			//print header
+			sb = new StringBuffer();
+			sb.append("Spectrum ID");
+			sb.append('\t');
+			sb.append("MD5");
+			sb.append('\t');
+			sb.append("File Name");
+			sb.append('\t');
+			sb.append("Score");
+			sb.append('\t');
+			sb.append("Precursor");
+			sb.append('\t');
+			sb.append("E Value");
+			sb.append('\t');
+			sb.append("Peptide");
+			sb.append('\t');
+			if (Peppy.Properties.isSequenceFileDNA) {
+				sb.append("Sequence File");
+				sb.append('\t');
+				sb.append("START");
+				sb.append('\t');
+				sb.append("STOP");
+				sb.append('\t');
+				sb.append("INTRON-START");
+				sb.append('\t');
+				sb.append("INTRON-STOP");
+				sb.append('\t');
+				sb.append("Strand");
+				sb.append('\t');
+				sb.append("Is Spliced");
+			} else {
+				sb.append("Protein Name");
+			}
+			sb.append('\t');
+			sb.append("Match Rank");
+			
+			pw.println(sb);
+			
+			
+			//print rows
 			for (Match match: matches) {;
 				sb = new StringBuffer();
 				sb.append(match.getSpectrum().getId());
