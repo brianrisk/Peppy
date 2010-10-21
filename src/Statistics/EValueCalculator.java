@@ -132,6 +132,7 @@ public class EValueCalculator {
 		//setting to Double.MAX_VALUE if eValue is Nan
 		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
 		return eValue;
+//		return getNormalDistributionEValue(score);
 	}
 
 
@@ -140,5 +141,49 @@ public class EValueCalculator {
 	public void setHistogram(int[] histogram) {
 		this.histogram = histogram;
 	}
+	
+	/* 
+	 * E value experiments
+	 */
+	double mean = -1;
+	double variance = -1;
+	double standardDeviation = -1;
+	private void calculateDistribution() {
+		//calculate mean
+		double total = 0;
+		int size = 0;
+		for (int i = 0; i < numberOfHistogramBars; i++) {
+			size += histogram[i];
+			total += xValues[i] * histogram[i];
+		}
+		mean = total / size;
+		
+		//calculate variance
+		total = 0;
+		double difference;
+		variance = 0;
+		for (int i = 0; i < numberOfHistogramBars; i++) {
+			difference = xValues[i] - mean;
+			difference *= difference;
+			variance += histogram[i] * difference;
+		}
+		
+		//Standard Deviation
+		standardDeviation = Math.sqrt(variance);
+	}
+	
+	public double getNormalDistributionEValue(double score) {
+		calculateDistribution();
+		
+		//scalar
+		double scalar = 1 / Math.sqrt(2 * Math.PI * variance);
+		
+		//exponent
+		double exponent = -1.0 * ((score - mean) / (2 * variance));
+		
+		return scalar * Math.exp(exponent);
+	}
+	
+	
 
 }

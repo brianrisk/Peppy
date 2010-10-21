@@ -224,6 +224,8 @@ public class Match implements Comparable<Match>, HasEValue{
 			return 0;
 		} else
 		if (sortParameter == SORT_BY_E_VALUE) {
+//			if (rank < match.getRank()) return -1;
+//			if (rank > match.getRank()) return  1;
 			if (eValue < match.getEValue()) return -1;
 			if (eValue > match.getEValue()) return  1;
 			return 0;
@@ -237,12 +239,10 @@ public class Match implements Comparable<Match>, HasEValue{
 			return 0;
 		} else
 		if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
-			//we want to sort from greatest to least great
-			//so -1 is returned where 1 usually is
-			if (rank > match.getRank()) return -1;
-			if (rank < match.getRank()) return  1;
-			if (score > match.getEValue()) return -1;
-			if (score < match.getEValue()) return  1;
+			if (rank < match.getRank()) return -1;
+			if (rank > match.getRank()) return  1;
+			if (eValue < match.getEValue()) return -1;
+			if (eValue > match.getEValue()) return  1;
 			return 0;
 		} else 
 		if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
@@ -355,8 +355,9 @@ public class Match implements Comparable<Match>, HasEValue{
 		return spectrum.getId() + "\t" + peptide.getAcidSequence()  + "\t" + getScore();
 	}
 	
-	public void calculateEValue() {
+	public double calculateEValue() {
 		eValue = spectrum.getEValue(getScore());
+		return eValue;
 	}
 
 }

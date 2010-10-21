@@ -217,7 +217,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		return file;
 	}
 
-	public EValueCalculator getEValueContainer() {
+	public EValueCalculator getEValueCalculator() {
 		return eValueCalculator;
 	}
 

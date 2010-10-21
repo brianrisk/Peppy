@@ -85,7 +85,8 @@ public class TestSet {
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
 		
 		//Sort matches by e value	
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
 		Collections.sort(positiveMatches);
 		
 		//See which of the positive matches are true

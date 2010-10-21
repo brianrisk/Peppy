@@ -106,11 +106,7 @@ public class MatchContainer implements Comparable<MatchContainer>{
 	public Match getTrueMatch() {return trueMatch;}
 
 	public int compareTo(MatchContainer o) {
-//		if (match.getRank() < o.getMatch().getRank()) return -1;
-//		if (match.getRank() > o.getMatch().getRank()) return  1;
-		if (getEValue() < o.getEValue()) return -1;
-		if (getEValue() > o.getEValue()) return  1;
-		return 0;
+		return match.compareTo(o.getMatch());
 	}
 	
 

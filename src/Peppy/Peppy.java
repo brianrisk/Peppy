@@ -255,7 +255,7 @@ public class Peppy {
 	
 	
 	public static ArrayList<Match> getMatches(Sequence sequence, ArrayList<Spectrum> spectra) {
-			U.p("Working on sequence: " +sequence.getSequenceFile().getName());
+			U.p("working on sequence: " +sequence.getSequenceFile().getName());
 			ArrayList<Match> matches = new ArrayList<Match>() ;
 			ArrayList<Peptide> peptides;
 			if (Properties.isSequenceFileDNA) {
@@ -293,6 +293,32 @@ public class Peppy {
 					matches.addAll(newMatches);
 				}
 //				matches.addAll(newMatches);
+			}
+			
+			//getting final ranks
+			U.p("sorting matches and getting final match ranks");
+			Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID);
+			int rank = 1;
+			Match theMatch = matches.get(0);
+			Match thePreviousMatch = matches.get(0);;
+			//set for the first
+			theMatch.setRank(1);
+			for (int i = 1; i < matches.size(); i++) {
+				//see if these are matches for a different spectrum
+				theMatch = matches.get(i);
+				if (theMatch.getSpectrum().getId() != thePreviousMatch.getSpectrum().getId()) {
+					rank = 1;
+				}
+				
+				if (theMatch.equals(thePreviousMatch)) {
+					rank = thePreviousMatch.getRank();
+				}
+				
+				theMatch.setRank(rank);
+				
+				rank++;
+				thePreviousMatch = theMatch;
+				
 			}
 			return matches;
 	}

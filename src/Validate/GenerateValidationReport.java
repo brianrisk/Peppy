@@ -49,6 +49,8 @@ public class GenerateValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
 		
+		Properties.spectrumToPeptideMassError = 2.0;
+		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
 		
@@ -63,9 +65,9 @@ public class GenerateValidationReport {
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 
-//		tests.add(new TestSet("ecoli"));
-//		tests.add(new TestSet("human"));
-//		tests.add(new TestSet("aurum"));	
+		tests.add(new TestSet("ecoli"));
+		tests.add(new TestSet("human"));
+		tests.add(new TestSet("aurum"));	
 		tests.add(new TestSet("USP"));
 
 	}

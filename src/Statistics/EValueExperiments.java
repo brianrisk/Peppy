@@ -52,8 +52,8 @@ public class EValueExperiments {
 	
 	public static void main(String args[]) {
 		setProperties();
-//		saveHistograms();
-		new EValueExperiments();
+		saveHistograms();
+//		new EValueExperiments();
 	}
 	
 	public static void setProperties() {
@@ -84,9 +84,9 @@ public class EValueExperiments {
 		}
 		
 		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("histograms.txt")));
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("evalue-tests/histograms.txt")));
 			for (Spectrum spectrum: spectra) {
-				int [] histogram = spectrum.getEValueContainer().getHistogram();
+				int [] histogram = spectrum.getEValueCalculator().getHistogram();
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < histogram.length; i++) {
 					sb.append(histogram[i]);
@@ -108,6 +108,53 @@ public class EValueExperiments {
 		ArrayList<Peptide> peptides = ReliabilityTester.loadHighScoringPeptides(testName);
 		findPositiveMatches(peptides);
 		printStatistics();
+		drawHistograms();
+	}
+	
+	private void drawHistograms() {
+		
+	}
+	
+	public static void drawHistogram(int [] histogram, int height, int width, File dest) throws IOException {
+		//setting up Graphics context
+		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = bdest.createGraphics();
+		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
+		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
+		g.setColor(Color.white);
+		g.fillRect(0,0,width,height);
+		
+		//find the maximum value
+		int max = 0;
+		for (int i = 0; i < histogram.length; i++) {
+			if (histogram[i] > max) max = histogram[i];
+		}
+		
+		//draw the bars
+		g.setColor(Color.darkGray);
+		g.drawRect(0,0,width - 1, height - 1);
+		double scaleFactor = (double) height / max;
+		for (int i = 0; i < histogram.length; i++) {
+			int x1 = (int) ((double) i * width / histogram.length);
+			int barWidth = (int) ((double) (i + 1.0) * width / histogram.length) - x1;
+			if (barWidth < 1) barWidth = 1;
+			int barHeight = (int) (histogram[i] * scaleFactor);
+			//account for tiny bars that might not be displayed
+			if (barHeight <= 1 && histogram[i] > 0) {
+				barHeight = 5;
+				g.setColor(Color.lightGray);
+			} else {
+				g.setColor(Color.black);
+			}
+			g.fillRect(x1, height - barHeight, barWidth, barHeight);
+		}
+		
+		//outline
+		g.setColor(Color.black);
+		g.drawRect(0,0,width - 1, height - 1);
+		
+		//write
+		ImageIO.write(bdest,"JPG",dest);
 	}
 	
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
@@ -121,9 +168,9 @@ public class EValueExperiments {
 		//get the matches
 		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
 		
-		//recalculate EValues
+		//load histograms; recalculate EValues
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("histograms.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("evalue-tests/histograms.txt"));
 			String line = br.readLine();
 			//there should be a line for each spectrum
 			for (Spectrum spectrum: spectra) {
@@ -134,7 +181,7 @@ public class EValueExperiments {
 					histogram[i] = Integer.valueOf(chunks[i].trim());
 				}
 				//set the histogram for the spectrum
-				spectrum.getEValueContainer().setHistogram(histogram);
+				spectrum.getEValueCalculator().setHistogram(histogram);
 				
 				//read the next line
 				line = br.readLine();
@@ -146,7 +193,7 @@ public class EValueExperiments {
 		
 		U.p("calculating final e values");
 		for (Match match: positiveMatches) {
-			match.calculateEValue();
+			U.p(match.calculateEValue());
 		}
 		
 
@@ -288,7 +335,7 @@ public class EValueExperiments {
 		try {
 			File testDirectory = new File(Properties.validationDirectory, testName);
 			testDirectory.mkdirs();
-			File imageFile = new File("precision-recall.jpg");
+			File imageFile = new File("evalue-tests/precision-recall.jpg");
 			ImageIO.write(bdest,"JPG",imageFile);
 		} catch (IOException e) {
 			e.printStackTrace();

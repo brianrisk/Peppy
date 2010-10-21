@@ -70,12 +70,6 @@ public class ScoringThread implements Runnable {
 				}
 			}
 
-			//set rank -- NOTE: this might not be true rank if multiple chromosomes, multiple digestion windows
-			for (int i = 0; i < topMatches.size(); i++) {
-				Match topMatch = topMatches.get(i);
-				topMatch.setRank(i);
-			}
-			
 			
 			//assign E values to top Matches:
 			if (matchesForOneSpectrum.size() != 0) {

@@ -69,7 +69,7 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Score");
 			sb.append('\t');
-			sb.append("Precursor");
+			sb.append("NeutralMass");
 			sb.append('\t');
 			sb.append("E Value");
 			sb.append('\t');
