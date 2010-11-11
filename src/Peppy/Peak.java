@@ -10,6 +10,8 @@ public class Peak implements Comparable<Peak>{
 	
 	double mass;
 	double intensity;
+	int yIonNumber = -1;
+	int bIonNumber = -1;
 
 	Color color = Color.gray;
 	boolean hilighted = false;
@@ -39,6 +41,34 @@ public class Peak implements Comparable<Peak>{
 	public double getIntensity() {return intensity;}
 	public Color getColor() {return color;}
 	
+	/**
+	 * @return the yIonNumber
+	 */
+	public int getyIonNumber() {
+		return yIonNumber;
+	}
+
+	/**
+	 * @return the bIonNumber
+	 */
+	public int getbIonNumber() {
+		return bIonNumber;
+	}
+
+	/**
+	 * @param yIonNumber the yIonNumber to set
+	 */
+	public void setyIonNumber(int yIonNumber) {
+		this.yIonNumber = yIonNumber;
+	}
+
+	/**
+	 * @param bIonNumber the bIonNumber to set
+	 */
+	public void setbIonNumber(int bIonNumber) {
+		this.bIonNumber = bIonNumber;
+	}
+
 	public void setCompareByMass() {compareBy = COMPARE_MASS;}
 	public void setCompareByIntensity() {compareBy = COMPARE_INTENSITY;}
 	public void setColor(Color color) {this.color = color;}

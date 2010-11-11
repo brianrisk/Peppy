@@ -23,8 +23,8 @@ public class Match implements Comparable<Match>, HasEValue{
 	private Peptide peptide;
 	private Sequence sequence;
 	
-	public final static int SORT_BY_DEFAULT = 0;
-	public final static int SORT_BY_SPECTRUM_ID = 1;
+	public final static int SORT_BY_SCORE = 0;
+	public final static int SORT_BY_SPECTRUM_ID_THEN_SCORE = 1;
 	public final static int SORT_BY_LOCUS = 2;
 	public final static int SORT_BY_SCORE_RATIO = 3;
 	public final static int SORT_BY_HMM = 4;
@@ -32,8 +32,12 @@ public class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_E_VALUE = 6;
 	public final static int SORT_BY_RANK_THEN_E_VALUE = 7;
 	public final static int SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE = 8;
+	public final static int SORT_BY_SPECTRUM_ID_THEN_PEPTIDE = 9;
+	public final static int SORT_BY_RANK_THEN_SCORE = 10;
 	
-	private static int sortParameter = SORT_BY_DEFAULT;
+	
+	
+	private static int sortParameter = SORT_BY_SCORE;
 	
 	public Match(String spectrumString, String peptideString) {
 		this.spectrum = new Spectrum(spectrumString);
@@ -160,9 +164,11 @@ public class Match implements Comparable<Match>, HasEValue{
 			if (yIonTrue) {
 //				score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				if (bIonTrue) {
-					amountToAdd =  1.17 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+//					amountToAdd =  1.17 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					amountToAdd =  Properties.YBtrue * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				} else {
-					amountToAdd =  1.43 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+//					amountToAdd =  1.43 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					amountToAdd =  Properties.YBfalse * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				}
 //				amountToAdd *=  1.3;
 				score += amountToAdd;
@@ -171,9 +177,11 @@ public class Match implements Comparable<Match>, HasEValue{
 			if (bIonTrue) {
 				//count b-ions less if not y-ion present, more if present
 				if (yIonTrue) {
-					amountToAdd =  1.1 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+//					amountToAdd =  1.1 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					amountToAdd =  Properties.BYtrue * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				} else {
-					amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+//					amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					amountToAdd =  Properties.BYfalse * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				}
 				score += amountToAdd;
 				ionMatchTally++;
@@ -189,78 +197,99 @@ public class Match implements Comparable<Match>, HasEValue{
 		return scoreHMM;
 	}
 	
+	public int compareTo(Match match) {
+			if (sortParameter == SORT_BY_SCORE) {
+				//want to sort from greatest to least
+				if (score > match.getScore()) return -1;
+				if (score < match.getScore()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_HMM) {
+				//want to sort from greatest to least
+				if (scoreHMM > match.getScoreHMM()) return -1;
+				if (scoreHMM < match.getScoreHMM()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_TANDEM_FIT) {
+				//want to sort from greatest to least
+				if (scoreTandemFit > match.getScoreTandemFit()) return -1;
+				if (scoreTandemFit < match.getScoreTandemFit()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_SCORE_RATIO) {
+				//want to sort from greatest to least
+				if (tandemFitScoreRatio > match.getTandemFitScoreRatio()) return -1;
+				if (tandemFitScoreRatio < match.getTandemFitScoreRatio()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_LOCUS) {
+				if (sequence.getId() < match.getSequence().getId()) return -1;
+				if (sequence.getId() > match.getSequence().getId()) return  1;
+				//in case sequences equal, compare index
+				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_E_VALUE) {
+				if (eValue < match.getEValue()) return -1;
+				if (eValue > match.getEValue()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_SCORE) {
+				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
+				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
+				//if spectrum is sorted, also sort by tandemFit
+				if (score > match.getScore()) return -1;
+				if (score < match.getScore()) return  1;
+				return 0;
+			} else
+			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_PEPTIDE) {
+				//first by spectrum ID
+				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
+				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
+				//then by start location
+				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
+				//then by alphabetical order of peptides
+				return peptide.getAcidSequence().compareTo(match.getPeptide().getAcidSequence());
+			} else	
+			if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
+				if (rank < match.getRank()) return -1;
+				if (rank > match.getRank()) return  1;
+				if (eValue < match.getEValue()) return -1;
+				if (eValue > match.getEValue()) return  1;
+				return 0;
+			} else 
+			if (sortParameter == SORT_BY_RANK_THEN_SCORE) {
+				if (rank < match.getRank()) return -1;
+				if (rank > match.getRank()) return  1;
+				if (score < match.getScore()) return 1;
+				if (score > match.getScore()) return -1;
+				return 0;
+			} else 
+			if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
+				//i'm putting this calculation in here as this is a not-often-used sort
+				//so calculating and storing this for every match is unnecessary
+				double myDifference = spectrum.getPrecursorMass() - peptide.getMass();
+				double theirDifference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
+				if (myDifference > theirDifference) return -1;
+				if (myDifference < theirDifference) return  1;
+				return 0;
+			} else 
+			{
+				//we want to sort from greatest to least great
+				//so -1 is returned where 1 usually is
+				if (score > match.getScore()) return -1;
+				if (score < match.getScore()) return  1;
+				return 0;
+			}
+		}
+
 	public boolean equals(Match match) {
 		if (getScore() == match.getScore()) {
 			if (peptide.equals(match.getPeptide())) return true;
 		}
 		return false;
-	}
-
-	public int compareTo(Match match) {
-		if (sortParameter == SORT_BY_HMM) {
-			//want to sort from greatest to least
-			if (scoreHMM > match.getScoreHMM()) return -1;
-			if (scoreHMM < match.getScoreHMM()) return  1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_TANDEM_FIT) {
-			//want to sort from greatest to least
-			if (scoreTandemFit > match.getScoreTandemFit()) return -1;
-			if (scoreTandemFit < match.getScoreTandemFit()) return  1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_SCORE_RATIO) {
-			//want to sort from greatest to least
-			if (tandemFitScoreRatio > match.getTandemFitScoreRatio()) return -1;
-			if (tandemFitScoreRatio < match.getTandemFitScoreRatio()) return  1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_LOCUS) {
-			if (sequence.getId() < match.getSequence().getId()) return -1;
-			if (sequence.getId() > match.getSequence().getId()) return  1;
-			//in case sequences equal, compare index
-			if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
-			if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  	1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_E_VALUE) {
-//			if (rank < match.getRank()) return -1;
-//			if (rank > match.getRank()) return  1;
-			if (eValue < match.getEValue()) return -1;
-			if (eValue > match.getEValue()) return  1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_SPECTRUM_ID) {
-			if (spectrum.getId() < match.getSpectrum().getId()) return -1;
-			if (spectrum.getId() > match.getSpectrum().getId()) return  1;
-			//if spectrum is sorted, also sort by tandemFit
-			if (score > match.getScore()) return -1;
-			if (score < match.getScore()) return  1;
-			return 0;
-		} else
-		if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
-			if (rank < match.getRank()) return -1;
-			if (rank > match.getRank()) return  1;
-			if (eValue < match.getEValue()) return -1;
-			if (eValue > match.getEValue()) return  1;
-			return 0;
-		} else 
-		if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
-			//i'm putting this calculation in here as this is a not-often-used sort
-			//so calculating and storing this for every match is unnecessary
-			double myDifference = spectrum.getPrecursorMass() - peptide.getMass();
-			double theirDifference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
-			if (myDifference > theirDifference) return -1;
-			if (myDifference < theirDifference) return  1;
-			return 0;
-		} else 
-		{
-			//we want to sort from greatest to least great
-			//so -1 is returned where 1 usually is
-			if (score > match.getScore()) return -1;
-			if (score < match.getScore()) return  1;
-			return 0;
-		}
 	}
 
 	public int getRank() {
@@ -318,6 +347,13 @@ public class Match implements Comparable<Match>, HasEValue{
 
 	public double getEValue() {
 		return eValue;
+	}
+
+	/**
+	 * @return the ionMatchTally
+	 */
+	public int getIonMatchTally() {
+		return ionMatchTally;
 	}
 
 	public static void setSortParameter(int sortParameter) {

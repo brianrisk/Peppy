@@ -127,7 +127,7 @@ public class RNA_Digestor {
 							Peptide peptide = null;
 							if (
 									(spliceLocation == -1) ||
-									(puc.getCodeChunkIndex() <= spliceLocation && acidIndex > spliceLocation)
+									(puc.getStartIndex() <= spliceLocation && acidIndex > spliceLocation)
 									){
 								//O, God!  keeping track of start and stop locations!  The madness consumes me!!!
 								//all values initially set to -1 as that is not a valid index.  If you see a -1,
@@ -136,14 +136,14 @@ public class RNA_Digestor {
 								int peptideStartIndex = -1, peptideStopIndex = -1, intronStartIndex = -1, intronStopIndex = -1;
 								if (spliceLocation == -1) {
 									if (isForward) {
-										peptideStartIndex = beginLocus + puc.getCodeChunkIndex();
+										peptideStartIndex = beginLocus + puc.getStartIndex();
 										peptideStopIndex = beginLocus + acidIndex;
 									} else {
-										peptideStartIndex = beginLocus + codeChunk.length - puc.getCodeChunkIndex();
+										peptideStartIndex = beginLocus + codeChunk.length - puc.getStartIndex();
 										peptideStopIndex = beginLocus + codeChunk.length - acidIndex;
 									}	
 								} else {
-									peptideStartIndex = absoluteIndicies[puc.getCodeChunkIndex()];
+									peptideStartIndex = absoluteIndicies[puc.getStartIndex()];
 									peptideStopIndex = absoluteIndicies[acidIndex];
 									intronStartIndex = absoluteIndicies[spliceLocation];
 									intronStopIndex = absoluteIndicies[spliceLocation + 1];
@@ -155,7 +155,6 @@ public class RNA_Digestor {
 										intronStartIndex,
 										intronStopIndex,
 										isForward,
-										(byte) (beginLocus % 3),
 										null,
 										(spliceLocation != -1)
 										);
@@ -205,19 +204,19 @@ public class RNA_Digestor {
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 			Peptide peptide = null;
 			if ((spliceLocation == -1) ||
-					(puc.getCodeChunkIndex() <= spliceLocation && acidIndex > spliceLocation)){
+					(puc.getStartIndex() <= spliceLocation && acidIndex > spliceLocation)){
 				//TODO any way I can avoid exactly repeating the code from above?
 				int peptideStartIndex = -1, peptideStopIndex = -1, intronStartIndex = -1, intronStopIndex = -1;
 				if (spliceLocation == -1) {
 					if (isForward) {
-						peptideStartIndex = beginLocus + puc.getCodeChunkIndex();
+						peptideStartIndex = beginLocus + puc.getStartIndex();
 						peptideStopIndex = beginLocus + acidIndex;
 					} else {
-						peptideStartIndex = beginLocus + codeChunk.length - puc.getCodeChunkIndex();
+						peptideStartIndex = beginLocus + codeChunk.length - puc.getStartIndex();
 						peptideStopIndex = beginLocus + codeChunk.length - acidIndex;
 					}	
 				} else {
-					peptideStartIndex = absoluteIndicies[puc.getCodeChunkIndex()];
+					peptideStartIndex = absoluteIndicies[puc.getStartIndex()];
 					peptideStartIndex = absoluteIndicies[acidIndex];
 				}
 				peptide = new Peptide(
@@ -227,7 +226,6 @@ public class RNA_Digestor {
 						intronStartIndex,
 						intronStopIndex,
 						isForward,
-						(byte) (beginLocus % 3),
 						null,
 						(spliceLocation != -1)
 						);
@@ -292,14 +290,25 @@ public class RNA_Digestor {
 							}
 						}
 						//TODO starts and stops not handled correctly for 3to5
-						peptides.addAll(digest(0, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
-						peptides.addAll(digest(1, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
-						peptides.addAll(digest(2, windowSize, isForward, splice, halfWindowSize, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
+						peptides.addAll(digest(0, windowSize, isForward, splice, halfWindowSize - 1, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
+						peptides.addAll(digest(1, windowSize, isForward, splice, halfWindowSize - 1, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
+						peptides.addAll(digest(2, windowSize, isForward, splice, halfWindowSize - 1, rna.getStart() + i - halfWindowSize, j - i, absoluteIndicies));
 					}
 				}
 			}
 		}
 	}
+	/*
+	 * 
+	 * @param startIndex
+	 * @param stopIndex
+	 * @param isForward
+	 * @param codeChunk
+	 * @param spliceLocation -1 if not a spliced sequence
+	 * @param beginLocus
+	 * @param intronLength
+	 * @return
+	 */
 	
 	
 	

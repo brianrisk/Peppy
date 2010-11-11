@@ -9,16 +9,16 @@ package Peppy;
 public class PeptideUnderConstruction {
 	
 	private int breakCount = 0;
-	private int sequenceIndex;
+	private int startIndex;
 	private StringBuffer buffer = new StringBuffer();
 	
-	public PeptideUnderConstruction(int sequenceIndex, char aminoAcid) {
-		this.sequenceIndex = sequenceIndex;
+	public PeptideUnderConstruction(int startIndex, char aminoAcid) {
+		this.startIndex = startIndex;
 		addAminoAcid(aminoAcid);
 	}
 	
 	public PeptideUnderConstruction(int sequenceIndex) {
-		this.sequenceIndex = sequenceIndex;
+		this.startIndex = sequenceIndex;
 	}
 	
 	public void addAminoAcid(char acid) {
@@ -36,8 +36,8 @@ public class PeptideUnderConstruction {
 		return buffer.toString();
 	}
 	
-	public int getCodeChunkIndex() {
-		return sequenceIndex;
+	public int getStartIndex() {
+		return startIndex;
 	}
 
 }

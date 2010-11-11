@@ -29,11 +29,9 @@ public class ReliabilityTester {
 	public static void main(String slwen[]) {
 		U.p("testing reliablity.");
 //		ReliabilityTester.runTheGamut("USP");
-//		ReliabilityTester.runTheGamut("ecoli");
+		ReliabilityTester.runTheGamut2("human");
 //		ReliabilityTester.testReliability("aurum");
-		Properties.leftIonDifference += 0.06591731345432421;
-		Properties.rightIonDifference += 0.10782993451209233;
-		ReliabilityTester.testReliability("human");
+//		ReliabilityTester.testReliability("human");
 //		ReliabilityTester.testReliability("ecoli");
 //		ReliabilityTester.testReliability("USP");
 //		ReliabilityTester.exportHighScoringPeptidesFromSwissProt("USP");
@@ -41,6 +39,66 @@ public class ReliabilityTester {
 //		ReliabilityTester.exportPeptidesInCommonWithDatabase("ecoli");
 //		ReliabilityTester.makeSureWeAreProperlyDigestingTheGenome("ecoli");
 		U.p("done!");
+	}
+	
+	public static void runTheGamut2(String species) {
+		U.p("running the gamut!");
+		U.startStopwatch();
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + species + "/spectra");
+		ArrayList<Peptide> peptides = loadHighScoringPeptides(species);
+		ArrayList<Peptide> correctPeptides = new  ArrayList<Peptide>();
+		ArrayList<String> correctPeptideNames = new ArrayList<String>();
+		loadCorrectPeptides(species,correctPeptides,correctPeptideNames );
+		double increment = 0.1;
+		double thresholdMin = 0.7;
+		double thresholdMax = 1.72;
+		
+//		best YBtrue:1.0999999999999999
+//		best YBfalse:1.2
+//		best BYtrue:1.3
+//		best BYtrue:0.8999999999999999
+		
+		double YBtrue, YBfalse, BYtrue, BYfalse;
+		double bestYBtrue = 0, bestYBfalse = 0, bestBYtrue = 0, bestBYfalse = 0;
+		int score;
+		int bestScore = 0;
+		for (YBtrue = 1.1; YBtrue <= thresholdMax; YBtrue += increment) {
+			for (YBfalse = 1.2; YBfalse <= thresholdMax; YBfalse += increment) {
+				for (BYtrue = 0.7; BYtrue <= thresholdMax; BYtrue += increment) {
+					for (BYfalse = 0.6; BYfalse <= 1; BYfalse += increment) {
+						Properties.YBtrue = YBtrue;
+						Properties.YBfalse = YBfalse;
+						Properties.BYtrue = BYtrue;
+						Properties.BYfalse = BYfalse;
+						score = getNumberOfTopRankingMatches(species, spectra, peptides, correctPeptides, correctPeptideNames);
+						U.p ("score: " + score + "; " + YBtrue + ", " + YBfalse + ", " + BYtrue + ", " + BYfalse);
+						if (score > bestScore) {
+							bestScore = score;
+							bestYBtrue = YBtrue;
+							bestYBfalse = YBfalse;
+							bestBYtrue = BYtrue;
+							bestBYfalse = BYfalse;
+							
+							U.p();
+							U.p("New best scores:");
+							U.p("best YBtrue:" + bestYBtrue);
+							U.p("best YBfalse:" + bestYBfalse);
+							U.p("best BYtrue:" + bestBYtrue);
+							U.p("best BYtrue:" + bestBYfalse);
+						}
+					}
+				}
+			}
+			
+		}
+
+		U.p();
+		U.p("BEST SCORES:");
+		U.p("best YBtrue:" + bestYBtrue);
+		U.p("best YBfalse:" + bestYBfalse);
+		U.p("best BYtrue:" + bestBYtrue);
+		U.p("best BYtrue:" + bestBYfalse);
+		U.stopStopwatch();
 	}
 	
 	public static void runTheGamut(String species) {

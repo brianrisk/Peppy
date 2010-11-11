@@ -1,6 +1,9 @@
 package SpectralVisualizer;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -19,6 +22,7 @@ import javax.imageio.ImageIO;
 
 import Peppy.Definitions;
 import Peppy.Peak;
+import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
@@ -26,17 +30,40 @@ import Utilities.U;
 
 public class SpectralVisualizer {
 	
-	static Color yIonColor = Color.yellow;
-	static Color bIonColor = Color.cyan;
+	public static final int THEME_WHITE = 0;
+	public static final int THEME_BLACK = 1;
+	private static int theTheme = THEME_WHITE;
+	private static boolean cubedScale = false;
+	static Color yIonColor = Color.RED;
+	static Color bIonColor = Color.BLUE;
 	static Color noIonColor = Color.gray;
 	static Color bothIonColor = Color.green;
+	static Color bkgndColor = Color.white;
+	static Color axesColor = Color.black;
 	
 	public static void main(String args[]) {
-		U.printUserDirectory();
+		if (theTheme == THEME_BLACK) {
+			yIonColor = Color.yellow;
+			bIonColor = Color.cyan;
+			noIonColor = Color.gray;
+			bothIonColor = Color.green;
+			bkgndColor = Color.black;
+			axesColor = Color.white;
+		}
+		if (theTheme == THEME_WHITE) {
+			yIonColor = Color.RED;
+			bIonColor = Color.BLUE;
+			noIonColor = Color.LIGHT_GRAY;
+			bothIonColor = Color.green;
+			bkgndColor = Color.white;
+			axesColor = Color.black;
+		}
 		U.p("drawing images for spectra");
+		Peppy.init();
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(Properties.spectraDirectoryOrFile);
 		ArrayList<Peptide> peptides = loadPeptides("peptides.txt");
 		generateFullReport(spectra, peptides);
+		U.p("done");
 	}
 	
 	public static void generateFullReport(ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides) {
@@ -59,7 +86,8 @@ public class SpectralVisualizer {
 				
 				//make an image file of the spectrum
 				File imageFile = new File(imageFolder, i + ".jpg");
-				drawSpectrum(spectra.get(i), 1000, 300, imageFile);
+//				drawSpectrum(spectra.get(i), 1000, 300, imageFile);
+				drawDeluxSpectrum(spectra.get(i), peptides.get(i), imageFile);
 				
 				//include in report file
 				pw.println("<img src=\"images/" + i + ".jpg\">");
@@ -72,9 +100,7 @@ public class SpectralVisualizer {
 			U.appendFile(pw, Properties.reportWebHeaderFile);
 
 			pw.flush();
-			pw.close();
-
-			
+			pw.close();		
 		} catch (FileNotFoundException e) {
 			U.p("could not find file: " + reportFile.getName());
 			e.printStackTrace();
@@ -82,6 +108,90 @@ public class SpectralVisualizer {
 			U.p("could not read file: " + reportFile.getName());
 			e.printStackTrace();
 		}
+	}
+	
+	public static void drawDeluxSpectrum(Spectrum spectrum, Peptide peptide, File imageFile)  throws IOException {
+		
+		//getting sectrum image
+		int spectrumWidth = 1000;
+		int spectrumHeight = 300;
+		BufferedImage spectrumImage = new BufferedImage(spectrumWidth, spectrumWidth, BufferedImage.TYPE_INT_RGB);
+		Graphics2D spectrumGraphics = spectrumImage.createGraphics();
+		drawSpectrum(spectrum, spectrumWidth, spectrumHeight, null, true, "", "", spectrumImage);
+		
+		//getting full chart graphics
+		int chartX = 75;
+		int chartY = 10;
+		int chartWidth = spectrumWidth + 100;
+		int chartHeigth = spectrumHeight + 50;
+		BufferedImage chartImage = new BufferedImage(chartWidth, chartHeigth, BufferedImage.TYPE_INT_RGB);
+		Graphics2D chartGraphics = chartImage.createGraphics();
+		chartGraphics.setBackground(bkgndColor);
+		FontMetrics fontMetrics = chartGraphics.getFontMetrics();
+		int fontHeight = fontMetrics.getHeight();
+		
+		//putting on the spectrum
+		chartGraphics.setColor(bkgndColor);
+		chartGraphics.fillRect(0,0,chartWidth,chartHeigth);
+		chartGraphics.drawImage(spectrumImage, chartX, chartY, null);
+//		ColorConvertOp cco = new ColorConvertOp(spectrumGraphics.getRenderingHints());
+//		chartGraphics.drawImage(chartImage, null, 50, 50);
+		
+		//fill in a stupid black rectangle
+		chartGraphics.fillRect(chartX,chartY + spectrumHeight + 3, spectrumWidth,chartHeigth - chartY - spectrumHeight);
+		
+		//draw axes
+		chartGraphics.setColor(axesColor);
+		chartGraphics.drawLine(chartX, chartY + spectrumHeight + 2, chartX + spectrumWidth, chartY + spectrumHeight + 2); //x axis
+		chartGraphics.drawLine(chartX + spectrumWidth, chartY + spectrumHeight -10, chartX + spectrumWidth, chartY + spectrumHeight +10); //x axis cap
+		chartGraphics.drawLine(chartX, chartY, chartX, chartY + spectrumHeight); //y axis
+		chartGraphics.drawLine(chartX - 10, chartY, chartX + 10, chartY); // y cap
+		
+		//find x tick marks
+		double xLabelIncrement = Math.log10(spectrum.getPrecursorMass());
+		xLabelIncrement = Math.pow(10, Math.round(xLabelIncrement) - 1);
+		int xPixelIncrement = (int) ((xLabelIncrement / spectrum.getPrecursorMass()) * spectrumWidth);
+		
+		//draw x ticks
+		int x1;
+		int numberOfTicks = (spectrumWidth / xPixelIncrement);
+		for (int i = 0; i <= numberOfTicks; i++) {
+			x1 = chartX + i * xPixelIncrement;
+			chartGraphics.drawLine(x1, chartY + spectrumHeight + 2, x1, chartY + spectrumHeight + 12);
+			String tickLabel = "" + (int) xLabelIncrement * i;
+			chartGraphics.drawString(tickLabel, x1 - 5, chartY + spectrumHeight + fontHeight + 9);
+		}
+		
+		//find y tick marks
+		double maxIntensity = spectrum.getMaxIntensity();
+		double yLabelIncrement = Math.log10(maxIntensity);
+		yLabelIncrement = Math.pow(10, Math.round(yLabelIncrement) - 1);
+		int yPixelIncrement = (int) ((yLabelIncrement / maxIntensity) * spectrumHeight);
+		
+		//draw y ticks
+		int y1;
+		numberOfTicks = (spectrumHeight / yPixelIncrement);
+		for (int i = 1; i <= numberOfTicks; i++) {
+			if (cubedScale) {
+				y1 = chartY + spectrumHeight - (int) ((Math.pow(i * yLabelIncrement, 0.333) / Math.pow(maxIntensity, 0.33)) * spectrumHeight);
+			} else {
+				y1 = chartY + spectrumHeight - i * yPixelIncrement;
+			}	
+			
+			chartGraphics.drawLine(chartX -10, y1, chartX, y1);
+			String tickLabel = "" + (int) yLabelIncrement * i;
+			int labelWidth = fontMetrics.stringWidth(tickLabel);
+			chartGraphics.drawString(tickLabel,chartX - 12 - labelWidth, y1);
+		}
+		
+		//draw labels
+		chartGraphics.setColor(Color.RED);
+		chartGraphics.drawString(peptide.getAcidSequence(), chartX + 10, chartY + fontHeight);
+		chartGraphics.drawString(spectrum.getFile().getName(), chartX + 10, (int) (chartY + fontHeight * 2.5));
+		
+		//save the file
+		ImageIO.write(chartImage,"JPG",imageFile);
+		
 	}
 	
 	public static ArrayList<Peptide> loadPeptides(String peptideFileName) {
@@ -115,37 +225,53 @@ public class SpectralVisualizer {
 	 * @throws IOException
 	 */
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest) throws IOException {
-		drawSpectrum(spectrum, width, height, dest, true, "", "");
+		//setting up Graphics context
+		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		drawSpectrum(spectrum, width, height, dest, true, "", "", bdest);
 	}
 	
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels) throws IOException {
-		drawSpectrum(spectrum, width, height, dest, drawLabels, "", "");
+		//setting up Graphics context
+		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		drawSpectrum(spectrum, width, height, dest, drawLabels, "", "", bdest);
 	}
 	
 	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels, String message1, String message2) throws IOException {
+		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		drawSpectrum(spectrum, width, height, dest, drawLabels, message1, message2, bdest);
+	}
+	
+	public static void drawSpectrum(Spectrum spectrum, int width, int height, File dest, boolean drawLabels, String message1, String message2, BufferedImage bdest) throws IOException {
 		
 		int xLoc, yLoc;
-		
-		//setting up Graphics context
-		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = bdest.createGraphics();
 		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
-		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
-		g.setColor(Color.BLACK);
+		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
+		g.setColor(bkgndColor);
 		g.fillRect(0,0,width,height);
 		
+		Font oldFont = g.getFont();
+		g.setFont(new Font(oldFont.getName(), oldFont.getSize(), (int) (oldFont.getSize() * 1.5)));
+		FontMetrics fontMetrics = g.getFontMetrics();
+		int fontHeight = fontMetrics.getHeight();
+		
 		//getting maximum spectrum value and intensity
-		double maxValue = spectrum.getMaxMass();
+		double maxValue = spectrum.getPrecursorMass();
 //		double maxValue = 1500;
 		double maxIntensity = spectrum.getCalculatedMaxIntensity();
+		if (cubedScale) maxIntensity = Math.pow(maxIntensity, 0.333);
+		double peakIntensity;
 		
 		//first draw the non-important lines
 		ArrayList<Peak> peaks = spectrum.getPeaks();
-		g.setColor(Color.gray);
+		g.setColor(noIonColor);
 		for (Peak peak: peaks) {
-			if (peak.getColor().equals(Color.gray)) {
+			if (peak.getColor().equals(noIonColor)) {
+				peakIntensity = peak.getIntensity();
+				if (cubedScale) peakIntensity = Math.pow(peakIntensity, 0.333);
 				xLoc = (int) (peak.getMass()  * width / maxValue);
-				yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
+				yLoc = (int) (height - ((peakIntensity / maxIntensity) * height));
+				g.setStroke(new BasicStroke(1.5f));
 				g.drawLine(xLoc, yLoc, xLoc, height);
 				
 				//if peak is hilighted, draw a little triangle above it
@@ -163,14 +289,37 @@ public class SpectralVisualizer {
 		
 		//draw the colored peaks
 		for (Peak peak: peaks) {
-			if (!peak.getColor().equals(Color.gray)) {
+			if (!peak.getColor().equals(noIonColor)) {
 				g.setColor(peak.getColor());
+				peakIntensity = peak.getIntensity();
+				if (cubedScale) peakIntensity = Math.pow(peakIntensity, 0.333);
 				xLoc = (int) (peak.getMass()  * width / maxValue);
-				yLoc = (int) (height - ((peak.getIntensity() / maxIntensity) * height));
+				yLoc = (int) (height - ((peakIntensity / maxIntensity) * height));
+				g.setStroke(new BasicStroke(2.0f));
 				g.drawLine(xLoc, yLoc, xLoc, height);
-				if (drawLabels && !peak.getColor().equals(Color.gray)) {
-					if (yLoc < 10) yLoc += 10;
-					g.drawString("" + peak.getIntensity(), xLoc, yLoc);
+				if (drawLabels && !peak.getColor().equals(noIonColor)) {
+					if (yLoc < fontHeight) yLoc += fontHeight;
+					StringBuffer label = new StringBuffer();
+					if (peak.getbIonNumber() != -1) label.append("b" + peak.getbIonNumber());
+					if (peak.getbIonNumber() != -1 && peak.getyIonNumber() != -1) label.append(", ");
+					if (peak.getyIonNumber() != -1) label.append("y" + peak.getyIonNumber());
+//					if (peak.getbIonNumber() != -1) {
+//						int y1 = height - (height * peak.getbIonNumber() / 20);
+//						int labelWidth = fontMetrics.stringWidth(label.toString());
+//						int x1 = labelWidth + 4;
+//						g.setStroke(new BasicStroke(1.5f));
+//						g.drawLine(x1, y1, xLoc, yLoc);
+//						g.drawString("" + label, 2, y1);
+//					}
+//					if (peak.getyIonNumber() != -1) {
+//						int y1 = height - (height * peak.getyIonNumber() / 20);
+//						int labelWidth = fontMetrics.stringWidth(label.toString());
+//						int x1 = width - (labelWidth + 4);
+//						g.setStroke(new BasicStroke(1.5f));
+//						g.drawLine(x1, y1, xLoc, yLoc);
+//						g.drawString("" + label, width - labelWidth, y1);
+//					}
+					g.drawString("" + label, xLoc + 4, yLoc);
 				}
 				//if peak is hilighted, draw a little triangle above it
 				if (peak.isHilighted()) {
@@ -191,7 +340,9 @@ public class SpectralVisualizer {
 		g.drawString(message2, 10, 40);
 		
 		//save the image
-		ImageIO.write(bdest,"JPG",dest);
+		if (dest != null) {
+			ImageIO.write(bdest,"JPG",dest);
+		}
 	}
 	
 
@@ -246,6 +397,9 @@ public class SpectralVisualizer {
 			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
 				if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
 					spectrum.getPeak(peakIndex).setColor(yIonColor);
+					int labelNumber = peptideLengthMinusOne - seqIndex;
+					if (peptideString.endsWith(".")) labelNumber--;
+					spectrum.getPeak(peakIndex).setyIonNumber(labelNumber);
 				}
 			}
 			
@@ -277,6 +431,7 @@ public class SpectralVisualizer {
 					} else {
 						spectrum.getPeak(peakIndex).setColor(bIonColor);
 					}
+					spectrum.getPeak(peakIndex).setbIonNumber(seqIndex + 1);
 				}
 			}
 			

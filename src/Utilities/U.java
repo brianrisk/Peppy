@@ -222,5 +222,10 @@ public class U {
 		parameterB = (1.0 / (stop - start)) * (temp2 - m * temp1);
 		return parameterB;
 	}
+	
+	public static String getFileNameWithoutSuffix(File file) {
+        return file.getName().substring(0, file.getName().lastIndexOf('.'));
+	}
+
 
 }

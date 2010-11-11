@@ -192,6 +192,7 @@ public class ProteinDigestion {
 		return out;
 	}
 	
+	
 	//TODO this code needs to reflect DNA digestion e.g. have peptides that both do and don't start with M
 	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
@@ -244,5 +245,216 @@ public class ProteinDigestion {
 		}
 		return out;
 	}
+	
+	public static ArrayList<Peptide> digestProtein(
+			String proteinString,
+			String proteinName
+			) {
+		return digestProtein(proteinString, false, null, proteinName, new int[proteinString.length()], -1, -1, true);
+	}
+	
+	public static ArrayList<Peptide> digestProtein(
+			String proteinString,
+			Sequence sequence,
+			int startIndex,
+			boolean isForward) {
+		int [] indicies = new int [proteinString.length()];
+		int index = startIndex;
+		for (int i = 0; i < proteinString.length(); i++) {
+			indicies[i] = index;
+			index += 3;
+		}
+		return digestProtein(proteinString, true, sequence, null, indicies, -1, -1, isForward);
+	}
+	
+	
+	public static ArrayList<Peptide> digestProtein(
+			String proteinString, 
+			boolean isFromSequence, 
+			Sequence geneSequence,
+			String proteinName,
+			int [] indicies,
+			int intronStartIndex,
+			int intronStopIndex,
+			boolean isForward
+			) {
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		
+		int proteinLength = proteinString.length();
+		int proteinLengthMinusOne = proteinLength - 1;
+		char aminoAcid = proteinString.charAt(0);
+		char previousAminoAcid = aminoAcid;
+		int acidIndex = -1;
+		
+		
+		//Where we store all of our forming peptides
+		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+		//start the first peptide
+		peptidesUnderConstruction.add(new PeptideUnderConstruction(indicies[0], aminoAcid));
+		
+		//keeping track of open reading frames within this sequence
+		boolean inORF = false;
+		
+		//start 1 out so we have a previous amino acid
+		for (int i = 1; i < proteinLength; i++) {
+			aminoAcid = proteinString.charAt(i);
+			acidIndex = indicies[i];
+			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+				puc.addAminoAcid(aminoAcid);
+			}
+			if ((isStart(aminoAcid)) ||  // start a new peptide at M
+				(isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+				(isBreak(previousAminoAcid) && !isStart(aminoAcid)))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+			{		
+				peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
+			}
+			
+			//adding peptides to the grand list
+			if (isStart(aminoAcid)) {
+				inORF = true;
+			} else {
+				if (isBreak(aminoAcid)) {
+					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+						evaluateNewPeptide(
+								puc,
+								intronStartIndex,
+								intronStopIndex,
+								acidIndex,
+								isFromSequence,
+								isForward,
+								geneSequence,
+								proteinName,
+								inORF,
+								peptides);
+					}
+				}
+				if (isStop(aminoAcid)) inORF = false;
+			}
+			
+			//if stop, then clear out
+			if (isStop(aminoAcid)) {
+				peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+			}
+			
+			//remove all peptide under construction that have reached their maximum break count
+			int size = peptidesUnderConstruction.size();
+			for (int pucIndex = 0; pucIndex < size; pucIndex++) {
+				PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
+				if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
+					peptidesUnderConstruction.remove(pucIndex);
+					pucIndex--;
+					size--;
+				}
+			}
+			
+			//skip X sequences
+			if (proteinString.charAt(i) == 'X') {
+				while (proteinString.charAt(i) == 'X') {
+					i++;
+					if (i ==  proteinString.length()) break;
+				}
+				i++;
+			}
+		}
+		
+		//adding all the remaining peptides under construction
+		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+			evaluateNewPeptide(
+					puc,
+					intronStartIndex,
+					intronStopIndex,
+					acidIndex,
+					isFromSequence,
+					isForward,
+					geneSequence,
+					proteinName,
+					inORF,
+					peptides);
+		}
+		return peptides;
+	}
+	
+	/**
+	 * This first creates a peptide from the peptide under construction.
+	 * This is mildly complicated as the peptide has different constructors
+	 * depending on if it comes form a protein database or nucleotide sequence
+	 * @param puc
+	 * @param intronStartIndex
+	 * @param intronStopIndex
+	 * @param acidIndex
+	 * @param isFromSequence
+	 * @param isForward
+	 * @param geneSequence
+	 * @param proteinName
+	 * @param inORF
+	 * @param peptides
+	 */
+	private static void evaluateNewPeptide(
+			PeptideUnderConstruction puc,
+			int intronStartIndex,
+			int intronStopIndex,
+			int acidIndex,
+			boolean isFromSequence,
+			boolean isForward,
+			Sequence geneSequence,
+			String proteinName,
+			boolean inORF,
+			ArrayList<Peptide> peptides
+			) {
+		boolean isSpliced = false;
+		int peptideIntronStartIndex;
+		int peptideIntronStopIndex;
+		Peptide peptide;
+		
+		//splice related
+		isSpliced =  (puc.getStartIndex() < intronStartIndex && acidIndex > intronStopIndex);
+		if (isSpliced) {
+			peptideIntronStartIndex = intronStartIndex;
+			peptideIntronStopIndex = intronStopIndex;
+		} else {
+			peptideIntronStartIndex = -1;
+			peptideIntronStopIndex = -1;
+		}
+		//If this is coming from DNA or RNA, there is a different peptide constructor
+		if (isFromSequence) {
+			peptide = new Peptide(
+					puc.getSequence(),
+					puc.getStartIndex(),
+					acidIndex,
+					peptideIntronStartIndex,
+					peptideIntronStopIndex,
+					isForward,
+					geneSequence,
+					isSpliced);
+		} else {
+			peptide = new Peptide(
+					puc.getSequence(),
+					proteinName);
+		}
+		//add peptide if it meets certain criteria
+		if (peptide.getMass() >= Properties.peptideMassThreshold) {
+			if (Properties.onlyUsePeptidesInOpenReadingFrames) {
+				if (inORF) {
+					peptides.add(peptide);
+				}
+			} else {
+				peptides.add(peptide);
+			}
+		}
+	}
+	
+	private static boolean isStart(char aminoAcid) {
+		return (aminoAcid == 'M');
+	}
+	
+	private static boolean isStop(char aminoAcid) {
+		return (aminoAcid == '.');
+	}
+	
+	private static boolean isBreak(char aminoAcid) {
+		return (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
+	}
+	
+	
 
 }

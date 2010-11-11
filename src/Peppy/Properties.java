@@ -38,6 +38,12 @@ public class Properties {
 	public static double peptideMassThreshold = 500.0;
 	public static int digestionWindowSize = 25000000;
 	
+	//Splicing?
+	public static boolean useSpliceVariants = false;
+	public static boolean useSequenceRegion = false;
+	public static int sequenceRegionStart = 0;
+	public static int sequenceRegionStop = 0;
+	
 	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
 	//units are daltons.
 	public static double spectrumToPeptideMassError = 2.0;
@@ -47,6 +53,15 @@ public class Properties {
 	public static double peakIntensityExponent = 0.33333333;
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
+//	public static double YBtrue = 1.1;
+//	public static double YBfalse = 1.2;
+//	public static double BYtrue = 1.3;
+//	public static double BYfalse = 0.9;
+	public static double YBtrue = 1.17;
+	public static double YBfalse = 1.43;
+	public static double BYtrue = 1.1;
+	public static double BYfalse = 0.9;
+	
 	
 	//matches per spectrum
 	public static int maximumNumberOfMatchesForASpectrum = 5;
@@ -91,15 +106,19 @@ public class Properties {
 	//considered part of the "neighborhood"
 	public static int locusNeighborhood = 3000;
 	
+	public static void loadProperties(String fileName) {
+		File propertiesFile = new File(fileName);
+		loadProperties(propertiesFile);
+	}
+	
 	
 	/**
 	 * 
 	 * @param fileName the name of our properties file
 	 */
-	public static void loadProperties(String fileName) {
-		File file = new File(fileName);
+	public static void loadProperties(File propertiesFile) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
 			String line = br.readLine();
 			while (line != null) {
 				setPropertyFromString(line);
@@ -107,10 +126,10 @@ public class Properties {
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
-			U.p("Could not find the properties file: " + fileName);
+			U.p("Could not find the properties file: " + propertiesFile.getName());
 			U.p("Using default properties...");
 		} catch (IOException e) {
-			U.p("Could not read the properties file: " + fileName);
+			U.p("Could not read the properties file: " + propertiesFile.getName());
 			e.printStackTrace();
 		}
 		
@@ -129,37 +148,39 @@ public class Properties {
 		}
 		
 		//sequence digestion
-		if (propertyName.equals("numberOfMissedCleavages")) {
+		if (propertyName.equals("numberOfMissedCleavages")) 
 			numberOfMissedCleavages =Integer.valueOf(propertyValue);
-		}
-		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) {
+		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) 
 			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
-		}
-		if (propertyName.equals("peptideMassThreshold")) {
+		if (propertyName.equals("peptideMassThreshold")) 
 			peptideMassThreshold = Double.valueOf(propertyValue);
-		}
-		if (propertyName.equals("digestionWindowSize")) {
+		if (propertyName.equals("digestionWindowSize")) 
 			digestionWindowSize =Integer.valueOf(propertyValue);
-		}
+		
+		//splicing
+		if (propertyName.equals("useSpliceVariants"))
+			useSpliceVariants = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("useSequenceRegion"))
+			useSequenceRegion = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("sequenceRegionStart")) 
+			sequenceRegionStart =Integer.valueOf(propertyValue);
+		if (propertyName.equals("sequenceRegionStop")) 
+			sequenceRegionStop =Integer.valueOf(propertyValue);
 		
 		
 		//spectrum cleaning
-		if (propertyName.equals("localMaximaCleaning")) {
+		if (propertyName.equals("localMaximaCleaning"))
 			localMaximaCleaning = Boolean.valueOf(propertyValue);
-		}
-		if (propertyName.equals("highIntensityCleaning")) {
+		if (propertyName.equals("highIntensityCleaning"))
 			highIntensityCleaning = Boolean.valueOf(propertyValue);
-		}
 		
-		if (propertyName.equals("maximumNumberOfMatchesForASpectrum")) {
+		
+		if (propertyName.equals("maximumNumberOfMatchesForASpectrum"))
 			maximumNumberOfMatchesForASpectrum = Integer.valueOf(propertyValue);
-		}
-		if (propertyName.equals("sequenceDirectoryOrFile")) {
+		if (propertyName.equals("sequenceDirectoryOrFile"))
 			sequenceDirectoryOrFile = new File(propertyValue);
-		}
-		if (propertyName.equals("spectraDirectoryOrFile")) {
+		if (propertyName.equals("spectraDirectoryOrFile")) 
 			spectraDirectoryOrFile = new File(propertyValue);
-		}
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
@@ -172,43 +193,33 @@ public class Properties {
 			}
 		}
 		
-		if (propertyName.equals("leftIonDifference")) {
+		if (propertyName.equals("leftIonDifference"))
 			leftIonDifference = Double.valueOf(propertyValue);
-		}
-		if (propertyName.equals("rightIonDifference")) {
+		if (propertyName.equals("rightIonDifference")) 
 			rightIonDifference = Double.valueOf(propertyValue);
-		}
 		
 		//e value
-		if (propertyName.equals("eValueCutOff")) {
+		if (propertyName.equals("eValueCutOff")) 
 			eValueCutOff = Double.valueOf(propertyValue);
-		}
-		if (propertyName.equals("useEValueCutOff")) {
+		if (propertyName.equals("useEValueCutOff")) 
 			useEValueCutOff = Boolean.valueOf(propertyValue);
-		}
 		
 		//matches
-		if (propertyName.equals("spectrumToPeptideMassError")) {
+		if (propertyName.equals("spectrumToPeptideMassError")) 
 			spectrumToPeptideMassError = Double.valueOf(propertyValue);
-		}
-		if (propertyName.equals("peakDifferenceThreshold")) {
+		if (propertyName.equals("peakDifferenceThreshold")) 
 			peakDifferenceThreshold = Double.valueOf(propertyValue);
-		}
 		
 		
 		//reports
-		if (propertyName.equals("createHTMLReport")) {
+		if (propertyName.equals("createHTMLReport")) 
 			createHTMLReport = Boolean.valueOf(propertyValue);
-		}
-		if (propertyName.equals("generateNeighborhoodReport")) {
+		if (propertyName.equals("generateNeighborhoodReport")) 
 			generateNeighborhoodReport = Boolean.valueOf(propertyValue);
-		}
-		if (propertyName.equals("generateSequenceReport")) {
+		if (propertyName.equals("generateSequenceReport")) 
 			generateSequenceReport = Boolean.valueOf(propertyValue);
-		}
-		if (propertyName.equals("generateSpectrumReport")) {
+		if (propertyName.equals("generateSpectrumReport")) 
 			generateSpectrumReport = Boolean.valueOf(propertyValue);
-		}
 		
 		
 	}

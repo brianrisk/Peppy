@@ -98,6 +98,14 @@ public class Spectrum implements Comparable<Spectrum>{
 		return maxMass;
 	}
 	
+	public double getMaxIntensity() {
+		double max = 0;
+		for (Peak peak: peaks) {
+			if (peak.getIntensity() > max) max = peak.getIntensity();
+		}
+		return max;
+	}
+	
 	
 	public void sortByIntensity() {
 		Peak p;
@@ -229,12 +237,16 @@ public class Spectrum implements Comparable<Spectrum>{
 		//before we mess with the peak data, let's make sure we have the MD5
 		MD5 = getMD5();
 		
-		if (Properties.highIntensityCleaning) 
+//		if (Properties.highIntensityCleaning) 
+//			cleanPeaksKeepingHighIntensity();
+//		if (Properties.localMaximaCleaning) 
+//			cleanPeaksKeepingLocalMaxima();
+		
+		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM)
 			cleanPeaksKeepingHighIntensity();
-		if (Properties.localMaximaCleaning) 
-			cleanPeaksKeepingLocalMaxima();
 	}
 	
+	@SuppressWarnings("unused")
 	private void cleanPeaksKeepingLocalMaxima() {
 		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
 		int i, peakCount = peaks.size();

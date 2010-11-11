@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import HMMScore.HMMScorer;
 import Reports.HTMLReporter;
@@ -33,6 +34,7 @@ public class Peppy {
 		init();
 //		splice();
 		new Peppy(args);
+//		cnvThenGenome();
 //		cnv();
 //		bigJob(args);
 //		cnvPeptideMassList();
@@ -60,29 +62,64 @@ public class Peppy {
 		//initialize our ArrayList of matches
 		ArrayList<Match> matches = new ArrayList<Match>();
 		
-		//loop through each sequence in the sequences ArrayList
-		for (Sequence sequence: sequences) {		
-			matches.addAll(getMatches(sequence, spectra));
+		if (Properties.useSpliceVariants) {
+			//gets the first nucleotide sequence in the first sequence file
+			Sequence sequenceFile = sequences.get(0);
+			RNA_Sequence rna = new RNA_Sequence(sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
+			
+			U.p("digesting...");
+			RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
+			ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
+			U.p("peptide tally: " + peptides.size());
+			
+			U.p("getting matches...");
+			matches = getMatches(peptides, spectra, sequenceFile);
+			
+		} else {
+			//loop through each sequence in the sequences ArrayList
+			for (Sequence sequence: sequences) {		
+				matches.addAll(getMatches(sequence, spectra));
+			}
+			U.p("peptide tally: " + peptideTally);
 		}
-		U.p("peptide tally: " + peptideTally);
 	
 		U.p("calculating final e values");
 		for (Match match: matches) {
 			match.calculateEValue();
 		}
 		
+		//create new report directory
+		File reportDir = new File(Properties.reportDirectory, "report " + System.currentTimeMillis());
 		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
 			U.p("creating HTML reports");
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
 			report.generateFullReport();
 		}
 		
 		U.p("creating text reports");
-		TextReporter textReport = new TextReporter(matches, spectra, sequences);
+		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
 		
 		U.p();
 		U.stopStopwatch();
+	}
+	
+	public static void runJobs() {
+		init();
+		File jobsDir = new File("jobs");
+		File[] potentialJobsFiles = jobsDir.listFiles();
+		ArrayList<File> jobFiles = new ArrayList<File>();
+		for (int i = 0; i < potentialJobsFiles.length; i++) {
+			if (potentialJobsFiles[i].getName().toLowerCase().endsWith(".txt")) {
+				jobFiles.add(potentialJobsFiles[i]);
+			}	
+		}
+		U.p("running " + jobFiles.size() + " jobs");
+		for (int i = 0; i < jobFiles.size(); i++) {
+			U.p("running job " + i);
+			Properties.loadProperties(jobFiles.get(i));
+			new Peppy(null);
+		}
 	}
 
 	public static void splice() {
@@ -211,11 +248,9 @@ public class Peppy {
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
 		U.p("loaded " +spectra.size() + " spectra.");
 		
-		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		
-		//get sequence, rna, peptides and matches
-		Sequence chr11 = sequences.get(0);
+		//Get chr 11
+		File chr11File = new File("/Users/risk2/PeppyOverflow/sequences HG19/chr11.fa");
+		Sequence chr11 = Sequence.loadSequences(chr11File).get(0);
 		RNA_Sequence rna = new RNA_Sequence(chr11.getNucleotideSequences().get(0), 35160417, 35253949);
 		
 		U.p("digesting...");
@@ -232,13 +267,94 @@ public class Peppy {
 			match.calculateEValue();
 		}
 		
+		File reportDir = new File(Properties.reportDirectory, "report " + System.currentTimeMillis());
 		U.p("creating text report");
-		TextReporter textReport = new TextReporter(matches, spectra, sequences);
+		TextReporter textReport = new TextReporter(matches, spectra, null, reportDir);
 		textReport.generateFullReport();
 		
 		U.p("creating HTML reports");
 		if (Properties.isSequenceFileDNA) {
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences);
+			HTMLReporter report = new HTMLReporter(matches, spectra, null, reportDir);
+			report.generateFullReport();
+		}
+
+		U.p();
+		U.stopStopwatch();
+	}
+	
+	public static void cnvThenGenome() {
+		U.startStopwatch();
+		printGreeting();
+		
+		U.p("Searching the bit of chr11, then comparing to genome");
+		
+		//setting other properties
+		Properties.maximumNumberOfMatchesForASpectrum = 2;
+
+		//Load our spectra
+		U.p("loading spectra...");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+		
+		//get sequence, rna, peptides and matches
+		File chr11File = new File("/Users/risk2/PeppyOverflow/sequences HG19/chr11.fa");
+		Sequence chr11 = Sequence.loadSequences(chr11File).get(0);
+		RNA_Sequence rna = new RNA_Sequence(chr11.getNucleotideSequences().get(0), 35160417, 35253949);
+		
+		U.p("digesting...");
+		RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
+		ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
+		U.p("peptide tally: " + peptides.size());
+		
+		U.p("getting matches...");
+		ArrayList<Match> chr11matches = new ArrayList<Match>();
+		chr11matches = getMatches(peptides, spectra, chr11);
+
+		U.p("calculating final e values");
+		for (Match match: chr11matches) {
+			match.calculateEValue();
+		}
+		
+		//clearing old peptides
+		peptides = null;
+		System.gc();
+		
+		//finding reduced set of promising spectra
+		ArrayList<Spectrum> interestingSpectra = new ArrayList<Spectrum>();
+		for (Match match: chr11matches) {
+			if (match.getRank() == 1 && match.getEValue() > Properties.eValueCutOff) {
+				match.getSpectrum().clearEValues();
+				interestingSpectra.add(match.getSpectrum());
+			}
+		}
+		
+		//Search genome
+		ArrayList<Sequence> sequences = Sequence.loadSequences(new File("/Users/risk2/PeppyOverflow/sequences HG19"));
+		ArrayList<Match> genomeMatches = new ArrayList<Match>();
+		for (Sequence sequence: sequences) {		
+			genomeMatches.addAll(getMatches(sequence, interestingSpectra));
+		}
+		
+		//find matches from chr11 that outmatch the whole genome
+		ArrayList<Match> interestingMatches = new ArrayList<Match>();
+		for (Match match: chr11matches) {
+			for (Match genomeMatch: genomeMatches) {
+				if (match.getSpectrum().getId() == genomeMatch.getSpectrum().getId()) {
+					if (match.getScore() >= genomeMatch.getScore()) {
+						interestingMatches.add(match);
+					}
+				}
+			}
+		}
+		File reportDir = new File(Properties.reportDirectory, "report " + System.currentTimeMillis());
+		
+		U.p("creating text report");
+		TextReporter textReport = new TextReporter(interestingMatches, interestingSpectra, sequences, reportDir);
+		textReport.generateFullReport();
+		
+		U.p("creating HTML reports");
+		if (Properties.isSequenceFileDNA) {
+			HTMLReporter report = new HTMLReporter(interestingMatches, interestingSpectra, sequences, reportDir);
 			report.generateFullReport();
 		}
 
@@ -250,7 +366,9 @@ public class Peppy {
 	public static void init() {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties("properties.txt");
-		HMMScore.HMMClass.HmmSetUp();
+		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
+			HMMScore.HMMClass.HmmSetUp();
+		}
 	}
 	
 	
@@ -295,31 +413,13 @@ public class Peppy {
 //				matches.addAll(newMatches);
 			}
 			
-			//getting final ranks
-			U.p("sorting matches and getting final match ranks");
-			Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID);
-			int rank = 1;
-			Match theMatch = matches.get(0);
-			Match thePreviousMatch = matches.get(0);;
-			//set for the first
-			theMatch.setRank(1);
-			for (int i = 1; i < matches.size(); i++) {
-				//see if these are matches for a different spectrum
-				theMatch = matches.get(i);
-				if (theMatch.getSpectrum().getId() != thePreviousMatch.getSpectrum().getId()) {
-					rank = 1;
-				}
-				
-				if (theMatch.equals(thePreviousMatch)) {
-					rank = thePreviousMatch.getRank();
-				}
-				
-				theMatch.setRank(rank);
-				
-				rank++;
-				thePreviousMatch = theMatch;
-				
-			}
+			U.p("removing duplicate matches");
+			removeDuplicateMatches(matches);
+			
+			U.p("assigning final match ranks");
+			assignRankToMatches(matches);
+			
+			
 			return matches;
 	}
 	
@@ -344,10 +444,68 @@ public class Peppy {
 		} else {
 			matches.addAll(newMatches);
 		}
+		
+		U.p("removing duplicate matches");
+		removeDuplicateMatches(matches);
+		
+		U.p("assigning final match ranks");
+		assignRankToMatches(matches);
+		
 		return matches;
 }
 	
+		
+	public static void assignRankToMatches(ArrayList<Match> matches) {
+		//first error check
+		if (matches.size() == 0) return;
+		
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
+		Collections.sort(matches);
+		int rank = 1;
+		Match theMatch = matches.get(0);
+		Match thePreviousMatch = matches.get(0);
+		//set for the first
+		theMatch.setRank(1);
+		for (int i = 1; i < matches.size(); i++) {
+			//see if these are matches for a different spectrum
+			theMatch = matches.get(i);
+			if (theMatch.getSpectrum().getId() != thePreviousMatch.getSpectrum().getId()) {
+				rank = 1;
+			}
+			if (theMatch.equals(thePreviousMatch)) {
+				rank = thePreviousMatch.getRank();
+			}
+			theMatch.setRank(rank);
+			rank++;
+			thePreviousMatch = theMatch;
+		}
+	}
 	
+	public static void removeDuplicateMatches(ArrayList<Match> matches) {
+		//first error check
+		if (matches.size() == 0) return;
+		
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+		Collections.sort(matches);
+		int numberOfMatches = matches.size();
+		Match match;
+		Match previousMatch = matches.get(0);
+		int spectrumID;
+		int previousSpectrumID = previousMatch.getSpectrum().getId();
+		for (int i = 1; i < numberOfMatches; i++) {
+			match = matches.get(i);
+			spectrumID = match.getSpectrum().getId();
+			if (match.equals(previousMatch) && spectrumID == previousSpectrumID) {
+				matches.remove(i);
+				i--;
+				numberOfMatches--;
+			} else {
+				previousMatch = match;
+				previousSpectrumID = spectrumID;
+			}
+		}
+	}
+
 	/**
 	 * saves a file of peptide information
 	 * @param peptides

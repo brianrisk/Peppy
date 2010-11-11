@@ -98,26 +98,12 @@ public class DNA_DigestionThread implements Runnable {
 				
 				//Events which might start a new peptide
 				if (aminoAcid == 'M') {
-//					/*
-//					 * This if is included to avoid repeated peptides
-//					 * e.g. MMADK would produce MMADK, MADK and the next step would produce MADK, ADK
-//					 * and MADK would be repeated twice.
-//					 * 
-//					 * This problem also comes in if previous amino acid is a break point
-//					 */
-//					if (previousAminoAcid != 'M' && !isBreak(previousAminoAcid)) {
-//						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, 'M'));
-//					}
-//					
-//					//sometimes the M is not added, so we're accounting for this here
-//					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
 					inORF = true;
 				} else {
 					if (isBreak(aminoAcid)) {
-//						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex + threeTimesCodonIncrement));
-						//add all peptides
+						//if the next codon is not for STOP then add all peptides
 						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-							Peptide peptide = new Peptide(puc.getSequence(), puc.getCodeChunkIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
+							Peptide peptide = new Peptide(puc.getSequence(), puc.getStartIndex(), forwards,  nucleotideSequence.getParentSequence());
 							if (peptide.getMass() >= Properties.peptideMassThreshold) {
 								if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 									if (inORF) {
@@ -139,11 +125,11 @@ public class DNA_DigestionThread implements Runnable {
 				
 				//remove all peptide under construction that have reached their maximum break count
 				int size = peptidesUnderConstruction.size();
-				for (int i = 0; i < size; i++) {
-					PeptideUnderConstruction puc = peptidesUnderConstruction.get(i);
+				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
+					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
 					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
-						peptidesUnderConstruction.remove(i);
-						i--;
+						peptidesUnderConstruction.remove(pucIndex);
+						pucIndex--;
 						size--;
 					}
 				}
@@ -159,7 +145,7 @@ public class DNA_DigestionThread implements Runnable {
 		}	
 		//adding all the remaining peptides under construction
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			Peptide peptide = new Peptide(puc.getSequence(), puc.getCodeChunkIndex(), forwards, frame,  nucleotideSequence.getParentSequence());
+			Peptide peptide = new Peptide(puc.getSequence(), puc.getStartIndex(), forwards,  nucleotideSequence.getParentSequence());
 			if (peptide.getMass() >= Properties.peptideMassThreshold) {
 				if (Properties.onlyUsePeptidesInOpenReadingFrames) {
 					if (inORF) {

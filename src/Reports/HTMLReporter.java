@@ -30,6 +30,7 @@ public class HTMLReporter {
 	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
 	ArrayList<Sequence> sequences;
+	File reportDir;
 	
 	
 	/**
@@ -38,22 +39,23 @@ public class HTMLReporter {
 	 * @param sequences
 	 */
 	public HTMLReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
+			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
 		this.matches = matches;
 		this.spectra = spectra;
 		this.sequences = sequences;
+		this.reportDir = reportDir;
 	}
 
 
 	public void generateFullReport() {
-		File indexFile = new File(Peppy.Properties.reportDirectory, "index" + Properties.reportWebSuffix);
+		//create our report directory
+		reportDir.mkdirs();
+		File indexFile = new File(reportDir, "index" + Properties.reportWebSuffix);
 		try {
-			//create our report directory
-			Peppy.Properties.reportDirectory.mkdirs();
 			
 			
 			//sorting our matches by spectrum then score
-			Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID);
+			Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 			Collections.sort(matches);
 			
 			/* 
@@ -145,11 +147,13 @@ public class HTMLReporter {
 				sb.append(Properties.reportWebSuffix);
 				sb.append("\">");
 				sb.append(match.getPeptide().getStartIndex());
+				sb.append(" (" + match.getPeptide().getStartIndex() % 3 + ")");
 				sb.append("</a>");
 				sb.append("</td>");
 				
 				sb.append("<td>");
 				sb.append(match.getPeptide().getStopIndex());
+				sb.append(" (" + match.getPeptide().getStopIndex() % 3 + ")");
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -165,7 +169,11 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getTandemFitScoreRatio());
+				sb.append(match.getIonMatchTally());
+				sb.append("</td>");
+				
+				sb.append("<td>");
+				sb.append((double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -206,7 +214,7 @@ public class HTMLReporter {
 	}
 	
 	public void generateNeighborhoodReport(Match match, int index) {
-		File neighborhoodDirectory = new File(Peppy.Properties.reportDirectory, "neighborhoods");
+		File neighborhoodDirectory = new File(reportDir, "neighborhoods");
 		File indexFile = new File(neighborhoodDirectory, index + Properties.reportWebSuffix);
 		
 		//find all matches that are from the same chromosome
@@ -252,7 +260,7 @@ public class HTMLReporter {
 		 */
 		
 		
-		File sequenceReportDirectory = new File(Peppy.Properties.reportDirectory, "sequences");
+		File sequenceReportDirectory = new File(reportDir, "sequences");
 		sequenceReportDirectory.mkdirs();
 		File indexFile = new File(sequenceReportDirectory, sequence.getId() + Properties.reportWebSuffix);
 		ArrayList<Match> theseMatches = getMatchesWithSequence(sequence, matches);
@@ -378,7 +386,7 @@ public class HTMLReporter {
 //	}
 	
 	public void generateSpectrumReport(Spectrum spectrum) {
-		File sequenceDirectory = new File(Properties.reportDirectory, "spectra");
+		File sequenceDirectory = new File(reportDir, "spectra");
 		File indexFile = new File(sequenceDirectory, spectrum.getId() + Properties.reportWebSuffix);
 		ArrayList<Match> theseMatches = getMatchesWithSpectrum(spectrum, matches);
 		try {
@@ -397,7 +405,7 @@ public class HTMLReporter {
 			pw.println("</p>");
 			
 			//sorting
-			Match.setSortParameter(Match.SORT_BY_DEFAULT);
+			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(theseMatches);
 			
 			//draw spectrum visualizations for top 2 matches
@@ -409,7 +417,7 @@ public class HTMLReporter {
 				Match match = theseMatches.get(i);
 				File spectrumVisualization = new File(sequenceDirectory, spectrum.getId() + "-spect-" + i + ".jpg");
 				SpectralVisualizer.markMatchingIons(spectrum, match.getPeptide());
-				SpectralVisualizer.drawSpectrum(spectrum, 500, 200, spectrumVisualization, false);
+				SpectralVisualizer.drawSpectrum(spectrum, 500, 200, spectrumVisualization, true);
 				pw.println("<a href=\"" + spectrumVisualization.getName() + "\"><img src=\"" + spectrumVisualization.getName() + "\" border=0></a><br>");
 			}
 			pw.println("</p>");
@@ -490,16 +498,17 @@ public class HTMLReporter {
 		}
 		if (match.getPeptide().isForward()) {sb.append(" forward ");}
 		else {sb.append(" reverse ");}
-		sb.append(match.getPeptide().getReadingFrame());
 		sb.append("</nobr></td>");
 		
 		
 		sb.append("<td>");
 		sb.append(match.getPeptide().getStartIndex());
+		sb.append(" (" + match.getPeptide().getStartIndex() % 3 + ")");
 		sb.append("</td>");
 		
 		sb.append("<td>");
 		sb.append(match.getPeptide().getStopIndex());
+		sb.append(" (" + match.getPeptide().getStopIndex() % 3 + ")");
 		sb.append("</td>");
 		
 		sb.append("<td>");
@@ -515,7 +524,11 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append(match.getTandemFitRank());
+		sb.append(match.getIonMatchTally());
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append((double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length());
 		sb.append("</td>");
 		
 		sb.append("<td>");

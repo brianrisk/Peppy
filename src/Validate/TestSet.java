@@ -35,8 +35,9 @@ public class TestSet {
 	private int setSize = -1;
 	
 	//statistics
-	private int trueTally = 0;
-	private int falseTally = 0;
+	private int topRankTrueTally = 0;
+	private int topRankFalseTally = 0;
+	private int totalTrueTally = 0;
 	private int trueTallyAtOnePercentError = -1;
 	private double percentAtOnePercentError = -1;
 	private double eValueAtOnePercentError = -1;
@@ -76,6 +77,22 @@ public class TestSet {
 	}
 	
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
+//		//first remove spectra which do not represent peptides in our given database
+//		correctMatches = loadCorrectMatches();
+//		for (Match match: correctMatches) {
+//			Peptide peptide = match.getPeptide();
+//			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) == -1) {
+//				for (int i = 0; i < spectra.size(); i++) {
+//					if (spectra.get(i).getId() == match.getSpectrum().getId()) {
+//						spectra.remove(i);
+//						i--;
+//					}	
+//				}
+//			}
+//		}
+//		setSize = spectra.size();
+		
+		
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();
 		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
@@ -84,9 +101,12 @@ public class TestSet {
 		timeToComplete = U.millisecondsToString(timeElapsed);
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
 		
-		//Sort matches by e value	
-//		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(positiveMatches);
 		
 		//See which of the positive matches are true
@@ -102,7 +122,7 @@ public class TestSet {
 		topForwardsMatches = new ArrayList<Match>();
 		topForwardsTestedMatches = new ArrayList<MatchContainer>();
 		for (Match match: positiveMatches) {
-			if (match.getRank() == 0) {
+			if (match.getRank() == 1) {
 				topForwardsMatches.add(match);
 				topForwardsTestedMatches.add(new MatchContainer(match));
 			}
@@ -158,18 +178,22 @@ public class TestSet {
 		boolean onePercenThresholdHasBeenReached = false;
 		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
-				trueTally++;
+				topRankTrueTally++;
 			} else {
-				falseTally++;
+				topRankFalseTally++;
 			}
 			if (!onePercenThresholdHasBeenReached) {
-				if ((double) falseTally / setSize >= 0.01) {
+				if ((double) topRankFalseTally / setSize >= 0.01) {
 					onePercenThresholdHasBeenReached = true;
-					trueTallyAtOnePercentError =  trueTally;
+					trueTallyAtOnePercentError =  topRankTrueTally;
 					percentAtOnePercentError = (double) trueTallyAtOnePercentError / setSize;
 					eValueAtOnePercentError = match.getEValue();
 				}
 			}
+		}
+		//count total true
+		for (MatchContainer match: testedMatches) {
+			if (match.isTrue()) totalTrueTally++;
 		}
 		
 		generatePrecisionRecallCurve();
@@ -208,7 +232,8 @@ public class TestSet {
 				
 				precision = (double) trueCount / (i + 1);
 				recallPrevious = recall;
-				recall = (double) trueCount / getSetSize();	
+//				recall = (double) trueCount / getSetSize();	
+				recall = (double) trueCount / totalTrueTally;	
 				
 				area += (recall - recallPrevious) * precision;
 				
@@ -355,11 +380,11 @@ public class TestSet {
 	}
 
 	public int getTrueTally() {
-		return trueTally;
+		return topRankTrueTally;
 	}
 
 	public int getFalseTally() {
-		return falseTally;
+		return topRankFalseTally;
 	}
 
 	public int getTrueTallyAtOnePercentError() {

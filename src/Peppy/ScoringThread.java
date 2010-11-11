@@ -2,6 +2,8 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Utilities.U;
+
 
 public class ScoringThread implements Runnable {
 	
@@ -46,12 +48,11 @@ public class ScoringThread implements Runnable {
 			}
 			
 			//collect the top maximumNumberOfMatchesForASpectrum
-			Match.setSortParameter(Match.SORT_BY_DEFAULT);
+			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(matchesForOneSpectrum);
 			ArrayList<Match> topMatches = new ArrayList<Match>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
-
 			for (int i = 0; i < max; i++) {
 				topMatches.add(matchesForOneSpectrum.get(i));
 			}

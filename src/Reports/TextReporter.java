@@ -29,6 +29,7 @@ public class TextReporter {
 	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
 	ArrayList<Sequence> sequences;
+	File reportDir;
 	
 	
 	/**
@@ -37,21 +38,25 @@ public class TextReporter {
 	 * @param sequences
 	 */
 	public TextReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
+			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
 		this.matches = matches;
 		this.spectra = spectra;
 		this.sequences = sequences;
+		this.reportDir = reportDir;
 	}
 
 
-	public void generateFullReport() {
-		File reportFile = new File(Properties.reportDirectory, "textReport.txt");
-		try {
-			//create our report directory
-			Properties.reportDirectory.mkdirs();
+	public void generateFullReport() {	
+		reportDir.mkdirs();
+		
+		//set up our main index file
+		File reportFile = new File(reportDir, "textReport.txt");
+		try {	
 			
-			//set up our main index file
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
+			
+			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
+			pw.println("format version 1");
 			
 			//sorting our matches by spectrum then score
 			Match.setSortParameter(Match.SORT_BY_E_VALUE);
