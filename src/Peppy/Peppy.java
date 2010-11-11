@@ -31,7 +31,7 @@ public class Peppy {
 	static int peptideTally = 0;
 	
 	public static void main(String [] args) {
-		init();
+		init(args[0]);
 //		splice();
 		new Peppy(args);
 //		cnvThenGenome();
@@ -363,12 +363,16 @@ public class Peppy {
 	}
 	
 
-	public static void init() {
+	public static void init(String propertiesFile) {
 		System.setProperty("java.awt.headless", "true"); 
-		Properties.loadProperties("properties.txt");
+		Properties.loadProperties(propertiesFile);
 		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
 			HMMScore.HMMClass.HmmSetUp();
 		}
+	}
+	
+	public static void init() {
+		init("properties.txt");
 	}
 	
 	

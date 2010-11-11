@@ -212,6 +212,8 @@ public class Properties {
 		
 		
 		//reports
+		if (propertyName.equals("reportDirectory")) 
+			reportDirectory = new File(propertyValue);
 		if (propertyName.equals("createHTMLReport")) 
 			createHTMLReport = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("generateNeighborhoodReport")) 
