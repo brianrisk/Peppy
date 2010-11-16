@@ -13,7 +13,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double score = 0.0;
 	private double scoreTandemFit = 0.0;
 	private double tandemFitScoreRatio = 0.0;
-	private int tandemFitRank = -1;
+	private int rankCount = 0; //longest variable name I've ever made
 	private double scoreHMM = 0.0;
 	private double eValue;
 	public int ionMatchTally = 0;
@@ -300,6 +300,15 @@ public class Match implements Comparable<Match>, HasEValue{
 		this.rank = rank;
 	}
 
+	public int getRankCount() {
+		return rankCount;
+	}
+
+	public void setRankCount(
+			int rankCount) {
+		this.rankCount = rankCount;
+	}
+
 	public double getScoreTandemFit() {
 		return scoreTandemFit;
 	}
@@ -341,10 +350,6 @@ public class Match implements Comparable<Match>, HasEValue{
 		return sequence;
 	}
 
-	public int getTandemFitRank() {
-		return tandemFitRank;
-	}
-
 	public double getEValue() {
 		return eValue;
 	}
@@ -376,11 +381,6 @@ public class Match implements Comparable<Match>, HasEValue{
 	 */
 	public void setPeptide(Peptide peptide) {
 		this.peptide = peptide;
-	}
-
-	
-	public void setTandemFitRank(int tandemFitRank) {
-		this.tandemFitRank = tandemFitRank;
 	}
 
 	public void setEValue(double eValue) {
