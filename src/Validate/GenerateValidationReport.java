@@ -19,6 +19,7 @@ public class GenerateValidationReport {
 	public static ArrayList<TestSet> tests;
 	public static File databaseFile;
 	public static PrintWriter indexWriter;
+	public static boolean doReverse = false;
 
 
 	/**
@@ -26,9 +27,12 @@ public class GenerateValidationReport {
 	 */
 	public static void main(String[] args) {	
 		setUp();
+		U.startStopwatch();
 		forwards();
-		reverse();
+		if (doReverse) reverse();
 		createReport();
+//		makeOnlyWrongReport();
+		U.stopStopwatch();
 		U.p("done.");
 	}
 	
@@ -63,13 +67,9 @@ public class GenerateValidationReport {
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 		
-		//set up which tests we will perform
-		tests = new ArrayList<TestSet>();
+		
 
-		tests.add(new TestSet("ecoli"));
-		tests.add(new TestSet("human"));
-		tests.add(new TestSet("aurum"));	
-		tests.add(new TestSet("USP"));
+
 
 	}
 	
@@ -84,6 +84,13 @@ public class GenerateValidationReport {
 		U.p("forwards database size: " + peptides.size());
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides();
+		
+		//set up which tests we will perform
+		tests = new ArrayList<TestSet>();
+		tests.add(new TestSet("ecoli", peptides));
+		tests.add(new TestSet("human", peptides));
+//		tests.add(new TestSet("aurum", peptides));	
+//		tests.add(new TestSet("USP", peptides));
 
 		for (TestSet test: tests) {
 			U.p("Getting matches for: " + test.getName());
@@ -198,74 +205,74 @@ public class GenerateValidationReport {
 				pw.println("<td>" + testSet.getAreaUnderPRCurve() + "</td>");
 			}
 			
-			
-			
-			
-			pw.println("</table>");
-			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
-			
-			pw.println("<h3>Forwards</h3>");
-			pw.println("<table border=1>");
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
-			}
 			pw.println("</table>");
 			
-			//REVERSE
-			pw.println("<h3>Reverse</h3>");
-			pw.println("<table border=1>");
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+			
+			
+			if (doReverse) {
+				pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
+				pw.println("<h3>Forwards</h3>");
+				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 5% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 25% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 50% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 75% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 95% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
+				}
+				pw.println("</table>");
+				
+				//REVERSE
+				pw.println("<h3>Reverse</h3>");
+				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 5% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 25% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 50% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 75% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 95% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
+				}
+				pw.println("</table>");
 			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
-			}
-			pw.println("</table>");
 
 
 			
-			pw.println("</table>");
 			pw.println("</body>");
 			pw.println("</html>");
 			
@@ -313,15 +320,12 @@ public class GenerateValidationReport {
 	 */
 	public static void makeOnlyWrongReport() {
 		setUp();
-		U.startStopwatch();
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(databaseFile);
 		for (TestSet test: tests) {
 			test.findPositiveMatches(peptides);
 			generateWrongReport(test);
 		}
-		U.p();
-		U.stopStopwatch();
 	}
 
 	public static void generateRightReport(TestSet test) {
@@ -372,7 +376,7 @@ public class GenerateValidationReport {
 	
 	public static void generateWrongReport(TestSet test) {
 		String testName = test.getName();
-		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
+		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
 		U.p("printing out all the spectra that we got wrong and comparing the two different matches");
 		
 		int width = 1000;

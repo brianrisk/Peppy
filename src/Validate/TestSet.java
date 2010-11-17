@@ -50,15 +50,32 @@ public class TestSet {
 	String timeToComplete = "";
 	double milisecondsPerSpectrum;
 	
-	public TestSet(String testName) {
+	public TestSet(String testName, ArrayList <Peptide> peptides) {
 		this.testName = testName;
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + testName + "/spectra");
-		setSize = spectra.size();
 		
 //		//load "correct" matches as defined by the test set
-//		correctMatches = loadCorrectMatches();
+		correctMatches = loadCorrectMatches();
+		
+		//remove spectra that don't have a proper match in our database
+		//first remove spectra which do not represent peptides in our given database
+		correctMatches = loadCorrectMatches();
+		for (Match match: correctMatches) {
+			Peptide peptide = match.getPeptide();
+			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) == -1) {
+				for (int i = 0; i < spectra.size(); i++) {
+					if (spectra.get(i).getId() == match.getSpectrum().getId()) {
+						spectra.remove(i);
+						i--;
+					}	
+				}
+			}
+		}
+		setSize = spectra.size();
+		
+		
 //		
 //		//use only spectra that don't have a big difference between precursor and the predicted protein mass
 //		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
@@ -77,20 +94,7 @@ public class TestSet {
 	}
 	
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
-//		//first remove spectra which do not represent peptides in our given database
-//		correctMatches = loadCorrectMatches();
-//		for (Match match: correctMatches) {
-//			Peptide peptide = match.getPeptide();
-//			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) == -1) {
-//				for (int i = 0; i < spectra.size(); i++) {
-//					if (spectra.get(i).getId() == match.getSpectrum().getId()) {
-//						spectra.remove(i);
-//						i--;
-//					}	
-//				}
-//			}
-//		}
-//		setSize = spectra.size();
+		
 		
 		
 		//get the matches
@@ -427,6 +431,10 @@ public class TestSet {
 		return testedMatches;
 	}
 	
+	public ArrayList<MatchContainer> getTopForwardsTestedMatches() {
+		return topForwardsTestedMatches;
+	}
+
 	public double getEValueAtPercentForwards(double percent) {
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 		Collections.sort(topForwardsMatches);

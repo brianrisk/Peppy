@@ -147,43 +147,41 @@ public class EValueCalculator {
 	 */
 	double mean = -1;
 	double variance = -1;
-	double standardDeviation = -1;
+	int numberOfHits = -1;
+	double scalar = -1;
 	private void calculateDistribution() {
 		//calculate mean
 		double total = 0;
-		int size = 0;
+		numberOfHits = 0;
 		for (int i = 0; i < numberOfHistogramBars; i++) {
-			size += histogram[i];
+			numberOfHits += histogram[i];
 			total += xValues[i] * histogram[i];
 		}
-		mean = total / size;
+		mean = total / numberOfHits;
 		
 		//calculate variance
-		total = 0;
 		double difference;
 		variance = 0;
 		for (int i = 0; i < numberOfHistogramBars; i++) {
 			difference = xValues[i] - mean;
-			difference *= difference;
-			variance += histogram[i] * difference;
+			variance += histogram[i] * difference * difference;
 		}
+		variance /= numberOfHits;
 		
-		//Standard Deviation
-		standardDeviation = Math.sqrt(variance);
+		scalar = 1.0 / Math.sqrt(2.0 * Math.PI * variance);
+		
 	}
 	
 	public double getNormalDistributionEValue(double score) {
 		calculateDistribution();
 		
-		//scalar
-		double scalar = 1 / Math.sqrt(2 * Math.PI * variance);
-		
 		//exponent
-		double exponent = -1.0 * ((score - mean) / (2 * variance));
+		double numerator = (score - mean);
+		numerator *= numerator;
+		double exponent =  numerator / (-2.0 * variance);
 		
-		return scalar * Math.exp(exponent);
+		return (double)  numberOfHits * scalar * Math.exp(exponent);
 	}
-	
 	
 
 }
