@@ -33,7 +33,10 @@ public class HMMClass {
 	
 
 	public HMMClass(String acidSequence, Spectrum spectrum) {
-		this.acidSequence = acidSequence;
+		//check the last character and if that is a stop, then ignore that last character
+		if (acidSequence.endsWith(".") ) acidSequence = acidSequence.substring(0, acidSequence.length()-1);
+//System.out.println("NOW  "+acidSequence);
+		this.acidSequence = acidSequence;	
 		this.spectrum = spectrum;
 	}
 
@@ -65,8 +68,8 @@ public class HMMClass {
 	public double score() {
 	
 		int i, k, kk, l, kmax;
-		int internalMatchCount;
-		int matchedPeakCount = 0;
+	//	int internalMatchCount;
+	//	int matchedPeakCount = 0;
 		double prod, maxprod = 0.0, currentMassEmitProb, currentIntensityEmitProb;
 		double currentValue, thisValue;
 		int currentMassBin = 0, currentIntensityBin = 0;
@@ -107,6 +110,7 @@ public class HMMClass {
 		generateFragmentsForSequence(acidSequence, 0);
 	
 		Vector<Double> sortedIntensity = EmitionProb.sortIntensities(peaks);
+		 double totalIntensity = getTotalIntensity (peaks);
 		int[] prevPath = { 0, 0 }, currentPath = { 0, 0 };
 		int[] prevPath2 = { 0, 0 };
 	
@@ -152,9 +156,9 @@ public class HMMClass {
 				// column:l];
 				currentIntensityEmitProb = logEI[currentIonType][currentIntensityBin];
 				thisValue = currentMassEmitProb + currentIntensityEmitProb
-						+ NTerCleaveProb + CTerCleaveProb;
+						+ NTerCleaveProb + CTerCleaveProb + (currentIntensity/totalIntensity);
 	
-				currentValue = maxprod + thisValue;
+				currentValue = maxprod + thisValue + observedProbArray[currentIonType];
 				viterbi[currentIonType][i] = currentValue;
 	
 				traceBack[i][currentIonType] = kmax;
@@ -190,10 +194,8 @@ public class HMMClass {
 		maxprod = (maxprod / 1000);
 		maxprod = (Math.exp(maxprod));
 		maxprod = maxprod * massSize;
-	
 		double weightFactor = calculateWeightFactor(path, massSize, acidSequence);
-		maxprod = maxprod * weightFactor;
-		
+		maxprod = maxprod * weightFactor;	
 		return maxprod;
 	}
 
@@ -231,8 +233,9 @@ public class HMMClass {
 			if (path[i] == Defines.INTERNAL18 + 1)
 				internal18Count++;
 		}
-		totalBIon = sequence.length() - 1;
-		totalYIon = sequence.length() - 1;
+		int length = sequence.length();
+		totalBIon = length - 1;
+		totalYIon = length - 1;
 		totalInternalIon = calculateInternalCount(sequence);
 		if (totalBIon == 0)
 			totalBIon = 1;
@@ -261,7 +264,7 @@ public class HMMClass {
 				+ ((double) AIonCount / totalBIon)
 				* observedProbArray[Defines.A_ION];
 
-		return 10 * matchPeakFreq;
+		return 5 * matchPeakFreq*length/4;
 	}
 
 	/**************************************************************************************/
@@ -300,7 +303,7 @@ public class HMMClass {
 				currentFrag += currentAcidMass;
 				frag17 = currentFrag - nitrogenMass - (3 * hydrogenMass);
 				frag18 = currentFrag - oxygenMass - (2 * hydrogenMass);
-				if (Math.abs(currentMass - currentFrag) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - currentFrag) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.INTERNAL_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.INTERNAL_ION + 1 & prevPath2[1] == i)) {
 						NTerCleavage = (logNTerCleavageProb[pAcid] + logNTerCleavageProb[nNAcid]) / 2;
@@ -315,7 +318,7 @@ public class HMMClass {
 					}
 				}
 
-				if (Math.abs(currentMass - frag17) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - frag17) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.INTERNAL17 + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.INTERNAL17 + 1 & prevPath2[1] == i)) {
 						NTerCleavage = (logNTerCleavageProb[pAcid] + logNTerCleavageProb[nNAcid]) / 2;
@@ -329,7 +332,7 @@ public class HMMClass {
 					}
 				}
 
-				if (Math.abs(currentMass - frag18) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - frag18) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.INTERNAL18 + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.INTERNAL18 + 1 & prevPath2[1] == i)) {
 						NTerCleavage = (logNTerCleavageProb[pAcid] + logNTerCleavageProb[nNAcid]) / 2;
@@ -347,6 +350,20 @@ public class HMMClass {
 		}
 
 	}
+	
+	
+    
+    /*************************************************************************************************************/
+    public static double getTotalIntensity (ArrayList<Peak> peaks) {
+       
+	     double totalIntensity=0.0;       
+         for (Peak peak : peaks) {
+	          totalIntensity += peak.getIntensity();
+        }
+        return totalIntensity/100;
+   }   
+	  
+	
 
 	/*****************************************************************************************************/
 	public static int[] countIonType(String sequence) {
@@ -409,7 +426,7 @@ public class HMMClass {
 			j = 0;
 			while (j < bIons.size() & !matched) {
 				bIon = (Double) bIons.get(j);
-				if (Math.abs(mass - bIon) < Defines.THRESHOLD) {
+				if (Math.abs(mass - bIon) < Properties.peakDifferenceThreshold) {
 					ionTypes.add(Defines.B_ION);
 					bIons.remove(j);
 					NTerCleaveProbs.add(logNTerCleavageProb[nextAcid]);
@@ -538,7 +555,7 @@ public class HMMClass {
 					bIon = acidMass + hydrogenMass;
 				else
 					bIon = prevBIon + acidMass;
-				if (Math.abs(currentMass - bIon) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - bIon) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.B_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.B_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.B_ION + 1, i };
@@ -549,7 +566,7 @@ public class HMMClass {
 				}
 				yIon = peptideMass - bIon + 2 * hydrogenMass;
 
-				if (Math.abs(currentMass - yIon) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - yIon) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.Y_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.Y_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.Y_ION + 1, i };
@@ -559,7 +576,7 @@ public class HMMClass {
 					}
 				}
 				b17Ion = bIon - nitrogenMass - (3 * hydrogenMass);
-				if (Math.abs(currentMass - b17Ion) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - b17Ion) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.B17_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.B17_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.B17_ION + 1, i };
@@ -569,7 +586,7 @@ public class HMMClass {
 					}
 				}
 				b18Ion = bIon - oxygenMass - (2 * hydrogenMass);
-				if (Math.abs(currentMass - b18Ion) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - b18Ion) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.B18_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.B18_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.B18_ION + 1, i };
@@ -579,7 +596,7 @@ public class HMMClass {
 					}
 				}
 				y18Ion = yIon - oxygenMass - (2 * hydrogenMass);
-				if (Math.abs(currentMass - y18Ion) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - y18Ion) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.Y18_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.Y18_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.Y18_ION + 1, i };
@@ -589,7 +606,7 @@ public class HMMClass {
 					}
 				}
 				y17Ion = yIon - nitrogenMass - (3 * hydrogenMass);
-				if (Math.abs(currentMass - y17Ion) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - y17Ion) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.Y17_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.Y17_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.Y17_ION + 1, i };
@@ -600,7 +617,7 @@ public class HMMClass {
 				}
 
 				aIon = bIon - carbonMass - oxygenMass;
-				if (Math.abs(currentMass - aIon) < Defines.THRESHOLD) {
+				if (Math.abs(currentMass - aIon) < Properties.peakDifferenceThreshold) {
 					if (!(prevPath[0] == Defines.A_ION + 1 & prevPath[1] == i)
 							& !(prevPath2[0] == Defines.A_ION + 1 & prevPath2[1] == i)) {
 						int[] ionName = { Defines.A_ION + 1, i };
@@ -611,7 +628,7 @@ public class HMMClass {
 				}
 			}
 			immIon = acidMass - carbonMass - oxygenMass + hydrogenMass;
-			if (Math.abs(currentMass - immIon) < Defines.THRESHOLD) {
+			if (Math.abs(currentMass - immIon) < Properties.peakDifferenceThreshold) {
 				if (!(prevPath[0] == Defines.IMM_ION + 1 & prevPath[1] == i)
 						& !(prevPath2[0] == Defines.IMM_ION + 1 & prevPath2[1] == i)) {
 					int[] ionName = { Defines.IMM_ION + 1, i };
@@ -722,7 +739,7 @@ public class HMMClass {
 		for (i = 0; i < massCount; i++) {
 			double currentMass = fragsMasses.get(i);
 			if ((mass - currentMass) > -1.0) {
-				if (Math.abs(mass - currentMass) < Defines.THRESHOLD) {
+				if (Math.abs(mass - currentMass) < Properties.peakDifferenceThreshold) {
 					currentMatch = fragsMatches.get(i);
 					int ionName = currentMatch.getIonName();
 					int ionIndex = currentMatch.getIonIndex();

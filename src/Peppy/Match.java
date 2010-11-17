@@ -18,6 +18,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double eValue;
 	public int ionMatchTally = 0;
 	private int rank = Integer.MAX_VALUE;
+	private int repetition=0;
 	
 	private Spectrum spectrum;
 	private Peptide peptide;
@@ -299,7 +300,13 @@ public class Match implements Comparable<Match>, HasEValue{
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
+	public int getRepetition() {
+		return repetition;
+	}
 
+	public void setRepetition(int repetition) {
+		this.repetition = repetition;
+	}
 	public double getScoreTandemFit() {
 		return scoreTandemFit;
 	}

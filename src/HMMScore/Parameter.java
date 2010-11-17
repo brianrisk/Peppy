@@ -1,5 +1,5 @@
 package HMMScore;
-
+import Peppy.Properties;
 import java.io.*;
 import java.util.*;
 import java.lang.Math.*;
@@ -33,7 +33,7 @@ public class Parameter {
 			float massValue = (Float) masses.get(i);
 			for (j = 0; j < bTypeIons.size(); j++) {
 				typeValue = (Double) bTypeIons.get(j); // .valueOf(typeStr)).floatValue();
-				if (Math.abs(massValue - typeValue) < Defines.THRESHOLD) {
+				if (Math.abs(massValue - typeValue) < Properties.peakDifferenceThreshold) {
 					bIonCount++;
 				}
 			}
