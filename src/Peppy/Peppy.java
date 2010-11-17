@@ -31,8 +31,9 @@ public class Peppy {
 	static int peptideTally = 0;
 	
 	public static void main(String [] args) {
-		init(args[0]);
+		init(args);
 //		splice();
+//		runJobs();
 		new Peppy(args);
 //		cnvThenGenome();
 //		cnv();
@@ -89,7 +90,7 @@ public class Peppy {
 		}
 		
 		//create new report directory
-		File reportDir = new File(Properties.reportDirectory, "report " + System.currentTimeMillis());
+		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
 		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
 			U.p("creating HTML reports");
 			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
@@ -116,7 +117,8 @@ public class Peppy {
 		}
 		U.p("running " + jobFiles.size() + " jobs");
 		for (int i = 0; i < jobFiles.size(); i++) {
-			U.p("running job " + i);
+			U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
+			init();
 			Properties.loadProperties(jobFiles.get(i));
 			new Peppy(null);
 		}
@@ -371,6 +373,14 @@ public class Peppy {
 		}
 	}
 	
+	public static void init(String [] args) {
+		if (args.length == 0) {
+			init();
+		} else {
+			init(args[0]);
+		}
+	}
+	
 	public static void init() {
 		init("properties.txt");
 	}
@@ -401,6 +411,8 @@ public class Peppy {
 					peptides = sequence.extractMorePeptides();
 				}
 				sequence.clearNucleotideData();
+				U.p("removing duplicate matches");
+				removeDuplicateMatches(matches);
 			} else {
 				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				peptideTally += peptides.size();
@@ -414,16 +426,12 @@ public class Peppy {
 				} else {
 					matches.addAll(newMatches);
 				}
-//				matches.addAll(newMatches);
 			}
-			
-			U.p("removing duplicate matches");
-			removeDuplicateMatches(matches);
-			
+
 			U.p("assigning final match ranks");
 			assignRankToMatches(matches);
-			
-			
+			assignRankCountsToMatches(matches);
+
 			return matches;
 	}
 	
@@ -456,32 +464,61 @@ public class Peppy {
 		assignRankToMatches(matches);
 		
 		return matches;
-}
+	}
 	
 		
 	public static void assignRankToMatches(ArrayList<Match> matches) {
 		//first error check
 		if (matches.size() == 0) return;
-		
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
-		int rank = 1;
-		Match theMatch = matches.get(0);
-		Match thePreviousMatch = matches.get(0);
+		Match match = matches.get(0);
+		Match previousMatch = matches.get(0);
 		//set for the first
-		theMatch.setRank(1);
+		match.setRank(1);
+		int rank = 1;
 		for (int i = 1; i < matches.size(); i++) {
 			//see if these are matches for a different spectrum
-			theMatch = matches.get(i);
-			if (theMatch.getSpectrum().getId() != thePreviousMatch.getSpectrum().getId()) {
+			match = matches.get(i);
+			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				rank = 1;
 			}
-			if (theMatch.equals(thePreviousMatch)) {
-				rank = thePreviousMatch.getRank();
+			if (match.getScore() == previousMatch.getScore()) {
+				rank = previousMatch.getRank();
 			}
-			theMatch.setRank(rank);
+			match.setRank(rank);
 			rank++;
-			thePreviousMatch = theMatch;
+			previousMatch = match;
+		}
+	}
+	
+	public static void assignRankCountsToMatches(ArrayList<Match> matches) {
+		//first error check
+		if (matches.size() == 0) return;
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
+		Collections.sort(matches);
+		Match match;
+		Match previousMatch = matches.get(0);
+		int rankCount = 1;
+		for (int i = 1; i < matches.size(); i++) {
+			//see if these are matches for a different spectrum
+			match = matches.get(i);
+			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
+				for (int j = i - rankCount; j < i; j++) {
+					matches.get(j).setRankCount(rankCount);
+				}
+				rankCount = 1;
+			} else {
+				if (match.getScore() == previousMatch.getScore()) {
+					rankCount++;
+				} else {
+					for (int j = i - rankCount; j < i; j++) {
+						matches.get(j).setRankCount(rankCount);
+					}
+					rankCount = 1;
+				}
+			}
+			previousMatch = match;
 		}
 	}
 	
@@ -496,14 +533,28 @@ public class Peppy {
 		Match previousMatch = matches.get(0);
 		int spectrumID;
 		int previousSpectrumID = previousMatch.getSpectrum().getId();
+		boolean areEqual;
 		for (int i = 1; i < numberOfMatches; i++) {
 			match = matches.get(i);
 			spectrumID = match.getSpectrum().getId();
-			if (match.equals(previousMatch) && spectrumID == previousSpectrumID) {
-				matches.remove(i);
-				i--;
-				numberOfMatches--;
-			} else {
+			areEqual = false;
+			if (match.getPeptide().isForward() && previousMatch.getPeptide().isForward()) {
+				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
+					areEqual = true;
+					matches.remove(i);
+					i--;
+					numberOfMatches--;
+				}
+			}
+			if (!match.getPeptide().isForward() && !previousMatch.getPeptide().isForward()) {
+				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
+					areEqual = true;
+					matches.remove(i);
+					i--;
+					numberOfMatches--;
+				}
+			}
+			if (!areEqual) {
 				previousMatch = match;
 				previousSpectrumID = spectrumID;
 			}

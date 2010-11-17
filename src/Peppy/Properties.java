@@ -84,6 +84,7 @@ public class Properties {
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
+	public static String reportDirectoryTitle = "report";
 	
 	//where we put our validation report
 	public static File validationDirectory = new File("validation");
@@ -210,8 +211,9 @@ public class Properties {
 		if (propertyName.equals("peakDifferenceThreshold")) 
 			peakDifferenceThreshold = Double.valueOf(propertyValue);
 		
-		
 		//reports
+		if (propertyName.equals("reportDirectoryTitle")) 
+			reportDirectoryTitle =propertyValue;
 		if (propertyName.equals("reportDirectory")) 
 			reportDirectory = new File(propertyValue);
 		if (propertyName.equals("createHTMLReport")) 
