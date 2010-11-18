@@ -45,10 +45,70 @@ public class TextReporter {
 		this.reportDir = reportDir;
 	}
 
+	public void generatePropertiesFile() {	
+		reportDir.mkdirs();
+		//set up our main index file
+		File paramFile = new File(reportDir, Properties.spectraDirectoryOrFile.getName()+".Parameter");
+		try {	
+			
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(paramFile)));
 
+			StringBuffer sb;
+			//print header
+			sb = new StringBuffer();
+			sb.append("Spectrum FileName or Directory");
+			sb.append('\t');
+			sb.append(Properties.spectraDirectoryOrFile.getName());
+			pw.println(sb);
+			sb = new StringBuffer();
+			sb.append("Sequence FileName or Directory");
+			sb.append('\t');
+			sb.append(Properties.sequenceDirectoryOrFile.getName());
+			pw.println(sb);
+			sb = new StringBuffer();
+			sb.append("Scoring Uyetm Used");
+			sb.append('\t');
+			sb.append(Properties.defaultScore);
+			pw.println(sb);
+			sb = new StringBuffer();
+			sb.append("Number of Missed Cleavages");
+			sb.append('\t');
+			sb.append(Properties.numberOfMissedCleavages);
+			pw.println(sb);
+			sb = new StringBuffer();
+			sb.append("Precursor Mass Threshold");
+			sb.append('\t');
+			sb.append(Properties.spectrumToPeptideMassError);
+			pw.println(sb);
+			sb = new StringBuffer();
+			sb.append("MS/MS Mass Threshold");
+			sb.append('\t');
+			sb.append(Properties.peakDifferenceThreshold);
+			pw.println(sb);
+			sb = new StringBuffer();
+			if (Properties.useEValueCutOff) {
+				sb = new StringBuffer();
+				sb.append("EValue Cutoff Used");
+				sb.append('\t');
+				sb.append(Properties.eValueCutOff);
+				pw.println(sb);
+			}
+			pw.flush();
+			pw.close();
+
+			
+	} catch (FileNotFoundException e) {
+			U.p("could not find file: " + paramFile.getName());
+			e.printStackTrace();
+		} catch (IOException e) {
+			U.p("could not read file: " + paramFile.getName());
+			e.printStackTrace();
+		}
+			
+	}
+	
 	public void generateFullReport() {	
 		reportDir.mkdirs();
-		
 		//set up our main index file
 		File reportFile = new File(reportDir, Properties.spectraDirectoryOrFile.getName() + ".txt");
 		try {	
@@ -56,7 +116,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 2");
+			pw.println("format version 3");
 			
 			//sorting our matches by spectrum then score
 			Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -74,11 +134,13 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Score");
 			sb.append('\t');
-			sb.append("NeutralMass");
+			sb.append("Precursor M/Z");
+			sb.append('\t');
+			sb.append("Precursor Neutral Mass");
 			sb.append('\t');
 			sb.append("E Value");
 			sb.append('\t');
-			sb.append("Peptide");
+			sb.append("Peptide Sequence");
 			sb.append('\t');
 			if (Peppy.Properties.isSequenceFileDNA) {
 				sb.append("Sequence File");
@@ -100,10 +162,8 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Match Rank");
 			sb.append('\t');
-			sb.append("Rank Count");
-			
-			pw.println(sb);
-			
+			sb.append("Rank Count");	
+			pw.println(sb);		
 			
 			//print rows
 			for (Match match: matches) {;
@@ -115,6 +175,8 @@ public class TextReporter {
 				sb.append(match.getSpectrum().getFile().getName());
 				sb.append('\t');
 				sb.append(match.getScore());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getPrecursorMZ());
 				sb.append('\t');
 				sb.append(match.getSpectrum().getPrecursorMass());
 				sb.append('\t');
@@ -143,7 +205,6 @@ public class TextReporter {
 				sb.append(match.getRank());
 				sb.append('\t');
 				sb.append(match.getRankCount());
-				
 				pw.println(sb);
 			}
 			

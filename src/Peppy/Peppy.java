@@ -100,6 +100,7 @@ public class Peppy {
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
+		textReport.generatePropertiesFile();
 		
 		U.p();
 		U.stopStopwatch();
@@ -427,7 +428,6 @@ public class Peppy {
 					matches.addAll(newMatches);
 				}
 			}
-
 			U.p("assigning final match ranks");
 			assignRankToMatches(matches);
 			assignRankCountsToMatches(matches);

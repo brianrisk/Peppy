@@ -1,4 +1,5 @@
 package HMMScore;
+import Peppy.Properties;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -184,7 +185,7 @@ public class CleavageProb {
 		int massCount = masses.size();
 		for (i = 0; i < massCount; i++) {
 			float massValue = (Float) masses.get(i);
-			if (Math.abs(massValue - bIon) < Defines.THRESHOLD) {
+			if (Math.abs(massValue - bIon) < Properties.peakDifferenceThreshold) {
 				matched = true;
 				return matched;
 			}

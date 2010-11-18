@@ -1,4 +1,5 @@
 package HMMScore;
+import Peppy.Properties;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -180,45 +181,45 @@ public class EmitionProb {
 	 * 
 	 * currentTypeIons = (Vector) allTypeIons.get("Y_IONS"); //[allTypeIons
 	 * objectForKey:@"Y_IONS"]; for (i=0; i< currentTypeIons.size() ; i++) { if
-	 * (Math.abs( mass -(Double) currentTypeIons.get(i) ) < Defines.THRESHOLD )
+	 * (Math.abs( mass -(Double) currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold )
 	 * { return Defines.Y_ION; } }
 	 * 
 	 * currentTypeIons = (Vector)allTypeIons.get("B_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.B_ION; }
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.B_ION; }
 	 * } currentTypeIons =(Vector) allTypeIons.get("Y17_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.Y17_ION;
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.Y17_ION;
 	 * } } currentTypeIons =(Vector) allTypeIons.get("Y18_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.Y18_ION;
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.Y18_ION;
 	 * } } currentTypeIons =(Vector) allTypeIons.get("B17_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.B17_ION;
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.B17_ION;
 	 * } } currentTypeIons =(Vector) allTypeIons.get("B18_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.B18_ION;
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.B18_ION;
 	 * } } currentTypeIons =(Vector) allTypeIons.get("A_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.A_ION; }
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.A_ION; }
 	 * }
 	 * 
 	 * currentTypeIons =(Vector) allTypeIons.get("IMM_IONS"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return Defines.IMM_ION;
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return Defines.IMM_ION;
 	 * } }
 	 * 
 	 * 
 	 * currentTypeIons =(Vector) allTypeIons.get("INTERNAL"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return
 	 * Defines.INTERNAL_ION; } } currentTypeIons =(Vector)
 	 * allTypeIons.get("INTERNAL17"); for (i=0; i< currentTypeIons.size() ; i++)
 	 * { if (Math.abs( mass -(Double) currentTypeIons.get(i) ) <
-	 * Defines.THRESHOLD ) { return Defines.INTERNAL17; } } currentTypeIons
+	 * Properties.peakDifferenceThreshold ) { return Defines.INTERNAL17; } } currentTypeIons
 	 * =(Vector) allTypeIons.get("INTERNAL18"); for (i=0; i<
 	 * currentTypeIons.size() ; i++) { if (Math.abs( mass -(Double)
-	 * currentTypeIons.get(i) ) < Defines.THRESHOLD ) { return
+	 * currentTypeIons.get(i) ) < Properties.peakDifferenceThreshold ) { return
 	 * Defines.INTERNAL18; } }
 	 */
 

@@ -25,6 +25,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	private ArrayList<Peak> peaks;
 	private double maxMass;
 	private double precursorMass;
+	private double precursorMZ;
 	private int id;
 	private int charge = 0;
 	private File file;
@@ -78,8 +79,8 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void addPrecursorFromString(String s) {
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
-		precursorMass = Double.parseDouble(chunks[0]);
-		precursorMass -= Definitions.HYDROGEN_MONO;
+		precursorMZ = Double.parseDouble(chunks[0]);
+		precursorMass = precursorMZ - Definitions.HYDROGEN_MONO;
 		if (file.getName().endsWith(".dta")) {
 			charge = Integer.parseInt(chunks[1]);
 		}
@@ -209,6 +210,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	public ArrayList<Peak> getPeaks() {return peaks;}
 	
 	public double getPrecursorMass() {return precursorMass;}
+	public double getPrecursorMZ() {return precursorMZ;}
 	
 	public int getPeakCount() {return peaks.size();}
 

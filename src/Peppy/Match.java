@@ -13,7 +13,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double score = 0.0;
 	private double scoreTandemFit = 0.0;
 	private double tandemFitScoreRatio = 0.0;
-	private int rankCount = 0; //longest variable name I've ever made
+	private int rankCount = 0; 
 	private double scoreHMM = 0.0;
 	private double eValue;
 	public int ionMatchTally = 0;
