@@ -171,34 +171,40 @@ public class U {
 		return Math.log(of) / Math.log(base);
 	}
 	
-	public static double calculateM(double [] xValues, double [] yValues, int start, int stop) {
+	public static double calculateM(double [] xValues, double [] yValues, int [] histogram, int start, int stop) {
 		double numerator1, numerator2, denomenator1, denomenator2;
 		double numerator = 0.0, denomenator = 0.0;
 		double temp1 = 0.0, temp2 = 0.0, temp = 0.0;
 		double parameterM;
 		int i;
 		for (i = start; i < stop; i++) {
-			temp += (xValues[i] * yValues[i]);
+			if (histogram[i] > 0)
+				temp += (xValues[i] * yValues[i]);
 		}
 		numerator1 = (stop - start) * (temp);
 		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
+			if (histogram[i] > 0)
+				temp1 += xValues[i];
 		}
 		for (i = start; i < stop; i++) {
-			temp2 += yValues[i];
+			if (histogram[i] > 0)
+				temp2 += yValues[i];
 		}
 		numerator2 = temp1 * temp2;
 		numerator = numerator1 - numerator2;
 		temp1 = temp2 = 0.0;
 		for (i = start; i < stop; i++) {
-			temp1 = xValues[i];
-			temp2 += (temp1 * temp1);
+			if (histogram[i] > 0) {
+				temp1 = xValues[i];
+				temp2 += (temp1 * temp1);
+			}
 		}
 		denomenator1 = (stop - start) * temp2;
 
 		temp1 = 0.0; 
 		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
+			if (histogram[i] > 0)
+				temp1 += xValues[i];
 		}
 		denomenator2 = (temp1 * temp1);
 		denomenator = denomenator1 - denomenator2;
@@ -206,18 +212,20 @@ public class U {
 		return parameterM;
 	}
 	
-	public static double calculateB(double [] xValues, double [] yValues, int start, int stop, double m) {
+	public static double calculateB(double [] xValues, double [] yValues, int [] histogram, int start, int stop, double m) {
 		double parameterB;
 		double temp1, temp2;
 		int i;
 
 		temp1 = temp2 = 0.0;
 		for (i = start; i < stop; i++) {
-			temp1 += xValues[i];
+			if (histogram[i] > 0)
+				temp1 += xValues[i];
 		}
 
 		for (i = start; i < stop; i++) {
-			temp2 += yValues[i];
+			if (histogram[i] > 0)
+				temp2 += yValues[i];
 		}
 		parameterB = (1.0 / (stop - start)) * (temp2 - m * temp1);
 		return parameterB;

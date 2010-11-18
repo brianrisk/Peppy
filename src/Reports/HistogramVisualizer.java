@@ -126,23 +126,12 @@ public class HistogramVisualizer {
 		g.setStroke(new BasicStroke(2.0f));
 		int x1 = 0, y1 = height, x2, y2;
 		
-//		if (dest.getName().startsWith("350")) {
-//			U.p("scalar: " + normalConstant);
-//			U.p("mean: " + mean);
-//			U.p("total: " + total);
-//			U.p();
-//		}
-		
 		
 		for (int i = 0; i < histogram.length; i++) {
 			numerator = (i - mean);
 			numerator *= numerator;
 			x2 = (int) ((double) i * width / histogram.length);
 			y2 = height - (int) (scaleFactor * total * normalConstant * Math.exp(numerator / denominator));
-			if (dest.getName().startsWith("350")) {
-//				U.p(x2 + ", " + y2);
-//				U.p(normalConstant * total * Math.exp(numerator / denominator));
-			}
 			g.drawLine(x1, y1, x2, y2);
 			x1 = x2;
 			y1 = y2;
@@ -154,6 +143,14 @@ public class HistogramVisualizer {
 		x1 = 0;
 		y1 = height;
 		double logNormalFirstTerm;
+//		if (
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") 
+//		) {
+//			U.p("variance: " + variance);
+//		}
 		for (int i = 0; i < histogram.length; i++) {
 			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
 			numerator = Math.log(i) - mean;
@@ -164,6 +161,10 @@ public class HistogramVisualizer {
 			x1 = x2;
 			y1 = y2;
 		}
+		
+		g.drawString("variance: " + variance, 10, 20);
+		
+		
 		
 		
 		//write

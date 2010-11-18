@@ -98,7 +98,8 @@ public class EValueCalculator {
 			if (histogram[topIndex] == 0) break;
 		}
 		//if we don't want to use topIndex....
-//		topIndex = numberOfHistogramBars;
+		chopIndex = 0;
+		topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex
@@ -108,8 +109,8 @@ public class EValueCalculator {
 		
 		//finding the least squares fit for that region
 		// y = m * x + b
-		m = U.calculateM(xValues, survivability, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, chopIndex, topIndex, m);
+		m = U.calculateM(xValues, survivability, histogram, chopIndex, topIndex);
+		b = U.calculateB(xValues, survivability, histogram, chopIndex, topIndex, m);
 		
 		//using our m and b to derive e values for all top matches
 		double eValue;
