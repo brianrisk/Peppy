@@ -13,7 +13,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double score = 0.0;
 	private double scoreTandemFit = 0.0;
 	private double tandemFitScoreRatio = 0.0;
-	private int rankCount = 0; 
+	private int repeatCount = 0; 
 	private double scoreHMM = 0.0;
 	private double eValue;
 	public int ionMatchTally = 0;
@@ -301,12 +301,16 @@ public class Match implements Comparable<Match>, HasEValue{
 	}
 
 	public int getRankCount() {
-		return rankCount;
+		return repeatCount;
 	}
 
-	public void setRankCount(
-			int rankCount) {
-		this.rankCount = rankCount;
+	public void setRepeatCount(
+			int repeatCount) {
+		this.repeatCount = repeatCount;
+	}
+
+	public int getRepeatCount() {
+		return repeatCount;
 	}
 
 	public double getScoreTandemFit() {

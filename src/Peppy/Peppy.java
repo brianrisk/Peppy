@@ -430,7 +430,7 @@ public class Peppy {
 			}
 			U.p("assigning final match ranks");
 			assignRankToMatches(matches);
-			assignRankCountsToMatches(matches);
+			assignRepeatedPeptideCount(matches);
 
 			return matches;
 	}
@@ -492,10 +492,14 @@ public class Peppy {
 		}
 	}
 	
-	public static void assignRankCountsToMatches(ArrayList<Match> matches) {
+	/**
+	 * finds the number of times a certain amino acid is found for each spectrum 
+	 * @param matches
+	 */
+	public static void assignRepeatedPeptideCount(ArrayList<Match> matches) {
 		//first error check
 		if (matches.size() == 0) return;
-		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
 		Collections.sort(matches);
 		Match match;
 		Match previousMatch = matches.get(0);
@@ -505,15 +509,15 @@ public class Peppy {
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				for (int j = i - rankCount; j < i; j++) {
-					matches.get(j).setRankCount(rankCount);
+					matches.get(j).setRepeatCount(rankCount);
 				}
 				rankCount = 1;
 			} else {
-				if (match.getScore() == previousMatch.getScore()) {
+				if (match.getPeptide().equals(previousMatch.getPeptide())) {
 					rankCount++;
 				} else {
 					for (int j = i - rankCount; j < i; j++) {
-						matches.get(j).setRankCount(rankCount);
+						matches.get(j).setRepeatCount(rankCount);
 					}
 					rankCount = 1;
 				}
