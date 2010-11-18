@@ -57,7 +57,7 @@ public class GenerateValidationReport {
 		Properties.peakDifferenceThreshold = 0.5;
 		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
-		Properties.reduceDuplicateMatches = false;
+		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
 		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
@@ -89,8 +89,8 @@ public class GenerateValidationReport {
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet("ecoli", peptides));
 		tests.add(new TestSet("human", peptides));
-//		tests.add(new TestSet("aurum", peptides));	
-//		tests.add(new TestSet("USP", peptides));
+		tests.add(new TestSet("aurum", peptides));	
+		tests.add(new TestSet("USP", peptides));
 
 		for (TestSet test: tests) {
 			U.p("Getting matches for: " + test.getName());

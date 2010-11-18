@@ -94,15 +94,28 @@ public class EValueCalculator {
 		
 		//find first 0 above chopIndex
 		int topIndex;
-		for (topIndex = chopIndex; topIndex < numberOfHistogramBars; topIndex++) {
+		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
 			if (histogram[topIndex] == 0) break;
 		}
 		//if we don't want to use topIndex....
-//		calculateDistribution();
-//		for (int i = 0; i < numberOfHistogramBars; i++) {
-//			if (xValues[i] < mean) chopIndex = i;
-//		}
-		topIndex = numberOfHistogramBars;
+		calculateDistribution();
+		for (int i = 0; i < numberOfHistogramBars; i++) {
+			if (xValues[i] < mean) chopIndex = i;
+		}
+		
+		//find topIndex that is the penultimate non zero value
+		boolean maxValueFound = false;
+		for (int i = numberOfHistogramBars - 1; i >= 0; i--) {
+			if (histogram[i] != 0) {
+				if (maxValueFound) {
+					topIndex = i;
+					break;
+				} else {
+					maxValueFound = true;
+				}
+			}
+		}
+//		topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex
