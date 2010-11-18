@@ -50,13 +50,13 @@ public class TextReporter {
 		reportDir.mkdirs();
 		
 		//set up our main index file
-		File reportFile = new File(reportDir, "textReport.txt");
+		File reportFile = new File(reportDir, Properties.spectraDirectoryOrFile.getName() + ".txt");
 		try {	
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 1");
+			pw.println("format version 2");
 			
 			//sorting our matches by spectrum then score
 			Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -99,6 +99,8 @@ public class TextReporter {
 			}
 			sb.append('\t');
 			sb.append("Match Rank");
+			sb.append('\t');
+			sb.append("Rank Count");
 			
 			pw.println(sb);
 			
@@ -139,6 +141,8 @@ public class TextReporter {
 				}
 				sb.append('\t');
 				sb.append(match.getRank());
+				sb.append('\t');
+				sb.append(match.getRankCount());
 				
 				pw.println(sb);
 			}
