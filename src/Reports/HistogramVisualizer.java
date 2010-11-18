@@ -149,22 +149,22 @@ public class HistogramVisualizer {
 		}
 		
 		//draw log normal curve
-//		g.setColor(Color.green);
-//		g.setStroke(new BasicStroke(2.0f));
-//		x1 = 0;
-//		y1 = height;
-//		double logNormalFirstTerm;
-//		for (int i = 0; i < histogram.length; i++) {
-//			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
-//			numerator = Math.log(i) - mean;
-//			numerator *= numerator;
-//			x2 = (int) ((double) i * width / histogram.length);
-//			y2 = height - (int) (scaleFactor * total * logNormalFirstTerm * Math.exp(numerator / denominator));
-//			g.drawLine(x1, y1, x2, y2);
-//			x1 = x2;
-//			y1 = y2;
-//		}
-//		
+		g.setColor(Color.green);
+		g.setStroke(new BasicStroke(2.0f));
+		x1 = 0;
+		y1 = height;
+		double logNormalFirstTerm;
+		for (int i = 0; i < histogram.length; i++) {
+			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
+			numerator = Math.log(i) - mean;
+			numerator *= numerator;
+			x2 = (int) ((double) i * width / histogram.length);
+			y2 = height - (int) (scaleFactor * total * logNormalFirstTerm * Math.exp(numerator / denominator));
+			g.drawLine(x1, y1, x2, y2);
+			x1 = x2;
+			y1 = y2;
+		}
+		
 		
 		//write
 		ImageIO.write(bdest,"JPG",dest);
