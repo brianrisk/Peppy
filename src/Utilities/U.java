@@ -171,6 +171,14 @@ public class U {
 		return Math.log(of) / Math.log(base);
 	}
 	
+	public static double calculateM(double [] xValues, double [] yValues, int start, int stop) {
+		return calculateM(xValues, yValues, null, start, stop);
+	}
+	
+	public static double calculateB(double [] xValues, double [] yValues, int start, int stop, double m) {
+		return calculateB(xValues, yValues, null, start, stop, m);
+	}
+	
 	public static double calculateM(double [] xValues, double [] yValues, int [] histogram, int start, int stop) {
 		double numerator1, numerator2, denomenator1, denomenator2;
 		double numerator = 0.0, denomenator = 0.0;

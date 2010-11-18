@@ -98,7 +98,10 @@ public class EValueCalculator {
 			if (histogram[topIndex] == 0) break;
 		}
 		//if we don't want to use topIndex....
-		chopIndex = 0;
+//		calculateDistribution();
+//		for (int i = 0; i < numberOfHistogramBars; i++) {
+//			if (xValues[i] < mean) chopIndex = i;
+//		}
 		topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned

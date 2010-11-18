@@ -162,7 +162,6 @@ public class HistogramVisualizer {
 			y1 = y2;
 		}
 		
-		g.drawString("variance: " + variance, 10, 20);
 		
 		
 		
