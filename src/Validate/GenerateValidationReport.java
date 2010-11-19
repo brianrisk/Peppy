@@ -319,7 +319,6 @@ public class GenerateValidationReport {
 	 * to the "right" one.
 	 */
 	public static void makeOnlyWrongReport() {
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		U.p("wrong report");
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(databaseFile);
 		U.p("forwards database size: " + peptides.size());
@@ -385,7 +384,8 @@ public class GenerateValidationReport {
 	
 	public static void generateWrongReport(TestSet test) {
 		String testName = test.getName();
-		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
+//		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
+		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
 		U.p("printing out all the spectra that we got wrong and comparing the two different matches");
 		
 		int width = 1000;
@@ -403,7 +403,7 @@ public class GenerateValidationReport {
 			U.appendFile(pw, Properties.reportWebHeaderFile);
 			pw.println("number of matches: " + testedMatches.size());
 			pw.println("<table border=1 cellspacing=0>");
-			pw.println("<th>isTrue</th>");
+//			pw.println("<th>isTrue</th>");
 			pw.println("<th>E value</th>");
 			pw.println("<th>name</th>");
 			pw.println("<th>ions</th>");
@@ -416,66 +416,68 @@ public class GenerateValidationReport {
 				correctPeptide = new Peptide(matchContainer.getCorrectAcidSequence());
 				Match ourMatch = matchContainer.getMatch();
 				Match trueMatch = matchContainer.getTrueMatch();
-				
-				pw.println("<tr>");
-				
-				pw.println("<td>");
-				pw.println(matchContainer.isTrue());
-				pw.println("</td>");
-				pw.println("<td>");
-				pw.println(ourMatch.getEValue());
-				pw.println("</td>");
-				pw.println("<td>");
-				pw.println(ourMatch.getSpectrum().getFile().getName());
-				pw.println("</td>");
-
-//					if (checkToSeeIfPeptideIsInDatabase) {
-//						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
-//						pw.println("<br>");
-//					}
-				pw.println("<td>");
-				pw.println(ourMatch.ionMatchTally);
-				if (!matchContainer.isTrue())
-					pw.println("<br>" + trueMatch.ionMatchTally);
-				pw.println("</td>");
-				
-				//creating the image of our match
-				File ourMatchFile = new File (imagesFolder, imageIndex + "a.jpg");
-				SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), ourMatch.getPeptide());
-				SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, ourMatchFile, false);
-				
-				File trueMatchFile = new File (imagesFolder, imageIndex + "b.jpg");
 				if (!matchContainer.isTrue()) {
-					//creating the image of their "true" match.  Whatever!
-					SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), correctPeptide);
-					SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, trueMatchFile, false);
-				}
-				//don't forget to increment that image index, Brian!
-				imageIndex++;
-				
-				pw.println("<td>");
-				pw.println(ourMatch.getPeptide().getAcidSequence());
-				if (!matchContainer.isTrue())
-					pw.println("<br>" + matchContainer.getCorrectAcidSequence());
-				pw.println("</td>");
-				
-				pw.println("<td>");
-				pw.print("<a href=\"");
-				pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-				pw.print("\">");
-				pw.print("<img src=\"");
-				pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-				pw.print("\" border=0 height=20></a><br>");
-				
-				if (!matchContainer.isTrue()) {
-					pw.print("<br><a href=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+					
+					pw.println("<tr>");
+					
+//					pw.println("<td>");
+//					pw.println(matchContainer.isTrue());
+//					pw.println("</td>");
+					pw.println("<td>");
+					pw.println(ourMatch.getEValue());
+					pw.println("</td>");
+					pw.println("<td>");
+					pw.println(ourMatch.getSpectrum().getFile().getName());
+					pw.println("</td>");
+	
+	//					if (checkToSeeIfPeptideIsInDatabase) {
+	//						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
+	//						pw.println("<br>");
+	//					}
+					pw.println("<td>");
+					pw.println(ourMatch.ionMatchTally);
+					if (!matchContainer.isTrue())
+						pw.println("<br>" + trueMatch.ionMatchTally);
+					pw.println("</td>");
+					
+					//creating the image of our match
+					File ourMatchFile = new File (imagesFolder, imageIndex + "a.jpg");
+					SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), ourMatch.getPeptide());
+					SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, ourMatchFile, false);
+					
+					File trueMatchFile = new File (imagesFolder, imageIndex + "b.jpg");
+					if (!matchContainer.isTrue()) {
+						//creating the image of their "true" match.  Whatever!
+						SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), correctPeptide);
+						SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, trueMatchFile, false);
+					}
+					//don't forget to increment that image index, Brian!
+					imageIndex++;
+					
+					pw.println("<td>");
+					pw.println(ourMatch.getPeptide().getAcidSequence());
+					if (!matchContainer.isTrue())
+						pw.println("<br>" + matchContainer.getCorrectAcidSequence());
+					pw.println("</td>");
+					
+					pw.println("<td>");
+					pw.print("<a href=\"");
+					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
 					pw.print("\">");
 					pw.print("<img src=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
 					pw.print("\" border=0 height=20></a><br>");
+					
+					if (!matchContainer.isTrue()) {
+						pw.print("<br><a href=\"");
+						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+						pw.print("\">");
+						pw.print("<img src=\"");
+						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+						pw.print("\" border=0 height=20></a><br>");
+					}
+					pw.println("</td>");
 				}
-				pw.println("</td>");
 
 			}
 			
