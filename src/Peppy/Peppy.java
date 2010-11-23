@@ -33,8 +33,8 @@ public class Peppy {
 	public static void main(String [] args) {
 		init(args);
 //		splice();
-//		runJobs();
-		new Peppy(args);
+		runJobs();
+//		new Peppy(args);
 //		cnvThenGenome();
 //		cnv();
 //		bigJob(args);
@@ -116,12 +116,18 @@ public class Peppy {
 				jobFiles.add(potentialJobsFiles[i]);
 			}	
 		}
-		U.p("running " + jobFiles.size() + " jobs");
-		for (int i = 0; i < jobFiles.size(); i++) {
-			U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
+		if (jobFiles.size() == 0) {
+			U.p("no jobs in jobs folder.  running according to main properties file");
 			init();
-			Properties.loadProperties(jobFiles.get(i));
 			new Peppy(null);
+		} else {
+			U.p("running " + jobFiles.size() + " jobs");
+			for (int i = 0; i < jobFiles.size(); i++) {
+				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
+				init();
+				Properties.loadProperties(jobFiles.get(i));
+				new Peppy(null);
+			}
 		}
 	}
 
