@@ -144,44 +144,6 @@ public class Peppy {
 		}
 	}
 	
-	public static void bigJob(String [] args) {
-		String database, error, job;
-		for (int i = 0; i < 1; i++) {
-			if (i == 0) {
-				database = "Genome";
-				Properties.isSequenceFileDNA = true;
-				Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences HG19");
-			} else {
-				database = "UniProt";
-				Properties.isSequenceFileDNA = false;
-				Properties.sequenceDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat");
-			}
-			for (int j = 0; j < 1; j++) {
-				if (j == 0) {
-					job = "GO_mem_FASP";
-					Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628");
-				} else {
-					job = "SDS";
-					Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra encode membrane/SDS");
-				}
-				for (int k = 0; k < 2; k++) {
-					if (k == 0) {
-						error = "01";
-						Properties.spectrumToPeptideMassError = 0.01;
-					} else {
-						error = "20";
-						Properties.spectrumToPeptideMassError = 0.20;
-					}
-					
-					//file:///Volumes/encode/Chris
-					Properties.reportDirectory = new File("/Volumes/encode/Chris/report" + "-" + job + "-" + database + "-" + error);
-					U.p(Properties.reportDirectory.getName());
-					new Peppy(args);
-					U.p();
-				}
-			}
-		}
-	}
 	
 	public static void cnvPeptideMassList() {
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
@@ -217,31 +179,6 @@ public class Peppy {
 		
 	}
 	
-	/**
-	 * This is just to test HMM score
-	 */
-	public static void testHMMScore() {
-		//set up HMM Score
-		HMMScore.HMMClass.HmmSetUp();
-		
-		//Set up peptide, spectra matches;
-		ArrayList<Match> matches = new ArrayList<Match>();
-		
-		matches.add(new Match("/Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628/020810_M6_FASP_ziptip.dta/020810_M6_FASP_ziptip.9662.9662.2.dta", "ELAEDGYSGVEVR"));
-//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1263.5822_6.txt", "MMDVIQEIER"));
-//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1952.9525_8.txt", "ELGLDQAIAEAAEAIPDAR"));
-//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1642.7903_7.txt", "LYYVVQMTAQAAER"));
-//		matches.add(new Match("HMM-ecoli/CheZ_MSMS_1911.8491_5.txt", "ALNSVEASQPHQDQMEK"));
-		
-		//calculate HMM scores for the spectrum/peptide pairs
-		HMMScorer hmmScorer = new HMMScorer(matches);
-		hmmScorer.score();
-		
-		//display the scores
-		for (Match match: matches) {
-			U.p(match.getPeptide().getAcidSequence() + ": " + match.getScoreHMM());
-		}
-	}
 	
 	public static void cnv() {
 		U.startStopwatch();
