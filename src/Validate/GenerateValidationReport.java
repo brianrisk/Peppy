@@ -19,7 +19,7 @@ public class GenerateValidationReport {
 	public static ArrayList<TestSet> tests;
 	public static File databaseFile;
 	public static PrintWriter indexWriter;
-
+	public static boolean doReverse = false;
 
 	/**
 	 * @param args
@@ -27,7 +27,7 @@ public class GenerateValidationReport {
 	public static void main(String[] args) {	
 		setUp();
 		forwards();
-		reverse();
+		if (doReverse) reverse();
 		createReport();
 		U.p("done.");
 	}
@@ -234,37 +234,37 @@ public class GenerateValidationReport {
 			pw.println("</table>");
 			
 			//REVERSE
-			pw.println("<h3>Reverse</h3>");
-			pw.println("<table border=1>");
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+			if (doReverse) {
+				pw.println("<h3>Reverse</h3>");
+				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 5% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 25% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 50% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 75% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 95% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
+				}
+				pw.println("</table>");
 			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
-			}
-			pw.println("</table>");
 
-
-			
 			pw.println("</table>");
 			pw.println("</body>");
 			pw.println("</html>");
