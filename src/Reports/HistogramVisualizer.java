@@ -1,5 +1,6 @@
 package Reports;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -8,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import Utilities.U;
 
 public class HistogramVisualizer {
 	
@@ -90,6 +93,78 @@ public class HistogramVisualizer {
 		//outline
 		g.setColor(Color.black);
 		g.drawRect(0,0,width - 1, height - 1);
+		
+		/*
+		 * calculate and draw normal curve
+		 */
+		//find  mean
+		double variance = 0;
+		double mean = 0;
+		int total = 0;
+		for (int i = 0; i < histogram.length; i++) {
+			mean += i * histogram[i];
+			total += histogram[i];
+		}
+		mean /= total;
+		//draw mean line
+		g.setColor(Color.green);
+		int meanX = (int) ((double) mean * width / histogram.length);
+		g.drawLine(meanX, 0, meanX, height);
+		//find variance
+		double meanDifference;
+		for (int i = 0; i < histogram.length; i++) {
+			meanDifference = i - mean;
+			variance += histogram[i] * (meanDifference * meanDifference);
+		}
+		variance /= total;
+		
+		//draw normal curve
+		double normalConstant = 1.0 / Math.sqrt(2 * Math.PI * variance);
+		double numerator;
+		double denominator = -2 * variance;
+		g.setColor(Color.red);
+		g.setStroke(new BasicStroke(2.0f));
+		int x1 = 0, y1 = height, x2, y2;
+		
+		
+		for (int i = 0; i < histogram.length; i++) {
+			numerator = (i - mean);
+			numerator *= numerator;
+			x2 = (int) ((double) i * width / histogram.length);
+			y2 = height - (int) (scaleFactor * total * normalConstant * Math.exp(numerator / denominator));
+			g.drawLine(x1, y1, x2, y2);
+			x1 = x2;
+			y1 = y2;
+		}
+		
+		//draw log normal curve
+		g.setColor(Color.green);
+		g.setStroke(new BasicStroke(2.0f));
+		x1 = 0;
+		y1 = height;
+		double logNormalFirstTerm;
+//		if (
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") ||
+//				dest.getName().startsWith("107") 
+//		) {
+//			U.p("variance: " + variance);
+//		}
+		for (int i = 0; i < histogram.length; i++) {
+			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
+			numerator = Math.log(i) - mean;
+			numerator *= numerator;
+			x2 = (int) ((double) i * width / histogram.length);
+			y2 = height - (int) (scaleFactor * total * logNormalFirstTerm * Math.exp(numerator / denominator));
+			g.drawLine(x1, y1, x2, y2);
+			x1 = x2;
+			y1 = y2;
+		}
+		
+		
+		
+		
 		
 		//write
 		ImageIO.write(bdest,"JPG",dest);

@@ -75,9 +75,11 @@ public class EValueCalculator {
 			}
 		}
 		
+		int [] smoothHistogram = smoothHistogram(histogram, 4);
+		
 		//find score probabilities
 		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) histogram[i] / numberOfMatches;
+			scoreProbabilities[i] = (double) smoothHistogram[i] / numberOfMatches;
 		}
 		
 		//find survivability values
@@ -94,11 +96,9 @@ public class EValueCalculator {
 		
 		//find first 0 above chopIndex
 		int topIndex;
-		for (topIndex = chopIndex; topIndex < numberOfHistogramBars; topIndex++) {
-			if (histogram[topIndex] == 0) break;
+		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
+			if (smoothHistogram[topIndex] == 0) break;
 		}
-		//if we don't want to use topIndex....
-//		topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex
@@ -108,8 +108,8 @@ public class EValueCalculator {
 		
 		//finding the least squares fit for that region
 		// y = m * x + b
-		m = U.calculateM(xValues, survivability, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, chopIndex, topIndex, m);
+		m = U.calculateM(xValues, survivability, smoothHistogram, chopIndex, topIndex);
+		b = U.calculateB(xValues, survivability, smoothHistogram, chopIndex, topIndex, m);
 		
 		//using our m and b to derive e values for all top matches
 		double eValue;
@@ -132,7 +132,6 @@ public class EValueCalculator {
 		//setting to Double.MAX_VALUE if eValue is Nan
 		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
 		return eValue;
-//		return getNormalDistributionEValue(score);
 	}
 
 
@@ -142,48 +141,32 @@ public class EValueCalculator {
 		this.histogram = histogram;
 	}
 	
-	/* 
-	 * E value experiments
-	 */
-	double mean = -1;
-	double variance = -1;
-	double standardDeviation = -1;
-	private void calculateDistribution() {
-		//calculate mean
-		double total = 0;
-		int size = 0;
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			size += histogram[i];
-			total += xValues[i] * histogram[i];
+	public int[] smoothHistogram(int [] histogram, int radius) {
+		int [] out = new int[histogram.length];
+		double sigma = radius / 3.0;
+		double coefficient = 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma);
+		double denominator = -2 * sigma * sigma;
+		int gaussianSize = radius * 2 + 1;
+		double [] gaussianY = new double[gaussianSize];
+		int [] gaussianX = new int[gaussianSize];
+		for (int i = 0; i < gaussianSize; i++) {
+			gaussianX[i] = i - radius;
+			gaussianY[i] = coefficient * Math.exp(gaussianX[i] * gaussianX[i] / denominator);
 		}
-		mean = total / size;
-		
-		//calculate variance
-		total = 0;
-		double difference;
-		variance = 0;
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			difference = xValues[i] - mean;
-			difference *= difference;
-			variance += histogram[i] * difference;
+		double smoothedValue;
+		int index;
+		for (int i = 0; i < histogram.length; i++) {
+			smoothedValue = 0;
+			for (int j = 0; j < gaussianSize; j++) {
+				index = gaussianX[j] + i;
+				if (index < 0) break;
+				if (index >= histogram.length) break;
+				smoothedValue += gaussianY[j] * histogram[index];
+			}
+			out[i] = (int) Math.round(smoothedValue);
 		}
-		
-		//Standard Deviation
-		standardDeviation = Math.sqrt(variance);
+		return out;
 	}
-	
-	public double getNormalDistributionEValue(double score) {
-		calculateDistribution();
-		
-		//scalar
-		double scalar = 1 / Math.sqrt(2 * Math.PI * variance);
-		
-		//exponent
-		double exponent = -1.0 * ((score - mean) / (2 * variance));
-		
-		return scalar * Math.exp(exponent);
-	}
-	
 	
 
 }

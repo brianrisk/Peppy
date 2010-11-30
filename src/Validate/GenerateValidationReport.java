@@ -26,13 +26,17 @@ public class GenerateValidationReport {
 	 */
 	public static void main(String[] args) {	
 		setUp();
+		U.startStopwatch();
 		forwards();
 		if (doReverse) reverse();
 		createReport();
+//		makeOnlyWrongReport();
+		U.stopStopwatch();
 		U.p("done.");
 	}
 	
 	public static void setUp() {
+		System.setProperty("java.awt.headless", "true"); 
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
 		Properties.validationDirectory.mkdirs();
@@ -65,16 +69,6 @@ public class GenerateValidationReport {
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
 		
-		//set up which tests we will perform
-		tests = new ArrayList<TestSet>();
-		
-		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-//		String testDirectoryName = "tests/";
-		tests.add(new TestSet(testDirectoryName, "ecoli"));
-		tests.add(new TestSet(testDirectoryName, "human"));
-		tests.add(new TestSet(testDirectoryName, "aurum"));	
-		tests.add(new TestSet(testDirectoryName, "USP"));
-
 	}
 	
 	
@@ -88,6 +82,15 @@ public class GenerateValidationReport {
 		U.p("forwards database size: " + peptides.size());
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides();
+		
+		//set up which tests we will perform
+		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+//		String testDirectoryName = "tests/";
+		tests = new ArrayList<TestSet>();
+		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
+		tests.add(new TestSet(testDirectoryName, "human", peptides));
+		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
+//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
 
 		for (TestSet test: tests) {
 			U.p("Getting matches for: " + test.getName());
@@ -202,43 +205,41 @@ public class GenerateValidationReport {
 				pw.println("<td>" + testSet.getAreaUnderPRCurve() + "</td>");
 			}
 			
-			
-			
-			
-			pw.println("</table>");
-			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
-			
-			pw.println("<h3>Forwards</h3>");
-			pw.println("<table border=1>");
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
-			}
 			pw.println("</table>");
 			
-			//REVERSE
+			
 			if (doReverse) {
+				pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
+				pw.println("<h3>Forwards</h3>");
+				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 5% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 25% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 50% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 75% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 95% (forwards)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
+				}
+				pw.println("</table>");
+				
+				//REVERSE
 				pw.println("<h3>Reverse</h3>");
 				pw.println("<table border=1>");
 				pw.println("<tr>");
@@ -269,7 +270,9 @@ public class GenerateValidationReport {
 				pw.println("</table>");
 			}
 
+
 			pw.println("</table>");
+
 			pw.println("</body>");
 			pw.println("</html>");
 			
@@ -316,16 +319,22 @@ public class GenerateValidationReport {
 	 * to the "right" one.
 	 */
 	public static void makeOnlyWrongReport() {
-		setUp();
-		U.startStopwatch();
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		U.p("wrong report");
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(databaseFile);
+		U.p("forwards database size: " + peptides.size());
+
+		//set up which tests we will perform
+		tests = new ArrayList<TestSet>();
+		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
+//		tests.add(new TestSet("human", peptides));
+//		tests.add(new TestSet("aurum", peptides));	
+//		tests.add(new TestSet("USP", peptides));
+		
 		for (TestSet test: tests) {
 			test.findPositiveMatches(peptides);
 			generateWrongReport(test);
 		}
-		U.p();
-		U.stopStopwatch();
 	}
 
 	public static void generateRightReport(TestSet test) {
@@ -376,6 +385,7 @@ public class GenerateValidationReport {
 	
 	public static void generateWrongReport(TestSet test) {
 		String testName = test.getName();
+//		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
 		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
 		U.p("printing out all the spectra that we got wrong and comparing the two different matches");
 		
@@ -391,65 +401,89 @@ public class GenerateValidationReport {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(testFile)));
 			
 			//print the header of the file
-			pw.println("<html><body>");
+			U.appendFile(pw, Properties.reportWebHeaderFile);
+			pw.println("number of matches: " + testedMatches.size());
+			pw.println("<table border=1 cellspacing=0>");
+//			pw.println("<th>isTrue</th>");
+			pw.println("<th>E value</th>");
+			pw.println("<th>name</th>");
+			pw.println("<th>ions</th>");
+			pw.println("<th>our sequence</th>");
+			pw.println("<th>our spectrum</th>");
 			
 			int imageIndex = 0;
 			for (MatchContainer matchContainer: testedMatches) {
+				Peptide correctPeptide = null;
+				correctPeptide = new Peptide(matchContainer.getCorrectAcidSequence());
+				Match ourMatch = matchContainer.getMatch();
+				Match trueMatch = matchContainer.getTrueMatch();
 				if (!matchContainer.isTrue()) {
-					Peptide correctPeptide = null;
-					correctPeptide = new Peptide(matchContainer.getCorrectAcidSequence());
-					Match ourMatch = matchContainer.getMatch();
-					Match trueMatch = matchContainer.getTrueMatch();
-					pw.println("<p>");
-					pw.println("E value: " + ourMatch.getEValue());
-					pw.println("<br>");
-					pw.println("Spectrum file name: " + ourMatch.getSpectrum().getFile().getName());
-					pw.println("<br>");
-//					if (checkToSeeIfPeptideIsInDatabase) {
-//						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
-//						pw.println("<br>");
-//					}
-					pw.println("our score: " + ourMatch.ionMatchTally + ", " + ourMatch.getScore());
-					pw.println("<br>");
-					pw.println("their score: " + trueMatch.ionMatchTally + ", " + trueMatch.getScore());
-					pw.println("<br>");
+					
+					pw.println("<tr>");
+					
+//					pw.println("<td>");
+//					pw.println(matchContainer.isTrue());
+//					pw.println("</td>");
+					pw.println("<td>");
+					pw.println(ourMatch.getEValue());
+					pw.println("</td>");
+					pw.println("<td>");
+					pw.println(ourMatch.getSpectrum().getFile().getName());
+					pw.println("</td>");
+	
+	//					if (checkToSeeIfPeptideIsInDatabase) {
+	//						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
+	//						pw.println("<br>");
+	//					}
+					pw.println("<td>");
+					pw.println(ourMatch.ionMatchTally);
+					if (!matchContainer.isTrue())
+						pw.println("<br>" + trueMatch.ionMatchTally);
+					pw.println("</td>");
 					
 					//creating the image of our match
 					File ourMatchFile = new File (imagesFolder, imageIndex + "a.jpg");
 					SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), ourMatch.getPeptide());
 					SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, ourMatchFile, false);
 					
-					//creating the image of their "true" match.  Whatever!
 					File trueMatchFile = new File (imagesFolder, imageIndex + "b.jpg");
-					SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), correctPeptide);
-					SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, trueMatchFile, false);
-					
+					if (!matchContainer.isTrue()) {
+						//creating the image of their "true" match.  Whatever!
+						SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), correctPeptide);
+						SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, trueMatchFile, false);
+					}
 					//don't forget to increment that image index, Brian!
 					imageIndex++;
 					
-					//print in out
-					pw.println("ours vs theirs: " + ourMatch.getPeptide().getAcidSequence() + " vs " + matchContainer.getCorrectAcidSequence() + "<br>");
-					pw.print("<a href=\"");
-					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-					pw.print("\">");
-					pw.print("<img src=\"");
-					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-					pw.print("\" border=0></a><br>");
+					pw.println("<td>");
+					pw.println(ourMatch.getPeptide().getAcidSequence());
+					if (!matchContainer.isTrue())
+						pw.println("<br>" + matchContainer.getCorrectAcidSequence());
+					pw.println("</td>");
 					
+					pw.println("<td>");
 					pw.print("<a href=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
 					pw.print("\">");
 					pw.print("<img src=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
-					pw.print("\" border=0></a><br>");
-					pw.print("<hr>");
-					pw.println();
-					pw.println();
+					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
+					pw.print("\" border=0 height=20></a><br>");
+					
+					if (!matchContainer.isTrue()) {
+						pw.print("<br><a href=\"");
+						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+						pw.print("\">");
+						pw.print("<img src=\"");
+						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+						pw.print("\" border=0 height=20></a><br>");
+					}
+					pw.println("</td>");
 				}
+
 			}
 			
 			//print the footer and close out
-			pw.println("</body></html>");
+			pw.println("</table></body></html>");
 			pw.flush();
 			pw.close();
 		} catch (IOException e) {
