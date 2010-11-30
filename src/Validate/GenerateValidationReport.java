@@ -28,15 +28,16 @@ public class GenerateValidationReport {
 	public static void main(String[] args) {	
 		setUp();
 		U.startStopwatch();
-//		forwards();
-//		if (doReverse) reverse();
-//		createReport();
-		makeOnlyWrongReport();
+		forwards();
+		if (doReverse) reverse();
+		createReport();
+//		makeOnlyWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
 	}
 	
 	public static void setUp() {
+		System.setProperty("java.awt.headless", "true"); 
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
 		
@@ -88,8 +89,8 @@ public class GenerateValidationReport {
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet("ecoli", peptides));
-//		tests.add(new TestSet("human", peptides));
-//		tests.add(new TestSet("aurum", peptides));	
+		tests.add(new TestSet("human", peptides));
+		tests.add(new TestSet("aurum", peptides));	
 //		tests.add(new TestSet("USP", peptides));
 
 		for (TestSet test: tests) {

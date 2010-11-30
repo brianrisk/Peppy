@@ -75,9 +75,11 @@ public class EValueCalculator {
 			}
 		}
 		
+		int [] smoothHistogram = smoothHistogram(histogram, 4);
+		
 		//find score probabilities
 		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) histogram[i] / numberOfMatches;
+			scoreProbabilities[i] = (double) smoothHistogram[i] / numberOfMatches;
 		}
 		
 		//find survivability values
@@ -95,27 +97,8 @@ public class EValueCalculator {
 		//find first 0 above chopIndex
 		int topIndex;
 		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
-			if (histogram[topIndex] == 0) break;
+			if (smoothHistogram[topIndex] == 0) break;
 		}
-		//if we don't want to use topIndex....
-		calculateDistribution();
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			if (xValues[i] < mean) chopIndex = i;
-		}
-		
-		//find topIndex that is the penultimate non zero value
-		boolean maxValueFound = false;
-		for (int i = numberOfHistogramBars - 1; i >= 0; i--) {
-			if (histogram[i] != 0) {
-				if (maxValueFound) {
-					topIndex = i;
-					break;
-				} else {
-					maxValueFound = true;
-				}
-			}
-		}
-//		topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex
@@ -125,8 +108,8 @@ public class EValueCalculator {
 		
 		//finding the least squares fit for that region
 		// y = m * x + b
-		m = U.calculateM(xValues, survivability, histogram, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, histogram, chopIndex, topIndex, m);
+		m = U.calculateM(xValues, survivability, smoothHistogram, chopIndex, topIndex);
+		b = U.calculateB(xValues, survivability, smoothHistogram, chopIndex, topIndex, m);
 		
 		//using our m and b to derive e values for all top matches
 		double eValue;
@@ -149,7 +132,6 @@ public class EValueCalculator {
 		//setting to Double.MAX_VALUE if eValue is Nan
 		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
 		return eValue;
-//		return getNormalDistributionEValue(score);
 	}
 
 
@@ -159,45 +141,31 @@ public class EValueCalculator {
 		this.histogram = histogram;
 	}
 	
-	/* 
-	 * E value experiments
-	 */
-	double mean = -1;
-	double variance = -1;
-	int numberOfHits = -1;
-	double scalar = -1;
-	private void calculateDistribution() {
-		//calculate mean
-		double total = 0;
-		numberOfHits = 0;
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			numberOfHits += histogram[i];
-			total += xValues[i] * histogram[i];
+	public int[] smoothHistogram(int [] histogram, int radius) {
+		int [] out = new int[histogram.length];
+		double sigma = radius / 3.0;
+		double coefficient = 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma);
+		double denominator = -2 * sigma * sigma;
+		int gaussianSize = radius * 2 + 1;
+		double [] gaussianY = new double[gaussianSize];
+		int [] gaussianX = new int[gaussianSize];
+		for (int i = 0; i < gaussianSize; i++) {
+			gaussianX[i] = i - radius;
+			gaussianY[i] = coefficient * Math.exp(gaussianX[i] * gaussianX[i] / denominator);
 		}
-		mean = total / numberOfHits;
-		
-		//calculate variance
-		double difference;
-		variance = 0;
-		for (int i = 0; i < numberOfHistogramBars; i++) {
-			difference = xValues[i] - mean;
-			variance += histogram[i] * difference * difference;
+		double smoothedValue;
+		int index;
+		for (int i = 0; i < histogram.length; i++) {
+			smoothedValue = 0;
+			for (int j = 0; j < gaussianSize; j++) {
+				index = gaussianX[j] + i;
+				if (index < 0) break;
+				if (index >= histogram.length) break;
+				smoothedValue += gaussianY[j] * histogram[index];
+			}
+			out[i] = (int) Math.round(smoothedValue);
 		}
-		variance /= numberOfHits;
-		
-		scalar = 1.0 / Math.sqrt(2.0 * Math.PI * variance);
-		
-	}
-	
-	public double getNormalDistributionEValue(double score) {
-		calculateDistribution();
-		
-		//exponent
-		double numerator = (score - mean);
-		numerator *= numerator;
-		double exponent =  numerator / (-2.0 * variance);
-		
-		return (double)  numberOfHits * scalar * Math.exp(exponent);
+		return out;
 	}
 	
 

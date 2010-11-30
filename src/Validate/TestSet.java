@@ -113,9 +113,6 @@ public class TestSet {
 //		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(positiveMatches);
 		
-		U.p("Found " + positiveMatches.size() + " forwards matches");
-		U.p("number of hits per spectrum: " + Properties.maximumNumberOfMatchesForASpectrum);
-		
 		//See which of the positive matches are true
 		testedMatches = new ArrayList<MatchContainer>();
 		for (Match match: positiveMatches) {
