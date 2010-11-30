@@ -1,5 +1,7 @@
 package Utilities;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * A basic utility class.
@@ -222,6 +226,31 @@ public class U {
 		parameterB = (1.0 / (stop - start)) * (temp2 - m * temp1);
 		return parameterB;
 	}
+	
+	public static double [] calculateLeastSquare(ArrayList<Point2D.Double> points) {
+		double meanX = 0;
+		double meanY = 0;
+		double meanXY = 0;
+		double meanXX = 0;
+		for (Point2D.Double point: points) {
+			meanX += point.getX();
+			meanY += point.getY();
+			meanXY += point.getX() * point.getY();
+			meanXX += point.getX() * point.getX();
+		}
+		meanX /= points.size();
+		meanY /= points.size();
+		meanXY /= points.size();
+		meanXX /= points.size();
+		
+		double beta = (meanXY - meanX * meanY) / (meanXX - meanX * meanX);
+		
+		double alpha = meanY - beta * meanX;
+		
+		double [] out = {alpha, beta};
+		return out;
+	}
+
 	
 	public static String getFileNameWithoutSuffix(File file) {
         return file.getName().substring(0, file.getName().lastIndexOf('.'));
