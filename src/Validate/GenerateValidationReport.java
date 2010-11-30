@@ -19,7 +19,7 @@ public class GenerateValidationReport {
 	public static ArrayList<TestSet> tests;
 	public static File databaseFile;
 	public static PrintWriter indexWriter;
-
+	public static boolean doReverse = false;
 
 	/**
 	 * @param args
@@ -27,7 +27,7 @@ public class GenerateValidationReport {
 	public static void main(String[] args) {	
 		setUp();
 		forwards();
-		reverse();
+		if (doReverse) reverse();
 		createReport();
 		U.p("done.");
 	}
@@ -35,7 +35,7 @@ public class GenerateValidationReport {
 	public static void setUp() {
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
-		
+		Properties.validationDirectory.mkdirs();
 		File indexFile = new File(Properties.validationDirectory, "index.html");
 		try {
 			indexWriter = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
@@ -53,23 +53,27 @@ public class GenerateValidationReport {
 		Properties.peakDifferenceThreshold = 0.5;
 		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
-		Properties.reduceDuplicateMatches = false;
+		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-//		HMMScore.HMMClass.HmmSetUp();
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+		HMMScore.HMMClass.HmmSetUp();
 //		Properties.highIntensityCleaning = true;
+		Properties.localMaximaCleaning = true;
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+//		databaseFile = new File("uniprot_sprot.fasta");
 		
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
-
-		tests.add(new TestSet("ecoli"));
-		tests.add(new TestSet("human"));
-		tests.add(new TestSet("aurum"));	
-		tests.add(new TestSet("USP"));
+		
+		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+//		String testDirectoryName = "tests/";
+		tests.add(new TestSet(testDirectoryName, "ecoli"));
+		tests.add(new TestSet(testDirectoryName, "human"));
+		tests.add(new TestSet(testDirectoryName, "aurum"));	
+		tests.add(new TestSet(testDirectoryName, "USP"));
 
 	}
 	
@@ -234,37 +238,37 @@ public class GenerateValidationReport {
 			pw.println("</table>");
 			
 			//REVERSE
-			pw.println("<h3>Reverse</h3>");
-			pw.println("<table border=1>");
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+			if (doReverse) {
+				pw.println("<h3>Reverse</h3>");
+				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 5% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 25% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 50% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 75% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
+				}
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 95% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
+				}
+				pw.println("</table>");
 			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (reverse)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
-			}
-			pw.println("</table>");
 
-
-			
 			pw.println("</table>");
 			pw.println("</body>");
 			pw.println("</html>");

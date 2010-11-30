@@ -50,11 +50,11 @@ public class TestSet {
 	String timeToComplete = "";
 	double milisecondsPerSpectrum;
 	
-	public TestSet(String testName) {
+	public TestSet(String testDirectoryName, String testName) {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + testName + "/spectra");
+		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
 		setSize = spectra.size();
 		
 //		//load "correct" matches as defined by the test set
