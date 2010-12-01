@@ -1,11 +1,14 @@
 package Validate;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 import Peppy.Match;
 import Peppy.Peptide;
@@ -18,6 +21,7 @@ public class GenerateValidationReport {
 	
 	public static ArrayList<TestSet> tests;
 	public static File databaseFile;
+	public static File reportFolder;
 	public static PrintWriter indexWriter;
 	public static boolean doReverse = false;
 
@@ -39,8 +43,9 @@ public class GenerateValidationReport {
 		System.setProperty("java.awt.headless", "true"); 
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
-		Properties.validationDirectory.mkdirs();
-		File indexFile = new File(Properties.validationDirectory, "index.html");
+		reportFolder =  new File(Properties.validationDirectory, "" + System.currentTimeMillis() + "/");
+		reportFolder.mkdirs();
+		File indexFile = new File(reportFolder, "index.html");
 		try {
 			indexWriter = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
 		} catch (IOException e) {
@@ -60,11 +65,11 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
-		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-		HMMScore.HMMClass.HmmSetUp();
+		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+//		HMMScore.HMMClass.HmmSetUp();
 //		Properties.highIntensityCleaning = true;
-		Properties.localMaximaCleaning = true;
+//		Properties.localMaximaCleaning = true;
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
@@ -118,7 +123,7 @@ public class GenerateValidationReport {
 		U.p("Data collected, now generating the report...");
 
 		try {
-			File indexFile = new File(Properties.validationDirectory, "index.html");
+			File indexFile = new File(reportFolder, "index.html");
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
 			
 			pw.println("<html>");
@@ -195,7 +200,13 @@ public class GenerateValidationReport {
 			pw.println("<tr>");
 			pw.println("<td>Precision-recall curve</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td><img src=\"" + testSet.getFileNameForPRCurve() + "\" width=200></td>");
+				BufferedImage bufferedImage = testSet.generatePrecisionRecallCurve();
+				File testDirectory = new File(reportFolder, testSet.getName());
+				testDirectory.mkdirs();
+				File imageFile = new File(testDirectory, "/precision-recall.jpg");
+				String fileNameForPRCurve = testSet.getName() + "/" + imageFile.getName();
+				ImageIO.write(bufferedImage,"JPG",imageFile);
+				pw.println("<td><img src=\"" + fileNameForPRCurve + "\" width=200></td>");
 			}
 			
 			//Area under PR Curve
@@ -340,7 +351,7 @@ public class GenerateValidationReport {
 	public static void generateRightReport(TestSet test) {
 		String testName = test.getName();
 		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
-		File testFileFolder = new File(Properties.validationDirectory, testName);
+		File testFileFolder = new File(reportFolder, testName);
 		testFileFolder.mkdirs();
 		File testFile = new File(testFileFolder, "right.html");
 		try {
@@ -392,7 +403,7 @@ public class GenerateValidationReport {
 		int width = 1000;
 		int height = 200;
 		
-		File testFileFolder = new File(Properties.validationDirectory, testName);
+		File testFileFolder = new File(reportFolder, testName);
 		testFileFolder.mkdirs();
 		File testFile = new File(testFileFolder, "wrong.html");
 		File imagesFolder = new File(testFileFolder, "wrongImages");

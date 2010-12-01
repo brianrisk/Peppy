@@ -19,6 +19,7 @@ public class EValueCalculator {
 	//E-Values:  allocating histogram variables
 	private final int numberOfHistogramBars = 100;
 	private int [] histogram = new int[numberOfHistogramBars];
+	private int [] smoothedHistogram  = new int[numberOfHistogramBars];
 	private double [] scoreProbabilities = new double[numberOfHistogramBars];
 	private double [] survivability = new double[numberOfHistogramBars];
 	private double [] xValues = new double[numberOfHistogramBars];
@@ -75,11 +76,12 @@ public class EValueCalculator {
 			}
 		}
 		
-		int [] smoothHistogram = smoothHistogram(histogram, 4);
+		smoothedHistogram = smoothHistogram(histogram, 4);
+//		smoothedHistogram = histogram;
 		
 		//find score probabilities
 		for (int i = 0; i < numberOfHistogramBars; i++) {
-			scoreProbabilities[i] = (double) smoothHistogram[i] / numberOfMatches;
+			scoreProbabilities[i] = (double) smoothedHistogram[i] / numberOfMatches;
 		}
 		
 		//find survivability values
@@ -97,7 +99,7 @@ public class EValueCalculator {
 		//find first 0 above chopIndex
 		int topIndex;
 		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
-			if (smoothHistogram[topIndex] == 0) break;
+			if (smoothedHistogram[topIndex] == 0) break;
 		}
 		
 		//taking the log of each of the survivability.  Only concerned
@@ -108,8 +110,8 @@ public class EValueCalculator {
 		
 		//finding the least squares fit for that region
 		// y = m * x + b
-		m = U.calculateM(xValues, survivability, smoothHistogram, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, smoothHistogram, chopIndex, topIndex, m);
+		m = U.calculateM(xValues, survivability, smoothedHistogram, chopIndex, topIndex);
+		b = U.calculateB(xValues, survivability, smoothedHistogram, chopIndex, topIndex, m);
 		
 		//using our m and b to derive e values for all top matches
 		double eValue;
@@ -135,11 +137,7 @@ public class EValueCalculator {
 	}
 
 
-	public int [] getHistogram() {return histogram;}
-	
-	public void setHistogram(int[] histogram) {
-		this.histogram = histogram;
-	}
+	public int [] getSmoothedHistogram() {return smoothedHistogram;}
 	
 	public int[] smoothHistogram(int [] histogram, int radius) {
 		int [] out = new int[histogram.length];
@@ -159,7 +157,7 @@ public class EValueCalculator {
 			smoothedValue = 0;
 			for (int j = 0; j < gaussianSize; j++) {
 				index = gaussianX[j] + i;
-				if (index < 0) break;
+				if (index < 0) continue;
 				if (index >= histogram.length) break;
 				smoothedValue += gaussianY[j] * histogram[index];
 			}

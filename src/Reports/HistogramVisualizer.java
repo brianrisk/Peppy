@@ -2,6 +2,7 @@ package Reports;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -60,6 +61,7 @@ public class HistogramVisualizer {
 		//setting up Graphics context
 		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = bdest.createGraphics();
+		FontMetrics fontMetrics = g.getFontMetrics();
 		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
 		g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
 		g.setColor(Color.white);
@@ -72,10 +74,14 @@ public class HistogramVisualizer {
 		}
 		
 		//draw the bars
+		int maxValue = 0;
+		int barTotal = 0;
 		g.setColor(Color.darkGray);
 		g.drawRect(0,0,width - 1, height - 1);
 		double scaleFactor = (double) height / max;
 		for (int i = 0; i < histogram.length; i++) {
+			if (histogram[i] > maxValue) maxValue = histogram[i];
+			barTotal += histogram[i];
 			int x1 = (int) ((double) i * width / histogram.length);
 			int barWidth = (int) ((double) (i + 1.0) * width / histogram.length) - x1;
 			if (barWidth < 1) barWidth = 1;
@@ -94,73 +100,78 @@ public class HistogramVisualizer {
 		g.setColor(Color.black);
 		g.drawRect(0,0,width - 1, height - 1);
 		
+		//print max value
+		String maxLabel = "Max value: " + maxValue;
+		int labelWidth = fontMetrics.stringWidth(maxLabel);
+		int labelHeight = fontMetrics.getHeight();
+		g.setColor(Color.black);
+		g.drawString(maxLabel, width - labelWidth - 10, labelHeight + 5);
+		
+		//print barTotal label
+		String barTotalLabel = "Bar total: " + barTotal;
+		labelWidth = fontMetrics.stringWidth(barTotalLabel);
+		g.drawString(barTotalLabel, width - labelWidth - 10, labelHeight * 2 + 10);
+		
+		
 		/*
 		 * calculate and draw normal curve
 		 */
-		//find  mean
-		double variance = 0;
-		double mean = 0;
-		int total = 0;
-		for (int i = 0; i < histogram.length; i++) {
-			mean += i * histogram[i];
-			total += histogram[i];
-		}
-		mean /= total;
-		//draw mean line
-		g.setColor(Color.green);
-		int meanX = (int) ((double) mean * width / histogram.length);
-		g.drawLine(meanX, 0, meanX, height);
-		//find variance
-		double meanDifference;
-		for (int i = 0; i < histogram.length; i++) {
-			meanDifference = i - mean;
-			variance += histogram[i] * (meanDifference * meanDifference);
-		}
-		variance /= total;
-		
-		//draw normal curve
-		double normalConstant = 1.0 / Math.sqrt(2 * Math.PI * variance);
-		double numerator;
-		double denominator = -2 * variance;
-		g.setColor(Color.red);
-		g.setStroke(new BasicStroke(2.0f));
-		int x1 = 0, y1 = height, x2, y2;
-		
-		
-		for (int i = 0; i < histogram.length; i++) {
-			numerator = (i - mean);
-			numerator *= numerator;
-			x2 = (int) ((double) i * width / histogram.length);
-			y2 = height - (int) (scaleFactor * total * normalConstant * Math.exp(numerator / denominator));
-			g.drawLine(x1, y1, x2, y2);
-			x1 = x2;
-			y1 = y2;
-		}
-		
-		//draw log normal curve
-		g.setColor(Color.green);
-		g.setStroke(new BasicStroke(2.0f));
-		x1 = 0;
-		y1 = height;
-		double logNormalFirstTerm;
-//		if (
-//				dest.getName().startsWith("107") ||
-//				dest.getName().startsWith("107") ||
-//				dest.getName().startsWith("107") ||
-//				dest.getName().startsWith("107") 
-//		) {
-//			U.p("variance: " + variance);
+//		//find  mean
+//		double variance = 0;
+//		double mean = 0;
+//		int total = 0;
+//		for (int i = 0; i < histogram.length; i++) {
+//			mean += i * histogram[i];
+//			total += histogram[i];
 //		}
-		for (int i = 0; i < histogram.length; i++) {
-			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
-			numerator = Math.log(i) - mean;
-			numerator *= numerator;
-			x2 = (int) ((double) i * width / histogram.length);
-			y2 = height - (int) (scaleFactor * total * logNormalFirstTerm * Math.exp(numerator / denominator));
-			g.drawLine(x1, y1, x2, y2);
-			x1 = x2;
-			y1 = y2;
-		}
+//		mean /= total;
+//		//draw mean line
+//		g.setColor(Color.green);
+//		int meanX = (int) ((double) mean * width / histogram.length);
+//		g.drawLine(meanX, 0, meanX, height);
+//		//find variance
+//		double meanDifference;
+//		for (int i = 0; i < histogram.length; i++) {
+//			meanDifference = i - mean;
+//			variance += histogram[i] * (meanDifference * meanDifference);
+//		}
+//		variance /= total;
+//		
+//		//draw normal curve
+//		double normalConstant = 1.0 / Math.sqrt(2 * Math.PI * variance);
+//		double numerator;
+//		double denominator = -2 * variance;
+//		g.setColor(Color.red);
+//		g.setStroke(new BasicStroke(2.0f));
+//		int x1 = 0, y1 = height, x2, y2;
+//		
+//		
+//		for (int i = 0; i < histogram.length; i++) {
+//			numerator = (i - mean);
+//			numerator *= numerator;
+//			x2 = (int) ((double) i * width / histogram.length);
+//			y2 = height - (int) (scaleFactor * total * normalConstant * Math.exp(numerator / denominator));
+//			g.drawLine(x1, y1, x2, y2);
+//			x1 = x2;
+//			y1 = y2;
+//		}
+//		
+//		//draw log normal curve
+//		g.setColor(Color.green);
+//		g.setStroke(new BasicStroke(2.0f));
+//		x1 = 0;
+//		y1 = height;
+//		double logNormalFirstTerm;
+//		for (int i = 0; i < histogram.length; i++) {
+//			logNormalFirstTerm = 1.0 / (i * Math.sqrt(2 * Math.PI * variance));
+//			numerator = Math.log(i) - mean;
+//			numerator *= numerator;
+//			x2 = (int) ((double) i * width / histogram.length);
+//			y2 = height - (int) (scaleFactor * total * logNormalFirstTerm * Math.exp(numerator / denominator));
+//			g.drawLine(x1, y1, x2, y2);
+//			x1 = x2;
+//			y1 = y2;
+//		}
 		
 		
 		

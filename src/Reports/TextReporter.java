@@ -116,7 +116,15 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 3");
+			pw.println("format version 4");
+			
+			if (Properties.isSequenceFileDNA) {
+				pw.println("> analysis-type: nucleotide");
+			} else {
+				pw.println("> analysis-type: protein");
+			}
+			if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) pw.println("> scoring method: HMM_Score");
+			if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) pw.println("> scoring method: TandemFit");
 			
 			//sorting our matches by spectrum then score
 			Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -167,45 +175,47 @@ public class TextReporter {
 			
 			//print rows
 			for (Match match: matches) {;
-				sb = new StringBuffer();
-				sb.append(match.getSpectrum().getId());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getMD5());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getFile().getName());
-				sb.append('\t');
-				sb.append(match.getScore());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getPrecursorMZ());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getPrecursorMass());
-				sb.append('\t');
-				sb.append(match.getEValue());
-				sb.append('\t');
-				sb.append(match.getPeptide().getAcidSequence());
-				sb.append('\t');
-				if (Peppy.Properties.isSequenceFileDNA) {
-					sb.append(match.getSequence().getSequenceFile().getName());
+				if (Properties.useEValueCutOff && match.getEValue() <= Properties.eValueCutOff) {
+					sb = new StringBuffer();
+					sb.append(match.getSpectrum().getId());
 					sb.append('\t');
-					sb.append(match.getPeptide().getStartIndex());
+					sb.append(match.getSpectrum().getMD5());
 					sb.append('\t');
-					sb.append(match.getPeptide().getStopIndex());
+					sb.append(match.getSpectrum().getFile().getName());
 					sb.append('\t');
-					sb.append(match.getPeptide().getIntronStartIndex());
+					sb.append(match.getScore());
 					sb.append('\t');
-					sb.append(match.getPeptide().getIntronStopIndex());
+					sb.append(match.getSpectrum().getPrecursorMZ());
 					sb.append('\t');
-					sb.append(match.getPeptide().isForward() ? "+" : "-");
+					sb.append(match.getSpectrum().getPrecursorMass());
 					sb.append('\t');
-					sb.append(match.getPeptide().isSpliced());
-				} else {
-					sb.append(match.getPeptide().getProteinName());
+					sb.append(match.getEValue());
+					sb.append('\t');
+					sb.append(match.getPeptide().getAcidSequence());
+					sb.append('\t');
+					if (Peppy.Properties.isSequenceFileDNA) {
+						sb.append(match.getSequence().getSequenceFile().getName());
+						sb.append('\t');
+						sb.append(match.getPeptide().getStartIndex());
+						sb.append('\t');
+						sb.append(match.getPeptide().getStopIndex());
+						sb.append('\t');
+						sb.append(match.getPeptide().getIntronStartIndex());
+						sb.append('\t');
+						sb.append(match.getPeptide().getIntronStopIndex());
+						sb.append('\t');
+						sb.append(match.getPeptide().isForward() ? "+" : "-");
+						sb.append('\t');
+						sb.append(match.getPeptide().isSpliced());
+					} else {
+						sb.append(match.getPeptide().getProteinName());
+					}
+					sb.append('\t');
+					sb.append(match.getRank());
+					sb.append('\t');
+					sb.append(match.getRankCount());
+					pw.println(sb);
 				}
-				sb.append('\t');
-				sb.append(match.getRank());
-				sb.append('\t');
-				sb.append(match.getRankCount());
-				pw.println(sb);
 			}
 			
 

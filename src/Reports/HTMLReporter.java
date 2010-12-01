@@ -400,7 +400,7 @@ public class HTMLReporter {
 			pw.println("<h2>E value histogram for spectrum " + spectrum.getId() + "</h2>");
 			pw.println("<p>");
 			File histogramFile = new File(sequenceDirectory, spectrum.getId() + "-hist.jpg");
-			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getHistogram(), 300, 300, histogramFile);
+			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
 			pw.println("<img src=\"" + histogramFile.getName() + "\">");
 			pw.println("</p>");
 			

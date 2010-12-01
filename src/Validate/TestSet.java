@@ -44,7 +44,6 @@ public class TestSet {
 	
 	//PR curve
 	private double areaUnderPRCurve = 0;
-	private String fileNameForPRCurve = "";
 	
 	long timeElapsed;
 	String timeToComplete = "";
@@ -205,12 +204,12 @@ public class TestSet {
 		generatePrecisionRecallCurve();
 	}
 
-	private void generatePrecisionRecallCurve() {
+	public BufferedImage generatePrecisionRecallCurve() {
 			int width = 500;
 			int height = 500;
 			//setting up Graphics context
-			BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			Graphics2D g = bdest.createGraphics();
+			BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = bufferedImage.createGraphics();
 			g.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
 			g.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
 			g.setColor(Color.white);
@@ -278,18 +277,8 @@ public class TestSet {
 			g.drawLine(x2, y1, x2, height);
 			
 			areaUnderPRCurve = area;
+			return bufferedImage;
 			
-	//		g.drawLine(x2, y2, width, height);
-			
-			try {
-				File testDirectory = new File(Properties.validationDirectory, testName);
-				testDirectory.mkdirs();
-				File imageFile = new File(testDirectory, "/precision-recall.jpg");
-				fileNameForPRCurve = testName + "/" + imageFile.getName();
-				ImageIO.write(bdest,"JPG",imageFile);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 
 	private ArrayList<Peptide> loadCorrectPeptides() {
@@ -407,10 +396,6 @@ public class TestSet {
 
 	public double getAreaUnderPRCurve() {
 		return areaUnderPRCurve;
-	}
-
-	public String getFileNameForPRCurve() {
-		return fileNameForPRCurve;
 	}
 
 	public long getTimeElapsed() {

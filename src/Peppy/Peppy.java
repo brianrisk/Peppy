@@ -102,10 +102,12 @@ public class Peppy {
 		File jobsDir = new File("jobs");
 		File[] potentialJobsFiles = jobsDir.listFiles();
 		ArrayList<File> jobFiles = new ArrayList<File>();
-		for (int i = 0; i < potentialJobsFiles.length; i++) {
-			if (potentialJobsFiles[i].getName().toLowerCase().endsWith(".txt")) {
-				jobFiles.add(potentialJobsFiles[i]);
-			}	
+		if (potentialJobsFiles != null) {
+			for (int i = 0; i < potentialJobsFiles.length; i++) {
+				if (potentialJobsFiles[i].getName().toLowerCase().endsWith(".txt")) {
+					jobFiles.add(potentialJobsFiles[i]);
+				}	
+			}
 		}
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
