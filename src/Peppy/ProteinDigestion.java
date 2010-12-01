@@ -26,7 +26,7 @@ public class ProteinDigestion {
 			while (line != null) {
 				if (line.startsWith(">")) {
 					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName));
-					proteinName = line.substring(1);
+					proteinName = line.substring(1).trim();
 					buffy = new StringBuffer(); 
 				} else {
 					buffy.append(line);
