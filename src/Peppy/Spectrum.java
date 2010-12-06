@@ -444,6 +444,10 @@ public class Spectrum implements Comparable<Spectrum>{
 		return eValueCalculator.getEValue(score);
 	}
 	
+	public double getPValue(double score) {
+		return eValueCalculator.getPValue(score);
+	}
+	
 	
 	public String getMD5() {
 		if (MD5 != null) {

@@ -16,6 +16,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private int repeatCount = 0; 
 	private double scoreHMM = 0.0;
 	private double eValue;
+	private double pValue;
 	public int ionMatchTally = 0;
 	private int rank = Integer.MAX_VALUE;
 	
@@ -34,6 +35,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE = 8;
 	public final static int SORT_BY_SPECTRUM_ID_THEN_PEPTIDE = 9;
 	public final static int SORT_BY_RANK_THEN_SCORE = 10;
+	public final static int SORT_BY_P_VALUE = 11;
 	
 	
 	
@@ -235,6 +237,11 @@ public class Match implements Comparable<Match>, HasEValue{
 				if (eValue > match.getEValue()) return  1;
 				return 0;
 			} else
+			if (sortParameter == SORT_BY_P_VALUE) {
+				if (pValue < match.getPValue()) return -1;
+				if (pValue > match.getPValue()) return  1;
+				return 0;
+			} else
 			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_SCORE) {
 				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
 				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
@@ -284,6 +291,14 @@ public class Match implements Comparable<Match>, HasEValue{
 				return 0;
 			}
 		}
+
+	public double getPValue() {
+		return pValue;
+	}
+
+	public void setPValue(double pValue) {
+		this.pValue = pValue;
+	}
 
 	public boolean equals(Match match) {
 		if (getScore() == match.getScore()) {
@@ -398,6 +413,11 @@ public class Match implements Comparable<Match>, HasEValue{
 	public double calculateEValue() {
 		eValue = spectrum.getEValue(getScore());
 		return eValue;
+	}
+	
+	public double calculatePValue() {
+		pValue = spectrum.getPValue(getScore());
+		return pValue;
 	}
 
 }

@@ -76,9 +76,7 @@ public class Peppy {
 		}
 	
 		U.p("calculating final e values");
-		for (Match match: matches) {
-			match.calculateEValue();
-		}
+		assignConfidenceValuesToMatches(matches);
 		
 		//create new report directory
 		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
@@ -322,6 +320,13 @@ public class Peppy {
 				previousMatch = match;
 				previousSpectrumID = spectrumID;
 			}
+		}
+	}
+	
+	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches) {
+		for (Match match: matches) {
+			match.calculateEValue();
+			match.calculatePValue();
 		}
 	}
 
