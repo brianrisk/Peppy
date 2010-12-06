@@ -108,7 +108,9 @@ public class TestSet {
 		
 		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
 		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
 //		Match.setSortParameter(Match.SORT_BY_SCORE);

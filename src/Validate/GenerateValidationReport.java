@@ -1,12 +1,16 @@
 package Validate;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
@@ -29,14 +33,16 @@ public class GenerateValidationReport {
 	 * @param args
 	 */
 	public static void main(String[] args) {	
-		setUp();
-		U.startStopwatch();
-		forwards();
-		if (doReverse) reverse();
-		createReport();
-//		makeOnlyWrongReport();
-		U.stopStopwatch();
-		U.p("done.");
+//		setUp();
+//		U.startStopwatch();
+//		forwards();
+//		if (doReverse) reverse();
+//		createReport();
+////		createResultsFiles();
+////		makeOnlyWrongReport();
+//		U.stopStopwatch();
+//		U.p("done.");
+		compareEValueReports();
 	}
 	
 	public static void setUp() {
@@ -321,6 +327,85 @@ public class GenerateValidationReport {
 //			U.p("75%: "+ falsePositiveMatches.get(level75).getEValue());
 //			U.p("95%: "+ falsePositiveMatches.get(level95).getEValue());
 //		}
+	}
+	
+	public static void createResultsFiles() {
+		for (TestSet test: tests) {
+			try {
+				File indexFile = new File(reportFolder, test.getName() + ".txt");
+				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
+				ArrayList<MatchContainer> topForwardsTestedMatches = test.getTopForwardsTestedMatches();
+				U.p("number of topForwardsTestedMatches: " + topForwardsTestedMatches.size());
+				Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+				Collections.sort(topForwardsTestedMatches);
+				for (MatchContainer match: topForwardsTestedMatches) {
+					StringBuffer sb = new StringBuffer();
+					sb.append(match.getMatch().getSpectrum().getId());
+					sb.append('\t');
+					sb.append(match.isTrue());
+					sb.append('\t');
+					sb.append(match.getEValue());
+					pw.println(sb.toString());
+				}
+				pw.flush();
+				pw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * This is for the very specific task of comparing e value reports to see
+	 * on average how many orders of magnitude e values are shifted when changes
+	 * to the e value computation method are made
+	 * 
+	 * This code is not used in the proper report creation process
+	 */
+	public static void compareEValueReports() {
+		String smooth0ReportsName = "evalue report smoothing 0";
+		String smooth4ReportsName = "evalue report smoothing 4";
+		File smooth0Dir = new File(Properties.validationDirectory, smooth0ReportsName);
+		File smooth4Dir = new File(Properties.validationDirectory, smooth4ReportsName);
+		File [] smooth0Files = smooth0Dir.listFiles();
+		double trueDiffTotal = 0;
+		int trueSampleSize = 0;
+		double falseDiffTotal = 0;
+		int falseSampleSize = 0;
+		for (int i = 0; i < smooth0Files.length; i++) {
+			try {
+				File smooth0File = smooth0Files[i];
+				if (!smooth0File.getName().endsWith(".txt")) continue;
+				BufferedReader smooth0BR = new BufferedReader(new FileReader(smooth0File));
+				File smooth4File = new File(smooth4Dir, smooth0File.getName());
+				BufferedReader smooth4BR = new BufferedReader(new FileReader(smooth4File));
+				String smooth0Line = smooth0BR.readLine();
+				String smooth4Line = smooth4BR.readLine();
+				while (smooth0Line != null) {
+					String [] smooth0Chunks = smooth0Line.split("\t");
+					String [] smooth4Chunks = smooth4Line.split("\t");
+					boolean isTrue = Boolean.parseBoolean(smooth0Chunks[1]);
+					double smooth0EValue = Double.parseDouble(smooth0Chunks[2]);
+					double smooth4EValue = Double.parseDouble(smooth4Chunks[2]);
+					if (isTrue) {
+						trueDiffTotal += (Math.log10(smooth4EValue) - Math.log10(smooth0EValue));
+						trueSampleSize++;
+					} else {
+						falseDiffTotal += (Math.log10(smooth4EValue) - Math.log10(smooth0EValue));
+						falseSampleSize++;
+					}
+					smooth0Line = smooth0BR.readLine();
+					smooth4Line = smooth4BR.readLine();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		U.p("Average magnitude change for true: " + (trueDiffTotal / trueSampleSize));
+		U.p("Average magnitude change for false: " + (falseDiffTotal / falseSampleSize));
+		U.p("Average magnitude change for total: " + ((falseDiffTotal + trueDiffTotal)/ (falseSampleSize + trueSampleSize)));
 	}
 	
 	
