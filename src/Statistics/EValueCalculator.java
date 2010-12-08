@@ -76,7 +76,7 @@ public class EValueCalculator {
 			}
 		}
 		
-		smoothedHistogram = smoothHistogram(histogram, 4);
+		smoothedHistogram = smoothHistogram(histogram, 2);
 //		smoothedHistogram = histogram;
 		
 		//find score probabilities
