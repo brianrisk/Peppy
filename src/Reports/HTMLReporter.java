@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -173,7 +174,10 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append((double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length());
+				double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length();
+				NumberFormat nfPercent = NumberFormat.getPercentInstance();
+				nfPercent.setMaximumFractionDigits(2);
+				sb.append(nfPercent.format(matchPercent));
 				sb.append("</td>");
 				
 				sb.append("<td>");

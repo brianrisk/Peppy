@@ -27,6 +27,12 @@ public class ProteinDigestion {
 				if (line.startsWith(">")) {
 					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName));
 					proteinName = line.substring(1).trim();
+					//try to get the accession number from UniProt databases
+					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
+						String [] proteinWords = proteinName.split("|");
+						proteinName = proteinWords[1];
+					}
+					
 					buffy = new StringBuffer(); 
 				} else {
 					buffy.append(line);

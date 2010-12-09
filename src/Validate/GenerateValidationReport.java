@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -131,6 +132,8 @@ public class GenerateValidationReport {
 		try {
 			File indexFile = new File(reportFolder, "index.html");
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
+			NumberFormat nfPercent = NumberFormat.getPercentInstance();
+			nfPercent.setMaximumFractionDigits(2);
 			
 			pw.println("<html>");
 			pw.println("<body>");
@@ -143,7 +146,7 @@ public class GenerateValidationReport {
 			pw.println("<tr>");
 			pw.println("<td>Metric</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getName() + "</td>");
+				pw.println("<th>" + testSet.getName() + "</th>");
 			}
 			
 			//# spectra in the set
@@ -179,7 +182,7 @@ public class GenerateValidationReport {
 			pw.println("<tr>");
 			pw.println("<td>% of true positives</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + ((double) testSet.getTrueTally() / testSet.getSetSize()) + "</td>");
+				pw.println("<td>" + (nfPercent.format((double) testSet.getTrueTally() / testSet.getSetSize())) + "</td>");
 			}
 			
 			//# found at 1% FPR
@@ -193,7 +196,7 @@ public class GenerateValidationReport {
 			pw.println("<tr>");
 			pw.println("<td>% of total found at 1% FPR</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getPercentAtOnePercentError() + "</td>");
+				pw.println("<td>" + nfPercent.format(testSet.getPercentAtOnePercentError()) + "</td>");
 			}
 			//E value at 1% FPR
 			pw.println("<tr>");
