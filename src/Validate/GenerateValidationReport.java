@@ -20,6 +20,7 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.ScoringThread;
+import Peppy.Sequence;
 import Utilities.U;
 
 public class GenerateValidationReport {
@@ -28,22 +29,25 @@ public class GenerateValidationReport {
 	public static File databaseFile;
 	public static File reportFolder;
 	public static PrintWriter indexWriter;
+	public static boolean doForwards = true;
 	public static boolean doReverse = false;
+	public static int forwardsDatabaseSize = 0;
+	public static int reverseDatabaseSize = 0;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {	
-//		setUp();
-//		U.startStopwatch();
-//		forwards();
-//		if (doReverse) reverse();
-//		createReport();
-////		createResultsFiles();
-////		makeOnlyWrongReport();
-//		U.stopStopwatch();
-//		U.p("done.");
-		compareEValueReports();
+		setUp();
+		U.startStopwatch();
+		if (doForwards) forwards();
+		if (doReverse) reverse();
+		createReport();
+//		createResultsFiles();
+//		makeOnlyWrongReport();
+		U.stopStopwatch();
+		U.p("done.");
+//		compareEValueReports();
 	}
 	
 	public static void setUp() {
@@ -80,6 +84,10 @@ public class GenerateValidationReport {
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
+		Properties.peakDifferenceThreshold = 0.25;
+		
+//		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
+//		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_09/uniprot_sprot_human.fasta");
 		
 	}
 	
@@ -91,9 +99,11 @@ public class GenerateValidationReport {
 		Properties.maximumNumberOfMatchesForASpectrum = 10;
 		//load the peptides
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
-		U.p("forwards database size: " + peptides.size());
+		
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides();
+		U.p("forwards database size: " + peptides.size());
+		forwardsDatabaseSize = peptides.size();
 		
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
@@ -102,7 +112,7 @@ public class GenerateValidationReport {
 		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
 		tests.add(new TestSet(testDirectoryName, "human", peptides));
 		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+		tests.add(new TestSet(testDirectoryName, "USP", peptides));
 
 		for (TestSet test: tests) {
 			U.p("Getting matches for: " + test.getName());
@@ -119,6 +129,7 @@ public class GenerateValidationReport {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		ArrayList<Peptide> peptides = ProteinDigestion.getReversePeptidesFromFASTA(databaseFile);
+		reverseDatabaseSize = peptides.size();
 		
 		for (TestSet test: tests) {
 			U.p("Getting false matches for: " + test.getName());
@@ -138,6 +149,27 @@ public class GenerateValidationReport {
 			pw.println("<html>");
 			pw.println("<body>");
 			pw.println("<h1>Validation Report</h1>");
+			
+			pw.println("<br>");
+			String scoringMethod = "TandemFit";
+			if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
+				scoringMethod = "HMM_Score";
+			}
+			pw.println("Scoring method: " + scoringMethod);
+			
+			pw.println("<br>");
+			pw.println("Database: " + databaseFile.getName());
+			
+			if (doForwards) {
+				pw.println("<br>");
+				pw.println("Forwards Database Size: " + forwardsDatabaseSize);
+			}
+			
+			if (doReverse) {
+				pw.println("<br>");
+				pw.println("Reverse Database Size: " + reverseDatabaseSize);
+			}
+			
 			pw.println("<h2>Basic performance metrics</h2>");
 			pw.println("<table border=1>");
 			
@@ -187,23 +219,24 @@ public class GenerateValidationReport {
 			
 			//# found at 1% FPR
 			pw.println("<tr>");
-			pw.println("<td># found at 1% FPR</td>");
+			pw.println("<td># found at 5% FPR</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getTrueTallyAtOnePercentError() + "</td>");
+				pw.println("<td>" + testSet.getTrueTallyAtFivePercentError() + 
+						" (" + nfPercent.format(testSet.getPercentAtFivePercentError()) + ")</td>");
 			}
 			
-			//% of total found at 1% FPR
-			pw.println("<tr>");
-			pw.println("<td>% of total found at 1% FPR</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + nfPercent.format(testSet.getPercentAtOnePercentError()) + "</td>");
-			}
-			//E value at 1% FPR
-			pw.println("<tr>");
-			pw.println("<td>E value at 1% FPR</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtOnePercentError() + "</td>");
-			}
+//			//% of total found at 1% FPR
+//			pw.println("<tr>");
+//			pw.println("<td>% of total found at 1% FPR</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + nfPercent.format(testSet.getPercentAtFivePercentError()) + "</td>");
+//			}
+//			//E value at 1% FPR
+//			pw.println("<tr>");
+//			pw.println("<td>E value at 1% FPR</td>");
+//			for (TestSet testSet: tests) {
+//				pw.println("<td>" + testSet.getEValueAtFivePercentError() + "</td>");
+//			}
 			
 			//PR Curve
 			pw.println("<tr>");
@@ -222,46 +255,60 @@ public class GenerateValidationReport {
 			pw.println("<tr>");
 			pw.println("<td>Area under PR Curve</td>");
 			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getAreaUnderPRCurve() + "</td>");
+				pw.println("<td>" + nfPercent.format(testSet.getAreaUnderPRCurve()) + "</td>");
 			}
 			
 			pw.println("</table>");
 			
 			
+
+			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
+			pw.println("<h3>Forwards</h3>");
+			pw.println("<table border=1>");
+			
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 1% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.01) + "</td>");
+			}
+			
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 5% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 25% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 50% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 75% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
+			}
+			pw.println("<tr>");
+			pw.println("<td>E value marking top 95% (forwards)</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
+			}
+			pw.println("</table>");
+			
+			//REVERSE
 			if (doReverse) {
-				pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
-				pw.println("<h3>Forwards</h3>");
-				pw.println("<table border=1>");
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 5% (forwards)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 25% (forwards)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 50% (forwards)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 75% (forwards)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 95% (forwards)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
-				}
-				pw.println("</table>");
-				
-				//REVERSE
 				pw.println("<h3>Reverse</h3>");
 				pw.println("<table border=1>");
+				pw.println("<tr>");
+				pw.println("<td>E value marking top 1% (reverse)</td>");
+				for (TestSet testSet: tests) {
+					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.01) + "</td>");
+				}
+				
 				pw.println("<tr>");
 				pw.println("<td>E value marking top 5% (reverse)</td>");
 				for (TestSet testSet: tests) {
@@ -301,7 +348,6 @@ public class GenerateValidationReport {
 			
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

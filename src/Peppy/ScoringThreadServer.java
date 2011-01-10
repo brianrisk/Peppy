@@ -43,6 +43,11 @@ public class ScoringThreadServer {
 		this.sequence = sequence;
 		matches = new ArrayList<ArrayList<Match>>(spectra.size());
 		
+		//There may be old E values from other searchers.  Clear those
+		for (Spectrum spectrum: spectra) {
+			spectrum.clearEValues();
+		}
+		
 		//here we make sure we don't use more threads than we have spectra
 		numberOfThreads = Properties.numberOfThreads;
 		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();

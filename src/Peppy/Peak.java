@@ -24,8 +24,9 @@ public class Peak implements Comparable<Peak>{
 		this.hilighted = hilighted;
 	}
 
-	final int COMPARE_MASS = 0;
-	final int COMPARE_INTENSITY = 1;
+	private static int tracker = 0;
+	final int COMPARE_MASS = tracker++;
+	final int COMPARE_INTENSITY = tracker++;
 	int compareBy = COMPARE_MASS;
 	
 	public Peak(String s) throws MalformedPeakException {
@@ -77,6 +78,7 @@ public class Peak implements Comparable<Peak>{
 	//@Override
 	public int compareTo(Peak p) {
 		if (compareBy == COMPARE_MASS) {
+			//want to sort from least to greatest
 			if (mass < p.getMass()) return -1;
 			if (mass > p.getMass()) return 1;
 			return  0;

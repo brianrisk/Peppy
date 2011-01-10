@@ -103,8 +103,8 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 		double sigmaX1Y1 = 0.0;
 		double sigmaX2 = 0.0;
 		double sigmaY2 = 0.0;
-		double xMean = spectrum1.getCalculatedAverageIntensity();
-		double yMean = spectrum2.getCalculatedAverageIntensity();
+		double xMean = spectrum1.getAverageIntensity();
+		double yMean = spectrum2.getAverageIntensity();
 		double xDifference, yDifference;
 		while (index1 < peaks1.size() && index2 < peaks2.size()) {
 			//making sure we're not out of bounds

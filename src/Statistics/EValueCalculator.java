@@ -76,8 +76,8 @@ public class EValueCalculator {
 			}
 		}
 		
-		smoothedHistogram = smoothHistogram(histogram, 2);
-//		smoothedHistogram = histogram;
+//		smoothedHistogram = smoothHistogram(histogram, 2);
+		smoothedHistogram = histogram;
 		
 		//find score probabilities
 		for (int i = 0; i < numberOfHistogramBars; i++) {
@@ -101,6 +101,7 @@ public class EValueCalculator {
 		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
 			if (smoothedHistogram[topIndex] == 0) break;
 		}
+		if (topIndex >= numberOfHistogramBars) topIndex = numberOfHistogramBars;
 		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex

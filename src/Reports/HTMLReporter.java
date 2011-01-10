@@ -89,7 +89,7 @@ public class HTMLReporter {
 //				match.setRank(matchRank);
 				if (matchRank == 2) {
 					scoreRatio = previousMatch.getScore() / match.getScore();
-					previousMatch.setTandemFitScoreRatio(scoreRatio);
+					previousMatch.setScoreRatio(scoreRatio);
 				}
 				previousMatch = match;
 			}
@@ -105,7 +105,10 @@ public class HTMLReporter {
 			pw.println("<h1>Best match for each spectrum</h1>");
 			pw.println("<p>Number of spectra with quality matches: " + bestMatches.size() + "</p>");
 			U.appendFile(pw, Properties.reportWebTableHeader);
-			
+			NumberFormat nfDecimal = NumberFormat.getInstance();
+			nfDecimal.setMaximumFractionDigits(4);
+			NumberFormat nfPercent = NumberFormat.getPercentInstance();
+			nfPercent.setMaximumFractionDigits(2);
 			
 			for (int i = 0; i < bestMatches.size(); i++) {
 				Match match = bestMatches.get(i);
@@ -134,12 +137,14 @@ public class HTMLReporter {
 //				sb.append("</td>");
 				
 				sb.append("<td><nobr>");
-				sb.append("<a href=\"sequences/");
-				sb.append(match.getSequence().getId());
-				sb.append(Properties.reportWebSuffix);
-				sb.append("\">");
-				sb.append(match.getSequence().getSequenceFile().getName());
-				sb.append("</a> ");
+				if (sequences != null) {
+					sb.append("<a href=\"sequences/");
+					sb.append(match.getSequence().getId());
+					sb.append(Properties.reportWebSuffix);
+					sb.append("\">");
+					sb.append(match.getSequence().getSequenceFile().getName());
+					sb.append("</a> ");
+				}
 				sb.append("</nobr></td>");
 				
 				sb.append("<td>");
@@ -166,7 +171,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getScore());
+				sb.append(nfDecimal.format(match.getScore()));
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -174,10 +179,12 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length();
-				NumberFormat nfPercent = NumberFormat.getPercentInstance();
-				nfPercent.setMaximumFractionDigits(2);
+				double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length();		
 				sb.append(nfPercent.format(matchPercent));
+				sb.append("</td>");
+				
+				sb.append("<td>");
+				sb.append(nfDecimal.format(match.getScoreRatio()));
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -495,9 +502,7 @@ public class HTMLReporter {
 			sb.append(match.getSequence().getId());
 			sb.append(Properties.reportWebSuffix);
 			sb.append("\">");
-		}
-		sb.append(match.getSequence().getSequenceFile().getName ());
-		if (Properties.generateSequenceReport) {
+			sb.append(match.getSequence().getSequenceFile().getName ());
 			sb.append("</a>");
 		}
 		if (match.getPeptide().isForward()) {sb.append(" forward ");}

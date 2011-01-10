@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.imageio.ImageIO;
-
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
@@ -38,9 +36,9 @@ public class TestSet {
 	private int topRankTrueTally = 0;
 	private int topRankFalseTally = 0;
 	private int totalTrueTally = 0;
-	private int trueTallyAtOnePercentError = -1;
-	private double percentAtOnePercentError = -1;
-	private double eValueAtOnePercentError = -1;
+	private int trueTallyAtFivePercentError = -1;
+	private double percentAtFivePercentError = -1;
+	private double eValueAtFivePercentError = -1;
 	
 	//PR curve
 	private double areaUnderPRCurve = 0;
@@ -110,6 +108,8 @@ public class TestSet {
 		Peppy.Peppy.assignRankToMatches(positiveMatches);
 		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
 //		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
@@ -182,20 +182,16 @@ public class TestSet {
 	 */
 	private void calculateStastics() {
 		//stats for tested matches
-		boolean onePercenThresholdHasBeenReached = false;
 		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
 				topRankTrueTally++;
 			} else {
 				topRankFalseTally++;
 			}
-			if (!onePercenThresholdHasBeenReached) {
-				if ((double) topRankFalseTally / setSize >= 0.01) {
-					onePercenThresholdHasBeenReached = true;
-					trueTallyAtOnePercentError =  topRankTrueTally;
-					percentAtOnePercentError = (double) trueTallyAtOnePercentError / setSize;
-					eValueAtOnePercentError = match.getEValue();
-				}
+			if ((double) topRankFalseTally / (topRankTrueTally + topRankFalseTally) <= 0.05) {
+				trueTallyAtFivePercentError =  topRankTrueTally;
+				percentAtFivePercentError = (double) trueTallyAtFivePercentError / setSize;
+				eValueAtFivePercentError = match.getEValue();
 			}
 		}
 		//count total true
@@ -384,12 +380,16 @@ public class TestSet {
 		return topRankFalseTally;
 	}
 
-	public int getTrueTallyAtOnePercentError() {
-		return trueTallyAtOnePercentError;
+	public int getTrueTallyAtFivePercentError() {
+		return trueTallyAtFivePercentError;
 	}
 
-	public double getEValueAtOnePercentError() {
-		return eValueAtOnePercentError;
+	public double getEValueAtFivePercentError() {
+		return eValueAtFivePercentError;
+	}
+
+	public double getPercentAtFivePercentError() {
+		return percentAtFivePercentError;
 	}
 
 	public double getMilisecondsPerSpectrum() {
@@ -410,10 +410,6 @@ public class TestSet {
 
 	public int getSetSize() {
 		return setSize;
-	}
-
-	public double getPercentAtOnePercentError() {
-		return percentAtOnePercentError;
 	}
 
 	public ArrayList<MatchContainer> getTestedMatches() {

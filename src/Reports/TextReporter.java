@@ -116,7 +116,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 4");
+			pw.println("format version 5");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -170,7 +170,9 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Match Rank");
 			sb.append('\t');
-			sb.append("Rank Count");	
+			sb.append("Rank Count");
+			sb.append('\t');
+			sb.append("Ion Count");	
 			pw.println(sb);		
 			
 			//print rows
@@ -214,6 +216,8 @@ public class TextReporter {
 					sb.append(match.getRank());
 					sb.append('\t');
 					sb.append(match.getRankCount());
+					sb.append('\t');
+					sb.append(match.getIonMatchTally());
 					pw.println(sb);
 				}
 			}

@@ -33,7 +33,7 @@ public class SpectralVisualizer {
 	public static final int THEME_WHITE = 0;
 	public static final int THEME_BLACK = 1;
 	private static int theTheme = THEME_WHITE;
-	private static boolean cubedScale = false;
+	private static boolean cubedScale = true;
 	static Color yIonColor = Color.RED;
 	static Color bIonColor = Color.BLUE;
 	static Color noIonColor = Color.gray;
@@ -41,7 +41,33 @@ public class SpectralVisualizer {
 	static Color bkgndColor = Color.white;
 	static Color axesColor = Color.black;
 	
+//	public static void main(String args[]) {
+//		if (theTheme == THEME_BLACK) {
+//			yIonColor = Color.yellow;
+//			bIonColor = Color.cyan;
+//			noIonColor = Color.gray;
+//			bothIonColor = Color.green;
+//			bkgndColor = Color.black;
+//			axesColor = Color.white;
+//		}
+//		if (theTheme == THEME_WHITE) {
+//			yIonColor = Color.RED;
+//			bIonColor = Color.BLUE;
+//			noIonColor = Color.LIGHT_GRAY;
+//			bothIonColor = Color.green;
+//			bkgndColor = Color.white;
+//			axesColor = Color.black;
+//		}
+//		U.p("drawing images for spectra");
+//		Peppy.init();
+//		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(Properties.spectraDirectoryOrFile);
+//		ArrayList<Peptide> peptides = loadPeptides("peptides.txt");
+//		generateFullReport(spectra, peptides);
+//		U.p("done");
+//	}
+	
 	public static void main(String args[]) {
+		System.setProperty("java.awt.headless", "true"); 
 		if (theTheme == THEME_BLACK) {
 			yIonColor = Color.yellow;
 			bIonColor = Color.cyan;
@@ -60,18 +86,125 @@ public class SpectralVisualizer {
 		}
 		U.p("drawing images for spectra");
 		Peppy.init();
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(Properties.spectraDirectoryOrFile);
-		ArrayList<Peptide> peptides = loadPeptides("peptides.txt");
-		generateFullReport(spectra, peptides);
+		
+		//load spectra
+		U.p("loading spectra...");
+//		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("spectra encode membrane/GO_mem_FASP_dta20100628");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder("spectra encode membrane/SDS");
+		
+		//load list of spectra and peptides
+		File listFolder = new File("differences_spectrum_reports/sds");
+		File [] lists = listFolder.listFiles();
+		for (int i = 0; i < lists.length; i++) {
+			if (!lists[i].getName().endsWith(".txt")) continue;
+			U.p("loading list " + lists[i].getName());
+			ArrayList<String> spectraNames = new ArrayList<String>();
+			ArrayList<String> peptideStrings = new ArrayList<String>();
+			ArrayList<String> eValues = new ArrayList<String>();
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(lists[i]));
+				String line = br.readLine();
+				int lineNumber = 1;
+				while (line != null) {
+					String [] chunks = line.split("\t");
+					if (chunks == null) {
+						U.p("chunks is null");
+						U.p("line number: " + lineNumber);
+						break;
+					}
+					if (chunks.length < 3) {
+						U.p("chunks length isn't 3");
+						U.p("line number: " + lineNumber);
+						break;
+					}
+					spectraNames.add(chunks[0]);
+					peptideStrings.add(chunks[1]);
+					eValues.add(chunks[2]);
+					line = br.readLine();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			//find the spectra from the list
+			U.p("finding spectra from list...");
+			ArrayList<Spectrum> spectraSelect = new ArrayList<Spectrum>();
+			ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+			for (int j = 0; j < spectraNames.size(); j++) {
+				String name = spectraNames.get(j);
+				for (Spectrum spectrum: spectra) {
+					if (spectrum.getFile().getName().equals(name)) {
+						spectraSelect.add(spectrum);
+						peptides.add(new Peptide(peptideStrings.get(j)));
+						break;
+					}
+				}
+			}
+			
+			//make the report
+			U.p("making drawings...");
+			SpectralVisualizer.generateFullReport(spectraSelect, peptides, eValues, lists[i].getName().substring(0, lists[i].getName().length() - 4));
+		}
+
 		U.p("done");
 	}
 	
-	public static void generateFullReport(ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides) {
-		File reportFile = new File(Properties.reportDirectory, "index.html");
+	public static void generateFullReport(ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides, ArrayList<String> eValues, String folderName) {
+		File reportFolder = new File(Properties.reportDirectory, folderName);
+		reportFolder.mkdirs();
+		File reportFile = new File(reportFolder, "index.html");
 		try {
 			//create our report directories
-			Properties.reportDirectory.mkdirs();
-			File imageFolder = new File(Properties.reportDirectory, "images");
+			File imageFolder = new File(reportFolder, "images");
+			imageFolder.mkdirs();
+			
+			//set up our main index file
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
+			
+			//print headers
+			U.appendFile(pw, Properties.reportWebHeaderFile);
+			
+			for (int i = 0 ; i <spectra.size(); i++) {
+				//mark potential peptide peaks
+				markMatchingIons(spectra.get(i), peptides.get(i));
+				
+				//make an image file of the spectrum
+				File imageFile = new File(imageFolder, i + ".jpg");
+//				drawSpectrum(spectra.get(i), 1000, 300, imageFile);
+				drawDeluxSpectrum(spectra.get(i), peptides.get(i), imageFile);
+				
+				//include in report file
+				pw.println("<img src=\"images/" + i + ".jpg\">");
+				pw.println("<br>");
+				pw.println(peptides.get(i).getAcidSequence());
+				pw.println("<br>");
+				pw.println(eValues.get(i));
+				pw.println("<p>");
+			}
+			
+			//print headers
+			U.appendFile(pw, Properties.reportWebHeaderFile);
+
+			pw.flush();
+			pw.close();		
+		} catch (FileNotFoundException e) {
+			U.p("could not find file: " + reportFile.getName());
+			e.printStackTrace();
+		} catch (IOException e) {
+			U.p("could not read file: " + reportFile.getName());
+			e.printStackTrace();
+		}
+	}
+	
+	public static void generateFullReport(ArrayList<Spectrum> spectra, ArrayList<Peptide> peptides) {
+		File reportFolder = new File(Properties.reportDirectory, "spectral visualizations " + System.currentTimeMillis());
+		reportFolder.mkdirs();
+		File reportFile = new File(reportFolder, "index.html");
+		try {
+			//create our report directories
+			File imageFolder = new File(reportFolder, "images");
 			imageFolder.mkdirs();
 			
 			//set up our main index file
@@ -258,7 +391,7 @@ public class SpectralVisualizer {
 		//getting maximum spectrum value and intensity
 		double maxValue = spectrum.getPrecursorMass();
 //		double maxValue = 1500;
-		double maxIntensity = spectrum.getCalculatedMaxIntensity();
+		double maxIntensity = spectrum.getMaxIntensity();
 		if (cubedScale) maxIntensity = Math.pow(maxIntensity, 0.333);
 		double peakIntensity;
 		

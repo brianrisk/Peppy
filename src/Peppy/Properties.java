@@ -50,7 +50,8 @@ public class Properties {
 	
 	//TandemFit
 	public static double peakDifferenceThreshold = 0.5;
-	public static double peakIntensityExponent = 0.33333333;
+//	public static double peakIntensityExponent = 0.33333333;
+	public static double peakIntensityExponent = 0.30;
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
 //	public static double YBtrue = 1.1;

@@ -132,6 +132,7 @@ public class Peppy {
 		}
 	}
 	
+	
 	public static void init(String [] args) {
 		if (args.length == 0) {
 			init();
@@ -247,6 +248,17 @@ public class Peppy {
 			match.setRank(rank);
 			rank++;
 			previousMatch = match;
+		}
+		//Setting Score ratios for those with rank 1
+		int i = matches.size() - 1;
+		double previousScore = match.getScore();
+		for (; i >= 0; i--) {
+			match = matches.get(i);
+			if (match.getRank() == 1) {
+				match.setScoreRatio(match.getScore() / previousScore);
+			} else {
+				previousScore = match.getScore();
+			}
 		}
 	}
 	

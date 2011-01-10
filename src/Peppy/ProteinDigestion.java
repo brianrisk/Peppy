@@ -286,8 +286,6 @@ public class ProteinDigestion {
 			) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		
-		int proteinLength = proteinString.length();
-		int proteinLengthMinusOne = proteinLength - 1;
 		char aminoAcid = proteinString.charAt(0);
 		char previousAminoAcid = aminoAcid;
 		int acidIndex = -1;
@@ -295,19 +293,35 @@ public class ProteinDigestion {
 		
 		//Where we store all of our forming peptides
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+		
 		//start the first peptide
-		peptidesUnderConstruction.add(new PeptideUnderConstruction(indicies[0], aminoAcid));
+		if (isFromSequence) {
+			peptidesUnderConstruction.add(new PeptideUnderConstruction(indicies[0], aminoAcid));
+		} else {
+			peptidesUnderConstruction.add(new PeptideUnderConstruction(-1, aminoAcid));
+		}
 		
 		//keeping track of open reading frames within this sequence
 		boolean inORF = false;
 		
+		//advance along each amino acid
 		//start 1 out so we have a previous amino acid
-		for (int i = 1; i < proteinLength; i++) {
+		for (int i = 1; i < proteinString.length(); i++) {
+			
+			//getting the present amino acid
 			aminoAcid = proteinString.charAt(i);
-			acidIndex = indicies[i];
+			
+			//set the amino acid index as described by the indicies
+			if (isFromSequence) {
+				acidIndex = indicies[i];
+			}
+			
+			//add the present amino acid to all forming peptides
 			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 				puc.addAminoAcid(aminoAcid);
 			}
+			
+			//create new forming peptides if necessary
 			if ((isStart(aminoAcid)) ||  // start a new peptide at M
 				(isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
 				(isBreak(previousAminoAcid) && !isStart(aminoAcid)))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
@@ -315,10 +329,13 @@ public class ProteinDigestion {
 				peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
 			}
 			
-			//adding peptides to the grand list
+			//are we in an open reading frame?
 			if (isStart(aminoAcid)) {
 				inORF = true;
-			} else {
+			} 
+			
+			//if we are at a break, add forming peptides to peptide list
+			else {
 				if (isBreak(aminoAcid)) {
 					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
 						evaluateNewPeptide(
@@ -334,22 +351,24 @@ public class ProteinDigestion {
 								peptides);
 					}
 				}
-				if (isStop(aminoAcid)) inORF = false;
 			}
 			
-			//if stop, then clear out
+			//if stop, then clear list of peptides under construction
 			if (isStop(aminoAcid)) {
 				peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
+				inORF = false;
 			}
 			
 			//remove all peptide under construction that have reached their maximum break count
-			int size = peptidesUnderConstruction.size();
-			for (int pucIndex = 0; pucIndex < size; pucIndex++) {
-				PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-				if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
-					peptidesUnderConstruction.remove(pucIndex);
-					pucIndex--;
-					size--;
+			else {
+				int size = peptidesUnderConstruction.size();
+				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
+					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
+					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
+						peptidesUnderConstruction.remove(pucIndex);
+						pucIndex--;
+						size--;
+					}
 				}
 			}
 			
