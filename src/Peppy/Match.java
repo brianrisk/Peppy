@@ -68,7 +68,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	}
 	
 	public double calculateTandemFit() {
-		String peptideString = peptide.getAcidSequence();
+		byte [] acidSequence = peptide.getAcidSequence();
 
 		int i;
 		boolean atLeastOneMatch = false;
@@ -77,12 +77,12 @@ public class Match implements Comparable<Match>, HasEValue{
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
-		int peptideLengthMinusOne = peptideString.length() - 1;
+		int peptideLengthMinusOne = acidSequence.length - 1;
 		
-		double [] bIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) bIonMatchesWithHighestIntensity[i] = 0.0;
-		double [] yIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) yIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] bIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) bIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] yIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) yIonMatchesWithHighestIntensity[i] = 0.0;
 
 		
 		//find the ranges around our theoretical peptides where we
@@ -95,7 +95,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -129,7 +129,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -162,7 +162,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		//find out final tally
 		boolean yIonTrue, bIonTrue;
 		double amountToAdd;
-		for (i = 0; i < peptideString.length(); i++) {
+		for (i = 0; i < acidSequence.length; i++) {
 			
 			yIonTrue = yIonMatchesWithHighestIntensity[i] > 0.0;
 			bIonTrue = bIonMatchesWithHighestIntensity[i] > 0.0;
@@ -194,12 +194,12 @@ public class Match implements Comparable<Match>, HasEValue{
 		}
 		//This slightly punishes for peptides with many amino acids as they have a slightly higher
 		//probability of getting alignments by chance
-		score /= MathFunctions.cachedLog(peptide.getAcidSequence().length());
+		score /= MathFunctions.cachedLog(acidSequence.length);
 		return score;
 	}
 	
 	public double calculateIMP() {
-		String peptideString = peptide.getAcidSequence();
+		byte [] acidSequence = peptide.getAcidSequence();
 
 		int i;
 		boolean atLeastOneMatch = false;
@@ -208,13 +208,10 @@ public class Match implements Comparable<Match>, HasEValue{
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
-		int peptideLengthMinusOne = peptideString.length() - 1;
+		int peptideLengthMinusOne = acidSequence.length - 1;
 		
-		double [] bIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) bIonMatchesWithHighestIntensity[i] = 0.0;
-		double [] yIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) yIonMatchesWithHighestIntensity[i] = 0.0;
-
+		double [] bIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		double [] yIonMatchesWithHighestIntensity = new double[acidSequence.length];
 		
 		//find the ranges around our theoretical peptides where we
 		//count spectrum peaks
@@ -226,7 +223,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -260,7 +257,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -296,7 +293,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		int totalIonsAbove12 = 0;
 		int totalIonsAbove06 = 0;
 		double totalMatchingIntensity = 0.0;
-		for (i = 0; i < peptideString.length(); i++) {
+		for (i = 0; i < acidSequence.length; i++) {
 			if (yIonMatchesWithHighestIntensity[i] > 0.0) {
 				ionMatchTally++;
 				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
@@ -338,7 +335,7 @@ public class Match implements Comparable<Match>, HasEValue{
 		double p;
 		
 		//peak match probability is the binomial distribution
-		n = peptideString.length() * 2;
+		n = acidSequence.length * 2;
 		k = ionMatchTally;
 		p = spectrum.getCoverage();
 		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
@@ -365,11 +362,11 @@ public class Match implements Comparable<Match>, HasEValue{
 					k = totalIonsAbove12;
 					intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
 					
-//					if (totalIonsAbove12 > 0) {
-//						n = totalIonsAbove12;
-//						k = totalIonsAbove06;
-//						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-//					}
+					if (totalIonsAbove12 > 0) {
+						n = totalIonsAbove12;
+						k = totalIonsAbove06;
+						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
+					}
 				}
 			}
 		}
@@ -392,8 +389,10 @@ public class Match implements Comparable<Match>, HasEValue{
 		return score;
 	}
 	
+	
+	
 	public double calculateHMM() {
-		HMMClass scorer = new HMMClass(peptide.getAcidSequence(), spectrum);
+		HMMClass scorer = new HMMClass(peptide.getAcidSequenceString(), spectrum);
 		score = scorer.score();
 		return score;
 	}
@@ -450,7 +449,12 @@ public class Match implements Comparable<Match>, HasEValue{
 				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
 				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
 				//then by alphabetical order of peptides
-				return peptide.getAcidSequence().compareTo(match.getPeptide().getAcidSequence());
+				int shortLength = peptide.getAcidSequence().length;
+				if (match.getPeptide().getAcidSequence().length < shortLength) shortLength = match.getPeptide().getAcidSequence().length;
+				for (int i = 0; i < shortLength; i++) {
+					if (match.getPeptide().getAcidSequence()[i] != peptide.getAcidSequence()[i]) return match.getPeptide().getAcidSequence()[i] - peptide.getAcidSequence()[i];
+				}
+				return 0;
 			} else	
 			if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
 				if (rank < match.getRank()) return -1;
@@ -598,7 +602,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	}
 
 	public String toString() {
-		return spectrum.getId() + "\t" + peptide.getAcidSequence()  + "\t" + getScore();
+		return spectrum.getId() + "\t" + peptide.getAcidSequenceString()  + "\t" + getScore();
 	}
 	
 	public double calculateEValue() {

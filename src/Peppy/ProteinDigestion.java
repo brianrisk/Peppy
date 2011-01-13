@@ -23,9 +23,10 @@ public class ProteinDigestion {
 			String line = br.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
+			int proteinIndex = 0;
 			while (line != null) {
 				if (line.startsWith(">")) {
-					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName));
+					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName, proteinIndex));
 					proteinName = line.substring(1).trim();
 					//try to get the accession number from UniProt databases
 					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
@@ -34,6 +35,7 @@ public class ProteinDigestion {
 					}
 					
 					buffy = new StringBuffer(); 
+					proteinIndex++;
 				} else {
 					buffy.append(line);
 				}
@@ -198,9 +200,12 @@ public class ProteinDigestion {
 		return out;
 	}
 	
+	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName) {
+		return getPeptidesFromProteinString(proteinString, proteinName, -1);
+	}
 	
 	//TODO this code needs to reflect DNA digestion e.g. have peptides that both do and don't start with M
-	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName) {
+	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName, int proteinIndex) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		if (proteinString.length() == 0) return out;
 		ArrayList<Peptide> fragments = new ArrayList<Peptide>();
@@ -215,7 +220,7 @@ public class ProteinDigestion {
 			if (proteinString.charAt(i) == 'P') cleavage = false;
 			if (proteinString.charAt(i) == 'X') cleavage = true;
 			if (cleavage) {
-				Peptide peptide = new Peptide(buffy.toString(), proteinName);
+				Peptide peptide = new Peptide(buffy.toString(), proteinName, proteinIndex);
 				fragments.add(peptide);
 				buffy = new StringBuffer();
 			}
@@ -230,22 +235,21 @@ public class ProteinDigestion {
 		
 		//get in the last peptide
 		buffy.append(proteinString.charAt(proteinString.length() - 1));
-		fragments.add(new Peptide(buffy.toString(), proteinName));
+		fragments.add(new Peptide(buffy.toString(), proteinName, proteinIndex));
 		
 		//add big enough fragments to out
-		for (int i = 0; i < fragments.size(); i++) {
-			Peptide peptide = fragments.get(i);
+		for (Peptide peptide: fragments) {
 			if (peptide.getMass() >= Properties.peptideMassThreshold) out.add(peptide);
 		}
 		
 		//getting all missed cleavages
 		for (int numberOfMissedCleavages = 1; numberOfMissedCleavages <= Properties.numberOfMissedCleavages; numberOfMissedCleavages++){
 			for (int i = 0; i < fragments.size() - numberOfMissedCleavages; i++) {
-				StringBuffer peptideString = new StringBuffer(fragments.get(i).getAcidSequence());
+				StringBuffer peptideString = new StringBuffer(fragments.get(i).getAcidSequenceString());
 				for (int j = 1; j <= numberOfMissedCleavages; j++) {
-					peptideString.append(fragments.get(i + j).getAcidSequence());
+					peptideString.append(fragments.get(i + j).getAcidSequenceString());
 				}
-				Peptide peptide = new Peptide(peptideString.toString(),  proteinName);
+				Peptide peptide = new Peptide(peptideString.toString(),  proteinName, proteinIndex);
 				if (peptide.getMass() >= Properties.peptideMassThreshold) out.add(peptide);
 			}
 		}

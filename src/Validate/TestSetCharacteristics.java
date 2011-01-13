@@ -66,7 +66,7 @@ public class TestSetCharacteristics {
 			Peptide peptide = match.getPeptide();
 			Spectrum spectrum = match.getSpectrum();
 			ArrayList<Peak> peaks = spectrum.getPeaks();
-			String peptideString = peptide.getAcidSequence();
+			String peptideString = peptide.getAcidSequenceString();
 			
 			//If precursor difference is too much, exit
 			double difference = spectrum.getPrecursorMass() - peptide.getMass();

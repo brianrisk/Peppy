@@ -53,25 +53,23 @@ public class TestSet {
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
-		setSize = spectra.size();
+		
 
 //		//load "correct" matches as defined by the test set
 		correctMatches = loadCorrectMatches();
 		
+		//load our spectra from our correct matches as not all matches may be valid
+		//and the correct 
 		//remove spectra that don't have a proper match in our database
 		//first remove spectra which do not represent peptides in our given database
-		correctMatches = loadCorrectMatches();
+		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
 		for (Match match: correctMatches) {
 			Peptide peptide = match.getPeptide();
-			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) == -1) {
-				for (int i = 0; i < spectra.size(); i++) {
-					if (spectra.get(i).getId() == match.getSpectrum().getId()) {
-						spectra.remove(i);
-						i--;
-					}	
-				}
+			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) != -1) {
+				reducedSpectra.add(match.getSpectrum());
 			}
 		}
+		spectra = reducedSpectra;
 		setSize = spectra.size();
 		
 		
@@ -355,9 +353,19 @@ public class TestSet {
 			if (correctAcidSequence.equals("")) {
 				validPeptideFile = false;
 			}
+			
+			//testing we've got a valid peptide
+			boolean validPeptide = true;
+			Peptide peptide = new Peptide(correctAcidSequence);
+			if (peptide.getMass() < 0) {
+				validPeptide = false;
+				U.p(correctAcidSequence);
+				U.p(testName);
+				U.p(spectrumFile.getName());
+			}
 			//adding to the array list
-			if (validPeptideFile) {
-				correctMatches.add(new Match(spectrum, new Peptide(correctAcidSequence), null));
+			if (validPeptideFile && validPeptide) {
+				correctMatches.add(new Match(spectrum, peptide, null));
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {

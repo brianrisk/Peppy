@@ -12,7 +12,8 @@ package Peppy;
  */
 public class Peptide implements Comparable<Peptide> {
 	
-	private String acidSequence;
+//	private String acidSequence;
+	private byte [] acidSequence;
 	private double mass;
 	private int startIndex;
 	private int stopIndex;
@@ -21,6 +22,7 @@ public class Peptide implements Comparable<Peptide> {
 	private boolean forward;
 	private Sequence parentSequence;
 	private String proteinName;
+	private int proteinIndex;
 	private boolean isSpliced;
 	
 	
@@ -29,7 +31,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this.acidSequence = sequence;
+		this.acidSequence = AminoAcids.getByteArrayForString(sequence);
 		this.mass = calculateMass();
 		this.startIndex = 0;
 		this.forward = true;
@@ -44,7 +46,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param forward
 	 */
 	public Peptide(String acidSequence, int startIndex, boolean forward, Sequence parentSequence) {
-		this.acidSequence = acidSequence;
+		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
 		if (forward) {
@@ -64,7 +66,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param forward
 	 */
 	public Peptide(String acidSequence, int startIndex, int stopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
-		this.acidSequence = acidSequence;
+		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
@@ -74,7 +76,7 @@ public class Peptide implements Comparable<Peptide> {
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
-		this.acidSequence = acidSequence;
+		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
@@ -91,25 +93,24 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param proteinName
 	 */
 	public Peptide(String acidSequence, String proteinName) {
-		this.acidSequence = acidSequence;
+		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.proteinName = proteinName;
 	}
+	
 
-
-	public String getProteinName() {
-		return proteinName;
+	public Peptide(String acidSequence, String proteinName, int proteinIndex) {
+		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence.toUpperCase());
+		this.mass = calculateMass();
+		this.proteinName = proteinName;
+		this.proteinIndex = proteinIndex;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
 	public String toString() {
-//		return "forward=" + forward + ", index=" + index + ", mass="
-//				+ mass + ", readingFrame=" + readingFrame + ", sequence="
-//				+ sequence;
-		return mass + "\t" + acidSequence + "\t" + startIndex + "\t" + proteinName;
+//		return mass + "\t" + getAcidSequenceString() + "\t" + startIndex + "\t" + proteinName;
+		return getAcidSequenceString();// + "\t" + startIndex;
 	}
 
 
@@ -125,51 +126,37 @@ public class Peptide implements Comparable<Peptide> {
 	 * 
 	 * the real trick for equality is ignoring any trailing stop (".") codon
 	 */
-	public boolean equals(String otherAcidSequence) {
-		String us = acidSequence.toUpperCase();
-		if (acidSequence.endsWith(".")) {
-			us = us.substring(0, us.indexOf('.'));
+	public boolean equals(byte [] otherAcidSequence) {
+		int ourLength = acidSequence.length;
+		int theirLength = otherAcidSequence.length;
+		
+		//ignoring terminating STOPs
+		if (acidSequence[acidSequence.length - 1] == AminoAcids.STOP) ourLength--;
+		if (otherAcidSequence[otherAcidSequence.length - 1] == AminoAcids.STOP) theirLength--;
+		
+		//if peptids not same length, they are not equal
+		if (ourLength != theirLength) return false;
+		
+		//compare each acid
+		for (int i = 0; i < ourLength; i++) {
+			if (acidSequence[i] != otherAcidSequence[i]) return false;
 		}
 		
-		String them = otherAcidSequence.toUpperCase();
-		if (otherAcidSequence.endsWith(".")) {
-			them = them.substring(0, them.indexOf('.'));
-		}
-		
-		if (us.length() != them.length()) return false;
-		
-		return us.equals(them);
-			
+		//if reached this point, they are equal
+		return true;
 	}
 	
 	/**
-	 * Equals if, by mass, each amino acid is equal
-	 * 
-	 * the real trick for equality is ignoring any trailing stop (".") codon
+	 * Equals if every sequential acid weighs the same as that of the other sequence
 	 */
-	public boolean equalsByAcidMasses(String otherAcidSequence) {
-		String us = acidSequence.toUpperCase();
-		if (acidSequence.endsWith(".")) {
-			us = us.substring(0, us.indexOf('.'));
+	public boolean equalsByAcidMasses(byte [] otherAcidSequence) {
+		if (!equals(otherAcidSequence)) return false;
+		
+		for (int i = 0; i < acidSequence.length; i++) {
+			if (AminoAcids.getWeightMono(acidSequence[i]) != AminoAcids.getWeightMono(otherAcidSequence[i])) return false;
 		}
 		
-		String them = otherAcidSequence.toUpperCase();
-		if (otherAcidSequence.endsWith(".")) {
-			them = them.substring(0, them.indexOf('.'));
-		}
-		
-		if (us.length() != them.length()) return false;
-		
-		//go through each amino acid and, if they weigh the same, they are considered equal
-		boolean equal = true;
-		
-		for (int i = 0; i < us.length(); i++) {
-			if (Definitions.getAminoAcidWeightMono(us.charAt(i)) != Definitions.getAminoAcidWeightMono(them.charAt(i))) {
-				equal = false;
-				break;
-			}
-		}
-		return equal;
+		return true;
 			
 	}
 	
@@ -180,13 +167,21 @@ public class Peptide implements Comparable<Peptide> {
 			return false;
 		}
 	}
+	
+	public boolean equals(String acidSequenceString) {
+		return equals(AminoAcids.getByteArrayForString(acidSequenceString));
+	}
 
 
 	/**
 	 * @return the sequence
 	 */
-	public String getAcidSequence() {
+	public byte [] getAcidSequence() {
 		return acidSequence;
+	}
+	
+	public String getAcidSequenceString() {
+		return AminoAcids.getStringForByteArray(acidSequence);
 	}
 
 
@@ -231,6 +226,14 @@ public class Peptide implements Comparable<Peptide> {
 		} else {
 			return intronStartIndex + 1;
 		}
+	}
+
+public String getProteinName() {
+		return proteinName;
+	}
+
+public int getProteinIndex() {
+		return proteinIndex;
 	}
 
 //	/**
@@ -281,17 +284,28 @@ public class Peptide implements Comparable<Peptide> {
 	public double calculateMass() {
 		double mass = 0.0;
 		if (Properties.useMonoMass) {
-			for (int i = 0; i < acidSequence.length(); i++) {
-				mass += Definitions.getAminoAcidWeightMono(acidSequence.charAt(i));
+			for (int i = 0; i < acidSequence.length; i++) {
+				if (AminoAcids.isValid(acidSequence[i])) {
+					mass += AminoAcids.getWeightMono(acidSequence[i]);
+				} else {
+					mass = -1;
+					return mass;
+				}
 			}
 			mass += Definitions.WATER_MONO;
 		} else {
-			for (int i = 0; i < acidSequence.length(); i++) {
-				mass += Definitions.getAminoAcidWeightAverage(acidSequence.charAt(i));
+			for (int i = 0; i < acidSequence.length; i++) {
+				if (AminoAcids.isValid(acidSequence[i])) {
+					mass += AminoAcids.getWeightAverage(acidSequence[i]);
+				} else {
+					mass = -1;
+					return mass;
+				}
 			}
 			mass += Definitions.WATER_AVERAGE;
 		}
 		return mass;
 	}
+	
 
 }

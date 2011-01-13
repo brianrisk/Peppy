@@ -76,11 +76,11 @@ public class CreateTestSuite {
 		for (Match match: matches) {
 			try {
 				for (Peptide peptide: correctPeptides) {
-					if (match.getPeptide().getAcidSequence().equals(peptide.getAcidSequence())) {
+					if (match.getPeptide().equals(peptide)) {
 						File peptideFile = new File(peptideDir, match.getSpectrum().getFile().getName());
 						PrintWriter pw;
 						pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
-						pw.println(match.getPeptide().getAcidSequence());
+						pw.println(match.getPeptide().getAcidSequenceString());
 						pw.flush();
 						pw.close();
 						
@@ -117,7 +117,7 @@ public class CreateTestSuite {
 				File peptideFile = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/" + match.getSpectrum().getFile().getName());
 				PrintWriter pw;
 				pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
-				pw.println(match.getPeptide().getAcidSequence());
+				pw.println(match.getPeptide().getAcidSequenceString());
 				pw.flush();
 				pw.close();
 				

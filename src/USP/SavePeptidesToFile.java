@@ -31,7 +31,7 @@ public class SavePeptidesToFile {
 			//printing full peptide list
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("USP/peptide-list.txt")));
 			for (Peptide peptide: peptides) {
-				pw.println(peptide.getAcidSequence());
+				pw.println(peptide.getAcidSequenceString());
 			}
 			
 			//closing our file
@@ -65,7 +65,7 @@ public class SavePeptidesToFile {
 			//printing unique mass peptide list
 			pw = new PrintWriter(new BufferedWriter(new FileWriter("USP/peptide-unique-mass-list.txt")));
 			for (Peptide peptide: peptides) {
-				pw.println(peptide.getAcidSequence());
+				pw.println(peptide.getAcidSequenceString());
 			}
 			
 			//closing our file

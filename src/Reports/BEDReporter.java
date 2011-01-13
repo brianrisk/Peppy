@@ -78,9 +78,9 @@ public class BEDReporter {
 				
 				//chromEnd
 				if (match.getPeptide().isForward()) {
-					chromEnd = chromStart + 3 * match.getPeptide().getAcidSequence().length();
+					chromEnd = chromStart + 3 * match.getPeptide().getAcidSequence().length;
 				} else {
-					chromEnd = chromStart - 3 * match.getPeptide().getAcidSequence().length();
+					chromEnd = chromStart - 3 * match.getPeptide().getAcidSequence().length;
 				}
 				
 				//name

@@ -129,7 +129,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append(match.getPeptide().getAcidSequence());
+				sb.append(match.getPeptide().getAcidSequenceString());
 				sb.append("</td>");
 				
 //				sb.append("<td>");
@@ -179,7 +179,7 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length();		
+				double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length;		
 				sb.append(nfPercent.format(matchPercent));
 				sb.append("</td>");
 				
@@ -493,7 +493,7 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append(match.getPeptide().getAcidSequence());
+		sb.append(match.getPeptide().getAcidSequenceString());
 		sb.append("</td>");
 		
 		sb.append("<td><nobr>");
@@ -537,7 +537,7 @@ public class HTMLReporter {
 		sb.append("</td>");
 		
 		sb.append("<td>");
-		sb.append((double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length());
+		sb.append((double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length);
 		sb.append("</td>");
 		
 		sb.append("<td>");

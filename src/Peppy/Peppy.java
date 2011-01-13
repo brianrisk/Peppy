@@ -32,9 +32,9 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init(args);
-		runJobs();
+//		runJobs();
 //		new Peppy(args);
-//		exportPeptideList();
+		exportPeptideList();
 		U.p("done");
 	}
 	
@@ -123,9 +123,8 @@ public class Peppy {
 	}
 
 
-
 	public static void init(String propertiesFile) {
-		System.setProperty("java.awt.headless", "true"); 
+		
 		Properties.loadProperties(propertiesFile);
 		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
 			HMMScore.HMMClass.HmmSetUp();
@@ -355,13 +354,12 @@ public class Peppy {
 			//loop through each sequence in the sequences ArrayList
 			File peptidesFolder = new File ("peptides");
 			peptidesFolder.mkdir();
-			for (int sequenceIndex = 0; sequenceIndex < sequences.size(); sequenceIndex++) {
-				Sequence sequence = sequences.get(sequenceIndex);
+			for (Sequence sequence: sequences) {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
 				
 				ArrayList<Peptide> peptides = null;
 				if (Properties.isSequenceFileDNA) {
-					//
+					peptides = sequence.extractAllPeptides();
 				} else {
 					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				}

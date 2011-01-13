@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import Peppy.AminoAcids;
 import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Peppy;
@@ -319,7 +320,7 @@ public class SpectralVisualizer {
 		
 		//draw labels
 		chartGraphics.setColor(Color.RED);
-		chartGraphics.drawString(peptide.getAcidSequence(), chartX + 10, chartY + fontHeight);
+		chartGraphics.drawString(peptide.getAcidSequenceString(), chartX + 10, chartY + fontHeight);
 		chartGraphics.drawString(spectrum.getFile().getName(), chartX + 10, (int) (chartY + fontHeight * 2.5));
 		
 		//save the file
@@ -481,7 +482,7 @@ public class SpectralVisualizer {
 
 	
 	public static void markMatchingIons(Spectrum spectrum, Peptide peptide) {
-		String peptideString = peptide.getAcidSequence();
+		byte [] acidSequence = peptide.getAcidSequence();
 		
 		//initialize all peaks to be gray
 		ArrayList<Peak> peaks = spectrum.getPeaks();
@@ -495,12 +496,12 @@ public class SpectralVisualizer {
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
-		int peptideLengthMinusOne = peptideString.length() - 1;
+		int peptideLengthMinusOne = acidSequence.length - 1;
 		
-		double [] bIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) bIonMatchesWithHighestIntensity[i] = 0.0;
-		double [] yIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) yIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] bIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) bIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] yIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) yIonMatchesWithHighestIntensity[i] = 0.0;
 
 		
 		//find the ranges around our theoretical peptides where we
@@ -513,7 +514,7 @@ public class SpectralVisualizer {
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -531,7 +532,7 @@ public class SpectralVisualizer {
 				if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
 					spectrum.getPeak(peakIndex).setColor(yIonColor);
 					int labelNumber = peptideLengthMinusOne - seqIndex;
-					if (peptideString.endsWith(".")) labelNumber--;
+//					if (acidSequence.endsWith(".")) labelNumber--;
 					spectrum.getPeak(peakIndex).setyIonNumber(labelNumber);
 				}
 			}
@@ -543,7 +544,7 @@ public class SpectralVisualizer {
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}

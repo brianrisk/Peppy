@@ -148,7 +148,7 @@ public class SpectrumComparison implements Comparable<SpectrumComparison> {
 	public double getDistance() {return distance;}
 	
 	public String toString() {
-		return spectrumPeptidePair1.getPeptide().getAcidSequence() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequence() + ": " + distance;
+		return spectrumPeptidePair1.getPeptide().getAcidSequenceString() + ", " + spectrumPeptidePair2.getPeptide().getAcidSequenceString() + ": " + distance;
 		}
 	
 	public Spectrum getSpectrumA() {return spectrum1;}

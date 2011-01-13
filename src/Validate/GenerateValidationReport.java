@@ -1,4 +1,4 @@
-package Validate;
+	package Validate;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -84,7 +84,7 @@ public class GenerateValidationReport {
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
-		Properties.peakDifferenceThreshold = 0.25;
+		Properties.peakDifferenceThreshold = 0.3;
 		
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_09/uniprot_sprot_human.fasta");
@@ -502,7 +502,7 @@ public class GenerateValidationReport {
 					pw.println("<tr>");
 					
 					pw.println("<td>");
-					pw.println(ourMatch.getPeptide().getAcidSequence());
+					pw.println(ourMatch.getPeptide().getAcidSequenceString());
 					pw.println("</td>");
 					
 					pw.println("<td>");
@@ -601,7 +601,7 @@ public class GenerateValidationReport {
 					imageIndex++;
 					
 					pw.println("<td>");
-					pw.println(ourMatch.getPeptide().getAcidSequence());
+					pw.println(ourMatch.getPeptide().getAcidSequenceString());
 					if (!matchContainer.isTrue())
 						pw.println("<br>" + matchContainer.getCorrectAcidSequence());
 					pw.println("</td>");
@@ -644,7 +644,7 @@ public class GenerateValidationReport {
 		double peptideMassButBigger = peptide.getMass() + .01;
 		for (int i = peptideIndex; i < peptides.size(); i++) {
 			if (peptide.getMass() == peptides.get(i).getMass()) {
-				if (peptide.getAcidSequence().equals(peptides.get(i).getAcidSequence())) {
+				if (peptide.equals(peptides.get(i))) {
 					return i;
 				}
 			}

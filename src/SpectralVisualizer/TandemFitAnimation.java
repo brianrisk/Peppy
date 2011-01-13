@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Peppy.AminoAcids;
 import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Peptide;
@@ -62,7 +63,8 @@ public class TandemFitAnimation {
 	
 	public void markMatchingIons() {
 		
-		String peptideString = peptide.getAcidSequence();
+		byte [] acidSequence = peptide.getAcidSequence();
+		String acidString = AminoAcids.getStringForByteArray(acidSequence);
 		
 		//initialize all peaks to be gray
 		ArrayList<Peak> peaks = spectrum.getPeaks();
@@ -76,12 +78,12 @@ public class TandemFitAnimation {
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
-		int peptideLengthMinusOne = peptideString.length() - 1;
+		int peptideLengthMinusOne = acidSequence.length - 1;
 		
-		double [] bIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) bIonMatchesWithHighestIntensity[i] = 0.0;
-		double [] yIonMatchesWithHighestIntensity = new double[peptideString.length()];
-		for (i = 0; i < peptideString.length(); i++) yIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] bIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) bIonMatchesWithHighestIntensity[i] = 0.0;
+		double [] yIonMatchesWithHighestIntensity = new double[acidSequence.length];
+		for (i = 0; i < acidSequence.length; i++) yIonMatchesWithHighestIntensity[i] = 0.0;
 
 		
 		//find the ranges around our theoretical peptides where we
@@ -94,7 +96,7 @@ public class TandemFitAnimation {
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -103,7 +105,7 @@ public class TandemFitAnimation {
 		seqIndex = 0;
 		while (peakIndex >= 0) {
 			hilightPeakAtIndex(peakIndex);
-			drawSpectrum(peptideString, "Y: " + peptideString.substring(seqIndex + 1));
+			drawSpectrum(acidString, "Y: " + acidString.substring(seqIndex + 1));
 			peakMass = spectrum.getPeak(peakIndex).getMass();
 			while (peakMass < theoreticalPeaksLeft[seqIndex]) {
 				seqIndex++;
@@ -113,7 +115,7 @@ public class TandemFitAnimation {
 			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
 				if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
 					spectrum.getPeak(peakIndex).setColor(yIonColor);
-					drawSpectrum(peptideString, "Y: " + peptideString.substring(seqIndex + 1));
+					drawSpectrum(acidString, "Y: " + acidString.substring(seqIndex + 1));
 				}
 			}
 			
@@ -124,7 +126,7 @@ public class TandemFitAnimation {
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 		}
@@ -133,7 +135,7 @@ public class TandemFitAnimation {
 		seqIndex = 0;
 		while (peakIndex < spectrum.getPeakCount()) {
 			hilightPeakAtIndex(peakIndex);
-			drawSpectrum(peptideString, "B: " + peptideString.substring(0, seqIndex + 1));
+			drawSpectrum(acidString, "B: " + acidString.substring(0, seqIndex + 1));
 			peakMass = spectrum.getPeak(peakIndex).getMass();
 			while (peakMass > theoreticalPeaksRight[seqIndex]) {
 				seqIndex++;
@@ -147,7 +149,7 @@ public class TandemFitAnimation {
 					} else {
 						spectrum.getPeak(peakIndex).setColor(bIonColor);
 					}
-					drawSpectrum(peptideString, "B: " + peptideString.substring(0, seqIndex + 1));
+					drawSpectrum(acidString, "B: " + acidString.substring(0, seqIndex + 1));
 				}
 			}
 			

@@ -29,7 +29,7 @@ public class SequenceRegion implements Comparable<SequenceRegion>{
 		
 		//multiply by 3 because there are three nucleotides for each amino acid
 		//TODO:  make this calculation part of Peptide?
-		int peptideLength = match.getPeptide().getAcidSequence().length() * 3;
+		int peptideLength = match.getPeptide().getAcidSequence().length * 3;
 		
 		double hitValue = Math.abs(Math.log(match.getEValue()));
 		

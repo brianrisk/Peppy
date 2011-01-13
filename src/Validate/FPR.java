@@ -126,12 +126,12 @@ public class FPR {
 				
 				
 				for (Match match: forwardsMatches) {
-					forwardsResults.println(match.getEValue() + "\t" + match.getPeptide().getAcidSequence());
+					forwardsResults.println(match.getEValue() + "\t" + match.getPeptide().getAcidSequenceString());
 				}
 				forwardsResults.flush();
 				forwardsResults.close();
 				for (Match match: reverseMatches) {
-					reverseResults.println(match.getEValue() + "\t" + match.getPeptide().getAcidSequence() + "\t" + match.getSpectrum().getFile().getName());
+					reverseResults.println(match.getEValue() + "\t" + match.getPeptide().getAcidSequenceString() + "\t" + match.getSpectrum().getFile().getName());
 				}
 				reverseResults.flush();
 				reverseResults.close();

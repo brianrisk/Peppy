@@ -143,11 +143,11 @@ public class ComparisonTester {
 				//print int out
 				pw.print(comparison.getSpectrumA().getFile().getName());
 				pw.print(";");
-				pw.print(comparison.getSpectrumPeptidePairA().getPeptide().getAcidSequence());
+				pw.print(comparison.getSpectrumPeptidePairA().getPeptide().getAcidSequenceString());
 				pw.print("<p>");
 				pw.print(comparison.getSpectrumB().getFile().getName());
 				pw.print(";");
-				pw.print(comparison.getSpectrumPeptidePairB().getPeptide().getAcidSequence());
+				pw.print(comparison.getSpectrumPeptidePairB().getPeptide().getAcidSequenceString());
 				pw.print("<p>");
 				pw.print("<img src=\"");
 				pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());

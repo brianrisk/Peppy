@@ -193,7 +193,7 @@ public class TextReporter {
 					sb.append('\t');
 					sb.append(match.getEValue());
 					sb.append('\t');
-					sb.append(match.getPeptide().getAcidSequence());
+					sb.append(match.getPeptide().getAcidSequenceString());
 					sb.append('\t');
 					if (Peppy.Properties.isSequenceFileDNA) {
 						sb.append(match.getSequence().getSequenceFile().getName());
