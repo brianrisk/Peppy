@@ -110,7 +110,7 @@ public class Peptide implements Comparable<Peptide> {
 	@Override
 	public String toString() {
 //		return mass + "\t" + getAcidSequenceString() + "\t" + startIndex + "\t" + proteinName;
-		return getAcidSequenceString();// + "\t" + startIndex;
+		return  getAcidSequenceString() + "\t" + startIndex + "\t" + forward + "\t" + (startIndex % 3);
 	}
 
 

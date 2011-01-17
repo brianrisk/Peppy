@@ -1,6 +1,8 @@
 package Peppy;
 import java.util.ArrayList;
 
+import Utilities.U;
+
 public class DNA_DigestionThread implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
@@ -15,7 +17,7 @@ public class DNA_DigestionThread implements Runnable {
 		if (forwards) {
 			digest(startIndex + frame, stopIndex);
 		} else {
-			digest(stopIndex - frame - 1, startIndex);	
+			digest(stopIndex - frame - 1, startIndex - 1);	
 		}
 	}
 	
@@ -39,8 +41,55 @@ public class DNA_DigestionThread implements Runnable {
 		return peptides;
 	}
 	
+	/**
+	 * creates an ArrayList of Proteins where STOPs mark the end
+	 * of each protein
+	 * @param startIndex
+	 * @param stopIndex
+	 */
+	public ArrayList<Protein> translateProteins(int startIndex, int stopIndex) {
+		ArrayList<Protein> proteins = new ArrayList<Protein>();
+		char [] codon = new char[3];
+		char aminoAcid;
+		int mod;
+		StringBuffer buildingProtein = new StringBuffer();
+		int proteinStart = startIndex;
+		Sequence sequence = nucleotideSequence.getParentSequence();
+		String name = sequence.getSequenceFile().getName();
+		
+		int increment = 1;
+		if (!forwards) increment = -1;
+		for (int index = startIndex; index != stopIndex; index += increment) {
+			mod = (increment * (index - startIndex)) % 3;
+			codon[mod] = nucleotideSequence.getSequence().charAt(index);
+			if (mod == 2) {
+				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwards)];
+				buildingProtein.append(aminoAcid);
+				if (aminoAcid == '.') {
+					if (buildingProtein.length() > 4) {
+						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwards, sequence));
+					}
+					proteinStart = startIndex + index + 1;
+					buildingProtein = new StringBuffer();
+				}
+			}
+		}
+		
+		if (buildingProtein.length() > 4) {
+			proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwards, sequence));
+		}
+		return proteins;
+	}
 	
 	public void digest(int startIndex, int stopIndex) {
+		ArrayList<Protein> proteins = translateProteins(startIndex, stopIndex);
+		peptides = new ArrayList<Peptide>();
+		for (Protein protein: proteins) {
+			peptides.addAll(protein.digest());
+		}
+	}
+	
+	public void digestOld(int startIndex, int stopIndex) {
 		//a codon is a set of 3 nucleotide characters
 		char [] codon = new char[3];
 		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
@@ -166,7 +215,7 @@ public class DNA_DigestionThread implements Runnable {
 	
 
 
-	private int indexForCodonArray(char [] codon, boolean forwards) {
+	public static int indexForCodonArray(char [] codon, boolean forwards) {
 		int out = indexForCodonArray(codon);
 		if (out == -1) return 56; //if unknown, return STOP
 		if (forwards) {
@@ -185,7 +234,7 @@ public class DNA_DigestionThread implements Runnable {
 	 * @param codon
 	 * @return
 	 */
-	private int indexForCodonArray(char [] codon) {
+	public static int indexForCodonArray(char [] codon) {
 		if (codon[0] == 'A') {
 			if (codon[1] == 'A') {
 				if (codon[2] == 'A') {

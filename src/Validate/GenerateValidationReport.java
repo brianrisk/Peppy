@@ -40,11 +40,11 @@ public class GenerateValidationReport {
 	public static void main(String[] args) {	
 		setUp();
 		U.startStopwatch();
-		if (doForwards) forwards();
-		if (doReverse) reverse();
-		createReport();
+//		if (doForwards) forwards();
+//		if (doReverse) reverse();
+//		createReport();
 //		createResultsFiles();
-//		makeOnlyWrongReport();
+		makeOnlyWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
 //		compareEValueReports();
@@ -472,9 +472,9 @@ public class GenerateValidationReport {
 		tests = new ArrayList<TestSet>();
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
-//		tests.add(new TestSet("human", peptides));
-//		tests.add(new TestSet("aurum", peptides));	
-//		tests.add(new TestSet("USP", peptides));
+		tests.add(new TestSet(testDirectoryName,"human", peptides));
+		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
+		tests.add(new TestSet(testDirectoryName, "USP", peptides));
 		
 		for (TestSet test: tests) {
 			test.findPositiveMatches(peptides);

@@ -204,55 +204,10 @@ public class ProteinDigestion {
 		return getPeptidesFromProteinString(proteinString, proteinName, -1);
 	}
 	
-	//TODO this code needs to reflect DNA digestion e.g. have peptides that both do and don't start with M
 	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName, int proteinIndex) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
-		if (proteinString.length() == 0) return out;
-		ArrayList<Peptide> fragments = new ArrayList<Peptide>();
-		StringBuffer buffy = new StringBuffer();
-		boolean cleavage;
-		//starting with the second amino acid
-		for (int i = 1; i < proteinString.length(); i++) {
-			buffy.append(proteinString.charAt(i - 1));
-			cleavage = false;
-			if (proteinString.charAt(i - 1) == 'K') cleavage = true;
-			if (proteinString.charAt(i - 1) == 'R') cleavage = true;
-			if (proteinString.charAt(i) == 'P') cleavage = false;
-			if (proteinString.charAt(i) == 'X') cleavage = true;
-			if (cleavage) {
-				Peptide peptide = new Peptide(buffy.toString(), proteinName, proteinIndex);
-				fragments.add(peptide);
-				buffy = new StringBuffer();
-			}
-			if (proteinString.charAt(i) == 'X') {
-				while (proteinString.charAt(i) == 'X') {
-					i++;
-					if (i ==  proteinString.length()) break;
-				}
-				i++;
-			}
-		}
-		
-		//get in the last peptide
-		buffy.append(proteinString.charAt(proteinString.length() - 1));
-		fragments.add(new Peptide(buffy.toString(), proteinName, proteinIndex));
-		
-		//add big enough fragments to out
-		for (Peptide peptide: fragments) {
-			if (peptide.getMass() >= Properties.peptideMassThreshold) out.add(peptide);
-		}
-		
-		//getting all missed cleavages
-		for (int numberOfMissedCleavages = 1; numberOfMissedCleavages <= Properties.numberOfMissedCleavages; numberOfMissedCleavages++){
-			for (int i = 0; i < fragments.size() - numberOfMissedCleavages; i++) {
-				StringBuffer peptideString = new StringBuffer(fragments.get(i).getAcidSequenceString());
-				for (int j = 1; j <= numberOfMissedCleavages; j++) {
-					peptideString.append(fragments.get(i + j).getAcidSequenceString());
-				}
-				Peptide peptide = new Peptide(peptideString.toString(),  proteinName, proteinIndex);
-				if (peptide.getMass() >= Properties.peptideMassThreshold) out.add(peptide);
-			}
-		}
+		Protein protein = new Protein(proteinName, proteinIndex, proteinString);
+		out = protein.digest();
 		return out;
 	}
 	

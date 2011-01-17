@@ -560,11 +560,6 @@ public class Spectrum implements Comparable<Spectrum>{
 		U.p("done");
 	}
 	
-	private static double transform(double value) {
-//		return Math.log(value);
-		return Math.pow(value, 1);
-	}
-	
 	/**
 	 * recursively goes through folder.
 	 * finds all files that end in .dta or .pkl

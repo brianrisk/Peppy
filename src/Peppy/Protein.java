@@ -2,6 +2,8 @@ package Peppy;
 
 import java.util.ArrayList;
 
+import Utilities.U;
+
 /**
  * Important note:  all begin indicies are inclusive, all ends are exclusive
  * @author Brian Risk
@@ -36,14 +38,17 @@ public class Protein implements Comparable<Protein>{
 		intronLength = intronStop - intronStart;
 		this.isForward = isForward;
 		this.sequence = sequence;
+		if (acidString.endsWith("WWW.")) U.p(acidString);
 	}
 	
 	public ArrayList<Peptide> digest() {
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		peptides = new ArrayList<Peptide>();
+		if (acidString.length() < 4) return peptides;
 		
 		char aminoAcid = acidString.charAt(0);
 		char previousAminoAcid = aminoAcid;
 
+		//setting up the acid indicies
 		int [] acidIndicies = new int[acidString.length()];
 		if (isSpliced) {
 			//Setting up nucleotide positions
@@ -72,9 +77,6 @@ public class Protein implements Comparable<Protein>{
 			}
 		}
 		
-		//setting up the acid indicies
-		
-		
 		
 		
 		//Where we store all of our forming peptides
@@ -96,70 +98,57 @@ public class Protein implements Comparable<Protein>{
 			}
 			
 			//create new forming peptides if necessary
-			if ((isStart(aminoAcid)) ||  // start a new peptide at M
-				(isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-				(isBreak(previousAminoAcid) && !isStart(aminoAcid)))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+			if ( (isStart(aminoAcid)) ||  // start a new peptide at M
+				 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+				 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
 			{		
 				peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
 			}
 			
-
-			
-			//if we are at a break, add forming peptides to peptide list
-			else {
+			//if we are at a break, 
+			if (isBreak(aminoAcid) || isStop(aminoAcid)) {
 				if (isBreak(aminoAcid)) {
-					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-						evaluateNewPeptide(
-								puc,
-								intronStart,
-								intronStop,
-								acidIndicies[i],
-								isForward,
-								name,
-								peptides);
+					//remove those which have exceeded the max break count
+					int size = peptidesUnderConstruction.size();
+					for (int pucIndex = 0; pucIndex < size; pucIndex++) {
+						PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
+						if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
+							peptidesUnderConstruction.remove(pucIndex);
+							pucIndex--;
+							size--;
+						}
 					}
 				}
-			}
-			
-			//if stop, then clear list of peptides under construction
-			if (isStop(aminoAcid)) {
-				peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
-			}
-			
-			//remove all peptide under construction that have reached their maximum break count	
-			else {
-				int size = peptidesUnderConstruction.size();
-				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
-					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
-						peptidesUnderConstruction.remove(pucIndex);
-						pucIndex--;
-						size--;
-					}
+				
+				//add forming peptides to peptide list
+				for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+					evaluateNewPeptide(
+							puc,
+							intronStart,
+							intronStop,
+							acidIndicies[i],
+							isForward,
+							name,
+							peptides);
 				}
+
 			}
 			
+
 			//skip X sequences
-			if (acidString.charAt(i) == 'X') {
+			if (aminoAcid == 'X') {
 				while (acidString.charAt(i) == 'X') {
 					i++;
 					if (i ==  acidString.length()) break;
 				}
 				i++;
 			}
+			
+			previousAminoAcid = aminoAcid;
 		}
 		
-		//adding all the remaining peptides under construction
-		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			evaluateNewPeptide(
-					puc,
-					intronStart,
-					intronStop,
-					acidIndicies[acidIndicies.length - 1],
-					isForward,
-					name,
-					peptides);
-		}
+		//no need for that string anymore.  Get rid of it.
+		acidString = null;
 		
 		return peptides;
 	}
@@ -211,7 +200,6 @@ public class Protein implements Comparable<Protein>{
 			peptideIntronStartIndex = -1;
 			peptideIntronStopIndex = -1;
 		}
-		//public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
 		//If this is coming from DNA or RNA, there is a different peptide constructor
 		peptide = new Peptide(
 				puc.getSequence(),
@@ -222,7 +210,7 @@ public class Protein implements Comparable<Protein>{
 				isForward,
 				sequence,
 				isSpliced);
-
+		
 		//add peptide if it meets certain criteria
 		if (peptide.getMass() >= Properties.peptideMassThreshold) {
 			peptides.add(peptide);
@@ -233,6 +221,7 @@ public class Protein implements Comparable<Protein>{
 	 * @return the peptides
 	 */
 	public ArrayList<Peptide> getPeptides() {
+		if (peptides == null) digest();
 		return peptides;
 	}
 
@@ -243,6 +232,18 @@ public class Protein implements Comparable<Protein>{
 		return hitCount;
 	}
 	
+	public int getStart() {
+		return start;
+	}
+
+	public String getAcidString() {
+		return acidString;
+	}
+
+	public boolean isForward() {
+		return isForward;
+	}
+
 	public int calculateHitCount() {
 		hitCount = 0;
 		for (Peptide peptide: peptides) {
@@ -251,16 +252,17 @@ public class Protein implements Comparable<Protein>{
 		return hitCount;
 	}
 
-	private static boolean isStart(char aminoAcid) {
+	private boolean isStart(char aminoAcid) {
 		return (aminoAcid == 'M');
 	}
 	
-	private static boolean isStop(char aminoAcid) {
+	private boolean isStop(char aminoAcid) {
 		return (aminoAcid == '.');
 	}
 	
-	private static boolean isBreak(char aminoAcid) {
-		return (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
+	
+	private boolean isBreak(char aminoAcid) {
+		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
 	}
 
 	public int compareTo(Protein other) {

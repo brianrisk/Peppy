@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import HMMScore.HMMScorer;
 import Reports.HTMLReporter;
 import Reports.TextReporter;
 import Utilities.U;
@@ -363,10 +362,11 @@ public class Peppy {
 				} else {
 					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				}
-				
-				for (int i = 1; i < peptides.size(); i++) {
-					pw.println(peptides.get(i));
+
+				for (Peptide peptide: peptides) {
+					pw.println(peptide);
 				}
+				
 				peptides = null;
 				System.gc();
 				pw.flush();
