@@ -25,7 +25,7 @@ public class SavePeptidesToFile {
 	 */
 	public static void main(String[] args) {
 		U.p("Saving peptides to file");
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("USP/extracted-proteins.txt"));
 		Collections.sort(peptides);
 		try {
 			//printing full peptide list

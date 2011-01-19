@@ -9,14 +9,18 @@ import Utilities.U;
 public class ProteinDigestion {
 	
 	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile) {
-		if (proteinFile.getName().toLowerCase().endsWith("fa")) return getPeptidesFromFASTA(proteinFile);
-		if (proteinFile.getName().toLowerCase().endsWith("fsa")) return getPeptidesFromFASTA(proteinFile);
-		if (proteinFile.getName().toLowerCase().endsWith("fasta")) return getPeptidesFromFASTA(proteinFile);
-		if (proteinFile.getName().toLowerCase().endsWith("dat")) return getPeptidesFromUniprotDAT(proteinFile);
+		return getPeptidesFromDatabase(proteinFile, false);
+	}
+	
+	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile, boolean reverse) {
+		if (proteinFile.getName().toLowerCase().endsWith("fa")) return getPeptidesFromFASTA(proteinFile, reverse);
+		if (proteinFile.getName().toLowerCase().endsWith("fsa")) return getPeptidesFromFASTA(proteinFile, reverse);
+		if (proteinFile.getName().toLowerCase().endsWith("fasta")) return getPeptidesFromFASTA(proteinFile, reverse);
+		if (proteinFile.getName().toLowerCase().endsWith("dat")) return getPeptidesFromUniprotDAT(proteinFile, reverse);
 		return null;
 	}
 	
-	public static ArrayList<Peptide> getPeptidesFromFASTA(File proteinFile) {
+	private static ArrayList<Peptide> getPeptidesFromFASTA(File proteinFile, boolean reverse) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
@@ -24,9 +28,12 @@ public class ProteinDigestion {
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			int proteinIndex = 0;
+			Protein protein;
 			while (line != null) {
 				if (line.startsWith(">")) {
-					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName, proteinIndex));
+					if (reverse) buffy.reverse();
+					protein = new Protein(proteinName, buffy.toString());
+					out.addAll(protein.digest());
 					proteinName = line.substring(1).trim();
 					//try to get the accession number from UniProt databases
 					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
@@ -55,7 +62,7 @@ public class ProteinDigestion {
 	 * @param proteinFile
 	 * @return
 	 */
-	public static ArrayList<Peptide> getPeptidesFromUniprotDAT(File proteinFile) {
+	private static ArrayList<Peptide> getPeptidesFromUniprotDAT(File proteinFile, boolean reverse) {
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
@@ -63,6 +70,7 @@ public class ProteinDigestion {
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			boolean inSequence = false;
+			Protein protein;
 			while (line != null) {
 				if (line.startsWith("ID")) {
 					proteinName = "NOT DEFINED";
@@ -91,7 +99,9 @@ public class ProteinDigestion {
 				}
 				if (line.startsWith("//")) {
 					inSequence = false;
-					out.addAll(getPeptidesFromProteinString(buffy.toString(), proteinName));
+					if (reverse) buffy.reverse();
+					protein = new Protein(proteinName, buffy.toString());
+					out.addAll(protein.digest());
 				}
 				//read a new line
 				line = br.readLine();
@@ -170,274 +180,7 @@ public class ProteinDigestion {
 		}
 	}
 	
-	public static ArrayList<Peptide> getReversePeptidesFromFASTA(File proteinFile) {
-		ArrayList<Peptide> out = new ArrayList<Peptide>();
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
-			String line = br.readLine();
-			StringBuffer buffy = new StringBuffer();
-			String proteinName = "";
-			while (line != null) {
-				if (line.startsWith(">")) {
-					String forwards = buffy.toString();
-					StringBuffer reverseBuffer = new StringBuffer();
-					for (int i = forwards.length() - 1; i >=0; i--) {
-						reverseBuffer.append(forwards.charAt(i));
-					}
-					out.addAll(getPeptidesFromProteinString(reverseBuffer.toString(), proteinName));
-					buffy = new StringBuffer(); 
-				} else {
-					buffy.append(line);
-				}
-				line = br.readLine();
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Collections.sort(out);
-		return out;
-	}
 	
-	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName) {
-		return getPeptidesFromProteinString(proteinString, proteinName, -1);
-	}
-	
-	public static ArrayList<Peptide> getPeptidesFromProteinString(String proteinString, String proteinName, int proteinIndex) {
-		ArrayList<Peptide> out = new ArrayList<Peptide>();
-		Protein protein = new Protein(proteinName, proteinIndex, proteinString);
-		out = protein.digest();
-		return out;
-	}
-	
-	public static ArrayList<Peptide> digestProtein(
-			String proteinString,
-			String proteinName
-			) {
-		return digestProtein(proteinString, false, null, proteinName, new int[proteinString.length()], -1, -1, true);
-	}
-	
-	public static ArrayList<Peptide> digestProtein(
-			String proteinString,
-			Sequence sequence,
-			int startIndex,
-			boolean isForward) {
-		int [] indicies = new int [proteinString.length()];
-		int index = startIndex;
-		for (int i = 0; i < proteinString.length(); i++) {
-			indicies[i] = index;
-			index += 3;
-		}
-		return digestProtein(proteinString, true, sequence, null, indicies, -1, -1, isForward);
-	}
-	
-	
-	public static ArrayList<Peptide> digestProtein(
-			String proteinString, 
-			boolean isFromSequence, 
-			Sequence geneSequence,
-			String proteinName,
-			int [] indicies,
-			int intronStartIndex,
-			int intronStopIndex,
-			boolean isForward
-			) {
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-		
-		char aminoAcid = proteinString.charAt(0);
-		char previousAminoAcid = aminoAcid;
-		int acidIndex = -1;
-		
-		
-		//Where we store all of our forming peptides
-		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
-		
-		//start the first peptide
-		if (isFromSequence) {
-			peptidesUnderConstruction.add(new PeptideUnderConstruction(indicies[0], aminoAcid));
-		} else {
-			peptidesUnderConstruction.add(new PeptideUnderConstruction(-1, aminoAcid));
-		}
-		
-		//keeping track of open reading frames within this sequence
-		boolean inORF = false;
-		
-		//advance along each amino acid
-		//start 1 out so we have a previous amino acid
-		for (int i = 1; i < proteinString.length(); i++) {
-			
-			//getting the present amino acid
-			aminoAcid = proteinString.charAt(i);
-			
-			//set the amino acid index as described by the indicies
-			if (isFromSequence) {
-				acidIndex = indicies[i];
-			}
-			
-			//add the present amino acid to all forming peptides
-			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-				puc.addAminoAcid(aminoAcid);
-			}
-			
-			//create new forming peptides if necessary
-			if ((isStart(aminoAcid)) ||  // start a new peptide at M
-				(isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-				(isBreak(previousAminoAcid) && !isStart(aminoAcid)))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-			{		
-				peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
-			}
-			
-			//are we in an open reading frame?
-			if (isStart(aminoAcid)) {
-				inORF = true;
-			} 
-			
-			//if we are at a break, add forming peptides to peptide list
-			else {
-				if (isBreak(aminoAcid)) {
-					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-						evaluateNewPeptide(
-								puc,
-								intronStartIndex,
-								intronStopIndex,
-								acidIndex,
-								isFromSequence,
-								isForward,
-								geneSequence,
-								proteinName,
-								inORF,
-								peptides);
-					}
-				}
-			}
-			
-			//if stop, then clear list of peptides under construction
-			if (isStop(aminoAcid)) {
-				peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
-				inORF = false;
-			}
-			
-			//remove all peptide under construction that have reached their maximum break count
-			else {
-				int size = peptidesUnderConstruction.size();
-				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
-					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
-						peptidesUnderConstruction.remove(pucIndex);
-						pucIndex--;
-						size--;
-					}
-				}
-			}
-			
-			//skip X sequences
-			if (proteinString.charAt(i) == 'X') {
-				while (proteinString.charAt(i) == 'X') {
-					i++;
-					if (i ==  proteinString.length()) break;
-				}
-				i++;
-			}
-		}
-		
-		//adding all the remaining peptides under construction
-		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			evaluateNewPeptide(
-					puc,
-					intronStartIndex,
-					intronStopIndex,
-					acidIndex,
-					isFromSequence,
-					isForward,
-					geneSequence,
-					proteinName,
-					inORF,
-					peptides);
-		}
-		return peptides;
-	}
-	
-	/**
-	 * This first creates a peptide from the peptide under construction.
-	 * This is mildly complicated as the peptide has different constructors
-	 * depending on if it comes form a protein database or nucleotide sequence
-	 * @param puc
-	 * @param intronStartIndex
-	 * @param intronStopIndex
-	 * @param acidIndex
-	 * @param isFromSequence
-	 * @param isForward
-	 * @param geneSequence
-	 * @param proteinName
-	 * @param inORF
-	 * @param peptides
-	 */
-	private static void evaluateNewPeptide(
-			PeptideUnderConstruction puc,
-			int intronStartIndex,
-			int intronStopIndex,
-			int acidIndex,
-			boolean isFromSequence,
-			boolean isForward,
-			Sequence geneSequence,
-			String proteinName,
-			boolean inORF,
-			ArrayList<Peptide> peptides
-			) {
-		boolean isSpliced = false;
-		int peptideIntronStartIndex;
-		int peptideIntronStopIndex;
-		Peptide peptide;
-		
-		//splice related
-		isSpliced =  (puc.getStartIndex() < intronStartIndex && acidIndex > intronStopIndex);
-		if (isSpliced) {
-			peptideIntronStartIndex = intronStartIndex;
-			peptideIntronStopIndex = intronStopIndex;
-		} else {
-			peptideIntronStartIndex = -1;
-			peptideIntronStopIndex = -1;
-		}
-		//If this is coming from DNA or RNA, there is a different peptide constructor
-		if (isFromSequence) {
-			peptide = new Peptide(
-					puc.getSequence(),
-					puc.getStartIndex(),
-					acidIndex,
-					peptideIntronStartIndex,
-					peptideIntronStopIndex,
-					isForward,
-					geneSequence,
-					isSpliced);
-		} else {
-			peptide = new Peptide(
-					puc.getSequence(),
-					proteinName);
-		}
-		//add peptide if it meets certain criteria
-		if (peptide.getMass() >= Properties.peptideMassThreshold) {
-			if (Properties.onlyUsePeptidesInOpenReadingFrames) {
-				if (inORF) {
-					peptides.add(peptide);
-				}
-			} else {
-				peptides.add(peptide);
-			}
-		}
-	}
-	
-	private static boolean isStart(char aminoAcid) {
-		return (aminoAcid == 'M');
-	}
-	
-	private static boolean isStop(char aminoAcid) {
-		return (aminoAcid == '.');
-	}
-	
-	private static boolean isBreak(char aminoAcid) {
-		return (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
-	}
 	
 	
 

@@ -49,7 +49,6 @@ public class MathFunctions {
 			}
 		}
 		
-		U.p("CachedMathFunctions initialized");
 	}
 	
 	public static double cachedLog(int n) {

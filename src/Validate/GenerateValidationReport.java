@@ -40,11 +40,11 @@ public class GenerateValidationReport {
 	public static void main(String[] args) {	
 		setUp();
 		U.startStopwatch();
-//		if (doForwards) forwards();
-//		if (doReverse) reverse();
-//		createReport();
+		if (doForwards) forwards();
+		if (doReverse) reverse();
+		createReport();
 //		createResultsFiles();
-		makeOnlyWrongReport();
+//		makeOnlyWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
 //		compareEValueReports();
@@ -67,7 +67,7 @@ public class GenerateValidationReport {
 //		Properties.peakDifferenceThreshold = 0.3;
 		
 		//how many missed cleavages when we digest
-		Properties.numberOfMissedCleavages = 2;
+		Properties.numberOfMissedCleavages = 1;
 		
 		Properties.spectrumToPeptideMassError = 2.0;
 		Properties.peakDifferenceThreshold = 0.5;
@@ -128,7 +128,7 @@ public class GenerateValidationReport {
 		//We only want one match per spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		ArrayList<Peptide> peptides = ProteinDigestion.getReversePeptidesFromFASTA(databaseFile);
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile, true);
 		reverseDatabaseSize = peptides.size();
 		
 		for (TestSet test: tests) {
@@ -465,16 +465,16 @@ public class GenerateValidationReport {
 	 */
 	public static void makeOnlyWrongReport() {
 		U.p("wrong report");
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(databaseFile);
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
 		U.p("forwards database size: " + peptides.size());
 
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
-		tests.add(new TestSet(testDirectoryName,"human", peptides));
-		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+//		tests.add(new TestSet(testDirectoryName,"human", peptides));
+//		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
+//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
 		
 		for (TestSet test: tests) {
 			test.findPositiveMatches(peptides);
@@ -530,8 +530,7 @@ public class GenerateValidationReport {
 	
 	public static void generateWrongReport(TestSet test) {
 		String testName = test.getName();
-//		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
-		ArrayList<MatchContainer> testedMatches = test.getTestedMatches();
+		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
 		U.p("printing out all the spectra that we got wrong and comparing the two different matches");
 		
 		int width = 1000;
@@ -582,8 +581,7 @@ public class GenerateValidationReport {
 	//					}
 					pw.println("<td>");
 					pw.println(ourMatch.ionMatchTally);
-					if (!matchContainer.isTrue())
-						pw.println("<br>" + trueMatch.ionMatchTally);
+					pw.println("<br>" + trueMatch.ionMatchTally);
 					pw.println("</td>");
 					
 					//creating the image of our match
@@ -602,8 +600,7 @@ public class GenerateValidationReport {
 					
 					pw.println("<td>");
 					pw.println(ourMatch.getPeptide().getAcidSequenceString());
-					if (!matchContainer.isTrue())
-						pw.println("<br>" + matchContainer.getCorrectAcidSequence());
+					pw.println("<br>" + matchContainer.getCorrectAcidSequence());
 					pw.println("</td>");
 					
 					pw.println("<td>");
@@ -614,14 +611,12 @@ public class GenerateValidationReport {
 					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
 					pw.print("\" border=0 height=20></a><br>");
 					
-					if (!matchContainer.isTrue()) {
-						pw.print("<br><a href=\"");
-						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
-						pw.print("\">");
-						pw.print("<img src=\"");
-						pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
-						pw.print("\" border=0 height=20></a><br>");
-					}
+					pw.print("<br><a href=\"");
+					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+					pw.print("\">");
+					pw.print("<img src=\"");
+					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
+					pw.print("\" border=0 height=20></a><br>");
 					pw.println("</td>");
 				}
 

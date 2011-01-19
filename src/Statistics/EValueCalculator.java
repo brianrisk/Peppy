@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import Utilities.U;
 
 /**
- * For the caluclation and storing of E Values.
+ * For the calculation and storing of E Values.
  * 
  * This will do all of the housekeeping things like
  * keep track of histograms, find least squares fit, etc.

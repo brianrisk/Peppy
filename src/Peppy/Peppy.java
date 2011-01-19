@@ -31,9 +31,9 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init(args);
-//		runJobs();
+		runJobs();
 //		new Peppy(args);
-		exportPeptideList();
+//		exportPeptideList();
 		U.p("done");
 	}
 	
@@ -66,11 +66,8 @@ public class Peppy {
 			U.p("getting matches...");
 			matches = getMatches(peptides, spectra, sequenceFile);
 			
-		} else {
-			//loop through each sequence in the sequences ArrayList
-			for (Sequence sequence: sequences) {		
-				matches.addAll(getMatches(sequence, spectra));
-			}
+		} else {	
+			matches.addAll(getMatches(sequences, spectra));
 			U.p("peptide tally: " + peptideTally);
 		}
 	
@@ -144,12 +141,36 @@ public class Peppy {
 	}
 	
 	
-	public static ArrayList<Match> getMatches(Sequence sequence, ArrayList<Spectrum> spectra) {
+	/**
+	 * Assumes that we are doing the normal, forwards digestion of our sequences
+	 * @param sequences
+	 * @param spectra
+	 * @return
+	 */
+	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		return getMatches(sequences, spectra, false);
+	}
+	
+	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		return getMatches(sequences, spectra, true);
+	}
+	
+	
+	/**
+	 * 
+	 * @param sequences our list of sequences where we will be getting our peptides
+	 * @param spectra our list of spectra
+	 * @param reverse if we are doing a normal, forwards search or if this is a null, reverse search
+	 * @return
+	 */
+	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean reverse) {
+		ArrayList<Match> matches = new ArrayList<Match>() ;
+		for (Sequence sequence: sequences) {
 			U.p("working on sequence: " +sequence.getSequenceFile().getName());
-			ArrayList<Match> matches = new ArrayList<Match>() ;
+			
 			ArrayList<Peptide> peptides;
 			if (Properties.isSequenceFileDNA) {
-				peptides = sequence.extractMorePeptides();
+				peptides = sequence.extractMorePeptides(reverse);
 				//continually extract peptides from the sequence until there aren't anymore
 				while (peptides != null) {
 					peptideTally += peptides.size();
@@ -166,13 +187,13 @@ public class Peppy {
 					//free up the memory of the old peptide arraylist
 					peptides.clear();
 					System.gc();
-					peptides = sequence.extractMorePeptides();
+					peptides = sequence.extractMorePeptides(reverse);
 				}
 				sequence.clearNucleotideData();
 				U.p("removing duplicate matches");
 				removeDuplicateMatches(matches);
 			} else {
-				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
+				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), reverse);
 				peptideTally += peptides.size();
 				//This is where the bulk of the processing in long jobs takes
 				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
@@ -187,9 +208,9 @@ public class Peppy {
 			}
 			U.p("assigning final match ranks");
 			assignRankToMatches(matches);
-			assignRepeatedPeptideCount(matches);
-
-			return matches;
+			assignRepeatedPeptideCount(matches);			
+		}
+		return matches;
 	}
 	
 	/**
@@ -358,12 +379,13 @@ public class Peppy {
 				
 				ArrayList<Peptide> peptides = null;
 				if (Properties.isSequenceFileDNA) {
-					peptides = sequence.extractAllPeptides();
+					peptides = sequence.extractAllPeptides(false);
 				} else {
 					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				}
 
 				for (Peptide peptide: peptides) {
+					if (!peptide.isForward())
 					pw.println(peptide);
 				}
 				

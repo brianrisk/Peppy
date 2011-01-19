@@ -59,8 +59,8 @@ public class Match implements Comparable<Match>, HasEValue{
 	public void calculateScore() {
 		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
 			//TODO THIS NEEDS TO BE CHANGED
-//			score = calculateTandemFit();
-			score = calculateIMP();
+			score = calculateTandemFit();
+//			score = calculateIMP();
 		} else
 		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
 			score = calculateHMM();

@@ -1,8 +1,6 @@
 package Peppy;
 import java.util.ArrayList;
 
-import Utilities.U;
-
 public class DNA_DigestionThread implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
@@ -11,6 +9,7 @@ public class DNA_DigestionThread implements Runnable {
 	boolean forwards;
 	int startIndex;
 	int stopIndex;
+	boolean reverse;
 
 	public void run() {
 		//go through each character in the line, skipping ahead "frame" characters
@@ -28,191 +27,83 @@ public class DNA_DigestionThread implements Runnable {
 	 * @param forwards
 	 */
 	public DNA_DigestionThread(DNA_Sequence nucleotideSequence,
-			byte frame, boolean forwards, int startIndex, int stopIndex) {
+			byte frame, boolean forwards, int startIndex, int stopIndex, boolean reverse) {
 		if (startIndex < 0) startIndex = 0;
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
 		this.forwards = forwards;
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
+		this.reverse = reverse;
 	}
+	
 	
 	public ArrayList<Peptide> getPeptides( ) {
 		return peptides;
 	}
 	
+	
+	public ArrayList<Peptide> digest(int startIndex, int stopIndex) {
+		ArrayList<Protein> proteins = translateToProteins(startIndex, stopIndex);
+		return digestProteins(proteins);
+	}
+	
+	
+	private ArrayList<Peptide> digestProteins(ArrayList<Protein> proteins) {
+		peptides = new ArrayList<Peptide>();
+		for (Protein protein: proteins) {
+			peptides.addAll(protein.digest());
+		}
+		return peptides;
+	}
+	
+
 	/**
 	 * creates an ArrayList of Proteins where STOPs mark the end
 	 * of each protein
-	 * @param startIndex
-	 * @param stopIndex
+	 * @param startPosition
+	 * @param stopPosition
 	 */
-	public ArrayList<Protein> translateProteins(int startIndex, int stopIndex) {
+	private ArrayList<Protein> translateToProteins(int startPosition, int stopPosition) {
 		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		char [] codon = new char[3];
 		char aminoAcid;
-		int mod;
+		int mod = 0;
 		StringBuffer buildingProtein = new StringBuffer();
-		int proteinStart = startIndex;
 		Sequence sequence = nucleotideSequence.getParentSequence();
 		String name = sequence.getSequenceFile().getName();
-		
 		int increment = 1;
 		if (!forwards) increment = -1;
-		for (int index = startIndex; index != stopIndex; index += increment) {
-			mod = (increment * (index - startIndex)) % 3;
+		int index;
+		int proteinStart = startPosition;
+		for (index = startPosition; index != stopPosition; index += increment) {
 			codon[mod] = nucleotideSequence.getSequence().charAt(index);
 			if (mod == 2) {
 				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwards)];
 				buildingProtein.append(aminoAcid);
 				if (aminoAcid == '.') {
-					if (buildingProtein.length() > 4) {
+					if (buildingProtein.length() > 3) {
+						if (reverse) buildingProtein.reverse();
 						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwards, sequence));
 					}
-					proteinStart = startIndex + index + 1;
 					buildingProtein = new StringBuffer();
+					proteinStart = index + 1;
 				}
+			}
+			if (mod == 2) {
+				mod = 0;
+			} else {
+				mod++;
 			}
 		}
 		
-		if (buildingProtein.length() > 4) {
-			proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwards, sequence));
+		if (buildingProtein.length() > 3) {
+			proteins.add(new Protein(name, index, buildingProtein.toString(), false, -1, -1, forwards, sequence));
 		}
+			
+	
 		return proteins;
 	}
-	
-	public void digest(int startIndex, int stopIndex) {
-		ArrayList<Protein> proteins = translateProteins(startIndex, stopIndex);
-		peptides = new ArrayList<Peptide>();
-		for (Protein protein: proteins) {
-			peptides.addAll(protein.digest());
-		}
-	}
-	
-	public void digestOld(int startIndex, int stopIndex) {
-		//a codon is a set of 3 nucleotide characters
-		char [] codon = new char[3];
-		//as we walk through the sequence, this index keeps track of which part of the codon array to fill
-		int codonIndex = 0;
-		//the amino acid is the translation of the codon
-		char aminoAcid = 'x';
-		char previousAminoAcid = 'x';
-		//Where we store all of our forming peptides
-		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
-		
-		final int codonIncrement;
-		if (forwards) {codonIncrement = 1;}
-		else {codonIncrement = -1;}
-		
-		int threeTimesCodonIncrement = (3 * codonIncrement);
-		
-		//account for digestionFrameOverlap making startIndex < 0
-		if (startIndex < 0) startIndex = 0;
-		int nucleotideIndex = startIndex;
-		//acidIndex points to the beginning of where the acid is coded
-		int acidIndex = startIndex;
-		//so we don't have to keep doing this calculation
-		int startIndexPlusThree = startIndex + threeTimesCodonIncrement;
-		
-		//if we are interested in ORFs (Open Reading Frames)
-		boolean inORF = false;
-		
-		
-		while (nucleotideIndex != stopIndex) {
-			
-			
-			//if codonIndex is 3 that means our codon is full and we can determine the amino acid
-			if (codonIndex == 3) {
-				codonIndex = 0;
-				
-				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwards)];
-				
-				//if this is the beginning, start a peptide
-				if (nucleotideIndex == startIndexPlusThree) {
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
-				} else {
-					//add this amino acid to all peptides under construction
-					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-						puc.addAminoAcid(aminoAcid);
-					}
-				}
-				
-				if ((aminoAcid == 'M') ||  // start a new peptide at M
-					(previousAminoAcid == 'M' && aminoAcid != 'M') || // handle possible N-terminal methionine truncation products
-					(isBreak(previousAminoAcid) && aminoAcid != 'M'))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid));
-				}
-
-				
-				//Events which might start a new peptide
-				if (aminoAcid == 'M') {
-					inORF = true;
-				} else {
-					if (isBreak(aminoAcid)) {
-						//if the next codon is not for STOP then add all peptides
-						for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-							Peptide peptide = new Peptide(puc.getSequence(), puc.getStartIndex(), forwards,  nucleotideSequence.getParentSequence());
-							if (peptide.getMass() >= Properties.peptideMassThreshold) {
-								if (Properties.onlyUsePeptidesInOpenReadingFrames) {
-									if (inORF) {
-										peptides.add(peptide);
-									}
-								} else {
-									peptides.add(peptide);
-								}
-							}
-						}
-					}
-					if (aminoAcid == '.') inORF = false;
-				}
-				
-				//if stop, then clear out
-				if (aminoAcid == '.') {
-					peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
-				}
-				
-				//remove all peptide under construction that have reached their maximum break count
-				int size = peptidesUnderConstruction.size();
-				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
-					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-					if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
-						peptidesUnderConstruction.remove(pucIndex);
-						pucIndex--;
-						size--;
-					}
-				}
-				
-				//our acid index can now move forward
-				acidIndex += threeTimesCodonIncrement;
-				previousAminoAcid = aminoAcid;
-			}
-			
-			codon[codonIndex] = nucleotideSequence.getSequence().charAt(nucleotideIndex);	
-			codonIndex++;
-			nucleotideIndex += codonIncrement;	
-		}	
-		//adding all the remaining peptides under construction
-		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			Peptide peptide = new Peptide(puc.getSequence(), puc.getStartIndex(), forwards,  nucleotideSequence.getParentSequence());
-			if (peptide.getMass() >= Properties.peptideMassThreshold) {
-				if (Properties.onlyUsePeptidesInOpenReadingFrames) {
-					if (inORF) {
-						peptides.add(peptide);
-					}
-				} else {
-					peptides.add(peptide);
-				}
-			}
-		}
-	}
-	
-	private boolean isBreak(char aminoAcid) {
-		return (aminoAcid == '.' || aminoAcid == 'K' || aminoAcid == 'R');
-	}
-	
-	
-	
 
 
 	public static int indexForCodonArray(char [] codon, boolean forwards) {

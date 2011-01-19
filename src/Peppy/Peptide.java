@@ -1,5 +1,7 @@
 package Peppy;
 
+import Utilities.U;
+
 /**
  * Is a data class that stores:
  * 1) a sequence of amino acids.
@@ -111,6 +113,7 @@ public class Peptide implements Comparable<Peptide> {
 	public String toString() {
 //		return mass + "\t" + getAcidSequenceString() + "\t" + startIndex + "\t" + proteinName;
 		return  getAcidSequenceString() + "\t" + startIndex + "\t" + forward + "\t" + (startIndex % 3);
+//		return  getAcidSequenceString();
 	}
 
 

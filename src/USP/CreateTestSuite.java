@@ -57,10 +57,10 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
 		
 		//load the correct peptide set
-		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//restrict the precursors since they should be pretty accurate
 		Properties.spectrumToPeptideMassError = 0.01;
@@ -106,7 +106,7 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromFASTA(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
 		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();

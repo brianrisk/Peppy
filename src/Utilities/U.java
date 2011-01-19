@@ -271,6 +271,9 @@ public class U {
 	public static String getFileNameWithoutSuffix(File file) {
         return file.getName().substring(0, file.getName().lastIndexOf('.'));
 	}
-
+	
+	public static String reverseString(String in) {
+		return new StringBuffer(in).reverse().toString();
+	}
 
 }

@@ -34,7 +34,8 @@ public class TestSetReduce {
 		
 		//specify test set
 		String testName = "USP";
-		String [] testNames = {"ecoli", "human", "aurum", "USP"};
+//		String [] testNames = {"ecoli", "human", "aurum", "USP"};
+		String [] testNames = {"ecoli"};
 		for (int testIndex = 0; testIndex < testNames.length; testIndex++) {
 			testName = testNames[testIndex];
 			U.p("doing: " + testName);
@@ -98,6 +99,11 @@ public class TestSetReduce {
 				if (correctAcidSequence == null) continue;
 				correctAcidSequence = correctAcidSequence.trim();
 				if (correctAcidSequence.equals("")) continue;
+				
+				if (testName.equals("ecoli")) {
+					if (correctAcidSequence.equals("KGEMNFDVVIASPDAMR")) continue;
+					if (correctAcidSequence.equals("EQIIFPEIDYDKVDR")) continue;
+				}
 				
 				//create a new peptide from out loaded string
 				Peptide peptide = new Peptide(correctAcidSequence);

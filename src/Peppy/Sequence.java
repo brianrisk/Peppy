@@ -43,9 +43,10 @@ public class Sequence {
 	 * multiple times, each time it is called it returns another portion of the
 	 * database of peptides.  When there are no more peptides from that sequence
 	 * then null is returned.
+	 * @param reverse This is if we want to reverse our database to get a null database
 	 * @return a sorted ArrayList of amino acid sequence fragments from the given sequence file
 	 */
-	public ArrayList<Peptide> extractMorePeptides() {
+	public ArrayList<Peptide> extractMorePeptides(boolean reverse) {
 		//if we have yet to read in all the ATGC data, do that now
 		if (nucleotideSequences == null) getNucleotideSequences();
 		
@@ -81,8 +82,8 @@ public class Sequence {
 		//Create our SequenceDigestionThread ArrayList
 		ArrayList<DNA_DigestionThread> digestors = new ArrayList<DNA_DigestionThread>();
 		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex));
-			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, false, startIndex, stopIndex - digestionFrameOverlap));
+			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, reverse));
+			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, reverse));
 		}
 		
 		//create the threads and start them engines!
@@ -116,14 +117,15 @@ public class Sequence {
 	/**
 	 * Runs extractMorePeptides() until there are no more peptides
 	 * to extract.  Returns the full list.
+	 * @param reverse This is if we want to reverse our database to get a null database
 	 * @return
 	 */
-	public ArrayList<Peptide> extractAllPeptides() {
+	public ArrayList<Peptide> extractAllPeptides(boolean reverse) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-		ArrayList<Peptide> peptidesToAdd = extractMorePeptides();
+		ArrayList<Peptide> peptidesToAdd = extractMorePeptides(reverse);
 		while (peptidesToAdd != null) {
 			peptides.addAll(peptidesToAdd);
-			peptidesToAdd = extractMorePeptides();
+			peptidesToAdd = extractMorePeptides(reverse);
 		}
 		return peptides;
 	}

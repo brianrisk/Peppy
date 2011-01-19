@@ -24,10 +24,27 @@ public class Protein implements Comparable<Protein>{
 	int hitCount = 0;
 	Sequence sequence;
 	
+	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
+
+	public Protein(String name, String acidString) {
+		this(name, 0, acidString);
+	}
+	
 	public Protein(String name, int start, String acidString) {
 		this(name, start, acidString, false, -1, -1, true, null);
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @param start
+	 * @param acidString  The acid string is assumed to, at most, have only one '.' and if one does exist it can only exist at the very end of thes string.
+	 * @param isSpliced
+	 * @param intronStart
+	 * @param intronStop
+	 * @param isForward
+	 * @param sequence
+	 */
 	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence sequence) {
 		this.name = name;
 		this.start = start;
@@ -38,7 +55,10 @@ public class Protein implements Comparable<Protein>{
 		intronLength = intronStop - intronStart;
 		this.isForward = isForward;
 		this.sequence = sequence;
-		if (acidString.endsWith("WWW.")) U.p(acidString);
+//		if (acidString.indexOf("GTAPTN") != -1) U.p(acidString);
+		//GISAKFFAALARANINIVAIAQGSSERSISVVVNNDDA
+		
+
 	}
 	
 	public ArrayList<Peptide> digest() {
@@ -73,7 +93,11 @@ public class Protein implements Comparable<Protein>{
 			}
 		} else {
 			for (int i = 0; i < acidString.length(); i++) {
-				acidIndicies[i] = (i * 3) + start;
+				if (isForward) {
+					acidIndicies[i] = (3 * i) + start;
+				} else {
+					acidIndicies[i] = start - (3 * i) - 2;
+				}
 			}
 		}
 		
@@ -84,10 +108,13 @@ public class Protein implements Comparable<Protein>{
 		
 		//start the first amino acid as peptide
 		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid));
+		
+		//special cases happen at the end of the sequence.  These indicies will come into play
+		int finalIndex = acidString.length() - 1;
 	
 		//advance along each amino acid
 		//start 1 out so we have a previous amino acid
-		for (int i = 1; i < acidString.length(); i++) {
+		for (int i = 1; i < finalIndex; i++) {
 
 			//getting the present amino acid
 			aminoAcid = acidString.charAt(i);
@@ -106,13 +133,13 @@ public class Protein implements Comparable<Protein>{
 			}
 			
 			//if we are at a break, 
-			if (isBreak(aminoAcid) || isStop(aminoAcid)) {
+			if (isBreak(aminoAcid)) {
 				if (isBreak(aminoAcid)) {
 					//remove those which have exceeded the max break count
 					int size = peptidesUnderConstruction.size();
 					for (int pucIndex = 0; pucIndex < size; pucIndex++) {
 						PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-						if (puc.getBreakCount() > Properties.numberOfMissedCleavages) {
+						if (puc.getBreakCount() > maxCleavages) {
 							peptidesUnderConstruction.remove(pucIndex);
 							pucIndex--;
 							size--;
@@ -145,6 +172,44 @@ public class Protein implements Comparable<Protein>{
 			}
 			
 			previousAminoAcid = aminoAcid;
+		}
+		
+		//add the final amino acid and all of the still-forming peptides
+		//This handles weird edge cases
+		aminoAcid = acidString.charAt(finalIndex);
+		boolean addPeptide;
+		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
+			puc.addAminoAcid(aminoAcid);
+			addPeptide = false;
+			if (isStop(aminoAcid)) {
+				if (isBreak(previousAminoAcid)) {
+					//do nothing
+				} else {
+					if (puc.getBreakCount() < maxCleavages ) {
+						addPeptide = true;
+					}
+				}
+			} else {
+				if (isBreak(aminoAcid)) {
+					if (puc.getBreakCount() <= maxCleavages ) {
+						addPeptide = true;
+					}
+				} else {
+					if (puc.getBreakCount() < maxCleavages ) {
+						addPeptide = true;
+					}
+				}
+			}
+			if (addPeptide) {
+				evaluateNewPeptide(
+						puc,
+						intronStart,
+						intronStop,
+						acidIndicies[finalIndex],
+						isForward,
+						name,
+						peptides);
+			}
 		}
 		
 		//no need for that string anymore.  Get rid of it.
