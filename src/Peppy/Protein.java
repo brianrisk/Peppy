@@ -15,6 +15,7 @@ public class Protein implements Comparable<Protein>{
 	private String name;
 	private int start = -1;
 	private String acidString;
+	private byte [] acidByteArray = null;
 	private boolean isSpliced;
 	private int intronStart = -1;
 	private int intronStop = -1;
@@ -207,6 +208,7 @@ public class Protein implements Comparable<Protein>{
 		}
 		
 		//no need for that string anymore.  Get rid of it.
+		acidByteArray = AminoAcids.getByteArrayForString(acidString);
 		acidString = null;
 		
 		return peptides;
@@ -317,6 +319,10 @@ public class Protein implements Comparable<Protein>{
 
 	public int compareTo(Protein other) {
 		return other.getHitCount() - hitCount;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 

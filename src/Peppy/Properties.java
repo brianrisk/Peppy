@@ -67,7 +67,7 @@ public class Properties {
 	public static int maximumNumberOfMatchesForASpectrum = 5;
 	
 	//e value cut off
-	public static double eValueCutOff = 0.01;
+	public static double eValueCutOff = 0.03359587957603186;
 	public static boolean useEValueCutOff = true;
 	
 	//This could be a directory or a file

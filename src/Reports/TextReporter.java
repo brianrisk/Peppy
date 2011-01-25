@@ -210,7 +210,7 @@ public class TextReporter {
 						sb.append('\t');
 						sb.append(match.getPeptide().isSpliced());
 					} else {
-						sb.append(match.getPeptide().getProteinName());
+						sb.append(match.getPeptide().getProtein().getName());
 					}
 					sb.append('\t');
 					sb.append(match.getRank());

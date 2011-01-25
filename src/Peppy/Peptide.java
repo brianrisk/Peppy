@@ -23,8 +23,7 @@ public class Peptide implements Comparable<Peptide> {
 	private int intronStopIndex;
 	private boolean forward;
 	private Sequence parentSequence;
-	private String proteinName;
-	private int proteinIndex;
+	private Protein protein;
 	private boolean isSpliced;
 	
 	
@@ -94,19 +93,12 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param acidSequence
 	 * @param proteinName
 	 */
-	public Peptide(String acidSequence, String proteinName) {
+	public Peptide(String acidSequence, Protein protein) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
-		this.proteinName = proteinName;
+		this.protein = protein;
 	}
 	
-
-	public Peptide(String acidSequence, String proteinName, int proteinIndex) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence.toUpperCase());
-		this.mass = calculateMass();
-		this.proteinName = proteinName;
-		this.proteinIndex = proteinIndex;
-	}
 
 
 	@Override
@@ -231,13 +223,10 @@ public class Peptide implements Comparable<Peptide> {
 		}
 	}
 
-public String getProteinName() {
-		return proteinName;
+	public Protein getProtein() {
+		return protein;
 	}
 
-public int getProteinIndex() {
-		return proteinIndex;
-	}
 
 //	/**
 //	 * This returns the start position.  For reporting purposes.  Conforms to standards.

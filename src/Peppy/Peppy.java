@@ -175,15 +175,7 @@ public class Peppy {
 					//This is where the bulk of the processing in long jobs takes
 					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
 					//Possible to add only matches with a decent e value
-					if (Properties.useEValueCutOff) {
-						for (Match match: newMatches) {
-							if (match.getEValue() <= Properties.eValueCutOff) {
-								matches.add(match);
-							}
-						}
-					} else {
-						matches.addAll(newMatches);
-					}
+					evaluateMatches(newMatches, matches);
 					//free up the memory of the old peptide arraylist
 					peptides.clear();
 					System.gc();
@@ -197,13 +189,7 @@ public class Peppy {
 				//This is where the bulk of the processing in long jobs takes
 				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
 				//Add only matches with a decent e value
-				if (Properties.useEValueCutOff) {
-					for (Match match: newMatches) {
-						if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
-					}
-				} else {
-					matches.addAll(newMatches);
-				}
+				evaluateMatches(newMatches, matches);
 			}		
 		}
 		assignRankToMatches(matches);
@@ -227,13 +213,7 @@ public class Peppy {
 		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
 		
 		//Add only matches with a decent e value
-		if (Properties.useEValueCutOff) {
-			for (Match match: newMatches) {
-				if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
-			}
-		} else {
-			matches.addAll(newMatches);
-		}
+		evaluateMatches(newMatches, matches);
 		
 		if (Properties.isSequenceFileDNA) {
 			removeDuplicateMatches(matches);
@@ -360,6 +340,27 @@ public class Peppy {
 			if (match.calculateEValue() < match.calculateIMP()) {
 				match.setEValue(Double.MAX_VALUE);
 			}
+		}
+	}
+	
+	/**
+	 * Evaluates newMatches, adds appropriate ones to matches
+	 * @param newMatches
+	 * @param matches
+	 */
+	public static void evaluateMatches(ArrayList<Match> newMatches, ArrayList<Match> matches) {	
+		if (Properties.useEValueCutOff) {
+			for (Match match: newMatches) {
+				//The match E value should be less than our cutoff
+				if (match.getEValue() <= Properties.eValueCutOff) {
+					//the match IMP value should always be less than its E value
+					if (match.calculateIMP() < match.getEValue()) {
+						matches.add(match);
+					}
+				}
+			}
+		} else {
+			matches.addAll(newMatches);
 		}
 	}
 
