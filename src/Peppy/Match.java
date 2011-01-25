@@ -1,9 +1,8 @@
 package Peppy;
 
 import HMMScore.HMMClass;
-import Statistics.MathFunctions;
 import Statistics.HasEValue;
-import Utilities.U;
+import Statistics.MathFunctions;
 
 /**
  * An object which contains scoring mechanisms to evaluate a spectrum/peptide match.
@@ -15,7 +14,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	private double score = 0.0;
 	private double scoreRatio = -1;
 	private int repeatCount = 0; 
-	private double eValue;;
+	private double eValue;
 	private double impValue = -1;
 	public int ionMatchTally = 0;
 	private int rank = Integer.MAX_VALUE;

@@ -32,6 +32,43 @@ public class RNA_Sequence {
 	public static final int pyrRichLength = 15;
 	
 	/**
+	 *  
+	 * @param dna assumes DNA is upper case
+	 * @return
+	 */
+	public static byte DNAtoRNA(char dna) {
+		if (dna == 'A') return BASE_A;
+		if (dna == 'T') return BASE_U;
+		if (dna == 'G') return BASE_G;
+		return BASE_C;
+	}
+	
+	/**
+	 * A method for printing purposes
+	 * @param rna
+	 * @return
+	 */
+	public static char getRNAChar(byte rna) {
+		if (rna == BASE_A) return 'A';
+		if (rna == BASE_U) return 'T'; //TODO change back to U
+		if (rna == BASE_G) return 'G';
+		return 'C';
+	}
+	
+	public static byte getRNACompliment(byte rna) {
+		if (rna == BASE_A) return BASE_U;
+		if (rna == BASE_U) return BASE_A;
+		if (rna == BASE_G) return BASE_C;
+		return BASE_G;
+	}
+	
+	public static boolean isPyrimidine(byte rna) {
+		if (rna == BASE_C) return true;
+		if (rna == BASE_U) return true;
+		return false;
+	}
+	
+	/**
 	 * Assumes start < stop
 	 * Assumes stop is an inclusive index
 	 * @param dna
@@ -75,57 +112,71 @@ public class RNA_Sequence {
 		findSpliceLocations();
 	}
 	
-	/**
-	 * A wee function to see what kind of results we are getting.
-	 */
-	public void printStats() {
-		U.p("sequence length: " + length);
+	public void checkCD44Sites() {
+//		int [] startZeroIndicies = {
+//				501,
+//				37871,
+//				41538,
+//				48031,
+//				51196,
+//				59377,
+//				62326,
+//				62918,
+//				65771,
+//				67374,
+//				69337,
+//				71185,
+//				72580,
+//				76045,
+//				80518,
+//				82863
+//			};
+//		int difference = -1;
+//		int foundTotal = 0;
+//		for (int i = 0; i < startZeroIndicies.length; i++) {
+//			int foundSpot = startZeroIndicies[i] + difference;
+//			if (forwardsStartLocations[foundSpot]) {
+//				foundTotal++;
+//			}
+//			for (int j = foundSpot; j < foundSpot + 20; j++) {
+//				System.out.print(getRNAChar(RNA_5to3[j]));
+//			}
+//			U.p();
+//		}
+//		U.p((double) foundTotal / startZeroIndicies.length);
 		
-		int startTotal = 0;
-		for (int i = 0; i < length; i++) {
-			if (forwardsStartLocations[i]) startTotal++;
-		}
-		U.p("Forwards start points: " + startTotal);
-		
-		int stopTotal = 0;
-		for (int i = 0; i < length; i++) {
-			if (forwardsStopLocations[i]) stopTotal++;
-		}
-		U.p("Forwards stop points: " + stopTotal);
-		
-		int prevLocation = 0;
-		int count = 0;
-		final int distance = 60;
-		for (int i = 0; i < length; i++) {
-			if (forwardsStopLocations[i]) {
-				if (i - prevLocation < distance) {
-					count++;
-				}
-				prevLocation = i;
+		int [] stopZeroIndicies = {
+				37705,
+				41404,
+				47962,
+				50965,
+				59251,
+				62212,
+				62801,
+				65642,
+				67242,
+				69235,
+				71095,
+				72376,
+				75982,
+				80446,
+				82784,
+				90259
+		};
+		int difference = -2;
+		int foundTotal = 0;
+		for (int i = 0; i < stopZeroIndicies.length; i++) {
+			int foundSpot = stopZeroIndicies[i] + difference;
+			if (forwardsStopLocations[foundSpot]) {
+				foundTotal++;
 			}
-		}
-		U.p("number of places where stops are less than " + distance + " apart: " + count);
-		
-		//printing a sample intron
-		U.p("Example intron:");
-		int intronStart = 0;
-		int intronStop = 0;
-		for (int i = 0; i < length; i++) {
-			if (forwardsStartLocations[i]) {
-				intronStart = i;
-				break;
+			for (int j = foundSpot - 20; j <= foundSpot; j++) {
+				System.out.print(getRNAChar(RNA_5to3[j]));
 			}
+			U.p();
 		}
-		for (int i = intronStart; i < length; i++) {
-			if (forwardsStopLocations[i]) {
-				intronStop = i;
-				break;
-			}
-		}
-		for (int i = intronStart; i <= intronStop; i++) {
-			System.out.print(getRNAChar(RNA_5to3[i]));
-		}
-		U.p();
+		U.p((double) foundTotal / stopZeroIndicies.length);
+
 	}
 	
 	//http://www.ncbi.nlm.nih.gov/bookshelf/br.fcgi?book=mcb&part=A2868&rendertype=figure&id=A2883
@@ -133,7 +184,7 @@ public class RNA_Sequence {
 		findSpliceSites(RNA_5to3, forwardsStartLocations, forwardsBranchLocations, forwardsStopLocations);
 		findSpliceSites(RNA_3to5, reverseStartLocations, reverseBranchLocations, reverseStopLocations);
 	}
-	
+
 	private void findSpliceSites(byte [] code, boolean [] startSites, boolean [] branchSites, boolean [] stopSites ) {
 		int begin, end;
 		double probability;
@@ -288,126 +339,6 @@ public class RNA_Sequence {
 		
 		
 	}
-	
-	public void checkCD44Sites() {
-//		int [] startZeroIndicies = {
-//				501,
-//				37871,
-//				41538,
-//				48031,
-//				51196,
-//				59377,
-//				62326,
-//				62918,
-//				65771,
-//				67374,
-//				69337,
-//				71185,
-//				72580,
-//				76045,
-//				80518,
-//				82863
-//			};
-//		int difference = -1;
-//		int foundTotal = 0;
-//		for (int i = 0; i < startZeroIndicies.length; i++) {
-//			int foundSpot = startZeroIndicies[i] + difference;
-//			if (forwardsStartLocations[foundSpot]) {
-//				foundTotal++;
-//			}
-//			for (int j = foundSpot; j < foundSpot + 20; j++) {
-//				System.out.print(getRNAChar(RNA_5to3[j]));
-//			}
-//			U.p();
-//		}
-//		U.p((double) foundTotal / startZeroIndicies.length);
-		
-		int [] stopZeroIndicies = {
-				37705,
-				41404,
-				47962,
-				50965,
-				59251,
-				62212,
-				62801,
-				65642,
-				67242,
-				69235,
-				71095,
-				72376,
-				75982,
-				80446,
-				82784,
-				90259
-		};
-		int difference = -2;
-		int foundTotal = 0;
-		for (int i = 0; i < stopZeroIndicies.length; i++) {
-			int foundSpot = stopZeroIndicies[i] + difference;
-			if (forwardsStopLocations[foundSpot]) {
-				foundTotal++;
-			}
-			for (int j = foundSpot - 20; j <= foundSpot; j++) {
-				System.out.print(getRNAChar(RNA_5to3[j]));
-			}
-			U.p();
-		}
-		U.p((double) foundTotal / stopZeroIndicies.length);
-
-	}
-	
-	/**
-	 *  
-	 * @param dna assumes DNA is upper case
-	 * @return
-	 */
-	public static byte DNAtoRNA(char dna) {
-		if (dna == 'A') return BASE_A;
-		if (dna == 'T') return BASE_U;
-		if (dna == 'G') return BASE_G;
-		return BASE_C;
-	}
-	
-	public static boolean isPyrimidine(byte rna) {
-		if (rna == BASE_C) return true;
-		if (rna == BASE_U) return true;
-		return false;
-	}
-
-	/**
-	 * A method for printing purposes
-	 * @param rna
-	 * @return
-	 */
-	public static char getRNAChar(byte rna) {
-		if (rna == BASE_A) return 'A';
-		if (rna == BASE_U) return 'T'; //TODO change back to U
-		if (rna == BASE_G) return 'G';
-		return 'C';
-	}
-
-	public static byte getRNACompliment(byte rna) {
-		if (rna == BASE_A) return BASE_U;
-		if (rna == BASE_U) return BASE_A;
-		if (rna == BASE_G) return BASE_C;
-		return BASE_G;
-	}
-
-	public int getStart() {
-		return start;
-	}
-
-	public int getStop() {
-		return stop;
-	}
-
-	public byte[] getRNA_5to3() {
-		return RNA_5to3;
-	}
-
-	public byte[] getRNA_3to5() {
-		return RNA_3to5;
-	}
 
 	public boolean[] getForwardsStartLocations() {
 		return forwardsStartLocations;
@@ -423,6 +354,75 @@ public class RNA_Sequence {
 
 	public boolean[] getReverseStopLocations() {
 		return reverseStopLocations;
+	}
+
+	public byte[] getRNA_3to5() {
+		return RNA_3to5;
+	}
+
+	public byte[] getRNA_5to3() {
+		return RNA_5to3;
+	}
+
+	public int getStart() {
+		return start;
+	}
+
+	public int getStop() {
+		return stop;
+	}
+
+	/**
+	 * A wee function to see what kind of results we are getting.
+	 */
+	public void printStats() {
+		U.p("sequence length: " + length);
+		
+		int startTotal = 0;
+		for (int i = 0; i < length; i++) {
+			if (forwardsStartLocations[i]) startTotal++;
+		}
+		U.p("Forwards start points: " + startTotal);
+		
+		int stopTotal = 0;
+		for (int i = 0; i < length; i++) {
+			if (forwardsStopLocations[i]) stopTotal++;
+		}
+		U.p("Forwards stop points: " + stopTotal);
+		
+		int prevLocation = 0;
+		int count = 0;
+		final int distance = 60;
+		for (int i = 0; i < length; i++) {
+			if (forwardsStopLocations[i]) {
+				if (i - prevLocation < distance) {
+					count++;
+				}
+				prevLocation = i;
+			}
+		}
+		U.p("number of places where stops are less than " + distance + " apart: " + count);
+		
+		//printing a sample intron
+		U.p("Example intron:");
+		int intronStart = 0;
+		int intronStop = 0;
+		for (int i = 0; i < length; i++) {
+			if (forwardsStartLocations[i]) {
+				intronStart = i;
+				break;
+			}
+		}
+		for (int i = intronStart; i < length; i++) {
+			if (forwardsStopLocations[i]) {
+				intronStop = i;
+				break;
+			}
+		}
+		for (int i = intronStart; i <= intronStop; i++) {
+			System.out.print(getRNAChar(RNA_5to3[i]));
+		}
+		U.p();
 	}
 
 }

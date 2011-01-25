@@ -1,6 +1,5 @@
 package Peppy;
 
-import Utilities.U;
 
 /**
  * Is a data class that stores:
@@ -25,8 +24,17 @@ public class Peptide implements Comparable<Peptide> {
 	private Sequence parentSequence;
 	private Protein protein;
 	private boolean isSpliced;
+	private boolean isMatched = false;
 	
 	
+	public boolean isMatched() {
+		return isMatched;
+	}
+
+	public void setMatched(boolean isMatched) {
+		this.isMatched = isMatched;
+	}
+
 	/**
 	 * just gets an amino acid sequence.
 	 * @param sequence

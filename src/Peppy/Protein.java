@@ -26,10 +26,6 @@ public class Protein implements Comparable<Protein>{
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
-	public Protein(String name, String acidString) {
-		this(name, 0, acidString);
-	}
-	
 	public Protein(String name, int start, String acidString) {
 		this(name, start, acidString, false, -1, -1, true, null);
 	}
@@ -54,6 +50,23 @@ public class Protein implements Comparable<Protein>{
 		this.intronStop = intronStop;
 		this.isForward = isForward;
 		this.sequence = sequence;
+	}
+	
+	public Protein(String name, String acidString) {
+		this(name, 0, acidString);
+	}
+	
+	public int getScore() {
+		hitCount = 0;
+		for (Peptide peptide: peptides) {
+//			if (peptide.getHitCount() > 0) hitCount++;
+		}
+		return hitCount;
+	}
+	
+	
+	public int compareTo(Protein other) {
+		return other.getHitCount() - hitCount;
 	}
 	
 	public ArrayList<Peptide> digest() {
@@ -213,8 +226,7 @@ public class Protein implements Comparable<Protein>{
 		
 		return peptides;
 	}
-	
-	
+
 	/**
 	 * This first creates a peptide from the peptide under construction.
 	 * This is mildly complicated as the peptide has different constructors
@@ -269,12 +281,8 @@ public class Protein implements Comparable<Protein>{
 		}
 	}
 	
-	/**
-	 * @return the peptides
-	 */
-	public ArrayList<Peptide> getPeptides() {
-		if (peptides == null) digest();
-		return peptides;
+	public String getAcidString() {
+		return acidString;
 	}
 
 	/**
@@ -283,46 +291,38 @@ public class Protein implements Comparable<Protein>{
 	public int getHitCount() {
 		return hitCount;
 	}
-	
+
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the peptides
+	 */
+	public ArrayList<Peptide> getPeptides() {
+		if (peptides == null) digest();
+		return peptides;
+	}
+
 	public int getStart() {
 		return start;
 	}
-
-	public String getAcidString() {
-		return acidString;
+	
+	private boolean isBreak(char aminoAcid) {
+		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
 	}
-
+	
+	
 	public boolean isForward() {
 		return isForward;
-	}
-
-	public int calculateHitCount() {
-		hitCount = 0;
-		for (Peptide peptide: peptides) {
-//			if (peptide.getHitCount() > 0) hitCount++;
-		}
-		return hitCount;
 	}
 
 	private boolean isStart(char aminoAcid) {
 		return (aminoAcid == 'M');
 	}
-	
+
 	private boolean isStop(char aminoAcid) {
 		return (aminoAcid == '.');
-	}
-	
-	
-	private boolean isBreak(char aminoAcid) {
-		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
-	}
-
-	public int compareTo(Protein other) {
-		return other.getHitCount() - hitCount;
-	}
-
-	public String getName() {
-		return name;
 	}
 	
 
