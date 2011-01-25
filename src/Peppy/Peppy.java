@@ -31,7 +31,7 @@ public class Peppy {
 	
 	public static void main(String [] args) {
 		init(args);
-		runJobs();
+		runJobs(args);
 //		new Peppy(args);
 //		exportPeptideList();
 		U.p("done");
@@ -89,8 +89,7 @@ public class Peppy {
 		U.stopStopwatch();
 	}
 	
-	public static void runJobs() {
-		init();
+	public static void runJobs(String [] args) {
 		File jobsDir = new File("jobs");
 		File[] potentialJobsFiles = jobsDir.listFiles();
 		ArrayList<File> jobFiles = new ArrayList<File>();
@@ -103,13 +102,12 @@ public class Peppy {
 		}
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
-			init();
 			new Peppy(null);
 		} else {
 			U.p("running " + jobFiles.size() + " jobs");
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
-				init();
+				init(args);
 				Properties.loadProperties(jobFiles.get(i));
 				new Peppy(null);
 			}
@@ -118,7 +116,6 @@ public class Peppy {
 
 
 	public static void init(String propertiesFile) {
-		
 		Properties.loadProperties(propertiesFile);
 		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
 			HMMScore.HMMClass.HmmSetUp();
@@ -131,6 +128,7 @@ public class Peppy {
 			init();
 		} else {
 			init(args[0]);
+			U.p("Initializing with properties file: " + args[0]);
 		}
 	}
 	
