@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import Peppy.Match;
 import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.ScoringThreadServer;
 import Peppy.Spectrum;
-import Peppy.Match;
 import Utilities.U;
 
 public class CreateTestSuite {
@@ -66,7 +66,7 @@ public class CreateTestSuite {
 		Properties.spectrumToPeptideMassError = 0.01;
 		
 		//Get the  matches
-		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches  = Peppy.getMatches(peptides, spectra, null);
 		
 		//save to appropriate files
 		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
@@ -109,7 +109,7 @@ public class CreateTestSuite {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
+		ArrayList<Match> matches  = Peppy.getMatches(peptides, spectra, null);
 		
 		//save to appropriate files
 		for (Match match: matches) {

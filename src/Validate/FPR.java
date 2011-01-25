@@ -23,6 +23,7 @@ public class FPR {
 	
 	public static void main(String args[]) {
 		U.p("running FPR report...");
+		U.startStopwatch();
 		
 		//grab our properties file, set up.
 		Peppy.init(args);
@@ -70,7 +71,6 @@ public class FPR {
 		for (Spectrum spectrum: spectra) {
 			spectrum.clearEValues();
 		}
-		
 		
 		//getting reverse matches -- need to reload the sequences
 		U.p("finding reverse matches...");
@@ -154,6 +154,7 @@ public class FPR {
 			U.p("ERROR: Could not create file writer for our report");
 			e.printStackTrace();
 		}
+		U.stopStopwatch();
 		U.p("done");
 	}
 	
@@ -170,7 +171,10 @@ public class FPR {
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
-			for (Match match: matches) {
+			int upper = 1000;
+			if (matches.size() < upper) upper = matches.size();
+			for (int i = 0; i < upper; i++) {
+				Match match = matches.get(i);
 				pw.println(match.toString());
 			}
 

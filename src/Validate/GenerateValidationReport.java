@@ -20,7 +20,6 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
 import Peppy.ScoringThread;
-import Peppy.Sequence;
 import Utilities.U;
 
 public class GenerateValidationReport {
@@ -69,9 +68,6 @@ public class GenerateValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 1;
 		
-		Properties.spectrumToPeptideMassError = 2.0;
-		Properties.peakDifferenceThreshold = 0.5;
-		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
 		
@@ -84,6 +80,7 @@ public class GenerateValidationReport {
 		
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
+		Properties.spectrumToPeptideMassError = 2.0;
 		Properties.peakDifferenceThreshold = 0.3;
 		
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
@@ -101,7 +98,7 @@ public class GenerateValidationReport {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
 		
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
-//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides();
+//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
 		U.p("forwards database size: " + peptides.size());
 		forwardsDatabaseSize = peptides.size();
 		
