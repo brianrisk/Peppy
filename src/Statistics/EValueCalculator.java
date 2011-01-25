@@ -136,10 +136,6 @@ public class EValueCalculator {
 		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
 		return eValue;
 	}
-	
-	public double getPValue(double score) {
-		return getEValue(score) / numberOfMatches;
-	}
 
 	public int [] getSmoothedHistogram() {return smoothedHistogram;}
 	

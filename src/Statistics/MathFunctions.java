@@ -1,6 +1,6 @@
 package Statistics;
 
-import Utilities.U;
+
 
 
 public class MathFunctions {
@@ -72,7 +72,7 @@ public class MathFunctions {
 	}
 
 	public static double getBinomialProbability(int n, int k, double p) {
-		double total = 0;
+		double total = 0.0;
 		double probability;
 		for (int i = k; i <= n; i++) {
 			probability = MathFunctions.cachedNChooseK(n, i);
@@ -82,25 +82,6 @@ public class MathFunctions {
 		}
 		return total;
 	}
-	
-//	public static void main(String args[]) {
-//		U.p("init");
-//		double p = 0.5;
-//
-//		int n = 4;
-//		int k = 1;
-//		double total = 0;
-//		double probability;
-//		for (int i = k; i <= n; i++) {
-//			probability = CachedMathFunctions.nChooseK(n, i);
-//			probability *= Math.pow(p, i);
-//			probability *= Math.pow(1 - p, n - i);
-//			U.p(probability);
-//			total += probability;
-//		}
-//		binomialProb50[n][k] = total;
-//
-//	}
 	
 
 }

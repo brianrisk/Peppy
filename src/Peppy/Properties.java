@@ -25,7 +25,6 @@ public class Properties {
 	public static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
 
 	//properties for spectral cleaning
-	public static boolean localMaximaCleaning = false;
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
 	
@@ -171,8 +170,6 @@ public class Properties {
 		
 		
 		//spectrum cleaning
-		if (propertyName.equals("localMaximaCleaning"))
-			localMaximaCleaning = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("highIntensityCleaning"))
 			highIntensityCleaning = Boolean.valueOf(propertyValue);
 		

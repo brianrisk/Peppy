@@ -64,15 +64,13 @@ public class Peppy {
 			U.p("peptide tally: " + peptides.size());
 			
 			U.p("getting matches...");
+			//TODO get rid of this getMatches function when this is overhauled
 			matches = getMatches(peptides, spectra, sequenceFile);
 			
 		} else {	
 			matches.addAll(getMatches(sequences, spectra));
 			U.p("peptide tally: " + peptideTally);
 		}
-	
-		U.p("calculating final e values");
-		assignConfidenceValuesToMatches(matches);
 		
 		//create new report directory
 		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
@@ -179,7 +177,9 @@ public class Peppy {
 					//Possible to add only matches with a decent e value
 					if (Properties.useEValueCutOff) {
 						for (Match match: newMatches) {
-							if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
+							if (match.getEValue() <= Properties.eValueCutOff) {
+								matches.add(match);
+							}
 						}
 					} else {
 						matches.addAll(newMatches);
@@ -190,7 +190,6 @@ public class Peppy {
 					peptides = sequence.extractMorePeptides(reverse);
 				}
 				sequence.clearNucleotideData();
-				U.p("removing duplicate matches");
 				removeDuplicateMatches(matches);
 			} else {
 				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), reverse);
@@ -205,11 +204,11 @@ public class Peppy {
 				} else {
 					matches.addAll(newMatches);
 				}
-			}
-			U.p("assigning final match ranks");
-			assignRankToMatches(matches);
-			assignRepeatedPeptideCount(matches);			
+			}		
 		}
+		assignRankToMatches(matches);
+		assignRepeatedPeptideCount(matches);	
+		assignConfidenceValuesToMatches(matches);
 		return matches;
 	}
 	
@@ -223,23 +222,25 @@ public class Peppy {
 	public static ArrayList<Match> getMatches(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
 		ArrayList<Match> matches = new ArrayList<Match>() ;
 		peptideTally += peptides.size();
+		
 		//This is where the bulk of the processing in long jobs takes
 		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
+		
 		//Add only matches with a decent e value
 		if (Properties.useEValueCutOff) {
 			for (Match match: newMatches) {
 				if (match.getEValue() <= Properties.eValueCutOff) matches.add(match);
-//				if (match.getScore() >= 40.0) matches.add(match);
 			}
 		} else {
 			matches.addAll(newMatches);
 		}
 		
-		U.p("removing duplicate matches");
-		removeDuplicateMatches(matches);
-		
-		U.p("assigning final match ranks");
+		if (Properties.isSequenceFileDNA) {
+			removeDuplicateMatches(matches);
+		}
 		assignRankToMatches(matches);
+		assignRepeatedPeptideCount(matches);
+		assignConfidenceValuesToMatches(matches);
 		
 		return matches;
 	}
@@ -356,8 +357,9 @@ public class Peppy {
 	
 	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches) {
 		for (Match match: matches) {
-			match.calculateEValue();
-			match.calculatePValue();
+			if (match.calculateEValue() < match.calculateIMP()) {
+				match.setEValue(Double.MAX_VALUE);
+			}
 		}
 	}
 
@@ -367,6 +369,7 @@ public class Peppy {
 	 */
 	@SuppressWarnings("unused")
 	private static void exportPeptideList() {
+		U.p("exporting peptide list");
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
@@ -383,9 +386,10 @@ public class Peppy {
 				} else {
 					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
 				}
+				
+				U.p("number of peptides: " + peptides.size());
 
 				for (Peptide peptide: peptides) {
-					if (!peptide.isForward())
 					pw.println(peptide);
 				}
 				

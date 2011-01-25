@@ -269,8 +269,6 @@ public class Spectrum implements Comparable<Spectrum>{
 		
 		if (Properties.highIntensityCleaning) 
 			cleanPeaksKeepingHighIntensity();
-		if (Properties.localMaximaCleaning) 
-			cleanPeaksKeepingLocalMaxima();
 		
 		//take exponent of peak intensities
 //		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
@@ -323,36 +321,6 @@ public class Spectrum implements Comparable<Spectrum>{
 		}
 		//add the final peak
 		retPeaks.add(peaks.get(peaks.size() - 1));
-		peaks = retPeaks;
-	}
-	
-	@SuppressWarnings("unused")
-	private void cleanPeaksKeepingLocalMaxima() {
-		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
-		int i, peakCount = peaks.size();
-		Peak thisPeak, nextPeak, prevPeak;
-		float gap = 5.0f;
-		retPeaks.add(peaks.get(0)); //add first peak
-		for (i=1; i<peakCount - 1; i++) {
-			thisPeak = (Peak) peaks.get(i);
-			nextPeak = (Peak) peaks.get(i+1);
-			prevPeak = (Peak) peaks.get(i-1);
-
-			//add the peak if it is on the edge of a gap
-			if	(
-				(thisPeak.getIntensity() - prevPeak.getIntensity() > gap) ||
-				(nextPeak.getIntensity()  - thisPeak.getIntensity()  > gap)
-			){
-				retPeaks.add(thisPeak);
-				continue;
-			}
-			if ( (thisPeak.getIntensity() > nextPeak.getIntensity()) && (thisPeak.getIntensity() > prevPeak.getIntensity()) ) {
-				retPeaks.add(thisPeak);
-			}
-		}
-		if (peakCount > 1) {
-			retPeaks.add(peaks.get(peakCount - 1));
-		}
 		peaks = retPeaks;
 	}
 	
@@ -649,10 +617,6 @@ public class Spectrum implements Comparable<Spectrum>{
 	
 	public double getEValue(double score) {
 		return eValueCalculator.getEValue(score);
-	}
-	
-	public double getPValue(double score) {
-		return eValueCalculator.getPValue(score);
 	}
 	
 	

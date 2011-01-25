@@ -43,11 +43,6 @@ public class ScoringThreadServer {
 		this.sequence = sequence;
 		matches = new ArrayList<ArrayList<Match>>(spectra.size());
 		
-		//There may be old E values from other searchers.  Clear those
-		for (Spectrum spectrum: spectra) {
-			spectrum.clearEValues();
-		}
-		
 		//here we make sure we don't use more threads than we have spectra
 		numberOfThreads = Properties.numberOfThreads;
 		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();
@@ -108,11 +103,13 @@ public class ScoringThreadServer {
 		}
 		//calculate size of combined ArrayLists
 		int size = 0;
-		for (int i = 0; i < matches.size(); i++) {size += matches.get(i).size();}
+		for (ArrayList<Match> matchCluster: matches) {
+			size += matchCluster.size();
+		}
 		//combine matches into result and return
 		ArrayList<Match> out = new ArrayList<Match>(size);
-		for (int i = 0; i < matches.size(); i++) {
-			out.addAll(matches.get(i));
+		for (ArrayList<Match> matchCluster: matches) {
+			out.addAll(matchCluster);
 		}
 		return out;
 	}

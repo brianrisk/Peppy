@@ -12,17 +12,16 @@ import Utilities.U;
 
 public class Protein implements Comparable<Protein>{
 	
-	String name;
-	int start = -1;
-	String acidString;
-	boolean isSpliced;
-	int intronStart = -1;
-	int intronStop = -1;
-	int intronLength = -1;
-	boolean isForward = true;
-	ArrayList<Peptide> peptides;
-	int hitCount = 0;
-	Sequence sequence;
+	private String name;
+	private int start = -1;
+	private String acidString;
+	private boolean isSpliced;
+	private int intronStart = -1;
+	private int intronStop = -1;
+	private boolean isForward = true;
+	private ArrayList<Peptide> peptides;
+	private int hitCount = 0;
+	private Sequence sequence;
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
@@ -52,13 +51,8 @@ public class Protein implements Comparable<Protein>{
 		this.isSpliced = isSpliced;
 		this.intronStart = intronStart;
 		this.intronStop = intronStop;
-		intronLength = intronStop - intronStart;
 		this.isForward = isForward;
 		this.sequence = sequence;
-//		if (acidString.indexOf("GTAPTN") != -1) U.p(acidString);
-		//GISAKFFAALARANINIVAIAQGSSERSISVVVNNDDA
-		
-
 	}
 	
 	public ArrayList<Peptide> digest() {
@@ -216,15 +210,6 @@ public class Protein implements Comparable<Protein>{
 		acidString = null;
 		
 		return peptides;
-	}
-	
-	public ArrayList<Peptide> reverseDigest() {
-		StringBuffer reverseBuffer = new StringBuffer();
-		for (int i = acidString.length() - 1; i >=0; i--) {
-			reverseBuffer.append(acidString.charAt(i));
-		}
-		acidString = reverseBuffer.toString();
-		return digest();
 	}
 	
 	
