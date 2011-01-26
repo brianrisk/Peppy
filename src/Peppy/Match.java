@@ -39,10 +39,9 @@ public class Match implements Comparable<Match>, HasEValue{
 	
 	private static int sortParameter = SORT_BY_SCORE;
 	
-	public Match(String spectrumString, String peptideString) {
-		this.spectrum = new Spectrum(spectrumString);
-		this.peptide = new Peptide(peptideString);
-		this.sequence = null;
+	public Match(Spectrum spectrum, Peptide peptide) {
+		this.spectrum = spectrum;
+		this.peptide = peptide;
 		calculateScore();
 	}
 	
