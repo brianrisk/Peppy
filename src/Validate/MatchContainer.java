@@ -76,7 +76,7 @@ public class MatchContainer implements Comparable<MatchContainer>{
 			
 			//If this match is not the true match:
 			if(!isTrue) {
-				trueMatch = new Match(match.getSpectrum(), new Peptide(this.correctAcidSequence), null);
+				trueMatch = new Match(match.getSpectrum(), new Peptide(this.correctAcidSequence));
 				double trueEValue = match.getSpectrum().getEValue(trueMatch.getScore());
 				trueMatch.setEValue(trueEValue);
 				

@@ -139,10 +139,10 @@ public class HTMLReporter {
 				sb.append("<td><nobr>");
 				if (sequences != null) {
 					sb.append("<a href=\"sequences/");
-					sb.append(match.getSequence().getId());
+					sb.append(match.getPeptide().getParentSequence().getId());
 					sb.append(Properties.reportWebSuffix);
 					sb.append("\">");
-					sb.append(match.getSequence().getSequenceFile().getName());
+					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
 					sb.append("</a> ");
 				}
 				sb.append("</nobr></td>");
@@ -232,7 +232,7 @@ public class HTMLReporter {
 		ArrayList<Match> theseMatches = new ArrayList<Match>();
 		for (int i = 0; i < matches.size(); i++) {
 			Match thisMatch = matches.get(i);
-			if (thisMatch.getSequence() != match.getSequence()) continue;
+			if (thisMatch.getPeptide().getParentSequence() != match.getPeptide().getParentSequence()) continue;
 			if (Math.abs(thisMatch.getPeptide().getStartIndex() - match.getPeptide().getStartIndex()) > Properties.locusNeighborhood) continue;
 			theseMatches.add(thisMatch);
 		}
@@ -468,7 +468,7 @@ public class HTMLReporter {
 		ArrayList<Match> out = new ArrayList<Match>();
 		for (int i = 0; i < theseMatches.size(); i++) {
 			Match match = theseMatches.get(i);
-			if (match.getSequence().getId() == sequence.getId()) {
+			if (match.getPeptide().getParentSequence().getId() == sequence.getId()) {
 				out.add(match);
 			}
 		}
@@ -499,10 +499,10 @@ public class HTMLReporter {
 		sb.append("<td><nobr>");
 		if (Properties.generateSequenceReport) {
 			sb.append("<a href=\"../sequences/");
-			sb.append(match.getSequence().getId());
+			sb.append(match.getPeptide().getParentSequence().getId());
 			sb.append(Properties.reportWebSuffix);
 			sb.append("\">");
-			sb.append(match.getSequence().getSequenceFile().getName ());
+			sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName ());
 			sb.append("</a>");
 		}
 		if (match.getPeptide().isForward()) {sb.append(" forward ");}

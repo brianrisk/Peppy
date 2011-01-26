@@ -42,7 +42,7 @@ public class ScoringThread implements Runnable {
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
-				Match match = new Match(spectrum, peptide, sequence);
+				Match match = new Match(spectrum, peptide);
 				if (match.getScore() == 0.0) {
 					continue;
 				}

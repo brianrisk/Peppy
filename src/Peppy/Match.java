@@ -21,7 +21,6 @@ public class Match implements Comparable<Match>, HasEValue{
 	
 	private Spectrum spectrum;
 	private Peptide peptide;
-	private Sequence sequence;
 	
 	private static int sortTracker = 0;
 	public final static int SORT_BY_SCORE = sortTracker++;
@@ -42,13 +41,6 @@ public class Match implements Comparable<Match>, HasEValue{
 	public Match(Spectrum spectrum, Peptide peptide) {
 		this.spectrum = spectrum;
 		this.peptide = peptide;
-		calculateScore();
-	}
-	
-	public Match(Spectrum spectrum, Peptide peptide, Sequence sequence) {
-		this.spectrum = spectrum;
-		this.peptide = peptide;
-		this.sequence = sequence;
 		calculateScore();
 	}
 	
@@ -422,8 +414,8 @@ public class Match implements Comparable<Match>, HasEValue{
 				return 0;
 			} else
 			if (sortParameter == SORT_BY_LOCUS) {
-				if (sequence.getId() < match.getSequence().getId()) return -1;
-				if (sequence.getId() > match.getSequence().getId()) return  1;
+				if (peptide.getParentSequence().getId() < match.getPeptide().getParentSequence().getId()) return -1;
+				if (peptide.getParentSequence().getId() > match.getPeptide().getParentSequence().getId()) return  1;
 				//in case sequences equal, compare index
 				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
 				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
@@ -552,10 +544,6 @@ public class Match implements Comparable<Match>, HasEValue{
 	 */
 	public Peptide getPeptide() {
 		return peptide;
-	}
-	
-	public Sequence getSequence() {
-		return sequence;
 	}
 
 	public double getEValue() {

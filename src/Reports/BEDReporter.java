@@ -70,7 +70,7 @@ public class BEDReporter {
 			int score;
 			for (Match match: matches) {
 				//chrom
-				chromFileName = match.getSequence().getSequenceFile().getName();
+				chromFileName = match.getPeptide().getParentSequence().getSequenceFile().getName();
 				chrom = chromFileName.substring(0, chromFileName.indexOf('.'));
 				
 				//chromStart
