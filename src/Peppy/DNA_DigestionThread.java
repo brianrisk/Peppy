@@ -45,16 +45,7 @@ public class DNA_DigestionThread implements Runnable {
 	
 	public ArrayList<Peptide> digest(int startIndex, int stopIndex) {
 		ArrayList<Protein> proteins = translateToProteins(startIndex, stopIndex);
-		return digestProteins(proteins);
-	}
-	
-	
-	private ArrayList<Peptide> digestProteins(ArrayList<Protein> proteins) {
-		peptides = new ArrayList<Peptide>();
-		for (Protein protein: proteins) {
-			peptides.addAll(protein.digest());
-		}
-		return peptides;
+		return ProteinDigestion.getPeptidesFromListOfProteins(proteins);
 	}
 	
 

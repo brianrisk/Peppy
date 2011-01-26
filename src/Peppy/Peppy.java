@@ -156,17 +156,17 @@ public class Peppy {
 	 * 
 	 * @param sequences our list of sequences where we will be getting our peptides
 	 * @param spectra our list of spectra
-	 * @param reverse if we are doing a normal, forwards search or if this is a null, reverse search
+	 * @param isReverse if we are doing a normal, forwards search or if this is a null, reverse search
 	 * @return
 	 */
-	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean reverse) {
+	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
 		ArrayList<Match> matches = new ArrayList<Match>() ;
 		for (Sequence sequence: sequences) {
 			U.p("working on sequence: " +sequence.getSequenceFile().getName());
 			
 			ArrayList<Peptide> peptides;
 			if (Properties.isSequenceFileDNA) {
-				peptides = sequence.extractMorePeptides(reverse);
+				peptides = sequence.extractMorePeptides(isReverse);
 				//continually extract peptides from the sequence until there aren't anymore
 				while (peptides != null) {
 					peptideTally += peptides.size();
@@ -177,12 +177,12 @@ public class Peppy {
 					//free up the memory of the old peptide arraylist
 					peptides.clear();
 					System.gc();
-					peptides = sequence.extractMorePeptides(reverse);
+					peptides = sequence.extractMorePeptides(isReverse);
 				}
 				sequence.clearNucleotideData();
 				removeDuplicateMatches(matches);
 			} else {
-				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), reverse);
+				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
 				peptideTally += peptides.size();
 				//This is where the bulk of the processing in long jobs takes
 				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
@@ -403,7 +403,7 @@ public class Peppy {
 		}
 	}
 	
-	private static void printGreeting() {
+	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
 		U.p("Proteogenomic mapping software.");
 		U.p("Developed 2010 by the Giddings Lab");
