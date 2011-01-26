@@ -177,7 +177,7 @@ public class TextReporter {
 			
 			//print rows
 			for (Match match: matches) {;
-				if (Properties.useEValueCutOff && match.getEValue() <= Properties.eValueCutOff) {
+				if (!Properties.useEValueCutOff || match.getEValue() <= Properties.eValueCutOff) {
 					sb = new StringBuffer();
 					sb.append(match.getSpectrum().getId());
 					sb.append('\t');
