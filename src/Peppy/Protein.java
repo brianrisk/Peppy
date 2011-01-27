@@ -21,8 +21,11 @@ public class Protein implements Comparable<Protein>{
 	private int intronStop = -1;
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
-	private int hitCount = 0;
 	private Sequence sequence;
+	private ArrayList<Match> matches = new ArrayList<Match>();
+	private double score = 0;
+	private double [] hitPositions = null;
+	private double hitCoverage = -1;
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
@@ -56,17 +59,67 @@ public class Protein implements Comparable<Protein>{
 		this(name, 0, acidString);
 	}
 	
-	public int getScore() {
-		hitCount = 0;
+	/**
+	 * Adds the match to our list of matches.  Updates our score;
+	 * @param match
+	 */
+	public void addMatch(Match match) {
+		matches.add(match);
+		//minus because this will be negative for good e values
+		score -= Math.log(match.getEValue());
+	}
+	
+	public ArrayList<Peptide> getUnfoundPeptides() {
+		ArrayList<Peptide> unfoundPeptides = new ArrayList<Peptide>();
+		boolean peptideFound;
 		for (Peptide peptide: peptides) {
-//			if (peptide.getHitCount() > 0) hitCount++;
+			peptideFound = false;
+			for (Match match: matches) {
+				if (peptide.equals(match.getPeptide())) {
+					peptideFound = true;
+					break;
+				}
+			}
+			if (!peptideFound) {
+				unfoundPeptides.add(peptide);
+			}
 		}
-		return hitCount;
+		return unfoundPeptides;
+	}
+	
+	public double [] getHitPositions() {
+		if (hitPositions == null) {
+			hitPositions = new double[acidByteArray.length];
+			Peptide peptide;
+			double logE;
+			for (Match match: matches) {
+				peptide = match.getPeptide();
+				logE = -Math.log(match.getEValue());
+				for (int i = peptide.getStartIndex(); i < peptide.getStopIndex(); i++) {
+					if (logE > hitPositions[i]) hitPositions[i] = logE;
+				}
+			}
+		}
+		return hitPositions;
+	}
+	
+	public double getHitCoverage() {
+		if (hitCoverage < 0) {
+			getHitPositions();
+			int tally = 0;
+			for (int i = 0; i < hitPositions.length; i++) {
+				if (hitPositions[i] > 0) tally++;
+			}
+			hitCoverage = (double) tally / hitPositions.length;
+		}
+		return hitCoverage;
 	}
 	
 	
 	public int compareTo(Protein other) {
-		return other.getHitCount() - hitCount;
+		if (other.getScore() < score) return  1;
+		if (other.getScore() > score) return -1;
+		return 0;
 	}
 	
 	public ArrayList<Peptide> digest() {
@@ -223,7 +276,6 @@ public class Protein implements Comparable<Protein>{
 		//no need for that string anymore.  Get rid of it.
 		acidByteArray = AminoAcids.getByteArrayForString(acidString);
 		acidString = null;
-		
 		return peptides;
 	}
 
@@ -285,11 +337,9 @@ public class Protein implements Comparable<Protein>{
 		return acidString;
 	}
 
-	/**
-	 * @return the hitCount
-	 */
-	public int getHitCount() {
-		return hitCount;
+
+	public double getScore() {
+		return score;
 	}
 
 	public String getName() {

@@ -1,39 +1,88 @@
 package Peppy;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import Utilities.U;
 
-
+/**
+ * The contract here is that all lists of peptides must be returned
+ * sorted by mass, from least to greatest.
+ * @author Brian Risk
+ *
+ */
 public class ProteinDigestion {
 	
 	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile) {
 		return getPeptidesFromDatabase(proteinFile, false);
 	}
 	
-	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile, boolean reverse) {
-		if (proteinFile.getName().toLowerCase().endsWith("fa")) return getPeptidesFromFASTA(proteinFile, reverse);
-		if (proteinFile.getName().toLowerCase().endsWith("fsa")) return getPeptidesFromFASTA(proteinFile, reverse);
-		if (proteinFile.getName().toLowerCase().endsWith("fasta")) return getPeptidesFromFASTA(proteinFile, reverse);
-		if (proteinFile.getName().toLowerCase().endsWith("dat")) return getPeptidesFromUniprotDAT(proteinFile, reverse);
+	/**
+	 * This method, right here, it's for reverse database searches for things like
+	 * False Positive Rates and the like.  So, only used for stats purposes, not
+	 * "real" searches
+	 * @param proteinFile
+	 * @return
+	 */
+	public static ArrayList<Peptide> getPeptidesFromReverseDatabase(File proteinFile) {
+		return getPeptidesFromDatabase(proteinFile, true);
+	}
+	
+	/**
+	 * Depending on the file suffix of the protein file it chooses how to extract the proteins
+	 * @param proteinFile a FASTA or DAT formatted file
+	 * @param isReverse
+	 * @return
+	 */
+	private static ArrayList<Protein> getProteinsFromDatabase(File proteinFile, boolean isReverse) {
+		if (proteinFile.getName().toLowerCase().endsWith("fa")) return getProteinsFromFASTA(proteinFile, isReverse);
+		if (proteinFile.getName().toLowerCase().endsWith("fsa")) return getProteinsFromFASTA(proteinFile, isReverse);
+		if (proteinFile.getName().toLowerCase().endsWith("fasta")) return getProteinsFromFASTA(proteinFile, isReverse);
+		if (proteinFile.getName().toLowerCase().endsWith("dat")) return getProteinsFromUniprotDAT(proteinFile, isReverse);
 		return null;
 	}
 	
-	private static ArrayList<Peptide> getPeptidesFromFASTA(File proteinFile, boolean reverse) {
-		ArrayList<Peptide> out = new ArrayList<Peptide>();
+	public static ArrayList<Protein> getProteinsFromDatabase(File proteinFile) {
+		return getProteinsFromDatabase(proteinFile, false);
+	}
+	
+	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile, boolean isReverse) {
+		ArrayList<Protein> proteins = getProteinsFromDatabase(proteinFile, isReverse);
+		return getPeptidesFromListOfProteins(proteins);	
+	}
+	
+	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		for (Protein protein: proteins) {
+			peptides.addAll(protein.digest());
+		}
+		Collections.sort(peptides);
+		return peptides;
+	}
+	
+	private static ArrayList<Protein> getProteinsFromFASTA(File proteinFile, boolean isReverse) {
+		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
 			String line = br.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			int proteinIndex = 0;
-			Protein protein;
 			while (line != null) {
+				//this symbol means we've reached the beginning of a new protein and
+				//the one we've been working on has ended
 				if (line.startsWith(">")) {
-					if (reverse) buffy.reverse();
-					protein = new Protein(proteinName, buffy.toString());
-					out.addAll(protein.digest());
+					if (isReverse) buffy.reverse();
+					proteins.add(new Protein(proteinName, buffy.toString()));
+
+					//this is the name of the next protein
 					proteinName = line.substring(1).trim();
 					//try to get the accession number from UniProt databases
 					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
@@ -53,8 +102,7 @@ public class ProteinDigestion {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Collections.sort(out);
-		return out;
+		return proteins;
 	}
 	
 	/**
@@ -62,15 +110,14 @@ public class ProteinDigestion {
 	 * @param proteinFile
 	 * @return
 	 */
-	private static ArrayList<Peptide> getPeptidesFromUniprotDAT(File proteinFile, boolean reverse) {
-		ArrayList<Peptide> out = new ArrayList<Peptide>();
+	private static ArrayList<Protein> getProteinsFromUniprotDAT(File proteinFile, boolean reverse) {
+		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
 			String line = br.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			boolean inSequence = false;
-			Protein protein;
 			while (line != null) {
 				if (line.startsWith("ID")) {
 					proteinName = "NOT DEFINED";
@@ -100,8 +147,7 @@ public class ProteinDigestion {
 				if (line.startsWith("//")) {
 					inSequence = false;
 					if (reverse) buffy.reverse();
-					protein = new Protein(proteinName, buffy.toString());
-					out.addAll(protein.digest());
+					proteins.add(new Protein(proteinName, buffy.toString()));
 				}
 				//read a new line
 				line = br.readLine();
@@ -111,8 +157,7 @@ public class ProteinDigestion {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Collections.sort(out);
-		return out;
+		return proteins;
 	}
 	
 	//TODO
