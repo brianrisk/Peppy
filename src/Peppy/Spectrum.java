@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import Math.EValueCalculator;
 import Reports.HistogramVisualizer;
-import Statistics.EValueCalculator;
 import Utilities.U;
 
 /**

@@ -3,8 +3,8 @@ package Peppy;
 import java.io.File;
 import java.io.IOException;
 
+import Math.MathFunctions;
 import SpectralVisualizer.SpectralVisualizerPTM;
-import Statistics.MathFunctions;
 import Utilities.U;
 
 public class MatchPTM extends Match {

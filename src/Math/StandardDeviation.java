@@ -1,4 +1,4 @@
-package Statistics;
+package Math;
 
 public class StandardDeviation {
 	

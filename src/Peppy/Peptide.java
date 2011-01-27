@@ -96,17 +96,18 @@ public class Peptide implements Comparable<Peptide> {
 		this.isSpliced = isSpliced;
 	}
 	
-	/**
-	 * A constructor for if our peptide comes from a protein database, not from digested DNA
-	 * @param acidSequence
-	 * @param proteinName
-	 */
-	public Peptide(String acidSequence, Protein protein) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
+		this.startIndex = startIndex;
+		this.stopIndex = stopIndex;
+		this.intronStartIndex = intronStartIndex;
+		this.intronStopIndex = intronStopIndex;
+		this.forward = forward;
+		this.parentSequence = parentSequence;
 		this.protein = protein;
+		this.isSpliced = isSpliced;
 	}
-	
 
 
 	@Override

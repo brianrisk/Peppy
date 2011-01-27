@@ -1,4 +1,4 @@
-package Statistics;
+package Math;
 
 /**
  * Implementing this interface says, "hey, I can have E value!"

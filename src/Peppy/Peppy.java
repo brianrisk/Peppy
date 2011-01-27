@@ -35,7 +35,7 @@ public class Peppy {
 		U.p("done");
 	}
 	
-	public Peppy(String [] args) {
+	public static void runPeppy(String [] args) {
 		U.startStopwatch();
 		peptideTally = 0;
 		//Load our spectra
@@ -98,14 +98,14 @@ public class Peppy {
 		}
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
-			new Peppy(null);
+			runPeppy(null);
 		} else {
 			U.p("running " + jobFiles.size() + " jobs");
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
 				init(args);
 				Properties.loadProperties(jobFiles.get(i));
-				new Peppy(null);
+				runPeppy(null);
 			}
 		}
 	}

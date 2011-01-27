@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import Utilities.U;
 
 /**
+ * A protein is in charge of digestion and holding its digested peptides.
+ * 
  * Important note:  all begin indicies are inclusive, all ends are exclusive
+ * 
  * @author Brian Risk
  *
  */
@@ -24,20 +27,21 @@ public class Protein implements Comparable<Protein>{
 	private Sequence sequence;
 	private ArrayList<Match> matches = new ArrayList<Match>();
 	private double score = 0;
-	private double [] hitPositions = null;
-	private double hitCoverage = -1;
+	private double [] matchPositions = null;
+	private double matchCoverage = -1;
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
-	public Protein(String name, int start, String acidString) {
-		this(name, start, acidString, false, -1, -1, true, null);
+	public Protein(String name, String acidString) {
+		this(name, 0, acidString, false, -1, -1, true, null);
 	}
-	
+
+
 	/**
 	 * 
 	 * @param name
 	 * @param start
-	 * @param acidString  The acid string is assumed to, at most, have only one '.' and if one does exist it can only exist at the very end of thes string.
+	 * @param acidString  The acid string is assumed to, at most, have only one '.' and if one does exist it can only exist at the very end of the string.
 	 * @param isSpliced
 	 * @param intronStart
 	 * @param intronStop
@@ -53,10 +57,6 @@ public class Protein implements Comparable<Protein>{
 		this.intronStop = intronStop;
 		this.isForward = isForward;
 		this.sequence = sequence;
-	}
-	
-	public Protein(String name, String acidString) {
-		this(name, 0, acidString);
 	}
 	
 	/**
@@ -87,38 +87,41 @@ public class Protein implements Comparable<Protein>{
 		return unfoundPeptides;
 	}
 	
-	public double [] getHitPositions() {
-		if (hitPositions == null) {
-			hitPositions = new double[acidByteArray.length];
+	public double [] getMatchPositions() {
+		if (matchPositions == null) {
+			matchPositions = new double[acidByteArray.length];
 			Peptide peptide;
 			double logE;
+			int start, stop;
 			for (Match match: matches) {
 				peptide = match.getPeptide();
 				logE = -Math.log(match.getEValue());
-				for (int i = peptide.getStartIndex(); i < peptide.getStopIndex(); i++) {
-					if (logE > hitPositions[i]) hitPositions[i] = logE;
+				start = peptide.getStartIndex()/3;
+				stop = peptide.getStopIndex()/3 + 1;
+				for (int i = start; i < stop; i++) {
+					if (logE > matchPositions[i]) matchPositions[i] = logE;
 				}
 			}
 		}
-		return hitPositions;
+		return matchPositions;
 	}
 	
-	public double getHitCoverage() {
-		if (hitCoverage < 0) {
-			getHitPositions();
+	public double getMatchCoverage() {
+		if (matchCoverage < 0) {
+			getMatchPositions();
 			int tally = 0;
-			for (int i = 0; i < hitPositions.length; i++) {
-				if (hitPositions[i] > 0) tally++;
+			for (int i = 0; i < matchPositions.length; i++) {
+				if (matchPositions[i] > 0) tally++;
 			}
-			hitCoverage = (double) tally / hitPositions.length;
+			matchCoverage = (double) tally / matchPositions.length;
 		}
-		return hitCoverage;
+		return matchCoverage;
 	}
 	
 	
 	public int compareTo(Protein other) {
-		if (other.getScore() < score) return  1;
-		if (other.getScore() > score) return -1;
+		if (other.getScore() < score) return -1;
+		if (other.getScore() > score) return  1;
 		return 0;
 	}
 	
@@ -325,6 +328,7 @@ public class Protein implements Comparable<Protein>{
 				peptideIntronStopIndex,
 				isForward,
 				sequence,
+				this,
 				isSpliced);
 		
 		//add peptide if it meets certain criteria
@@ -334,7 +338,7 @@ public class Protein implements Comparable<Protein>{
 	}
 	
 	public String getAcidString() {
-		return acidString;
+		return AminoAcids.getStringForByteArray(acidByteArray);
 	}
 
 

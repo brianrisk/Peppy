@@ -1,8 +1,8 @@
 package Peppy;
 
 import HMMScore.HMMClass;
-import Statistics.HasEValue;
-import Statistics.MathFunctions;
+import Math.HasEValue;
+import Math.MathFunctions;
 
 /**
  * An object which contains scoring mechanisms to evaluate a spectrum/peptide match.
