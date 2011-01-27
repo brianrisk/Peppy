@@ -19,20 +19,18 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class PTMPeppy extends Peppy{
+public class PeppyPTM extends Peppy{
 	
 	
 	public static void main(String [] args) {
 		init(args);
-		new PTMPeppy(args);
+		new PeppyPTM(args);
 		U.p("done");
 	}
 	
-	public PTMPeppy(String [] args) {
+	public PeppyPTM(String [] args) {
 		super(args);
 		U.startStopwatch();
-		printGreeting();
-		peptideTally = 0;
 		
 		//Load our spectra
 		U.p("loading spectra...");

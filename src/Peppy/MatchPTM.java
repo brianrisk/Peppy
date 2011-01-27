@@ -7,7 +7,7 @@ import SpectralVisualizer.SpectralVisualizerPTM;
 import Statistics.MathFunctions;
 import Utilities.U;
 
-public class PTMMatch extends Match {
+public class MatchPTM extends Match {
 	
 	//Peptide/Spectrum difference in mass
 	double psDifference;
@@ -39,7 +39,7 @@ public class PTMMatch extends Match {
 		U.p("spectrum mass: " + spectrum.getPrecursorMass());
 		double difference = ( spectrum.getPrecursorMass() - peptide.getMass());
 		U.p("difference: " + difference);
-		PTMMatch match = new PTMMatch(spectrum, peptide);
+		MatchPTM match = new MatchPTM(spectrum, peptide);
 		U.p("raw score: " + match.getScore());
 		
 //		try {
@@ -51,13 +51,13 @@ public class PTMMatch extends Match {
 		//scores when we iterate where the mod is occuring
 		double imp;
 		for (int i= 0; i < acidString.length(); i++) {
-			match = new PTMMatch(spectrum, peptide);
+			match = new MatchPTM(spectrum, peptide);
 			imp = match.calculateIMP(match.psDifference, i);
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 		}
 	}
 	
-	public PTMMatch(Spectrum spectrum, Peptide peptide) {
+	public MatchPTM(Spectrum spectrum, Peptide peptide) {
 		super(spectrum, peptide, false);
 		psDifference = spectrum.getPrecursorMass() - peptide.getMass();
 		calculateScore();
