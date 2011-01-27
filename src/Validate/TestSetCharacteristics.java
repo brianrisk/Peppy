@@ -69,7 +69,7 @@ public class TestSetCharacteristics {
 			String peptideString = peptide.getAcidSequenceString();
 			
 			//If precursor difference is too much, exit
-			double difference = spectrum.getPrecursorMass() - peptide.getMass();
+			double difference = spectrum.getMass() - peptide.getMass();
 			if (Math.abs(difference) > 2) continue;
 	
 			int i;
@@ -149,15 +149,15 @@ public class TestSetCharacteristics {
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE);
 		Collections.sort(correctMatches);
 		for(Match match: correctMatches) {
-			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
-			U.p(match.getSpectrum().getFile().getName() + ", " + match.getSpectrum().getPrecursorMass() + ": " + difference);
+			double difference = match.getSpectrum().getMass() - match.getPeptide().getMass();
+			U.p(match.getSpectrum().getFile().getName() + ", " + match.getSpectrum().getMass() + ": " + difference);
 		}
 	}
 	
 	public int countBadPrecursors() {
 		int total = 0;
 		for(Match match: correctMatches) {
-			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
+			double difference = match.getSpectrum().getMass() - match.getPeptide().getMass();
 			if (Math.abs(difference) > 2.0) total++;
 		}
 		return total;

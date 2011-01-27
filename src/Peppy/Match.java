@@ -478,8 +478,8 @@ public class Match implements Comparable<Match>, HasEValue{
 			if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
 				//i'm putting this calculation in here as this is a not-often-used sort
 				//so calculating and storing this for every match is unnecessary
-				double myDifference = spectrum.getPrecursorMass() - peptide.getMass();
-				double theirDifference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
+				double myDifference = spectrum.getMass() - peptide.getMass();
+				double theirDifference = match.getSpectrum().getMass() - match.getPeptide().getMass();
 				if (myDifference > theirDifference) return -1;
 				if (myDifference < theirDifference) return  1;
 				return 0;

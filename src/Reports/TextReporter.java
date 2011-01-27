@@ -189,7 +189,7 @@ public class TextReporter {
 					sb.append('\t');
 					sb.append(match.getSpectrum().getPrecursorMZ());
 					sb.append('\t');
-					sb.append(match.getSpectrum().getPrecursorMass());
+					sb.append(match.getSpectrum().getMass());
 					sb.append('\t');
 					sb.append(match.getEValue());
 					sb.append('\t');

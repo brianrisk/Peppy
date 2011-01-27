@@ -76,7 +76,7 @@ public class HMMClass {
 		int currentIonType, currentIonIndex;
 		double currentMass, currentIntensity;
 		double NTerCleaveProb = 0.0, CTerCleaveProb = 0.0;
-		double precursorMass = spectrum.getPrecursorMass(); // (Float)
+		double precursorMass = spectrum.getMass(); // (Float)
 		// tandemData.get("PrecursorMass");
 		ArrayList<Peak> peaks = spectrum.getPeaks();
 	

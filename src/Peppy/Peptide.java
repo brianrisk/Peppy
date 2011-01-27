@@ -1,5 +1,7 @@
 package Peppy;
 
+import Math.HasValue;
+
 
 /**
  * Is a data class that stores:
@@ -11,7 +13,7 @@ package Peppy;
  * @author Brian Risk
  *
  */
-public class Peptide implements Comparable<Peptide> {
+public class Peptide implements Comparable<Peptide>, HasValue {
 	
 //	private String acidSequence;
 	private byte [] acidSequence;
@@ -306,6 +308,10 @@ public class Peptide implements Comparable<Peptide> {
 			mass += Definitions.WATER_AVERAGE;
 		}
 		return mass;
+	}
+
+	public double getValue() {
+		return getMass();
 	}
 	
 

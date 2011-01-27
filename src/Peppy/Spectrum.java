@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import Math.EValueCalculator;
+import Math.HasValue;
 import Reports.HistogramVisualizer;
 import Utilities.U;
 
@@ -22,11 +23,11 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class Spectrum implements Comparable<Spectrum>{
+public class Spectrum implements Comparable<Spectrum>, HasValue {
 
 	private ArrayList<Peak> peaks;
 	private double maxMass;
-	private double precursorMass;
+	private double mass;
 	private double precursorMZ;
 	private int id;
 	private int charge = 0;
@@ -63,7 +64,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		this.file = file;
 		Spectrum spectrum = loadSpectra(file).get(0); 
 		peaks = spectrum.getPeaks();
-		precursorMass = spectrum.getPrecursorMass();
+		mass = spectrum.getMass();
 		if (normalizePeaks) normalizePeaks();
 	}
 	
@@ -76,7 +77,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void addPeakFromString(String s) {
 		try {
 			Peak p = new Peak(s);
-			if (p.getMass() <= precursorMass) peaks.add(new Peak(s));
+			if (p.getMass() <= mass) peaks.add(new Peak(s));
 		} catch (Exception e) {
 			//don't add it if it's bad!
 		}	
@@ -86,14 +87,14 @@ public class Spectrum implements Comparable<Spectrum>{
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
 		precursorMZ = Double.parseDouble(chunks[0]);
-		precursorMass = precursorMZ - Definitions.HYDROGEN_MONO;
+		mass = precursorMZ - Definitions.HYDROGEN_MONO;
 		if (file.getName().endsWith(".dta")) {
 			charge = Integer.parseInt(chunks[1]);
 		}
 		//assumes txt files are really pkl
 		if (file.getName().endsWith(".pkl") || file.getName().endsWith(".txt")) {
 			charge = Integer.parseInt(chunks[2]);
-			precursorMass *= charge;
+			mass *= charge;
 		}
 	}
 	
@@ -215,7 +216,7 @@ public class Spectrum implements Comparable<Spectrum>{
 			double upperBound, lowerBound, lastUpperBound = 0;
 			double windowSize = 2 * Properties.peakDifferenceThreshold;
 			for (Peak peak: peaks) {
-				if (peak.getMass() < precursorMass) {
+				if (peak.getMass() < mass) {
 					upperBound = peak.getMass() + Properties.peakDifferenceThreshold;
 					lowerBound = peak.getMass() - Properties.peakDifferenceThreshold;
 					if (lowerBound < lastUpperBound) {
@@ -226,7 +227,7 @@ public class Spectrum implements Comparable<Spectrum>{
 					lastUpperBound = upperBound;
 				}
 			}
-			coverage = covered / precursorMass;
+			coverage = covered / mass;
 		}
 		return coverage;
 	}
@@ -235,7 +236,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	
 	public ArrayList<Peak> getPeaks() {return peaks;}
 	
-	public double getPrecursorMass() {return precursorMass;}
+	public double getMass() {return mass;}
 	public double getPrecursorMZ() {return precursorMZ;}
 	
 	public int getPeakCount() {return peaks.size();}
@@ -598,8 +599,8 @@ public class Spectrum implements Comparable<Spectrum>{
 	
 
 	public int compareTo(Spectrum spectrum) {
-		if (precursorMass < spectrum.getPrecursorMass()) return -1;
-		if (precursorMass > spectrum.getPrecursorMass())  return 1;
+		if (mass < spectrum.getMass()) return -1;
+		if (mass > spectrum.getMass())  return 1;
 		return  0;
 	}
 	
@@ -662,6 +663,10 @@ public class Spectrum implements Comparable<Spectrum>{
 			out.append("\r");
 		}
 		return out.toString();
+	}
+
+	public double getValue() {
+		return getMass();
 	}
 	
 	

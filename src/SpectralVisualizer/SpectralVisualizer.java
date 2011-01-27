@@ -282,9 +282,9 @@ public class SpectralVisualizer {
 		chartGraphics.drawLine(chartX - 10, chartY, chartX + 10, chartY); // y cap
 		
 		//find x tick marks
-		double xLabelIncrement = Math.log10(spectrum.getPrecursorMass());
+		double xLabelIncrement = Math.log10(spectrum.getMass());
 		xLabelIncrement = Math.pow(10, Math.round(xLabelIncrement) - 1);
-		int xPixelIncrement = (int) ((xLabelIncrement / spectrum.getPrecursorMass()) * spectrumWidth);
+		int xPixelIncrement = (int) ((xLabelIncrement / spectrum.getMass()) * spectrumWidth);
 		
 		//draw x ticks
 		int x1;
@@ -390,7 +390,7 @@ public class SpectralVisualizer {
 		int fontHeight = fontMetrics.getHeight();
 		
 		//getting maximum spectrum value and intensity
-		double maxValue = spectrum.getPrecursorMass();
+		double maxValue = spectrum.getMass();
 //		double maxValue = 1500;
 		double maxIntensity = spectrum.getMaxIntensity();
 		if (cubedScale) maxIntensity = Math.pow(maxIntensity, 0.333);

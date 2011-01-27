@@ -1,5 +1,7 @@
 package Math;
 
+import java.util.ArrayList;
+
 
 
 
@@ -81,6 +83,28 @@ public class MathFunctions {
 			total += probability;
 		}
 		return total;
+	}
+	
+	/**
+	 * Boolean search to locate the first peptide in the SORTED list of peptides that has
+	 * a mass greater than the "mass" parameter.
+	 * 
+	 * CAUTION:  this method is not perfect due to rounding error.  However, returns
+	 * very good ballpark.
+	 * 
+	 * @param values
+	 * @param value
+	 * @return
+	 */
+	public static int findFirstIndexGreater(ArrayList<? extends HasValue> values, double value) {
+		int index = values.size() / 2;
+		int increment = index / 2;
+		while (increment > 0) {
+			if (values.get(index).getValue() > value) {index -= increment;}
+			else {index += increment;}
+			increment /= 2;
+		}
+		return index;
 	}
 	
 

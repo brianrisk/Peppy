@@ -2,6 +2,8 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Math.MathFunctions;
+
 
 public class ScoringThread implements Runnable {
 	
@@ -28,14 +30,14 @@ public class ScoringThread implements Runnable {
 			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-			double lowestPeptideMassToConsider = spectrum.getPrecursorMass() - Properties.spectrumToPeptideMassError;
-			int firstPeptideIndex = findFirstIndexWithGreaterMass(peptides, lowestPeptideMassToConsider);
+			double lowestPeptideMassToConsider = spectrum.getMass() - Properties.spectrumToPeptideMassError;
+			int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
 			firstPeptideIndex -= 8;
 			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
 			
 			//find the last index, compensate for rounding error
-			double highestPeptideMassToConsider = spectrum.getPrecursorMass() + Properties.spectrumToPeptideMassError;
-			int lastPeptideIndex = findFirstIndexWithGreaterMass(peptides, highestPeptideMassToConsider);
+			double highestPeptideMassToConsider = spectrum.getMass() + Properties.spectrumToPeptideMassError;
+			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
 			lastPeptideIndex += 8;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
 			
@@ -85,28 +87,6 @@ public class ScoringThread implements Runnable {
 	}
 
 	
-	/**
-	 * Boolean search to locate the first peptide in the SORTED list of peptides that has
-	 * a mass greater than the "mass" parameter.
-	 * 
-	 * CAUTION:  this method is not perfect due to rounding error.  However, returns
-	 * very good ballpark.
-	 * 
-	 * @param peptides
-	 * @param mass
-	 * @return
-	 */
-	public static int findFirstIndexWithGreaterMass(ArrayList<Peptide> peptides, double mass) {
-		Peptide peptide;
-		int index = peptides.size() / 2;
-		int increment = index / 2;
-		while (increment > 0) {
-			peptide = peptides.get(index);
-			if (peptide.getMass() > mass) {index -= increment;}
-			else {index += increment;}
-			increment /= 2;
-		}
-		return index;
-	}
+	
 
 }

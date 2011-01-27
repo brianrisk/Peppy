@@ -15,11 +15,11 @@ import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
+import Math.MathFunctions;
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
-import Peppy.ScoringThread;
 import Utilities.U;
 
 public class GenerateValidationReport {
@@ -632,7 +632,7 @@ public class GenerateValidationReport {
 
 	
 	public static int isPeptidePresentInList(Peptide peptide, ArrayList<Peptide> peptides) {
-		int peptideIndex = ScoringThread.findFirstIndexWithGreaterMass(peptides, peptide.getMass() - .01);
+		int peptideIndex = MathFunctions.findFirstIndexGreater(peptides, peptide.getMass() - .01);
 		peptideIndex -= 8;
 		if (peptideIndex < 0) peptideIndex = 0;
 		for (int i = peptideIndex; i < peptides.size(); i++) {

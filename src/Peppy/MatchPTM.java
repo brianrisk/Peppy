@@ -36,8 +36,8 @@ public class MatchPTM extends Match {
 		
 		//quick report
 		U.p("peptide mass: " + peptide.getMass());
-		U.p("spectrum mass: " + spectrum.getPrecursorMass());
-		double difference = ( spectrum.getPrecursorMass() - peptide.getMass());
+		U.p("spectrum mass: " + spectrum.getMass());
+		double difference = ( spectrum.getMass() - peptide.getMass());
 		U.p("difference: " + difference);
 		MatchPTM match = new MatchPTM(spectrum, peptide);
 		U.p("raw score: " + match.getScore());
@@ -59,7 +59,7 @@ public class MatchPTM extends Match {
 	
 	public MatchPTM(Spectrum spectrum, Peptide peptide) {
 		super(spectrum, peptide, false);
-		psDifference = spectrum.getPrecursorMass() - peptide.getMass();
+		psDifference = spectrum.getMass() - peptide.getMass();
 		calculateScore();
 	}
 	

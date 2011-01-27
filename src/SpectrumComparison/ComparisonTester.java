@@ -80,7 +80,7 @@ public class ComparisonTester {
 			SpectrumPeptidePair spp1 = spectrumPeptidePairs.get(i);
 			for (int j = i + 1; j < spectrumPeptidePairs.size(); j++) {
 				SpectrumPeptidePair spp2 = spectrumPeptidePairs.get(j);
-				double precursorDifference = Math.abs(spp1.getSpectrum().getPrecursorMass() - spp2.getSpectrum().getPrecursorMass());
+				double precursorDifference = Math.abs(spp1.getSpectrum().getMass() - spp2.getSpectrum().getMass());
 				if (precursorDifference < 2.0 ) {
 					SpectrumComparison comparison = new SpectrumComparison(spp1,spp2, delta);
 					comparison.computeDistance();
