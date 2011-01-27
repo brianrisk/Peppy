@@ -62,38 +62,18 @@ public class TestSet {
 		//and the correct 
 		//remove spectra that don't have a proper match in our database
 		//first remove spectra which do not represent peptides in our given database
-		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
-		for (Match match: correctMatches) {
-			Peptide peptide = match.getPeptide();
-			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) != -1) {
-				reducedSpectra.add(match.getSpectrum());
-			}
-		}
-		spectra = reducedSpectra;
-		setSize = spectra.size();
-		
-		
-//		
-//		//use only spectra that don't have a big difference between precursor and the predicted protein mass
 //		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
 //		for (Match match: correctMatches) {
-//			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
-//			if (Math.abs(difference) < Properties.peptideMassThreshold) {
+//			Peptide peptide = match.getPeptide();
+//			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) != -1) {
 //				reducedSpectra.add(match.getSpectrum());
 //			}
 //		}
 //		spectra = reducedSpectra;
-//		setSize = spectra.size();
-//		
-//		//add all the correct peptides to the peptide database
-//		peptides.addAll(loadCorrectPeptides());
-//		Collections.sort(peptides);		
+		setSize = spectra.size();	
 	}
 	
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
-		
-		
-		
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();
 		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
@@ -127,7 +107,7 @@ public class TestSet {
 		topForwardsMatches = new ArrayList<Match>();
 		topForwardsTestedMatches = new ArrayList<MatchContainer>();
 		for (Match match: positiveMatches) {
-			if (match.getRank() == 1) {
+			if (match.rank == 1) {
 				topForwardsMatches.add(match);
 				topForwardsTestedMatches.add(new MatchContainer(match));
 			}

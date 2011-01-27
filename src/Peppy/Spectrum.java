@@ -77,7 +77,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		try {
 			Peak p = new Peak(s);
 			if (p.getMass() <= precursorMass) peaks.add(new Peak(s));
-		} catch (MalformedPeakException mpe) {
+		} catch (Exception e) {
 			//don't add it if it's bad!
 		}	
 	}
@@ -261,7 +261,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		for (int i = 0; i < getPeakCount(); i++) {getPeak(i).setColor(c);}
 	}
 
-	public void cleanPeaks() {
+	private void cleanPeaks() {
 		//before we mess with the peak data, let's make sure we have the MD5
 		MD5 = getMD5();
 		

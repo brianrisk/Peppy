@@ -577,8 +577,8 @@ public class GenerateValidationReport {
 	//						pw.println("<br>");
 	//					}
 					pw.println("<td>");
-					pw.println(ourMatch.ionMatchTally);
-					pw.println("<br>" + trueMatch.ionMatchTally);
+					pw.println(ourMatch.getIonMatchTally());
+					pw.println("<br>" + trueMatch.getIonMatchTally());
 					pw.println("</td>");
 					
 					//creating the image of our match
@@ -633,14 +633,13 @@ public class GenerateValidationReport {
 	
 	public static int isPeptidePresentInList(Peptide peptide, ArrayList<Peptide> peptides) {
 		int peptideIndex = ScoringThread.findFirstIndexWithGreaterMass(peptides, peptide.getMass() - .01);
-		double peptideMassButBigger = peptide.getMass() + .01;
+		peptideIndex -= 8;
+		if (peptideIndex < 0) peptideIndex = 0;
 		for (int i = peptideIndex; i < peptides.size(); i++) {
-			if (peptide.getMass() == peptides.get(i).getMass()) {
-				if (peptide.equals(peptides.get(i))) {
-					return i;
-				}
+			if (peptide.equals(peptides.get(i))) {
+				return i;
 			}
-			if (peptides.get(i).getMass() > peptideMassButBigger) {
+			if (peptides.get(i).getMass() > peptide.getMass()) {
 				break;
 			}
 		}

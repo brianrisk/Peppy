@@ -11,9 +11,6 @@ import Reports.HTMLReporter;
 import Reports.TextReporter;
 import Utilities.U;
 
-
-
-
 /**
  * Peppy
  * A very stripped down Java version of the MS/MS to genome mapping of Morgan Gidding's GFS.
@@ -30,6 +27,7 @@ public class Peppy {
 	static int peptideTally = 0;
 	
 	public static void main(String [] args) {
+		printGreeting();
 		init(args);
 		runJobs(args);
 //		new Peppy(args);
@@ -39,9 +37,7 @@ public class Peppy {
 	
 	public Peppy(String [] args) {
 		U.startStopwatch();
-		printGreeting();
 		peptideTally = 0;
-		
 		//Load our spectra
 		U.p("loading spectra...");
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -232,7 +228,7 @@ public class Peppy {
 		Match match = matches.get(0);
 		Match previousMatch = matches.get(0);
 		//set for the first
-		match.setRank(1);
+		match.rank = 1;
 		int rank = 1;
 		for (int i = 1; i < matches.size(); i++) {
 			//see if these are matches for a different spectrum
@@ -241,9 +237,9 @@ public class Peppy {
 				rank = 1;
 			}
 			if (match.getScore() == previousMatch.getScore()) {
-				rank = previousMatch.getRank();
+				rank = previousMatch.rank;
 			}
-			match.setRank(rank);
+			match.rank = rank;
 			rank++;
 			previousMatch = match;
 		}
@@ -252,7 +248,7 @@ public class Peppy {
 		double previousScore = match.getScore();
 		for (; i >= 0; i--) {
 			match = matches.get(i);
-			if (match.getRank() == 1) {
+			if (match.rank == 1) {
 				match.setScoreRatio(match.getScore() / previousScore);
 			} else {
 				previousScore = match.getScore();
@@ -277,7 +273,7 @@ public class Peppy {
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				for (int j = i - rankCount; j < i; j++) {
-					matches.get(j).setRepeatCount(rankCount);
+					matches.get(j).repeatCount = rankCount;
 				}
 				rankCount = 1;
 			} else {
@@ -285,7 +281,7 @@ public class Peppy {
 					rankCount++;
 				} else {
 					for (int j = i - rankCount; j < i; j++) {
-						matches.get(j).setRepeatCount(rankCount);
+						matches.get(j).repeatCount = rankCount;
 					}
 					rankCount = 1;
 				}

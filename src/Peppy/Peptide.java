@@ -281,7 +281,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * in your Properties object.
 	 * @return
 	 */
-	public double calculateMass() {
+	private double calculateMass() {
 		double mass = 0.0;
 		if (Properties.useMonoMass) {
 			for (int i = 0; i < acidSequence.length; i++) {

@@ -11,16 +11,18 @@ import Statistics.MathFunctions;
  */
 public class Match implements Comparable<Match>, HasEValue{
 	
-	private double score = 0.0;
-	private double scoreRatio = -1;
-	private int repeatCount = 0; 
-	private double eValue;
-	private double impValue = -1;
-	public int ionMatchTally = 0;
-	private int rank = Integer.MAX_VALUE;
+	protected Spectrum spectrum;
+	protected Peptide peptide;
 	
-	private Spectrum spectrum;
-	private Peptide peptide;
+	protected double score = 0.0;
+	protected double impValue = -1;
+	protected int ionMatchTally = 0;
+	
+	public double scoreRatio = -1;
+	public int repeatCount = 0; 
+	public int rank = Integer.MAX_VALUE;
+	
+	private double eValue;
 	
 	private static int sortTracker = 0;
 	public final static int SORT_BY_SCORE = sortTracker++;
@@ -36,12 +38,17 @@ public class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_RANK_THEN_SCORE = sortTracker++;
 	public final static int SORT_BY_IMP_VALUE = sortTracker++;
 	
+	//default is that we sort matches by score
 	private static int sortParameter = SORT_BY_SCORE;
 	
 	public Match(Spectrum spectrum, Peptide peptide) {
+		this(spectrum, peptide, true);
+	}
+	
+	public Match(Spectrum spectrum, Peptide peptide, boolean calculateScore) {
 		this.spectrum = spectrum;
 		this.peptide = peptide;
-		calculateScore();
+		if (calculateScore) calculateScore();
 	}
 	
 	public void calculateScore() {
@@ -197,6 +204,7 @@ public class Match implements Comparable<Match>, HasEValue{
 			//we want -1 because most of these spectra will have a match with 
 			//the last theoretical peak
 			int peptideLengthMinusOne = acidSequence.length - 1;
+			if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
 			
 			double [] bIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
 			double [] yIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
@@ -338,7 +346,6 @@ public class Match implements Comparable<Match>, HasEValue{
 			p = spectrum.getCoverage();
 			double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
 			
-			
 			//TODO: optimize this.  it is a great place to improve performance
 			if (peakMatchProbability > 0.5) {
 				impValue = 1;
@@ -455,15 +462,15 @@ public class Match implements Comparable<Match>, HasEValue{
 				return 0;
 			} else	
 			if (sortParameter == SORT_BY_RANK_THEN_E_VALUE) {
-				if (rank < match.getRank()) return -1;
-				if (rank > match.getRank()) return  1;
+				if (rank < match.rank) return -1;
+				if (rank > match.rank) return  1;
 				if (eValue < match.getEValue()) return -1;
 				if (eValue > match.getEValue()) return  1;
 				return 0;
 			} else 
 			if (sortParameter == SORT_BY_RANK_THEN_SCORE) {
-				if (rank < match.getRank()) return -1;
-				if (rank > match.getRank()) return  1;
+				if (rank < match.rank) return -1;
+				if (rank > match.rank) return  1;
 				if (score < match.getScore()) return 1;
 				if (score > match.getScore()) return -1;
 				return 0;
@@ -496,29 +503,6 @@ public class Match implements Comparable<Match>, HasEValue{
 		}
 		return false;
 	}
-
-	public int getRank() {
-		return rank;
-	}
-
-	public void setRank(int rank) {
-		this.rank = rank;
-	}
-
-	public int getRankCount() {
-		return repeatCount;
-	}
-
-	public void setRepeatCount(
-			int repeatCount) {
-		this.repeatCount = repeatCount;
-	}
-
-	public int getRepeatCount() {
-		return repeatCount;
-	}
-
-	
 	
 	/**
 	 * Returns the default score.  This could be TandemFit or HMM.
@@ -561,22 +545,9 @@ public class Match implements Comparable<Match>, HasEValue{
 		Match.sortParameter = sortParameter;
 	}
 
-	/**
-	 * @param spectrum the spectrum to set
-	 */
-	public void setSpectrum(Spectrum spectrum) {
-		this.spectrum = spectrum;
-	}
 
 	public void setScoreRatio(double scoreRatio) {
 		this.scoreRatio = scoreRatio;
-	}
-
-	/**
-	 * @param peptide the peptide to set
-	 */
-	public void setPeptide(Peptide peptide) {
-		this.peptide = peptide;
 	}
 
 	public void setEValue(double eValue) {

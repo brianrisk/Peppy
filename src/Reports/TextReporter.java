@@ -213,9 +213,9 @@ public class TextReporter {
 						sb.append(match.getPeptide().getProtein().getName());
 					}
 					sb.append('\t');
-					sb.append(match.getRank());
+					sb.append(match.rank);
 					sb.append('\t');
-					sb.append(match.getRankCount());
+					sb.append(match.repeatCount);
 					sb.append('\t');
 					sb.append(match.getIonMatchTally());
 					pw.println(sb);

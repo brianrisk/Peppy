@@ -34,7 +34,7 @@ public class SpectralVisualizer {
 	public static final int THEME_WHITE = 0;
 	public static final int THEME_BLACK = 1;
 	private static int theTheme = THEME_WHITE;
-	private static boolean cubedScale = true;
+	private static boolean cubedScale = false;
 	static Color yIonColor = Color.RED;
 	static Color bIonColor = Color.BLUE;
 	static Color noIonColor = Color.gray;

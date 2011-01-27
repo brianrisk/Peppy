@@ -29,10 +29,10 @@ public class Peak implements Comparable<Peak>{
 	final int COMPARE_INTENSITY = tracker++;
 	int compareBy = COMPARE_MASS;
 	
-	public Peak(String s) throws MalformedPeakException {
+	public Peak(String s) throws Exception {
 		String [] chunks = s.split(" |\t");
 		if (chunks.length != 2) {
-			throw new MalformedPeakException();
+			throw new Exception("Malformed peak exception for string: \"" + s + "\"");
 		}
 		mass = Double.parseDouble(chunks[0]);
 		intensity = Double.parseDouble(chunks[1]);

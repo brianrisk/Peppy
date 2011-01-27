@@ -5,7 +5,7 @@ package Statistics;
 
 public class MathFunctions {
 	
-	private static final int length = 150;
+	private static final int length = 200;
 	private static double [] logs = new double[length];
 	private static double [] factorial = new double[length];
 	private static double [][] nChooseK = new double [length][length];
