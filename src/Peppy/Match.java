@@ -67,7 +67,7 @@ public class Match implements Comparable<Match>, HasEValue{
 
 		int i;
 		boolean atLeastOneMatch = false;
-		double theoreticalPeakMass, peakMass;
+		double theoreticalPeakMassLeft, peakMass;
 		int peakIndex, seqIndex;
 		ionMatchTally = 0;
 		
@@ -86,11 +86,12 @@ public class Match implements Comparable<Match>, HasEValue{
 		
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+		theoreticalPeakMassLeft = peptide.getMass() + Properties.rightIonDifference - Properties.peakDifferenceThreshold;
+		double peakDifferenceThresholdArea = Properties.peakDifferenceThreshold + Properties.peakDifferenceThreshold;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+			theoreticalPeakMassLeft -= AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeaksLeft[i] = theoreticalPeakMassLeft;
+			theoreticalPeaksRight[i] = theoreticalPeakMassLeft + peakDifferenceThresholdArea;
 		}
 		
 		peakIndex = spectrum.getPeakCount() - 1;
@@ -120,11 +121,11 @@ public class Match implements Comparable<Match>, HasEValue{
 			
 		
 		/* b-ion  */
-		theoreticalPeakMass = Properties.leftIonDifference;
+		theoreticalPeakMassLeft = Properties.leftIonDifference  - Properties.peakDifferenceThreshold;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+			theoreticalPeakMassLeft += AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeaksLeft[i] = theoreticalPeakMassLeft;
+			theoreticalPeaksRight[i] = theoreticalPeakMassLeft + peakDifferenceThresholdArea;
 		}
 		
 		peakIndex = 0;
