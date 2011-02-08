@@ -1,5 +1,8 @@
 package Peppy;
 
+import java.io.File;
+import java.util.ArrayList;
+
 /**
  * A class where we store all of our constants. All variables
  * should be declared "final".  All methods should be static
@@ -23,6 +26,9 @@ public class Definitions {
 	//indicies in our amino acid list which define trypsin cleavages
 	public final static int [] NoCleavageBefore = {20, 23, 22, 21}; 
 	public final static int [] Cleavages = {8, 10, 24, 25, 26, 0, 2}; 
+	
+	//protein modifications
+	public static ArrayList<ProteinModification> proteinModifications = ProteinModification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
 	
 	//HMM state constant
 	public final static int NUMBER_OF_IONS =12;

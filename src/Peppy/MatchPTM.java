@@ -10,12 +10,12 @@ import Utilities.U;
 public class MatchPTM extends Match {
 	
 	//Peptide/Spectrum difference in mass
-	double psDifference;
+	double difference;
 	
 	//this is which amino acid we think has the modification
-	int [] potentialPlacesForModification;
+	boolean [] potentialPlacesForModification;
 	
-	public static void main(String args[]) {
+	public static void test() {
 		//load our weird spectrum
 //		Spectrum spectrum = Spectrum.loadSpectra("/Users/risk2/PeppyOverflow/tests/kapp-just-modified/spectra/JNA-and-JGP-AAP-27Aug03_HUPO.1948.1948.1.dta").get(0);
 //		Spectrum spectrum = Spectrum.loadSpectra("/Users/risk2/PeppyOverflow/tests/kapp-just-modified/spectra/JNA-and-JGP-AAP-27Aug03_HUPO.1987.1987.3.dta").get(0);
@@ -42,37 +42,51 @@ public class MatchPTM extends Match {
 		MatchPTM match = new MatchPTM(spectrum, peptide);
 		U.p("raw score: " + match.getScore());
 		
-//		try {
-//			SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, new File ("spectrumPTM.jpg"), difference, 9);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, new File ("spectrumPTM.jpg"), difference, 9);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		//scores when we iterate where the mod is occuring
 		double imp;
 		for (int i= 0; i < acidString.length(); i++) {
 			match = new MatchPTM(spectrum, peptide);
-			imp = match.calculateIMP(match.psDifference, i);
+			imp = match.calculateIMP(match.difference, i);
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 		}
 	}
 	
 	public MatchPTM(Spectrum spectrum, Peptide peptide) {
 		super(spectrum, peptide, false);
-		psDifference = spectrum.getMass() - peptide.getMass();
+		difference = spectrum.getMass() - peptide.getMass();
 		calculateScore();
 	}
 	
 	public void calculateScore() {
-		double imp;
-		imp = calculateIMP(psDifference, 0);
-		score = imp;
-//		U.p("imp 1: " + imp);
-		
-		imp = calculateIMP(psDifference, peptide.getAcidSequence().length - 1);
-//		U.p("imp 2: " + imp);
-		score *= imp;
-		score = Math.sqrt(score);
+		score = -Math.log(calculateIMP());
+	}
+	
+	public double calculateIMP() {
+		if (impValue < 0) {
+			double impValue1 = calculateIMP(difference, 0);
+			double impValue2 = calculateIMP(difference, peptide.getAcidSequence().length - 1);
+			if (impValue1 < 1.0E-9 || impValue2 < 1.0E-9) {
+				double bestIMP = impValue1;
+				double tempIMP;
+				for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
+					tempIMP = calculateIMP(difference, i);
+					if (tempIMP < bestIMP) bestIMP = tempIMP; 
+				}
+				if (impValue2 < bestIMP) bestIMP = impValue2;
+				impValue = bestIMP;
+			} else {
+				impValue = impValue1;
+				if (impValue2 < impValue) impValue = impValue2;
+			}
+			
+		}
+		return impValue;
 	}
 	
 	public double calculateIMP(double offset, int modifiedIndex) {
@@ -269,6 +283,12 @@ public class MatchPTM extends Match {
 		
 		impValue =  peakMatchProbability  * intensityProbability * consecutiveProbability;
 		return impValue;
+	}
+	
+	public double getDifference() {return difference;}
+	
+	public boolean hasModification() {
+		return true;
 	}
 
 }

@@ -245,12 +245,13 @@ public class SpectralVisualizer {
 	}
 	
 	public static void drawDeluxSpectrum(Spectrum spectrum, Peptide peptide, File imageFile)  throws IOException {
+		//mark matching ions
+		markMatchingIons(spectrum, peptide);
 		
 		//getting sectrum image
 		int spectrumWidth = 1000;
 		int spectrumHeight = 300;
 		BufferedImage spectrumImage = new BufferedImage(spectrumWidth, spectrumWidth, BufferedImage.TYPE_INT_RGB);
-		Graphics2D spectrumGraphics = spectrumImage.createGraphics();
 		drawSpectrum(spectrum, spectrumWidth, spectrumHeight, null, true, "", "", spectrumImage);
 		
 		//getting full chart graphics
@@ -325,6 +326,9 @@ public class SpectralVisualizer {
 		
 		//save the file
 		ImageIO.write(chartImage,"JPG",imageFile);
+		
+		//free memory
+		chartGraphics.dispose();
 		
 	}
 	
@@ -477,6 +481,9 @@ public class SpectralVisualizer {
 		if (dest != null) {
 			ImageIO.write(bdest,"JPG",dest);
 		}
+		
+		//free memory
+		g.dispose();
 	}
 	
 

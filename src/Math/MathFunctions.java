@@ -39,15 +39,7 @@ public class MathFunctions {
 		double p = 0.5;
 		for (int n = 1; n < length; n++) {
 			for (int k = 0; k <= n; k++) {
-				double total = 0;
-				double probability;
-				for (int i = k; i <= n; i++) {
-					probability = MathFunctions.cachedNChooseK(n, i);
-					probability *= Math.pow(p, i);
-					probability *= Math.pow(1 - p, n - i);
-					total += probability;
-				}
-				binomialProb50[n][k] = total;
+				binomialProb50[n][k] = getBinomialProbability(n, k, p);
 			}
 		}
 		
@@ -74,6 +66,7 @@ public class MathFunctions {
 	}
 
 	public static double getBinomialProbability(int n, int k, double p) {
+		if (k <= n * p) return 1;
 		double total = 0.0;
 		double probability;
 		for (int i = k; i <= n; i++) {

@@ -289,15 +289,15 @@ public class Match implements Comparable<Match>, HasEValue{
 			int totalIonsAbove12 = 0;
 			int totalIonsAbove06 = 0;
 			double totalMatchingIntensity = 0.0;
-			boolean yIonMatch, bIonMatch, ionMatch, previousIonMatch = false;
+			boolean yIonMatch, bIonMatch, ionMatch = false;
 			int acidMatchTally = 0;
-			int consecutiveAcidTally = 0;
+			int yGreaterThanBTally = 0;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
 				yIonMatch = yIonMatchesWithHighestIntensity[i] > 0.0;
 				bIonMatch = bIonMatchesWithHighestIntensity[i] > 0.0;
 				ionMatch = bIonMatch || yIonMatch;
 				if (ionMatch) acidMatchTally++;
-				if (previousIonMatch && ionMatch) consecutiveAcidTally++;
+				if (yIonMatchesWithHighestIntensity[i] > bIonMatchesWithHighestIntensity[i]) yGreaterThanBTally++;
 				if (yIonMatch) {
 					ionMatchTally++;
 					totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
@@ -330,8 +330,6 @@ public class Match implements Comparable<Match>, HasEValue{
 						}
 					}
 				}
-				previousIonMatch = ionMatch;
-				
 			}
 			
 			
@@ -347,16 +345,15 @@ public class Match implements Comparable<Match>, HasEValue{
 			double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
 			
 			//TODO: optimize this.  it is a great place to improve performance
-			if (peakMatchProbability > 0.5) {
+			if (peakMatchProbability > 0.25) {
 				impValue = 1;
 				return impValue;
 			}
 			
-			//consecutive match probability
+			//y greater than b probability
 			n = peptideLengthMinusOne;
-			k = consecutiveAcidTally;
-			p = (double) acidMatchTally / peptideLengthMinusOne;
-			double consecutiveProbability = MathFunctions.getBinomialProbability(n, k, p);
+			k = yGreaterThanBTally;
+			double yGreaterThanBProbability = MathFunctions.getCachedBinomialProbability50(n, k);
 			
 			
 			//probability of ions being above thresholds
@@ -394,7 +391,7 @@ public class Match implements Comparable<Match>, HasEValue{
 	//		totalMatchingIntensityProbability = Math.exp(totalMatchingIntensityProbability - totalPeakCombnations);
 	//		U.p(totalMatchingIntensityProbability);
 			
-			impValue =  peakMatchProbability  * intensityProbability * consecutiveProbability;
+			impValue =  peakMatchProbability  * intensityProbability * yGreaterThanBProbability;
 		}
 		return impValue;
 	}
@@ -561,6 +558,10 @@ public class Match implements Comparable<Match>, HasEValue{
 	public double calculateEValue() {
 		eValue = spectrum.getEValue(getScore());
 		return eValue;
+	}
+	
+	public boolean hasModification() {
+		return false;
 	}
 	
 

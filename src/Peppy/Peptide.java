@@ -45,45 +45,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.acidSequence = AminoAcids.getByteArrayForString(sequence);
 		this.mass = calculateMass();
 		this.startIndex = 0;
+		this.stopIndex = acidSequence.length;
 		this.forward = true;
 		this.parentSequence = null;
 		this.isSpliced = false;
-	}
-	
-	/**
-	 * A version of the constructor which calculates the mass from the given sequence.
-	 * @param acidSequence
-	 * @param startIndex
-	 * @param forward
-	 */
-	public Peptide(String acidSequence, int startIndex, boolean forward, Sequence parentSequence) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
-		this.startIndex = startIndex;
-		if (forward) {
-			this.stopIndex = startIndex + (acidSequence.length() * 3);
-		} else {
-			this.stopIndex = startIndex - (acidSequence.length() * 3);
-		}
-		this.forward = forward;
-		this.parentSequence = parentSequence;
-		this.isSpliced = false;
-	}
-	
-	/**
-	 * For spliced peptides
-	 * @param acidSequence
-	 * @param startIndex
-	 * @param forward
-	 */
-	public Peptide(String acidSequence, int startIndex, int stopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
-		this.startIndex = startIndex;
-		this.stopIndex = stopIndex;
-		this.forward = forward;
-		this.parentSequence = parentSequence;
-		this.isSpliced = isSpliced;
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
@@ -120,9 +85,9 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	}
 
 
-	public int compareTo(Peptide o) {
-		if (mass > o.getMass()) return 1;
-		if (mass < o.getMass()) return -1;
+	public int compareTo(Peptide other) {
+		if (mass > other.getMass()) return  1;
+		if (mass < other.getMass()) return -1;
 		return 0;
 	}
 	

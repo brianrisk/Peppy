@@ -598,9 +598,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	}
 	
 
-	public int compareTo(Spectrum spectrum) {
-		if (mass < spectrum.getMass()) return -1;
-		if (mass > spectrum.getMass())  return 1;
+	public int compareTo(Spectrum other) {
+		if (mass > other.getMass()) return  1;
+		if (mass < other.getMass()) return -1;
 		return  0;
 	}
 	

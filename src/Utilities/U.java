@@ -1,6 +1,7 @@
 package Utilities;
 
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -129,6 +130,8 @@ public class U {
 	public static void p(int o) {System.out.println(o);}
 	public static void p(char o) {System.out.println(o);}
 	public static void p() {System.out.println();}
+	
+	public static void beep() {Toolkit.getDefaultToolkit().beep();}
 	
 	public static void copyfile(File sourceFile, File destinationFile){
 	    try{

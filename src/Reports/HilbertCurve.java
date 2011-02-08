@@ -96,7 +96,6 @@ public class HilbertCurve {
 
 		//initialize our image
 		int whiteRGB = Color.white.getRGB();
-		int blackRGB = Color.blue.getRGB(); //Color.black.getRGB();
 		curveImage = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_RGB);
 		for (int x = 0; x < sideLength; x++) {
 			for (int y = 0; y < sideLength; y++) {
@@ -111,7 +110,6 @@ public class HilbertCurve {
 		boolean forwards = true;
 		Point point;
 		boolean inORF = false;
-		int [] colors = {Color.red.getRGB(), Color.green.getRGB(), Color.blue.getRGB()};
 		Color color;
 		for (int start = 0; start < 3; start++) {
 			for (int index = start; index < dna.length(); index++) {

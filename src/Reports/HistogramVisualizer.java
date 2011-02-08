@@ -11,8 +11,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Utilities.U;
-
 public class HistogramVisualizer {
 	
 	/**
@@ -55,6 +53,9 @@ public class HistogramVisualizer {
 			
 		}
 		ImageIO.write(bdest,"JPG",dest);
+		
+		//free memory
+		g.dispose();
 	}
 	
 	public static void drawHistogram(int [] histogram, int height, int width, File dest) throws IOException {
@@ -159,6 +160,9 @@ public class HistogramVisualizer {
 			int x2 = (int) ((double) (topIndex) * width / histogram.length);
 			g.drawLine(x1, 0, x1, height);
 			g.drawLine(x2, 0, x2, height);
+			
+			//free memory
+			g.dispose();
 			
 		}
 		
@@ -286,6 +290,9 @@ public class HistogramVisualizer {
 			}
 		}
 		ImageIO.write(bdest,"JPG",dest);
+		
+		//free memory
+		g.dispose();
 	}
 
 }

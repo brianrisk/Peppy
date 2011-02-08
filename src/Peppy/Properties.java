@@ -35,6 +35,7 @@ public class Properties {
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
+	public static int peptideMaximumLength = 80;
 	public static int digestionWindowSize = 25000000;
 	
 	//Splicing?

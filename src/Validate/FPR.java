@@ -43,7 +43,7 @@ public class FPR {
 		ArrayList<File> spectraFiles = new ArrayList<File>();
 		Spectrum.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
 		U.p("loaded " + spectraFiles.size() + " spectra files");
-		int setSize = 10000;
+		int setSize = 1000;
 		if (setSize > spectraFiles.size()) setSize = spectraFiles.size();
 		U.p("loading subset of spectra from the files...");
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();

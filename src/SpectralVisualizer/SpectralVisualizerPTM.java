@@ -109,12 +109,15 @@ public class SpectralVisualizerPTM  {
 		}
 		
 		//draw labels
-		chartGraphics.setColor(Color.RED);
-		chartGraphics.drawString(peptide.getAcidSequenceString(), chartX + 10, chartY + fontHeight);
-		chartGraphics.drawString(spectrum.getFile().getName(), chartX + 10, (int) (chartY + fontHeight * 2.5));
+//		chartGraphics.setColor(Color.RED);
+//		chartGraphics.drawString(peptide.getAcidSequenceString(), chartX + 10, chartY + fontHeight);
+//		chartGraphics.drawString(spectrum.getFile().getName(), chartX + 10, (int) (chartY + fontHeight * 2.5));
 		
 		//save the file
 		ImageIO.write(chartImage,"JPG",imageFile);
+		
+		//free memory
+		chartGraphics.dispose();
 		
 	}
 	
@@ -206,6 +209,9 @@ public class SpectralVisualizerPTM  {
 		if (dest != null) {
 			ImageIO.write(bdest,"JPG",dest);
 		}
+		
+		//free memory
+		g.dispose();
 	}
 	
 

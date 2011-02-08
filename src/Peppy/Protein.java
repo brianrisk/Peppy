@@ -2,8 +2,6 @@ package Peppy;
 
 import java.util.ArrayList;
 
-import Utilities.U;
-
 /**
  * A protein is in charge of digestion and holding its digested peptides.
  * 
@@ -27,8 +25,19 @@ public class Protein implements Comparable<Protein>{
 	private Sequence sequence;
 	private ArrayList<Match> matches = new ArrayList<Match>();
 	private double score = 0;
-	private double [] matchPositions = null;
+	private int [] matchPositions = null;
 	private double matchCoverage = -1;
+	private int matchArea = -1;
+	private double modCoverage = -1;
+	private int modArea = -1;
+	
+	private static int tracker = 0;
+	public static final int T_NOTHING= tracker++;
+	public static final int T_FPRXX = tracker++;
+	public static final int T_FPR01 = tracker++;
+	public static final int T_FPR05 = tracker++;
+	public static final int T_MOD = tracker++;
+	
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
@@ -66,62 +75,109 @@ public class Protein implements Comparable<Protein>{
 	public void addMatch(Match match) {
 		matches.add(match);
 		//minus because this will be negative for good e values
-		score -= Math.log(match.getEValue());
+//		score -= Math.log(match.getEValue());
+
+		if (matchPositions == null) {
+			matchPositions = new int[acidByteArray.length];
+			for (int i = 0; i < matchPositions.length; i++) {
+				matchPositions[i] = T_NOTHING;
+			}
+		}
+		int type = T_FPRXX;
+		if (match.getEValue() < 0.03359587957603186) type = T_FPR05;
+		if (match.getEValue() < 0.0034847330927202927) type = T_FPR01;
+		for (int i =  match.getPeptide().getStartIndex(); i < match.getPeptide().getStopIndex(); i++) {
+			matchPositions[i] = type;
+		}
+		
+		score += 1;
+	}
+	
+	public void addMatchPTM(MatchPTM match) {
+		matches.add(match);
+		//minus because this will be negative for good e values
+//		score -= Math.log(match.getEValue());
+
+
+		if (matchPositions == null) {
+			matchPositions = new int[acidByteArray.length];
+			for (int i = 0; i < matchPositions.length; i++) {
+				matchPositions[i] = T_NOTHING;
+			}
+		}
+		for (int i =  match.getPeptide().getStartIndex(); i < match.getPeptide().getStopIndex(); i++) {
+			if (matchPositions[i] != T_FPR05 && matchPositions[i] != T_FPR01 )
+			matchPositions[i] = T_MOD;
+		}
+		
+		score += 1;
 	}
 	
 	public ArrayList<Peptide> getUnfoundPeptides() {
-		ArrayList<Peptide> unfoundPeptides = new ArrayList<Peptide>();
-		boolean peptideFound;
-		for (Peptide peptide: peptides) {
-			peptideFound = false;
-			for (Match match: matches) {
-				if (peptide.equals(match.getPeptide())) {
-					peptideFound = true;
-					break;
-				}
-			}
-			if (!peptideFound) {
-				unfoundPeptides.add(peptide);
-			}
-		}
-		return unfoundPeptides;
-	}
+		if (matchPositions != null) {
+			ArrayList<Peptide> unfoundPeptides = new ArrayList<Peptide>();
+			boolean peptideFound;
+			for (Peptide peptide: peptides) {
+				peptideFound = true;
 	
-	public double [] getMatchPositions() {
-		if (matchPositions == null) {
-			matchPositions = new double[acidByteArray.length];
-			Peptide peptide;
-			double logE;
-			int start, stop;
-			for (Match match: matches) {
-				peptide = match.getPeptide();
-				logE = -Math.log(match.getEValue());
-				start = peptide.getStartIndex()/3;
-				stop = peptide.getStopIndex()/3 + 1;
-				for (int i = start; i < stop; i++) {
-					if (logE > matchPositions[i]) matchPositions[i] = logE;
+				//this says that if there is any amino acid that hasn't been accounted for
+				//that exists in this peptide, then the peptide hasn't been matched
+				for (int i =  peptide.getStartIndex(); i < peptide.getStopIndex(); i++) {
+					if (matchPositions[i] == T_NOTHING) {
+						peptideFound = false;
+						break;
+					}
+				}
+				if (!peptideFound) {
+					unfoundPeptides.add(peptide);
 				}
 			}
+			return unfoundPeptides;
 		}
-		return matchPositions;
+		return peptides;
 	}
 	
 	public double getMatchCoverage() {
 		if (matchCoverage < 0) {
-			getMatchPositions();
-			int tally = 0;
-			for (int i = 0; i < matchPositions.length; i++) {
-				if (matchPositions[i] > 0) tally++;
-			}
-			matchCoverage = (double) tally / matchPositions.length;
+			matchCoverage = (double) getMatchArea() / matchPositions.length;
 		}
 		return matchCoverage;
 	}
 	
+	public int getMatchArea() {
+		if (matchArea < 0) {
+			matchArea = 0;
+			for (int i = 0; i < matchPositions.length; i++) {
+				if (matchPositions[i] == T_FPR01) matchArea++;
+				if (matchPositions[i] == T_FPR05) matchArea++;
+			}
+		}
+		return matchArea;
+	}
+	
+	public double getModCoverage() {
+		if (modCoverage < 0) {
+			modCoverage = (double) getModArea() / matchPositions.length;
+		}
+		return modCoverage;
+	}
+	
+	public int getModArea() {
+		if (modArea < 0) {
+			modArea = 0;
+			for (int i = 0; i < matchPositions.length; i++) {
+				if (matchPositions[i] == T_MOD) modArea++;
+			}
+		}
+		return modArea;
+	}
+	
+	public int [] getMatchPositions() {return matchPositions;}
+	
 	
 	public int compareTo(Protein other) {
-		if (other.getScore() < score) return -1;
-		if (other.getScore() > score) return  1;
+		if (other.getScore() < getScore()) return -1;
+		if (other.getScore() > getScore()) return  1;
 		return 0;
 	}
 	
@@ -134,34 +190,40 @@ public class Protein implements Comparable<Protein>{
 
 		//setting up the acid indicies
 		int [] acidIndicies = new int[acidString.length()];
-		if (isSpliced) {
-			//Setting up nucleotide positions
-			//doing this as divisions at intron start/stop might not be clean; this is just the
-			//easiest way to keep track of such things.
-			int [] nucleotideIndicies = new int[acidString.length() * 3];
-			for (int i = start; i < intronStart; i++) {
-				nucleotideIndicies[i - start] = i;
-			}
-			for (int i = intronStop; i < acidString.length() * 3; i++) {
-				nucleotideIndicies[i - start] = i;
-			}
-			
-			if (isForward) {
-				for (int i = 0; i < acidString.length(); i++) {
-					acidIndicies[i] = nucleotideIndicies[i * 3];
+		if (Properties.isSequenceFileDNA) {
+			if (isSpliced) {
+				//Setting up nucleotide positions
+				//doing this as divisions at intron start/stop might not be clean; this is just the
+				//easiest way to keep track of such things.
+				int [] nucleotideIndicies = new int[acidString.length() * 3];
+				for (int i = start; i < intronStart; i++) {
+					nucleotideIndicies[i - start] = i;
+				}
+				for (int i = intronStop; i < acidString.length() * 3; i++) {
+					nucleotideIndicies[i - start] = i;
+				}
+				
+				if (isForward) {
+					for (int i = 0; i < acidString.length(); i++) {
+						acidIndicies[i] = nucleotideIndicies[i * 3];
+					}
+				} else {
+					for (int i = acidString.length() - 1; i >= 0; i--) {
+						acidIndicies[i] = nucleotideIndicies[i * 3];
+					}
 				}
 			} else {
-				for (int i = acidString.length() - 1; i >= 0; i--) {
-					acidIndicies[i] = nucleotideIndicies[i * 3];
+				for (int i = 0; i < acidString.length(); i++) {
+					if (isForward) {
+						acidIndicies[i] = (3 * i) + start;
+					} else {
+						acidIndicies[i] = start - (3 * i) - 2;
+					}
 				}
 			}
 		} else {
 			for (int i = 0; i < acidString.length(); i++) {
-				if (isForward) {
-					acidIndicies[i] = (3 * i) + start;
-				} else {
-					acidIndicies[i] = start - (3 * i) - 2;
-				}
+				acidIndicies[i] = i;
 			}
 		}
 		
@@ -217,7 +279,7 @@ public class Protein implements Comparable<Protein>{
 							puc,
 							intronStart,
 							intronStop,
-							acidIndicies[i],
+							acidIndicies[i] + 1,
 							isForward,
 							name,
 							peptides);
@@ -269,7 +331,7 @@ public class Protein implements Comparable<Protein>{
 						puc,
 						intronStart,
 						intronStop,
-						acidIndicies[finalIndex],
+						acidIndicies[finalIndex] + 1,
 						isForward,
 						name,
 						peptides);
@@ -319,21 +381,25 @@ public class Protein implements Comparable<Protein>{
 			peptideIntronStartIndex = -1;
 			peptideIntronStopIndex = -1;
 		}
-		//If this is coming from DNA or RNA, there is a different peptide constructor
-		peptide = new Peptide(
-				puc.getSequence(),
-				puc.getStartIndex(),
-				acidIndex,
-				peptideIntronStartIndex,
-				peptideIntronStopIndex,
-				isForward,
-				sequence,
-				this,
-				isSpliced);
 		
-		//add peptide if it meets certain criteria
-		if (peptide.getMass() >= Properties.peptideMassThreshold) {
-			peptides.add(peptide);
+		//might not be considering very long peptides
+		if (puc.getSequence().length() <= Properties.peptideMaximumLength) {
+			//If this is coming from DNA or RNA, there is a different peptide constructor
+			peptide = new Peptide(
+					puc.getSequence(),
+					puc.getStartIndex(),
+					acidIndex,
+					peptideIntronStartIndex,
+					peptideIntronStopIndex,
+					isForward,
+					sequence,
+					this,
+					isSpliced);
+			
+			//add peptide if it meets certain criteria
+			if (peptide.getMass() >= Properties.peptideMassThreshold) {
+				peptides.add(peptide);
+			}
 		}
 	}
 	
@@ -343,7 +409,9 @@ public class Protein implements Comparable<Protein>{
 
 
 	public double getScore() {
-		return score;
+		if (matchPositions == null) return 0.0;
+		return getMatchArea();
+//		return score;
 	}
 
 	public String getName() {
@@ -357,6 +425,11 @@ public class Protein implements Comparable<Protein>{
 		if (peptides == null) digest();
 		return peptides;
 	}
+
+	public ArrayList<Match> getMatches() {
+		return matches;
+	}
+
 
 	public int getStart() {
 		return start;
