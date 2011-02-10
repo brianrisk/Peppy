@@ -345,7 +345,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public void normalizePeaks() {
 		double maxIntensity = getMaxIntensity();
 		for (Peak peak: peaks) {
-			peak.setIntensity(peak.getIntensity() * 100.0 / maxIntensity);
+			peak.setIntensity((float) (peak.getIntensity() * 100.0 / maxIntensity));
 		}
 	}
 	

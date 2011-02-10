@@ -8,8 +8,8 @@ import java.awt.Color;
  */
 public class Peak implements Comparable<Peak>{
 	
-	double mass;
-	double intensity;
+	float mass;
+	float intensity;
 	int yIonNumber = -1;
 	int bIonNumber = -1;
 
@@ -34,12 +34,12 @@ public class Peak implements Comparable<Peak>{
 		if (chunks.length != 2) {
 			throw new Exception("Malformed peak exception for string: \"" + s + "\"");
 		}
-		mass = Double.parseDouble(chunks[0]);
-		intensity = Double.parseDouble(chunks[1]);
+		mass = Float.parseFloat(chunks[0]);
+		intensity = Float.parseFloat(chunks[1]);
 	}
 	
-	public double getMass() {return mass;}
-	public double getIntensity() {return intensity;}
+	public float getMass() {return mass;}
+	public float getIntensity() {return intensity;}
 	public Color getColor() {return color;}
 	
 	/**
@@ -73,7 +73,7 @@ public class Peak implements Comparable<Peak>{
 	public void setCompareByMass() {compareBy = COMPARE_MASS;}
 	public void setCompareByIntensity() {compareBy = COMPARE_INTENSITY;}
 	public void setColor(Color color) {this.color = color;}
-	public void setIntensity(double intensity) {this.intensity = intensity;}
+	public void setIntensity(float intensity) {this.intensity = intensity;}
 	
 	//@Override
 	public int compareTo(Peak p) {
