@@ -64,6 +64,10 @@ public abstract class HTMLPage {
 		print("</th>");
 	}
 	
+	protected void printTR() {
+		print("<tr>");
+	}
+	
 	protected void printLI(String string) {
 		print("<li>");
 		print(string);
@@ -75,11 +79,42 @@ public abstract class HTMLPage {
 	}
 	
 	protected void printHeader() {
-		U.appendFile(pw, Properties.reportWebHeaderFile);
+		printHeader("Peppy Report", "");
+	}
+	
+	protected void printHeader(String title, String other) {
+		print("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+		print("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		print("<head>");
+		print("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />");
+		print("<title>" + title + "</title>");
+		print(other);
+		print("<style type=\"text/css\">");
+		print("<!--");
+		print("@import url(\"http://proteomics.me/resources/reports/style.css\");");
+		print("@import url(\"http://proteomics.me/resources/reports/sortable.css\");");
+		print("-->");
+		print("</style>");
+		print("<script type=\"text/javascript\" src=\"http://proteomics.me/resources/reports/sortable.js\"></script>");
+		print("</head>");
+		//title
+		print("<div id=\"container\">");
+		print("<div id=\"header\">");
+		printH1(title);
+		print("</div>");
+		print("<div id=\"emphasis-bar-top\"><p></p></div>");
+		print("<div id=\"body\">");
 	}
 	
 	protected void printFooter() {
-		U.appendFile(pw, Properties.reportWebFooterFile);
+		print("<div id=\"footer\">");
+		print("<div id=\"emphasis-bar\"><p></p></div>");
+		print("<p>Created with <a href=\"http://unitedproteomics.com/peppy\">Peppy</a>, protein identification, proteogenomic mapping software by ");
+		print("<a href=\"http://unitedproteomics.com\">United Proteomics</a></p>");
+		print("</div>");
+		print("</div>");
+		print("</body>");
+		print("</html>");
 		pw.flush();
 		pw.close();
 	}

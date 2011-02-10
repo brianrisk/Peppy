@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.MatchPTM;
+import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.ProteinModification;
 import Peppy.Spectrum;
@@ -23,21 +24,60 @@ public class MatchHTMLPage extends HTMLPage {
 	
 	@Override
 	public void makePage() {
-		printHeader();
+		
+		//get useful variables
 		Spectrum spectrum = match.getSpectrum();
 		Peptide peptide = match.getPeptide();
 		String acidString = peptide.getAcidSequenceString();
-		printP("from protein: " + peptide.getProtein().getName());
-		printP("spectum: " +match.getSpectrum().getFile().getName());
-		printP("peptide: " + acidString);
-		printP("peptide start: " + peptide.getStartIndex());
-		printP("IMP value: " + match.getImpValue());
 		
-		//input spectrum image
-		File spectrumFile = new File(destinationFile.getParentFile(), "spectrum.jpg");
-		printP("<img src=\"spectrum.jpg\">");
+		//build spectrum script for header
+		StringBuffer spectrumScript = new StringBuffer();
+		spectrumScript.append("<script type=\"text/javascript\">");
+		if (match.hasModification()) {
+			spectrumScript.append("modificationMass = ");
+			spectrumScript.append(match.getSpectrum().getMass() - match.getPeptide().getMass());
+			spectrumScript.append(";");
+		}
+		spectrumScript.append(" var acidSequence = '");
+		spectrumScript.append(acidString);
+		spectrumScript.append("';");
+		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
+		spectrumScript.append("var spectrumMaxIntensity = " + spectrum.getMaxIntensity() + ";");
+		spectrumScript.append("var peakMasses = [");
+		ArrayList<Peak> peaks = spectrum.getPeaks();
+		for (int i = 0; i < peaks.size(); i++) {
+			Peak peak = peaks.get(i);
+			spectrumScript.append(peak.getMass());
+			if (i < peaks.size() - 1) spectrumScript.append(", ");
+		}
+		spectrumScript.append("];");
+		spectrumScript.append("var peakIntensities = [");
+		for (int i = 0; i < peaks.size(); i++) {
+			Peak peak = peaks.get(i);
+			spectrumScript.append(peak.getIntensity());
+			if (i < peaks.size() - 1) spectrumScript.append(", ");
+		}
+		spectrumScript.append("];");
+		spectrumScript.append("</script>");
+		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
+		
+		//print header
+		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
+		
+		//spectrum
+		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		
+//		printP("from protein: " + peptide.getProtein().getName());
+//		printP("peptide: " + acidString);
+//		printP("peptide start: " + peptide.getStartIndex());
+//		printP("IMP value: " + match.getImpValue());
 		
 		if (match.hasModification()) {
+			//details table
+			print("<table valign=\"top\" width=\"95%\">");
+			printTR();
+			print("<td>");
+			
 			MatchPTM matchPTM = (MatchPTM) match;
 			printH2("Modification properties");
 			printP("mass difference: " + matchPTM.getDifference());
@@ -64,6 +104,9 @@ public class MatchHTMLPage extends HTMLPage {
 			}
 			
 			
+			print("</td>");
+			print("<td>");
+			
 			//finding and printing best modification locations
 			double imp;
 			double bestIMP = Double.MAX_VALUE;
@@ -74,7 +117,27 @@ public class MatchHTMLPage extends HTMLPage {
 			for (int i= 0; i < acidString.length(); i++) {
 				matchPTM = new MatchPTM(spectrum, peptide);
 				imp = matchPTM.calculateIMP(matchPTM.getDifference(), i);
-				printLI(acidString.charAt(i) + ": " + imp);
+				
+				//building the link
+				StringBuffer peptideLine = new StringBuffer();
+				peptideLine.append("<a href=\"\" onMouseOver=\"javascript:modificationIndex='");
+				peptideLine.append(i);
+				peptideLine.append("'; return false;\">");
+				
+				//print out the acid string, with bold modification
+				for (int j = 0; j <i; j++) {
+					peptideLine.append(acidString.charAt(j));
+				}
+				peptideLine.append("<b>");
+				peptideLine.append(acidString.charAt(i));
+				peptideLine.append("</b>");
+				for (int j = i+1; j <acidString.length(); j++) {
+					peptideLine.append(acidString.charAt(j));
+				}
+				
+				peptideLine.append(": " + imp);
+				peptideLine.append("</a>");
+				printLI(peptideLine.toString());
 				if (imp < bestIMP) {
 					bestIMP = imp;
 					bestIndex = i;
@@ -83,18 +146,9 @@ public class MatchHTMLPage extends HTMLPage {
 			}
 			print("</ol>");
 			
-			//printing the spectrum match with the best mod location we just found
-			try {
-				SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, spectrumFile, bestMatch.getDifference(), bestIndex);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}			
-		} else {
-			try {
-				SpectralVisualizer.drawDeluxSpectrum(spectrum, peptide, spectrumFile);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+			print("</td>");
+			print("</table>");
 		}
 		
 		printFooter();

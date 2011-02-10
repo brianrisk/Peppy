@@ -76,13 +76,13 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-					if (Peppy.Properties.useEValueCutOff) {
+//					if (Peppy.Properties.useEValueCutOff) {
 						if (match.getEValue() < Peppy.Properties.eValueCutOff) {
 							bestMatches.add(match);
 						}
-					} else {
-						bestMatches.add(match);
-					}
+//					} else {
+//						bestMatches.add(match);
+//					}
 				} else {
 					matchRank++;
 				}
@@ -274,7 +274,7 @@ public class HTMLReporter {
 		File sequenceReportDirectory = new File(reportDir, "sequences");
 		sequenceReportDirectory.mkdirs();
 		File indexFile = new File(sequenceReportDirectory, sequence.getId() + Properties.reportWebSuffix);
-		ArrayList<Match> theseMatches = getMatchesWithSequence(sequence, matches);
+		ArrayList<Match> theseMatches = MatchSearches.getMatchesWithSequence(sequence, matches);
 		try {
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
@@ -398,82 +398,13 @@ public class HTMLReporter {
 	
 	public void generateSpectrumReport(Spectrum spectrum) {
 		File sequenceDirectory = new File(reportDir, "spectra");
+		sequenceDirectory.mkdirs();
 		File indexFile = new File(sequenceDirectory, spectrum.getId() + Properties.reportWebSuffix);
-		ArrayList<Match> theseMatches = getMatchesWithSpectrum(spectrum, matches);
-		try {
-			sequenceDirectory.mkdirs();
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-			U.appendFile(pw, Properties.reportWebHeaderSubFile);
-			
-			pw.println("<h1>" + spectrum.getFile().getName() + "</h1>");
-			
-			//draw the e value histogram
-			pw.println("<h2>E value histogram for spectrum " + spectrum.getId() + "</h2>");
-			pw.println("<p>");
-			File histogramFile = new File(sequenceDirectory, spectrum.getId() + "-hist.jpg");
-			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
-			pw.println("<img src=\"" + histogramFile.getName() + "\">");
-			pw.println("</p>");
-			
-			//sorting
-			Match.setSortParameter(Match.SORT_BY_SCORE);
-			Collections.sort(theseMatches);
-			
-			//draw spectrum visualizations for top 2 matches
-			pw.println("<h2>Ion matches for top two spectra</h2>");
-			pw.println("<p>");
-			int atLeastTwo = 2;
-			if (theseMatches.size() < atLeastTwo) atLeastTwo = theseMatches.size();
-			for (int i = 0; i < atLeastTwo; i++) {
-				Match match = theseMatches.get(i);
-				File spectrumVisualization = new File(sequenceDirectory, spectrum.getId() + "-spect-" + i + ".jpg");
-				SpectralVisualizer.markMatchingIons(spectrum, match.getPeptide());
-				SpectralVisualizer.drawSpectrum(spectrum, 500, 200, spectrumVisualization, true);
-				pw.println("<a href=\"" + spectrumVisualization.getName() + "\"><img src=\"" + spectrumVisualization.getName() + "\" border=0></a><br>");
-			}
-			pw.println("</p>");
-			
-			//print the best match for each spectrum
-			pw.println("<h2>Matches for spectrum " + spectrum.getId() + "</h2>");
-			U.appendFile(pw, Properties.reportWebTableHeader);
-			for (int i = 0; i < theseMatches.size(); i++) {
-				pw.println(getTableRow(theseMatches.get(i), i));
-			}
-			
-			U.appendFile(pw, Properties.reportWebFooterFile);
-			pw.flush();
-			pw.close();
-			
-		} catch (FileNotFoundException e) {
-			U.p("could not find file: " + indexFile.getName());
-			e.printStackTrace();
-		} catch (IOException e) {
-			U.p("could not read file: " + indexFile.getName());
-			e.printStackTrace();
-		}
+		SpectrumHTMLPage page = new SpectrumHTMLPage(spectrum, matches, indexFile);
+		page.makePage();
 	}
 	
-	private ArrayList<Match> getMatchesWithSpectrum(Spectrum spectrum, ArrayList<Match> theseMatches) {
-		ArrayList<Match> out = new ArrayList<Match>();
-		for (int i = 0; i < theseMatches.size(); i++) {
-			Match match = theseMatches.get(i);
-			if (match.getSpectrum().getId() == spectrum.getId()) {
-				out.add(match);
-			}
-		}
-		return out;
-	}
 	
-	private ArrayList<Match> getMatchesWithSequence(Sequence sequence, ArrayList<Match> theseMatches) {
-		ArrayList<Match> out = new ArrayList<Match>();
-		for (int i = 0; i < theseMatches.size(); i++) {
-			Match match = theseMatches.get(i);
-			if (match.getPeptide().getParentSequence().getId() == sequence.getId()) {
-				out.add(match);
-			}
-		}
-		return out;
-	}
 
 	private String getTableRow(Match match, int index) {
 		StringBuffer sb = new StringBuffer();
