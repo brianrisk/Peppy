@@ -1,7 +1,6 @@
 package Reports;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import Peppy.Definitions;
@@ -11,8 +10,6 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.ProteinModification;
 import Peppy.Spectrum;
-import SpectralVisualizer.SpectralVisualizer;
-import SpectralVisualizer.SpectralVisualizerPTM;
 
 public class MatchHTMLPage extends HTMLPage {
 	

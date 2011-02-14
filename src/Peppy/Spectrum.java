@@ -258,10 +258,6 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		return eValueCalculator;
 	}
 
-	public void setAllPeaksToColor(Color c) {
-		for (int i = 0; i < getPeakCount(); i++) {getPeak(i).setColor(c);}
-	}
-
 	private void cleanPeaks() {
 		//before we mess with the peak data, let's make sure we have the MD5
 		MD5 = getMD5();

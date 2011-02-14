@@ -1,12 +1,10 @@
 package Peppy;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import Reports.PeptidesWithModificaitonsHTMLPage;
 import Reports.ProteinsHTMLPage;
-import SpectralVisualizer.SpectralVisualizerPTM;
 import Utilities.U;
 
 
@@ -77,11 +75,6 @@ public class PeppyPTM extends Peppy{
 			}
 		}
 		
-		try {
-			SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, new File ("PTM_IS_AWESOME.jpg"), difference, bestIndex);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		U.p();
 		U.stopStopwatch();
 	}

@@ -582,16 +582,8 @@ public class GenerateValidationReport {
 					pw.println("</td>");
 					
 					//creating the image of our match
-					File ourMatchFile = new File (imagesFolder, imageIndex + "a.jpg");
-					SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), ourMatch.getPeptide());
-					SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, ourMatchFile, false);
+					//TODO needs to be redone
 					
-					File trueMatchFile = new File (imagesFolder, imageIndex + "b.jpg");
-					if (!matchContainer.isTrue()) {
-						//creating the image of their "true" match.  Whatever!
-						SpectralVisualizer.SpectralVisualizer.markMatchingIons(ourMatch.getSpectrum(), correctPeptide);
-						SpectralVisualizer.SpectralVisualizer.drawSpectrum(ourMatch.getSpectrum(), width, height, trueMatchFile, false);
-					}
 					//don't forget to increment that image index, Brian!
 					imageIndex++;
 					
@@ -600,21 +592,6 @@ public class GenerateValidationReport {
 					pw.println("<br>" + matchContainer.getCorrectAcidSequence());
 					pw.println("</td>");
 					
-					pw.println("<td>");
-					pw.print("<a href=\"");
-					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-					pw.print("\">");
-					pw.print("<img src=\"");
-					pw.print(imagesFolder.getName() + "/" + ourMatchFile.getName());
-					pw.print("\" border=0 height=20></a><br>");
-					
-					pw.print("<br><a href=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
-					pw.print("\">");
-					pw.print("<img src=\"");
-					pw.print(imagesFolder.getName() + "/" + trueMatchFile.getName());
-					pw.print("\" border=0 height=20></a><br>");
-					pw.println("</td>");
 				}
 
 			}

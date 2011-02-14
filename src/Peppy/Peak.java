@@ -10,22 +10,9 @@ public class Peak implements Comparable<Peak>{
 	
 	float mass;
 	float intensity;
-	int yIonNumber = -1;
-	int bIonNumber = -1;
 	
 	public boolean used = false;
-
-	Color color = Color.gray;
-	boolean hilighted = false;
 	
-	public boolean isHilighted() {
-		return hilighted;
-	}
-
-	public void setHilighted(boolean hilighted) {
-		this.hilighted = hilighted;
-	}
-
 	private static int tracker = 0;
 	final int COMPARE_MASS = tracker++;
 	final int COMPARE_INTENSITY = tracker++;
@@ -41,40 +28,13 @@ public class Peak implements Comparable<Peak>{
 	}
 	
 	public float getMass() {return mass;}
-	public float getIntensity() {return intensity;}
-	public Color getColor() {return color;}
 	
-	/**
-	 * @return the yIonNumber
-	 */
-	public int getyIonNumber() {
-		return yIonNumber;
-	}
-
-	/**
-	 * @return the bIonNumber
-	 */
-	public int getbIonNumber() {
-		return bIonNumber;
-	}
-
-	/**
-	 * @param yIonNumber the yIonNumber to set
-	 */
-	public void setyIonNumber(int yIonNumber) {
-		this.yIonNumber = yIonNumber;
-	}
-
-	/**
-	 * @param bIonNumber the bIonNumber to set
-	 */
-	public void setbIonNumber(int bIonNumber) {
-		this.bIonNumber = bIonNumber;
-	}
+	public float getIntensity() {return intensity;}
 
 	public void setCompareByMass() {compareBy = COMPARE_MASS;}
+	
 	public void setCompareByIntensity() {compareBy = COMPARE_INTENSITY;}
-	public void setColor(Color color) {this.color = color;}
+	
 	public void setIntensity(float intensity) {this.intensity = intensity;}
 	
 	//@Override

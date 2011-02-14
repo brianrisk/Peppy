@@ -1,10 +1,6 @@
 package Peppy;
 
-import java.io.File;
-import java.io.IOException;
-
 import Math.MathFunctions;
-import SpectralVisualizer.SpectralVisualizerPTM;
 import Utilities.U;
 
 public class MatchPTM extends Match {
@@ -43,11 +39,11 @@ public class MatchPTM extends Match {
 		MatchPTM match = new MatchPTM(spectrum, peptide);
 		U.p("raw score: " + match.getScore());
 		
-		try {
-			SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, new File ("spectrumPTM.jpg"), difference, 9);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			SpectralVisualizerPTM.drawDeluxSpectrum(spectrum, peptide, new File ("spectrumPTM.jpg"), difference, 9);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		//scores when we iterate where the mod is occuring
 		double imp;

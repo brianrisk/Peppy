@@ -14,7 +14,6 @@ import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Spectrum;
-import SpectralVisualizer.SpectralVisualizer;
 import Utilities.U;
 
 
