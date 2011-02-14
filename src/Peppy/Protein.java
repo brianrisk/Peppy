@@ -23,7 +23,9 @@ public class Protein implements Comparable<Protein>{
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
 	private Sequence sequence;
-	private ArrayList<Match> matches = new ArrayList<Match>();
+	private ArrayList<Match> matchesAll = new ArrayList<Match>();
+	private ArrayList<MatchPTM> matchesWithModifications = new ArrayList<MatchPTM>();
+	private ArrayList<Match> matchesWithoutModifications = new ArrayList<Match>();
 	private double score = 0;
 	private int [] matchPositions = null;
 	private double matchCoverage = -1;
@@ -73,7 +75,8 @@ public class Protein implements Comparable<Protein>{
 	 * @param match
 	 */
 	public void addMatch(Match match) {
-		matches.add(match);
+		matchesAll.add(match);
+		matchesWithoutModifications.add(match);
 		//minus because this will be negative for good e values
 //		score -= Math.log(match.getEValue());
 
@@ -84,6 +87,7 @@ public class Protein implements Comparable<Protein>{
 			}
 		}
 		int type = T_FPRXX;
+		//TODO do not hard code these FPRs!
 		if (match.getEValue() < 0.03359587957603186) type = T_FPR05;
 		if (match.getEValue() < 0.0034847330927202927) type = T_FPR01;
 		for (int i =  match.getPeptide().getStartIndex(); i < match.getPeptide().getStopIndex(); i++) {
@@ -94,7 +98,8 @@ public class Protein implements Comparable<Protein>{
 	}
 	
 	public void addMatchPTM(MatchPTM match) {
-		matches.add(match);
+		matchesAll.add(match);
+		matchesWithModifications.add(match);
 		//minus because this will be negative for good e values
 //		score -= Math.log(match.getEValue());
 
@@ -410,7 +415,7 @@ public class Protein implements Comparable<Protein>{
 
 	public double getScore() {
 		if (matchPositions == null) return 0.0;
-		return getMatchArea();
+		return (double) getMatchArea() * getMatchArea() / acidByteArray.length;
 //		return score;
 	}
 
@@ -426,8 +431,18 @@ public class Protein implements Comparable<Protein>{
 		return peptides;
 	}
 
-	public ArrayList<Match> getMatches() {
-		return matches;
+	public ArrayList<Match> getMatchesAll() {
+		return matchesAll;
+	}
+
+
+	public ArrayList<MatchPTM> getMatchesWithModifications() {
+		return matchesWithModifications;
+	}
+
+
+	public ArrayList<Match> getMatchesWithoutModifications() {
+		return matchesWithoutModifications;
 	}
 
 

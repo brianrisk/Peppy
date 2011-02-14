@@ -28,7 +28,9 @@ public class SpectrumHTMLPage extends HTMLPage {
 		//build spectrum script for header
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
-		spectrumScript.append(" var acidSequence = '");
+		spectrumScript.append("modificationIndex = -1;modificationMass = 0; ");
+		spectrumScript.append("var lock = false;");
+		spectrumScript.append("var acidSequence = '");
 		spectrumScript.append(theseMatches.get(0).getPeptide().getAcidSequenceString());
 		spectrumScript.append("';");
 		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
@@ -49,7 +51,8 @@ public class SpectrumHTMLPage extends HTMLPage {
 		}
 		spectrumScript.append("];");
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
+//		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
@@ -65,7 +68,8 @@ public class SpectrumHTMLPage extends HTMLPage {
 //		printP("<img src=\"" + histogramFile.getName() + "\">");
 		
 		//spectrum
-		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://proteomics.me/resources/ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+//		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 		//Our table
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
@@ -91,9 +95,9 @@ public class SpectrumHTMLPage extends HTMLPage {
 		
 		//peptide sequence
 		StringBuffer peptideLine = new StringBuffer();
-		peptideLine.append("<a href=\"\" onMouseOver=\"javascript:acidSequence='");
+		peptideLine.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"javascript:if (!lock) {acidSequence='");
 		peptideLine.append(match.getPeptide().getAcidSequenceString());
-		peptideLine.append("'; return false;\">");
+		peptideLine.append("';} return false;\">");
 		peptideLine.append(match.getPeptide().getAcidSequenceString());
 		peptideLine.append("</a>");
 		printTD(peptideLine.toString());

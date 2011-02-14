@@ -11,6 +11,7 @@ public class MatchPTM extends Match {
 	
 	//Peptide/Spectrum difference in mass
 	double difference;
+	int modificationIndex = 0;
 	
 	//this is which amino acid we think has the modification
 	boolean [] potentialPlacesForModification;
@@ -76,9 +77,15 @@ public class MatchPTM extends Match {
 				double tempIMP;
 				for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
 					tempIMP = calculateIMP(difference, i);
-					if (tempIMP < bestIMP) bestIMP = tempIMP; 
+					if (tempIMP < bestIMP) {
+						bestIMP = tempIMP;
+						modificationIndex = i;
+					}
 				}
-				if (impValue2 < bestIMP) bestIMP = impValue2;
+				if (impValue2 < bestIMP) {
+					bestIMP = impValue2;
+					modificationIndex =  peptide.getAcidSequence().length - 1;
+				}
 				impValue = bestIMP;
 			} else {
 				impValue = impValue1;
@@ -287,6 +294,10 @@ public class MatchPTM extends Match {
 	
 	public double getDifference() {return difference;}
 	
+	public int getModificationIndex() {
+		return modificationIndex;
+	}
+
 	public boolean hasModification() {
 		return true;
 	}

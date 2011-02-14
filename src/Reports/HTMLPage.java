@@ -93,9 +93,12 @@ public abstract class HTMLPage {
 		print("<!--");
 		print("@import url(\"http://proteomics.me/resources/reports/style.css\");");
 		print("@import url(\"http://proteomics.me/resources/reports/sortable.css\");");
+//		print("@import url(\"../../style.css\");");
+//		print("@import url(\"../../sortable.css\");");
 		print("-->");
 		print("</style>");
 		print("<script type=\"text/javascript\" src=\"http://proteomics.me/resources/reports/sortable.js\"></script>");
+//		print("<script type=\"text/javascript\" src=\"../../sortable.js\"></script>");
 		print("</head>");
 		//title
 		print("<div id=\"container\">");
@@ -107,10 +110,11 @@ public abstract class HTMLPage {
 	}
 	
 	protected void printFooter() {
+		print("</div>");
 		print("<div id=\"footer\">");
 		print("<div id=\"emphasis-bar\"><p></p></div>");
-		print("<p>Created with <a href=\"http://unitedproteomics.com/peppy\">Peppy</a>, protein identification, proteogenomic mapping software by ");
-		print("<a href=\"http://unitedproteomics.com\">United Proteomics</a></p>");
+		print("<p>Created with <a href=\"http://unitedproteomics.com/peppy\">Peppy</a>, protein identification, proteogenomic mapping software ");
+//		print("by <a href=\"http://unitedproteomics.com\">United Proteomics</a></p>");
 		print("</div>");
 		print("</div>");
 		print("</body>");

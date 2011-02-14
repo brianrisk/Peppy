@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Reports.ProteinReporter;
+import Reports.PeptidesWithModificaitonsHTMLPage;
 import Reports.ProteinsHTMLPage;
 import SpectralVisualizer.SpectralVisualizerPTM;
 import Utilities.U;
@@ -23,29 +23,9 @@ public class PeppyPTM extends Peppy{
 	
 	public static void main(String [] args) {
 		init(args);
-//		test();
 		runPeppyPTM(args);
-//		runPeppyProtein(args);
-//		findPeptidePTM();
 		U.p("done");
 	}
-	
-//	public static void test() {
-//		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-//		Spectrum spectrum = spectra.get(0);
-//		U.p(spectrum.getFile().getName());
-//		Peptide peptide = new Peptide("PSYVLSGAAMNVAYTDGDLER");
-//		MatchPTM matchPTM = new MatchPTM(spectrum, peptide);
-//		U.p("score: " + matchPTM.getScore());
-//		U.p("difference: " + matchPTM.difference);
-//		
-//		File visualizationTestFile = new File("visualizationTest.jpg");
-//		try {
-//			SpectralVisualizer.drawDeluxSpectrum(spectrum, peptide, visualizationTestFile);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
 	
 	public static void findPeptidePTM() {
 		U.p("Peppy+ finding PTM");
@@ -107,79 +87,7 @@ public class PeppyPTM extends Peppy{
 	}
 	
 	
-	
-	public static void runPeppyProtein(String [] args) {
-		U.p("Peppy+ standard protein report");
-		U.startStopwatch();
-		
-		//Load our spectra
-		U.p("loading spectra...");
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-		
-		//Get references to our sequence files
-		//These should be protein databases such as UniProt
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		
-		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
-		
-		//Set up our proteins
-		ArrayList<Protein> proteins = new ArrayList<Protein>();
-		
-		//Set up our peptides
-		ArrayList<Peptide> peptides;
-		
-		//loop through sequences, get proteins
-		U.p("loading proteins");
-		for (Sequence sequence: sequences) {
-			proteins.addAll(ProteinDigestion.getProteinsFromDatabase(sequence.getSequenceFile()));
-		}
-		
-		//digest peptides from all those proteins
-		U.p("digesting proteins");
-		peptides = ProteinDigestion.getPeptidesFromListOfProteins(proteins);
-		
-		//get the matches
-		U.p("finding matches");
-		matches = getMatches(peptides, spectra, null);
-		
-		//double check e values
-		assignConfidenceValuesToMatches(matches);
-		
-		//add the good matches we've found to our proteins
-		for (Match match: matches) {
-			match.getPeptide().getProtein().addMatch(match);
-		}
-		
-		//Sorting our proteins by the score they have now acquired
-		Collections.sort(proteins);
-		
-		//get the top proteins
-		ArrayList<Protein> topProteins = new ArrayList<Protein>();
-		for (int i = 0; i < 64; i++) {
-			topProteins.add(proteins.get(i));
-		}
-		
-//		//get the peptides that weren't found
-//		ArrayList<Peptide> unfoundPeptides = new ArrayList<Peptide>();
-//		for (Protein protein: topProteins) {
-//			unfoundPeptides.addAll(protein.getUnfoundPeptides());
-//		}
-//		
-//		//quick update on things
-//		U.p("there were this many unfound peptides: " + unfoundPeptides.size());
-		
-		//create new report directory
-		File reportDir = new File(Properties.reportDirectory, "Proteins " + System.currentTimeMillis());
-		reportDir.mkdirs();
-		ProteinReporter reporter = new ProteinReporter(topProteins, new File(reportDir, "index.html"));
-		reporter.generateReport();
-		
-		U.beep();
-		U.p();
-		U.stopStopwatch();
-	}
+
 	
 	public static void runPeppyPTM(String [] args) {
 		U.p("Peppy+ PTM");
@@ -268,12 +176,18 @@ public class PeppyPTM extends Peppy{
 			match.getPeptide().getProtein().addMatchPTM(match);
 		}
 		
-		//create report
 		U.p("creating reports");
+		//create report directory
 		File reportDir = new File(Properties.reportDirectory, "Proteins " + System.currentTimeMillis());
 		reportDir.mkdirs();
+		
+		//making the main index page
 		ProteinsHTMLPage php = new ProteinsHTMLPage(topProteins, new File(reportDir, "index.html"));
 		php.makePage();
+		
+		//the modifications page
+		PeptidesWithModificaitonsHTMLPage pwmhp = new PeptidesWithModificaitonsHTMLPage(topProteins, new File(reportDir, "modifications.html"));
+		pwmhp.makePage();
 		
 		
 		U.p();

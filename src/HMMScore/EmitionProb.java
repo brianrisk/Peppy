@@ -1,6 +1,4 @@
 package HMMScore;
-import Peppy.Properties;
-
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -269,7 +267,7 @@ public class EmitionProb {
 	public static Vector<Double> sortIntensities(ArrayList<Peak> peaks) {
 		Vector<Double> intensities = new Vector<Double>();
 		for (Peak peak : peaks) {
-			intensities.add(peak.getIntensity());
+			intensities.add((double) peak.getIntensity());
 		}
 		int i, j, intensityCount = intensities.size();
 		double tempIntensity, prevIntensity, maxIntensity, currentIntensity;

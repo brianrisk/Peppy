@@ -31,7 +31,7 @@ public class ProteinHTMLPage extends HTMLPage{
 		
 		
 		//printing the acid table which shows match regions
-		print("<table>");
+		print("<table width=\"80%\">");
 		for (int i = 0; i < acidString.length(); i++) {
 			if (i % 20 == 0) {
 				print("<tr>");
@@ -46,7 +46,7 @@ public class ProteinHTMLPage extends HTMLPage{
 		print("</table>");
 		
 		//printing the table of matches
-		ArrayList<Match> matches = protein.getMatches();
+		ArrayList<Match> matches = protein.getMatchesAll();
 		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 		Collections.sort(matches);
 		print("<table class=\"sortable\" id=\"box-table-a\">");
@@ -68,16 +68,14 @@ public class ProteinHTMLPage extends HTMLPage{
 				print("<tr>");	
 			}
 			
-			printTD("<a href=\"match" + i + "/index.html\">" + match.getPeptide().getAcidSequenceString() + "</a>");
+			printTD("<a href=\"" + match.getPeptide().getAcidSequenceString() + ".html\">" + match.getPeptide().getAcidSequenceString() + "</a>");
 			printTD("" + match.getPeptide().getStartIndex());
 			printTD("" + match.getImpValue());
 			printTD("" + match.getScore());
 			printTD("" + match.hasModification());
 			
 			//make a page for the match
-			File matchDir = new File(destinationFile.getParentFile(), "match" + i);
-			matchDir.mkdirs();
-			File matchFile = new File(matchDir, "index.html");
+			File matchFile = new File(destinationFile.getParentFile(), match.getPeptide().getAcidSequenceString() + ".html");
 			MatchHTMLPage matchPage = new MatchHTMLPage(match, matchFile);
 			matchPage.makePage();
 		}

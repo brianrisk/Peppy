@@ -12,6 +12,8 @@ public class Peak implements Comparable<Peak>{
 	float intensity;
 	int yIonNumber = -1;
 	int bIonNumber = -1;
+	
+	public boolean used = false;
 
 	Color color = Color.gray;
 	boolean hilighted = false;

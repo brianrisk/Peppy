@@ -33,18 +33,20 @@ public class ProteinsHTMLPage extends HTMLPage {
 		printTH("mod area");
 		print("</thead>");
 		print("<tbody>");
+		//make a directory to hold all of the proteins
+		File proteinsDir = new File(destinationFile.getParentFile(), "proteins");
 		for (int i = 0; i < proteins.size(); i++) {
 			//make a page for our protein
 			Protein protein = proteins.get(i);
-			File proteinDir = new File(destinationFile.getParentFile(), "protein" + i);
-			File proteinFile = new File(proteinDir, "index.html");
+			File proteinDir = new File(proteinsDir, protein.getName());
 			proteinDir.mkdirs();
+			File proteinFile = new File(proteinDir, "index.html");
 			ProteinHTMLPage php = new ProteinHTMLPage(protein, proteinFile);
 			php.makePage();
 			
 			//print out the table row
 			print("<tr>");
-			printTD("<a href=\"protein" + i + "/index.html\">" + protein.getName() + "</a>");
+			printTD("<a href=\"proteins/" + protein.getName() + "/index.html\">" + protein.getName() + "</a>");
 			printTD("" + protein.getMatchCoverage());
 			printTD("" + protein.getMatchArea());
 			printTD("" + protein.getModCoverage());

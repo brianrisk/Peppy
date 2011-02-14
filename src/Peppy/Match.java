@@ -98,12 +98,14 @@ public class Match implements Comparable<Match>, HasEValue{
 		seqIndex = 0;
 		while (peakIndex >= 0) {
 			peakMass = spectrum.getPeak(peakIndex).getMass();
+			spectrum.getPeak(peakIndex).used = false;
 			while (peakMass < theoreticalPeaksLeft[seqIndex]) {
 				seqIndex++;
 				if (seqIndex == peptideLengthMinusOne) break;
 			}
 			if (seqIndex == peptideLengthMinusOne) break;
 			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+				spectrum.getPeak(peakIndex).used = true;
 				atLeastOneMatch = true;
 				if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
 					yIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
@@ -131,19 +133,20 @@ public class Match implements Comparable<Match>, HasEValue{
 		peakIndex = 0;
 		seqIndex = 0;
 		while (peakIndex < spectrum.getPeakCount()) {
-			peakMass = spectrum.getPeak(peakIndex).getMass();
-			while (peakMass > theoreticalPeaksRight[seqIndex]) {
-				seqIndex++;
+			if (!spectrum.getPeak(peakIndex).used) {
+				peakMass = spectrum.getPeak(peakIndex).getMass();
+				while (peakMass > theoreticalPeaksRight[seqIndex]) {
+					seqIndex++;
+					if (seqIndex == peptideLengthMinusOne) break;
+				}
 				if (seqIndex == peptideLengthMinusOne) break;
-			}
-			if (seqIndex == peptideLengthMinusOne) break;
-			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-				atLeastOneMatch = true;
-				if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
-					bIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
+				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+					atLeastOneMatch = true;
+					if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
+						bIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
+					}
 				}
 			}
-			
 			peakIndex++;
 		}
 		
@@ -229,12 +232,14 @@ public class Match implements Comparable<Match>, HasEValue{
 			seqIndex = 0;
 			while (peakIndex >= 0) {
 				peakMass = spectrum.getPeak(peakIndex).getMass();
+				spectrum.getPeak(peakIndex).used = false;
 				while (peakMass < theoreticalPeaksLeft[seqIndex]) {
 					seqIndex++;
 					if (seqIndex == peptideLengthMinusOne) break;
 				}
 				if (seqIndex == peptideLengthMinusOne) break;
 				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+					spectrum.getPeak(peakIndex).used = true;
 					atLeastOneMatch = true;
 					if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
 						yIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
@@ -262,19 +267,20 @@ public class Match implements Comparable<Match>, HasEValue{
 			peakIndex = 0;
 			seqIndex = 0;
 			while (peakIndex < spectrum.getPeakCount()) {
-				peakMass = spectrum.getPeak(peakIndex).getMass();
-				while (peakMass > theoreticalPeaksRight[seqIndex]) {
-					seqIndex++;
+				if (!spectrum.getPeak(peakIndex).used) {
+					peakMass = spectrum.getPeak(peakIndex).getMass();
+					while (peakMass > theoreticalPeaksRight[seqIndex]) {
+						seqIndex++;
+						if (seqIndex == peptideLengthMinusOne) break;
+					}
 					if (seqIndex == peptideLengthMinusOne) break;
-				}
-				if (seqIndex == peptideLengthMinusOne) break;
-				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-					atLeastOneMatch = true;
-					if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
-						bIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
+					if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+						atLeastOneMatch = true;
+						if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
+							bIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
+						}
 					}
 				}
-				
 				peakIndex++;
 			}
 			

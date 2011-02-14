@@ -34,11 +34,21 @@ public class MatchHTMLPage extends HTMLPage {
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
 		if (match.hasModification()) {
-			spectrumScript.append("modificationMass = ");
-			spectrumScript.append(match.getSpectrum().getMass() - match.getPeptide().getMass());
+			MatchPTM matchPTM = (MatchPTM) match;
+			//modification index
+			spectrumScript.append("modificationIndex = ");
+			spectrumScript.append(matchPTM.getModificationIndex());
 			spectrumScript.append(";");
+			
+			//modification index
+			spectrumScript.append("modificationMass = ");
+			spectrumScript.append(matchPTM.getDifference());
+			spectrumScript.append(";");
+		} else {
+			spectrumScript.append("modificationIndex = -1; modificationMass = 0;");
 		}
-		spectrumScript.append(" var acidSequence = '");
+		spectrumScript.append("var lock = false;");
+		spectrumScript.append("var acidSequence = '");
 		spectrumScript.append(acidString);
 		spectrumScript.append("';");
 		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
@@ -59,13 +69,15 @@ public class MatchHTMLPage extends HTMLPage {
 		}
 		spectrumScript.append("];");
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
+//		spectrumScript.append("<script src=\"../../processing-1.0.0.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
 		
 		//spectrum
-		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://proteomics.me/resources/ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+//		printP("<canvas data-processing-sources=\"../../ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 //		printP("from protein: " + peptide.getProtein().getName());
 //		printP("peptide: " + acidString);
@@ -73,12 +85,14 @@ public class MatchHTMLPage extends HTMLPage {
 //		printP("IMP value: " + match.getImpValue());
 		
 		if (match.hasModification()) {
+			//this is a Modification match, make it so
+			MatchPTM matchPTM = (MatchPTM) match;
+			
 			//details table
 			print("<table valign=\"top\" width=\"95%\">");
 			printTR();
 			print("<td>");
 			
-			MatchPTM matchPTM = (MatchPTM) match;
 			printH2("Modification properties");
 			printP("mass difference: " + matchPTM.getDifference());
 			
@@ -107,42 +121,39 @@ public class MatchHTMLPage extends HTMLPage {
 			print("</td>");
 			print("<td>");
 			
-			//finding and printing best modification locations
-			double imp;
-			double bestIMP = Double.MAX_VALUE;
-			MatchPTM bestMatch = null;
-			int bestIndex = 0;
+			//printing the list of modification points
 			printH3("Modification location scores:");
 			print("<ol>");
+			//printing the modification possibility links
+			
 			for (int i= 0; i < acidString.length(); i++) {
-				matchPTM = new MatchPTM(spectrum, peptide);
-				imp = matchPTM.calculateIMP(matchPTM.getDifference(), i);
+				MatchPTM indexModificationMatch = new MatchPTM(spectrum, peptide);
+				double indexIMP = indexModificationMatch.calculateIMP(matchPTM.getDifference(), i);
 				
 				//building the link
-				StringBuffer peptideLine = new StringBuffer();
-				peptideLine.append("<a href=\"\" onMouseOver=\"javascript:modificationIndex='");
-				peptideLine.append(i);
-				peptideLine.append("'; return false;\">");
+				StringBuffer modificationLink = new StringBuffer();
+				if (indexIMP != match.getImpValue()) {
+					modificationLink.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"javascript:if (!lock) {modificationIndex='");
+				} else {
+					modificationLink.append("<a href=\"\" class=\"spectrumTrigger bestTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"if (!lock) {javascript:modificationIndex='");
+				}
+				modificationLink.append(i);
+				modificationLink.append("';} return false;\">");
 				
 				//print out the acid string, with bold modification
 				for (int j = 0; j <i; j++) {
-					peptideLine.append(acidString.charAt(j));
+					modificationLink.append(acidString.charAt(j));
 				}
-				peptideLine.append("<b>");
-				peptideLine.append(acidString.charAt(i));
-				peptideLine.append("</b>");
+				modificationLink.append("<b>");
+				modificationLink.append(acidString.charAt(i));
+				modificationLink.append("</b>");
 				for (int j = i+1; j <acidString.length(); j++) {
-					peptideLine.append(acidString.charAt(j));
+					modificationLink.append(acidString.charAt(j));
 				}
 				
-				peptideLine.append(": " + imp);
-				peptideLine.append("</a>");
-				printLI(peptideLine.toString());
-				if (imp < bestIMP) {
-					bestIMP = imp;
-					bestIndex = i;
-					bestMatch = matchPTM;
-				}
+				modificationLink.append(": " + indexIMP);
+				modificationLink.append("</a>");
+				printLI(modificationLink.toString());
 			}
 			print("</ol>");
 			
