@@ -79,14 +79,18 @@ public class ProteinDigestion {
 				//this symbol means we've reached the beginning of a new protein and
 				//the one we've been working on has ended
 				if (line.startsWith(">")) {
-					if (isReverse) buffy.reverse();
-					proteins.add(new Protein(proteinName, buffy.toString()));
+					//make a new protein if we've been building one
+					if (buffy.length() > 0) {
+						if (isReverse) buffy.reverse();
+						proteins.add(new Protein(proteinName, buffy.toString()));
+					}
 
 					//this is the name of the next protein
 					proteinName = line.substring(1).trim();
+					
 					//try to get the accession number from UniProt databases
 					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
-						String [] proteinWords = proteinName.split("|");
+						String [] proteinWords = proteinName.split("\\|");
 						proteinName = proteinWords[1];
 					}
 					
