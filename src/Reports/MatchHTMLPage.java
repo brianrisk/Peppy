@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.MatchPTM;
+import Peppy.Modification;
 import Peppy.Peak;
 import Peppy.Peptide;
-import Peppy.ProteinModification;
 import Peppy.Spectrum;
 
 public class MatchHTMLPage extends HTMLPage {
@@ -50,6 +50,8 @@ public class MatchHTMLPage extends HTMLPage {
 		spectrumScript.append("';");
 		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
 		spectrumScript.append("var spectrumMaxIntensity = " + spectrum.getMaxIntensity() + ";");
+		
+		//printing out spectrum's peak masses
 		spectrumScript.append("var peakMasses = [");
 		ArrayList<Peak> peaks = spectrum.getPeaks();
 		for (int i = 0; i < peaks.size(); i++) {
@@ -58,6 +60,8 @@ public class MatchHTMLPage extends HTMLPage {
 			if (i < peaks.size() - 1) spectrumScript.append(", ");
 		}
 		spectrumScript.append("];");
+		
+		//printing our spectrum's peak intensities
 		spectrumScript.append("var peakIntensities = [");
 		for (int i = 0; i < peaks.size(); i++) {
 			Peak peak = peaks.get(i);
@@ -65,6 +69,18 @@ public class MatchHTMLPage extends HTMLPage {
 			if (i < peaks.size() - 1) spectrumScript.append(", ");
 		}
 		spectrumScript.append("];");
+		
+		//print the modifications array
+		spectrumScript.append("];");
+		spectrumScript.append("var peakIntensities = [");
+		ArrayList<Modification> modifications = match.getModifications();
+		for (int i = 0; i < modifications.size(); i++) {
+			Modification modification = modifications.get(i);
+			spectrumScript.append(modification.getMonoMass());
+			if (i < peaks.size() - 1) spectrumScript.append(", ");
+		}
+		spectrumScript.append("];");
+		
 		spectrumScript.append("</script>");
 		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
 //		spectrumScript.append("<script src=\"../../processing-1.0.0.js\"></script>");
@@ -94,9 +110,9 @@ public class MatchHTMLPage extends HTMLPage {
 			printP("mass difference: " + matchPTM.getDifference());
 			
 			//print the probable modifications
-			ArrayList<ProteinModification> potentialModifications = new ArrayList<ProteinModification>(); 
-			ArrayList<ProteinModification> proteinModifications = Definitions.proteinModifications;
-			for (ProteinModification pm: proteinModifications) {
+			ArrayList<Modification> potentialModifications = new ArrayList<Modification>(); 
+			ArrayList<Modification> modifications = Definitions.modifications;
+			for (Modification pm: modifications) {
 				if (Math.abs(matchPTM.getDifference() - pm.getMonoMass()) < 0.1) {
 					potentialModifications.add(pm);
 				}
@@ -104,7 +120,7 @@ public class MatchHTMLPage extends HTMLPage {
 			if (potentialModifications.size() > 0) {
 				printH3("The modification might be:");
 				print("<table>");
-				for (ProteinModification pm: potentialModifications) {
+				for (Modification pm: potentialModifications) {
 					print("<tr>");
 					printTD(pm.getDescription());
 					printTD("" + pm.getMonoMass());

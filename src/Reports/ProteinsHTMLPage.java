@@ -45,12 +45,15 @@ public class ProteinsHTMLPage extends HTMLPage {
 			php.makePage();
 			
 			//print out the table row
-			print("<tr>");
-			printTD("<a href=\"proteins/" + protein.getName() + "/index.html\">" + protein.getName() + "</a>");
-			printTD("" + protein.getMatchCoverage());
-			printTD("" + protein.getMatchArea());
-			printTD("" + protein.getModCoverage());
-			printTD("" + protein.getModArea());
+			//making sure that there is at least one match in the protein
+			if (protein.getMatchesAll().size() > 0) {
+				print("<tr>");
+				printTD("<a href=\"proteins/" + protein.getName() + "/index.html\">" + protein.getName() + "</a>");
+				printTD("" + protein.getMatchCoverage());
+				printTD("" + protein.getMatchArea());
+				printTD("" + protein.getModCoverage());
+				printTD("" + protein.getModArea());
+			}
 		}
 		print("</tbody>");
 		print("</table>");

@@ -203,11 +203,6 @@ public class HTMLReporter {
 			pw.flush();
 			pw.close();
 			
-			if (Peppy.Properties.isSequenceFileDNA &&  Properties.generateSequenceReport) {
-				for (int i = 0; i < sequences.size(); i++) {
-					generateSequenceReport(sequences.get(i));
-				}
-			}
 			if (Properties.generateSpectrumReport) {
 				for (Match match: bestMatches) {
 					generateSpectrumReport(match.getSpectrum());
@@ -262,64 +257,7 @@ public class HTMLReporter {
 		}
 	}
 	
-	public void generateSequenceReport(Sequence sequence) {
-		/*
-		 * The main index page will have a list with each spectrum and their top match.
-		 * If there are more than one sequence then we will list each sequence and 
-		 * how many matches for each spectra there were.
-		 */
-		
-		
-		File sequenceReportDirectory = new File(reportDir, "sequences");
-		sequenceReportDirectory.mkdirs();
-		File indexFile = new File(sequenceReportDirectory, sequence.getId() + Properties.reportWebSuffix);
-		ArrayList<Match> theseMatches = MatchSearches.getMatchesWithSequence(sequence, matches);
-		try {
-			
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-			U.appendFile(pw, Properties.reportWebHeaderSubFile);
-			
-			//region report
-//			insertSequenceRegionReport(theseMatches, sequenceReportDirectory, pw, sequence);
-			GeneReport geneReport = new GeneReport(sequence, theseMatches, 3000);
-			//draw the e value histogram
-			pw.println("<h2>E value histogram for genes</h2>");
-			pw.println("<p>");
-			File histogramFile = new File(sequenceReportDirectory, sequence.getId() + "-hist.jpg");
-			HistogramVisualizer.drawHistogram(geneReport.getEValueHistogram(), 300, 300, histogramFile);
-			pw.println("<img src=\"" + histogramFile.getName() + "\">");
-			pw.println("</p>");
-			geneReport.insertSequenceRegionReport(theseMatches, sequenceReportDirectory, pw);
-			
-			//print the best match for each spectrum
-//			//collect the best matches
-//			ArrayList<Match> bestMatches = new ArrayList<Match>();
-//			for (int i = 0; i < spectra.size(); i++) {
-//				ArrayList<Match> specific = getMatchesWithSpectrum(spectra.get(i), theseMatches);
-//				Collections.sort(specific);
-//				if (specific.size() > 0)
-//					bestMatches.add(specific.get(0));
-//			}
-//			Collections.sort(bestMatches);
-//			pw.println("<h1>Best match for each spectrum in " + sequence.getSequenceFile().getName() + "</h1>");
-//			appendFile(pw, Properties.reportWebTableHeader);
-//			
-//			for (int i = 0; i < bestMatches.size(); i++) {
-//				pw.println(getTableRow(bestMatches.get(i), i));
-//			}
-			
-			U.appendFile(pw, Properties.reportWebFooterFile);
-			pw.flush();
-			pw.close();
-			
-		} catch (FileNotFoundException e) {
-			U.p("could not find file: " + indexFile.getName());
-			e.printStackTrace();
-		} catch (IOException e) {
-			U.p("could not read file: " + indexFile.getName());
-			e.printStackTrace();
-		}
-	}
+	
 	
 	/**
 	 * Give this method a print writer and some other necessary ingredients and it will put the report in there
