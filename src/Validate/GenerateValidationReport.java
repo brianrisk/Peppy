@@ -73,15 +73,17 @@ public class GenerateValidationReport {
 		
 		//What scoring mechanism?
 		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
-//		HMMScore.HMMClass.HmmSetUp();
-//		Properties.highIntensityCleaning = true;
-//		Properties.localMaximaCleaning = true;
-		
+
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
 		Properties.spectrumToPeptideMassError = 2.0;
 		Properties.peakDifferenceThreshold = 0.3;
+
+		//uncomment to use HMM score
+//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+//		HMMScore.HMMClass.HmmSetUp();
+//		Properties.highIntensityCleaning = true;
+//		Properties.peakDifferenceThreshold = 0.5;
 		
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_09/uniprot_sprot_human.fasta");

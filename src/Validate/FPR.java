@@ -43,7 +43,7 @@ public class FPR {
 		ArrayList<File> spectraFiles = new ArrayList<File>();
 		Spectrum.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
 		U.p("loaded " + spectraFiles.size() + " spectra files");
-		int setSize = 1000;
+		int setSize = 10000;
 		if (setSize > spectraFiles.size()) setSize = spectraFiles.size();
 		U.p("loading subset of spectra from the files...");
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
@@ -107,26 +107,44 @@ public class FPR {
 		double fpr05 = getFPR(points, 0.05);
 		
 		//Find the percent of total spectra found at 1%
+		int total01 = 0;
 		double percent01 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
 			if (forwardsMatches.get(i).getEValue() <= fpr01) {
-				percent01 =  i;
+				total01++;
 			} else {
 				break;
 			}
 		}
-		percent01 /= setSize;
+		percent01 = (double) total01 / setSize;
 		
 		//Find the percent of total spectra found at 5%
+		int total05 = 0;
 		double percent05 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
 			if (forwardsMatches.get(i).getEValue() <= fpr05) {
-				percent05 =  i;
+				total05++;
 			} else {
 				break;
 			}
 		}
-		percent05 /= setSize;
+		percent05 = (double) total05/ setSize;
+		
+		//find peptide spectrum mass differences
+		double averageMassDifference = 0;
+		double averageAbsMassDifference = 0;
+		double lowestMassDifference = Double.MAX_VALUE;
+		double highestMassDifference = Double.MIN_VALUE;
+		double massDifference;
+		for (int i = 0; i < total01; i++) {
+			massDifference = forwardsMatches.get(i).getSpectrum().getMass() - forwardsMatches.get(i).getPeptide().getMass();
+			averageMassDifference += massDifference;
+			averageAbsMassDifference += Math.abs(massDifference);
+			if (lowestMassDifference > massDifference) lowestMassDifference = massDifference;
+			if (highestMassDifference < massDifference) highestMassDifference = massDifference;
+		}
+		averageMassDifference /= total01;
+		averageAbsMassDifference /= total01;
 			
 		File fprFile = new File("FPR-" + scoreName + ".txt");
 		try {
@@ -145,6 +163,13 @@ public class FPR {
 			pw.println("percent found at 1% FPR: " + nfPercent.format(percent01));
 			pw.println("5% FPR: " + fpr05);
 			pw.println("percent found at 5% FPR: " + nfPercent.format(percent05));
+			pw.println();
+			
+			//print peptide/spectrum mass differences
+			pw.println("average mass difference: " + averageMassDifference);
+			pw.println("average absolute value of mass difference: " + averageAbsMassDifference);
+			pw.println("lowest mass difference: " + lowestMassDifference);
+			pw.println("higest mass difference: " + highestMassDifference);
 			pw.println();
 
 			pw.flush();
