@@ -64,7 +64,7 @@ public class Peppy {
 			matches = getMatches(peptides, spectra, sequenceFile);
 			
 		} else {	
-			matches.addAll(getMatches(sequences, spectra));
+			matches = getMatches(sequences, spectra);
 			U.p("peptide tally: " + peptideTally);
 		}
 		
@@ -156,39 +156,64 @@ public class Peppy {
 	 * @return
 	 */
 	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
-		ArrayList<Match> matches = new ArrayList<Match>() ;
-		for (Sequence sequence: sequences) {
-			U.p("working on sequence: " +sequence.getSequenceFile().getName());
+		//TODO: turn these into preferences
+		int numberOfSpectraPerSegment = 40000;
+		
+		int spectraStart = 0;
+		int spectraStop = numberOfSpectraPerSegment;
+		if (spectraStop > spectra.size()) spectraStop = spectra.size();
+		ArrayList<Match> matches = new ArrayList<Match>();
+		while (true) {
+			ArrayList<Match> segmentMatches = new ArrayList<Match>();
 			
-			ArrayList<Peptide> peptides;
-			if (Properties.isSequenceFileDNA) {
-				peptides = sequence.extractMorePeptides(isReverse);
-				//continually extract peptides from the sequence until there aren't anymore
-				while (peptides != null) {
+			//grab our segment of spectra
+			ArrayList<Spectrum> spectraSegment = new ArrayList<Spectrum>();
+			for (int i = spectraStart; i < spectraStop; i++) {
+				spectraSegment.add(spectra.get(i));
+			}
+			
+			for (Sequence sequence: sequences) {
+				U.p("working on sequence: " +sequence.getSequenceFile().getName());
+				
+				ArrayList<Peptide> peptides;
+				if (Properties.isSequenceFileDNA) {
+					peptides = sequence.extractMorePeptides(isReverse);
+					//continually extract peptides from the sequence until there aren't anymore
+					while (peptides != null) {
+						peptideTally += peptides.size();
+						//This is where the bulk of the processing in long jobs takes
+						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment, sequence)).getMatches();
+						//Possible to add only matches with a decent e value
+						evaluateMatches(newMatches, segmentMatches);
+						//free up the memory of the old peptide arraylist
+						peptides.clear();
+						System.gc();
+						peptides = sequence.extractMorePeptides(isReverse);
+					}
+					sequence.reset();
+					removeDuplicateMatches(segmentMatches);
+				} else {
+					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
 					peptideTally += peptides.size();
 					//This is where the bulk of the processing in long jobs takes
-					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
-					//Possible to add only matches with a decent e value
-					evaluateMatches(newMatches, matches);
-					//free up the memory of the old peptide arraylist
-					peptides.clear();
-					System.gc();
-					peptides = sequence.extractMorePeptides(isReverse);
-				}
-				sequence.clearNucleotideData();
-				removeDuplicateMatches(matches);
-			} else {
-				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
-				peptideTally += peptides.size();
-				//This is where the bulk of the processing in long jobs takes
-				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
-				//Add only matches with a decent e value
-				evaluateMatches(newMatches, matches);
-			}		
+					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment, sequence)).getMatches();
+					//Add only matches with a decent e value
+					evaluateMatches(newMatches, segmentMatches);
+				}		
+			}
+			assignConfidenceValuesToMatches(segmentMatches);
+			evaluateMatches(segmentMatches, matches);
+			
+			//increment our spectrum segment markers
+			if (spectraStop == spectra.size()) break;
+			spectraStart = spectraStop;
+			spectraStop += numberOfSpectraPerSegment;
+			if (spectraStop > spectra.size()) spectraStop = spectra.size();
+			
 		}
 		assignRankToMatches(matches);
 		assignRepeatedPeptideCount(matches);	
-		assignConfidenceValuesToMatches(matches);
+		
 		return matches;
 	}
 	
@@ -373,19 +398,23 @@ public class Peppy {
 			File peptidesFolder = new File ("peptides");
 			peptidesFolder.mkdir();
 			for (Sequence sequence: sequences) {
+				U.p("working on sequence " + sequence.getSequenceFile().getName());
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
 				
 				ArrayList<Peptide> peptides = null;
 				if (Properties.isSequenceFileDNA) {
-					peptides = sequence.extractAllPeptides(false);
+					peptides = sequence.extractMorePeptides(false);
+					while (peptides != null) {
+						for (Peptide peptide: peptides) {
+							pw.println(peptide);
+						}
+						peptides = sequence.extractMorePeptides(false);
+					}
 				} else {
 					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
-				}
-				
-				U.p("number of peptides: " + peptides.size());
-
-				for (Peptide peptide: peptides) {
-					pw.println(peptide);
+					for (Peptide peptide: peptides) {
+						pw.println(peptide);
+					}
 				}
 				
 				peptides = null;
