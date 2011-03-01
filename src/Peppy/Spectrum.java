@@ -47,6 +47,10 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double minimumIntensity = -1; 
 	private double coverage = -1;
 	
+	//for Multi PTMS
+	private double massPlusMargin;
+	private double massMinusMargin;
+	
 	public Spectrum() {
 		peaks = new ArrayList<Peak>();
 	}
@@ -65,6 +69,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		Spectrum spectrum = loadSpectra(file).get(0); 
 		peaks = spectrum.getPeaks();
 		mass = spectrum.getMass();
+		massPlusMargin = mass + Properties.multiModPrecursorMargin;
+		massMinusMargin = mass - Properties.multiModPrecursorMargin;
 		if (normalizePeaks) normalizePeaks();
 	}
 	
@@ -96,6 +102,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			charge = Integer.parseInt(chunks[2]);
 			mass *= charge;
 		}
+		//for our multi modification search homies
+		massPlusMargin = mass + Properties.multiModPrecursorMargin;
+		massMinusMargin = mass - Properties.multiModPrecursorMargin;
 	}
 	
 	/* returns a double, but we're really interested in setting the max */
@@ -230,6 +239,14 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			coverage = covered / mass;
 		}
 		return coverage;
+	}
+	
+	public double getMassPlusMargin() {
+		return massPlusMargin;
+	}
+	
+	public double getMassMinusMargin() {
+		return massMinusMargin;
 	}
 
 	public Peak getPeak(int i) {return (Peak) peaks.get(i);}
