@@ -35,13 +35,13 @@ public class ScoringThreadPTM implements Runnable {
 			ArrayList<MatchPTM> matchesForOneSpectrum = new ArrayList<MatchPTM>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-			double lowestSpectrumMassToConsider = peptide.getMass() - 20;
+			double lowestSpectrumMassToConsider = peptide.getMass() - 40;
 			int firstSpectrumIndex = MathFunctions.findFirstIndexGreater(spectra, lowestSpectrumMassToConsider);
 			firstSpectrumIndex -= 8;
 			if (firstSpectrumIndex < 0) firstSpectrumIndex = 0;
 			
 			//find the last index, compensate for rounding error
-			double highestSpectrumMassToConsider = peptide.getMass() + 200;
+			double highestSpectrumMassToConsider = peptide.getMass() + 550;
 			int lastSpectrumIndex = MathFunctions.findFirstIndexGreater(spectra, highestSpectrumMassToConsider);
 			lastSpectrumIndex += 8;
 			if (lastSpectrumIndex >= spectra.size()) lastSpectrumIndex = spectra.size() - 1;

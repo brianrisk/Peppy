@@ -165,4 +165,8 @@ public class AminoAcids {
 		return sb.toString();
 	}
 	
+	public static int getNumberOfAminoAcids() {
+		return acids.length;
+	}
+	
 }

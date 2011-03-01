@@ -103,6 +103,10 @@ public class EValueCalculator {
 		}
 		if (topIndex >= numberOfHistogramBars) topIndex = numberOfHistogramBars;
 		
+		//if width is only one bar wide, make it 2
+		if (topIndex - chopIndex == 1) chopIndex--;
+		if (chopIndex < 0) chopIndex = 0;
+		
 		//taking the log of each of the survivability.  Only concerned
 		//about values at and above chopIndex
 		for (int i = chopIndex; i < topIndex; i++) {

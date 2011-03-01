@@ -28,7 +28,7 @@ public class Definitions {
 	public final static int [] Cleavages = {8, 10, 24, 25, 26, 0, 2}; 
 	
 	//protein modifications
-	public static ArrayList<ProteinModification> proteinModifications = ProteinModification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
+	public static ArrayList<Modification> modifications = Modification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
 	
 	//HMM state constant
 	public final static int NUMBER_OF_IONS =12;
