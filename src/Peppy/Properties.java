@@ -22,7 +22,8 @@ public class Properties {
 	//which scoring mechanism to use?
 	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
 	public final static int DEFAULT_SCORE_HMM = 1;
-	public static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
+	public final static int DEFAULT_SCORE_IMP = 2;
+	public static int defaultScore = DEFAULT_SCORE_IMP;
 
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
@@ -108,6 +109,9 @@ public class Properties {
 	//considered part of the "neighborhood"
 	public static int locusNeighborhood = 3000;
 	
+	//Multiple Modifications
+	public static double multiModPrecursorMargin = 0.006;
+	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
 		loadProperties(propertiesFile);
@@ -186,10 +190,14 @@ public class Properties {
 		}
 		
 		if (propertyName.equals("defaultScore")) {
-			//Default to tandemFit:
-			defaultScore = DEFAULT_SCORE_TANDEM_FIT;
 			if (propertyValue.equals("HMM_Score")) {
 				defaultScore = DEFAULT_SCORE_HMM;
+			}
+			if (propertyValue.equals("IMP")) {
+				defaultScore = DEFAULT_SCORE_IMP;
+			}
+			if (propertyValue.equals("TandemFit")) {
+				defaultScore = DEFAULT_SCORE_TANDEM_FIT;
 			}
 		}
 		
@@ -223,6 +231,10 @@ public class Properties {
 			generateSequenceReport = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("generateSpectrumReport")) 
 			generateSpectrumReport = Boolean.valueOf(propertyValue);
+		
+		//Multi PTMS
+		if (propertyName.equals("multiModPrecursorMargin")) 
+			multiModPrecursorMargin = Double.valueOf(propertyValue);
 		
 		
 	}

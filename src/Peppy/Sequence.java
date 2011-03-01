@@ -23,8 +23,6 @@ public class Sequence {
 	private int startIndex = 0;
 	private int stopIndex = 0;
 	private int nucleotideSequenceIndex = 0;
-	//length of the first sequence.  not logical if sequence file contains more than one sequence.
-	private int sequenceLength = 0;
 	//To avoid missing some peptides when digestion in discrete windows we
 	//are allowing for some overlap
 	private final int digestionFrameOverlap = 999; //divisible by three
@@ -61,11 +59,15 @@ public class Sequence {
 		
 			//if we've reached the end of the nucleotide sequence
 			if (stopIndex == nucleotideSequence.getSequence().length()) {
-				nucleotideSequenceIndex++;
-				if (nucleotideSequenceIndex >= nucleotideSequences.size()) return null;
-				nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 				startIndex = 0;
 				stopIndex = Properties.digestionWindowSize;
+				nucleotideSequenceIndex++;
+				if (nucleotideSequenceIndex >= nucleotideSequences.size()) {
+					//returning null as signal that we have reached the end
+					return null;
+				} else {
+					nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+				}
 			} else {
 				startIndex += Properties.digestionWindowSize;
 				stopIndex += Properties.digestionWindowSize;
@@ -181,7 +183,6 @@ public class Sequence {
 						//if sequenceDescription has not been defined, that means it is the first in the file
 						if (sequenceDescription != null) {
 							nucleotideSequences.add(new DNA_Sequence(sequenceDescription, sequence.toString().toUpperCase(), this));
-							if (sequenceLength == 0) sequenceLength = sequence.length();
 							sequence = new StringBuffer();
 						}
 						sequenceDescription = line;
@@ -198,7 +199,6 @@ public class Sequence {
 				}
 				String acidSequence = sequence.toString().toUpperCase();
 				nucleotideSequences.add(new DNA_Sequence(sequenceDescription, acidSequence, this));
-				if (sequenceLength == 0) sequenceLength = acidSequence.length();
 				
 				//close out our stream.  It's the courteous thing to do!
 				br.close();
@@ -225,25 +225,17 @@ public class Sequence {
 		this.id = id;
 	}
 	
-	//TODO
-	/**
-	 * Since there can be many sequences inside of one sequence file this
-	 * method is not the best.  It needs some sort of improvement.  In fact,
-	 * the whole basic data structure for this kind of thing may need to be
-	 * overhauled.
-	 * 
-	 * Oh well.  In the mean time this returns the length of the first
-	 * nucleotide sequence.
-	 * 
-	 */
-	public int getSequenceLength() {
-		return sequenceLength;
-	}
-	
-	public void clearNucleotideData() {
+	//Resets the sequence as if it is being read for the first time
+	//clears nucleotide data
+	//resets index variables
+	public void reset() {
 		if (nucleotideSequences != null) {
 			nucleotideSequences.clear();
 		}
+		nucleotideSequences = null;
+		startIndex = 0;
+		stopIndex = 0;
+		nucleotideSequenceIndex = 0;
 	}
 
 }

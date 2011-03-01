@@ -27,6 +27,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private Protein protein;
 	private boolean isSpliced;
 	private boolean isMatched = false;
+	private int lengthMinusOne;
 	
 	
 	public boolean isMatched() {
@@ -49,6 +50,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.forward = true;
 		this.parentSequence = null;
 		this.isSpliced = false;
+		this.lengthMinusOne = this.acidSequence.length - 1;
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
@@ -61,6 +63,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.forward = forward;
 		this.parentSequence = parentSequence;
 		this.isSpliced = isSpliced;
+		this.lengthMinusOne = this.acidSequence.length - 1;
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced) {
@@ -74,13 +77,18 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.parentSequence = parentSequence;
 		this.protein = protein;
 		this.isSpliced = isSpliced;
+		this.lengthMinusOne = this.acidSequence.length - 1;
 	}
 
+
+	public int getLengthMinusOne() {
+		return lengthMinusOne;
+	}
 
 	@Override
 	public String toString() {
 //		return mass + "\t" + getAcidSequenceString() + "\t" + startIndex + "\t" + proteinName;
-		return  getAcidSequenceString() + "\t" + startIndex + "\t" + forward + "\t" + (startIndex % 3);
+		return  getAcidSequenceString() + "\t" + getMass() + "\t" + getStartIndex() + "\t" +  getStopIndex()  + "\t" + forward;
 //		return  getAcidSequenceString();
 	}
 
@@ -153,6 +161,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	
 	public String getAcidSequenceString() {
 		return AminoAcids.getStringForByteArray(acidSequence);
+	}
+	
+	public int getLength() {
+		return acidSequence.length;
 	}
 
 

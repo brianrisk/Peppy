@@ -35,11 +35,9 @@ public class PeppyPTM extends Peppy{
 		U.p("loaded " +spectra.size() + " spectra.");
 		Collections.sort(spectra);
 		
-
 		//initialize our ArrayList of matches
 		ArrayList<MatchPTM> matches = new ArrayList<MatchPTM>();
-		
-		
+			
 		//Set up our peptides
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 //		Peptide thePeptide = new Peptide("AAHSEGNTTAGLDMR");
@@ -113,6 +111,7 @@ public class PeppyPTM extends Peppy{
 		//digest peptides from all those proteins
 		U.p("digesting proteins");
 		proteinPeptides = ProteinDigestion.getPeptidesFromListOfProteins(proteins);
+		U.p(proteinPeptides.size() + " peptides created");
 		
 		//get the matches
 		U.p("finding matches");
@@ -131,7 +130,9 @@ public class PeppyPTM extends Peppy{
 		
 		//get the top proteins
 		ArrayList<Protein> topProteins = new ArrayList<Protein>();
-		for (int i = 0; i < 64; i++) {
+		int topProteinNumber = 64;
+		if (topProteinNumber > proteins.size()) topProteinNumber = proteins.size();
+		for (int i = 0; i < topProteinNumber; i++) {
 			topProteins.add(proteins.get(i));
 		}
 		
