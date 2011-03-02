@@ -345,7 +345,7 @@ public class TestSet {
 			}
 			//adding to the array list
 			if (validPeptideFile && validPeptide) {
-				correctMatches.add(new Match(spectrum, peptide));
+				correctMatches.add(Match.createMatch(spectrum, peptide));
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {

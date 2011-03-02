@@ -16,7 +16,7 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class PeppyPTM extends Peppy{
+public class Peppy_VariMod extends Peppy{
 	
 	
 	public static void main(String [] args) {
@@ -36,7 +36,7 @@ public class PeppyPTM extends Peppy{
 		Collections.sort(spectra);
 		
 		//initialize our ArrayList of matches
-		ArrayList<MatchPTM> matches = new ArrayList<MatchPTM>();
+		ArrayList<Match_IMP_VariMod> matches = new ArrayList<Match_IMP_VariMod>();
 			
 		//Set up our peptides
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
@@ -48,7 +48,7 @@ public class PeppyPTM extends Peppy{
 		Collections.sort(matches);
 		U.p("number of matches: " + matches.size());
 		
-		MatchPTM match = matches.get(0);
+		Match_IMP_VariMod match = matches.get(0);
 		Spectrum spectrum = match.getSpectrum();
 		Peptide peptide = match.getPeptide();
 		String acidString = peptide.getAcidSequenceString();
@@ -62,10 +62,10 @@ public class PeppyPTM extends Peppy{
 		double imp;
 		double bestIMP = Double.MAX_VALUE;
 		int bestIndex = 0;
-		MatchPTM matchPTM;
+		Match_IMP_VariMod match_IMP_VariMod;
 		for (int i= 0; i < acidString.length(); i++) {
-			matchPTM = new MatchPTM(spectrum, peptide);
-			imp = matchPTM.calculateIMP(matchPTM.difference, i);
+			match_IMP_VariMod = new Match_IMP_VariMod(spectrum, peptide);
+			imp = match_IMP_VariMod.calculateIMP(match_IMP_VariMod.difference, i);
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 			if (imp < bestIMP) {
 				bestIMP = imp;
@@ -148,13 +148,13 @@ public class PeppyPTM extends Peppy{
 		//search for all unfound peptides
 		U.p("finding modifications");
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		ArrayList<MatchPTM> matchesPTM = (new ScoringThreadServerPTM(unfoundPeptides, spectra)).getMatches();
+		ArrayList<Match_IMP_VariMod> matchesPTM = (new ScoringThreadServerPTM(unfoundPeptides, spectra)).getMatches();
 		Collections.sort(matchesPTM);
 		
 		//find matches with greater than 2 Da difference, and great score
 		//TODO why are some from less than 2 Da not showing up in first search?
-		MatchPTM topMatch;
-		ArrayList<MatchPTM> topMatchesPTM = new ArrayList<MatchPTM>();
+		Match_IMP_VariMod topMatch;
+		ArrayList<Match_IMP_VariMod> topMatchesPTM = new ArrayList<Match_IMP_VariMod>();
 		for (int i = 0; i < matchesPTM.size(); i++) {
 			topMatch = matchesPTM.get(i);
 			if (topMatch.getDifference() > 2) {
@@ -166,7 +166,7 @@ public class PeppyPTM extends Peppy{
 		
 		
 		//add the good matches we've found to our proteins
-		for (MatchPTM match: topMatchesPTM) {
+		for (Match_IMP_VariMod match: topMatchesPTM) {
 			match.getPeptide().getProtein().addMatchPTM(match);
 		}
 		

@@ -24,7 +24,7 @@ public class Protein implements Comparable<Protein>{
 	private ArrayList<Peptide> peptides;
 	private Sequence sequence;
 	private ArrayList<Match> matchesAll = new ArrayList<Match>();
-	private ArrayList<MatchPTM> matchesWithModifications = new ArrayList<MatchPTM>();
+	private ArrayList<Match_IMP_VariMod> matchesWithModifications = new ArrayList<Match_IMP_VariMod>();
 	private ArrayList<Match> matchesWithoutModifications = new ArrayList<Match>();
 	private double score = 0;
 	private int [] matchPositions = null;
@@ -97,7 +97,7 @@ public class Protein implements Comparable<Protein>{
 		score += 1;
 	}
 	
-	public void addMatchPTM(MatchPTM match) {
+	public void addMatchPTM(Match_IMP_VariMod match) {
 		matchesAll.add(match);
 		matchesWithModifications.add(match);
 		//minus because this will be negative for good e values
@@ -436,7 +436,7 @@ public class Protein implements Comparable<Protein>{
 	}
 
 
-	public ArrayList<MatchPTM> getMatchesWithModifications() {
+	public ArrayList<Match_IMP_VariMod> getMatchesWithModifications() {
 		return matchesWithModifications;
 	}
 

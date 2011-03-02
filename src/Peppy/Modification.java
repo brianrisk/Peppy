@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ProteinModification implements Comparable<ProteinModification>{
+public class Modification implements Comparable<Modification>{
 
 	int accessionNumber;
 	String PSI_MSname;
@@ -22,7 +22,7 @@ public class ProteinModification implements Comparable<ProteinModification>{
 	 * builds a ProteinModification from string from the ptm file
 	 * @param line
 	 */
-	public ProteinModification(String line) {
+	public Modification(String line) {
 		String [] chunks = line.split("\t");
 		accessionNumber = Integer.parseInt(chunks[0]);
 		PSI_MSname = chunks[1];
@@ -33,13 +33,13 @@ public class ProteinModification implements Comparable<ProteinModification>{
 		compositioin = chunks[6];
 	}
 	
-	public static ArrayList<ProteinModification> getProteinModificationsFromFile(File file) {
-		ArrayList<ProteinModification> out = new ArrayList<ProteinModification>();
+	public static ArrayList<Modification> getProteinModificationsFromFile(File file) {
+		ArrayList<Modification> out = new ArrayList<Modification>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();
 			while (line != null) {
-				out.add(new ProteinModification(line));
+				out.add(new Modification(line));
 				line = br.readLine();
 			}
 		} catch (FileNotFoundException e) {
@@ -51,7 +51,7 @@ public class ProteinModification implements Comparable<ProteinModification>{
 		return out;
 	}
 
-	public int compareTo(ProteinModification other) {
+	public int compareTo(Modification other) {
 		if (getMonoMass() < other.getMonoMass()) return -1;
 		if (getMonoMass() > other.getMonoMass()) return  1;
 		return 0;

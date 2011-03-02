@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Math.MathFunctions;
+import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -44,7 +45,9 @@ public class ScoringThread implements Runnable {
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
-				Match match = new Match(spectrum, peptide);
+				
+				Match match = Match.createMatch(spectrum, peptide);
+
 				if (match.getScore() == 0.0) {
 					continue;
 				}

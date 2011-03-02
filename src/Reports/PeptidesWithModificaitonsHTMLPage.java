@@ -5,23 +5,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
-import Peppy.MatchPTM;
+import Peppy.Match_IMP_VariMod;
 import Peppy.Properties;
 import Peppy.Protein;
 
 public class PeptidesWithModificaitonsHTMLPage extends HTMLPage {
 	
 	private ArrayList<Protein> proteins;
-	private ArrayList<MatchPTM> matchesPTM;
+	private ArrayList<Match_IMP_VariMod> matchesPTM;
 	
 	public PeptidesWithModificaitonsHTMLPage(ArrayList<Protein> proteins, File destinationFile) {
 		super(destinationFile);
 		this.proteins = proteins;
-		matchesPTM = new ArrayList<MatchPTM>();
+		matchesPTM = new ArrayList<Match_IMP_VariMod>();
 		for (Protein protein: proteins) {
 			matchesPTM.addAll(protein.getMatchesWithModifications());
 		}
-		Match.setSortParameter(MatchPTM.SORT_BY_IMP_VALUE);
+		Match.setSortParameter(Match_IMP_VariMod.SORT_BY_IMP_VALUE);
 		Collections.sort(matchesPTM);
 	}
 
@@ -47,7 +47,7 @@ public class PeptidesWithModificaitonsHTMLPage extends HTMLPage {
 //		File modDir = new File(destinationFile.getParentFile(), "modifications");
 //		modDir.mkdirs();
 		
-		MatchPTM match;
+		Match_IMP_VariMod match;
 		for (int i = 0; i < matchesPTM.size(); i++) {
 			match = matchesPTM.get(i);
 			

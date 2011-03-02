@@ -16,7 +16,7 @@ public class ScoringThreadServerPTM {
 	 * threads wait.  Let's not make them wait.  Let's let them do their work as fast as they
 	 * can and then merge all the match ArrayLists together at the end.
 	 */
-	ArrayList<ArrayList<MatchPTM>> matches;
+	ArrayList<ArrayList<Match_IMP_VariMod>> matches;
 	
 	ArrayList<Thread> threads = new ArrayList<Thread>(Properties.numberOfThreads);
 	
@@ -32,7 +32,7 @@ public class ScoringThreadServerPTM {
 	 */
 	public ScoringThreadServerPTM(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
 		this.peptides = peptides;
-		matches = new ArrayList<ArrayList<MatchPTM>>(peptides.size());
+		matches = new ArrayList<ArrayList<Match_IMP_VariMod>>(peptides.size());
 		
 		//making sure lists are sorted
 		Collections.sort(spectra);
@@ -56,7 +56,7 @@ public class ScoringThreadServerPTM {
 	 * @param matchesForOneSpectrum
 	 * @return the next Spectrum on the list.  Null if there are no more.
 	 */
-	public synchronized Peptide getNextPeptide(ArrayList<MatchPTM> matchesForOneSpectrum) {
+	public synchronized Peptide getNextPeptide(ArrayList<Match_IMP_VariMod> matchesForOneSpectrum) {
 		matches.add(matchesForOneSpectrum);
 		return getNextPeptide();
 	}
@@ -79,7 +79,7 @@ public class ScoringThreadServerPTM {
 	 * "Yo ScoringThreads, I'm happy for you and I'ma let you finish"
 	 * @return accumulated 
 	 */
-	public ArrayList<MatchPTM> getMatches() {
+	public ArrayList<Match_IMP_VariMod> getMatches() {
 		boolean going = true;
 		while (going) {
 			for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
@@ -98,12 +98,12 @@ public class ScoringThreadServerPTM {
 		}
 		//calculate size of combined ArrayLists
 		int size = 0;
-		for (ArrayList<MatchPTM> matchCluster: matches) {
+		for (ArrayList<Match_IMP_VariMod> matchCluster: matches) {
 			size += matchCluster.size();
 		}
 		//combine matches into result and return
-		ArrayList<MatchPTM> out = new ArrayList<MatchPTM>(size);
-		for (ArrayList<MatchPTM> matchCluster: matches) {
+		ArrayList<Match_IMP_VariMod> out = new ArrayList<Match_IMP_VariMod>(size);
+		for (ArrayList<Match_IMP_VariMod> matchCluster: matches) {
 			out.addAll(matchCluster);
 		}
 		return out;

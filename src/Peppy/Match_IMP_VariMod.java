@@ -3,7 +3,7 @@ package Peppy;
 import Math.MathFunctions;
 import Utilities.U;
 
-public class MatchPTM extends Match {
+public class Match_IMP_VariMod extends Match {
 	
 	//Peptide/Spectrum difference in mass
 	double difference;
@@ -36,7 +36,7 @@ public class MatchPTM extends Match {
 		U.p("spectrum mass: " + spectrum.getMass());
 		double difference = ( spectrum.getMass() - peptide.getMass());
 		U.p("difference: " + difference);
-		MatchPTM match = new MatchPTM(spectrum, peptide);
+		Match_IMP_VariMod match = new Match_IMP_VariMod(spectrum, peptide);
 		U.p("raw score: " + match.getScore());
 		
 //		try {
@@ -48,13 +48,13 @@ public class MatchPTM extends Match {
 		//scores when we iterate where the mod is occuring
 		double imp;
 		for (int i= 0; i < acidString.length(); i++) {
-			match = new MatchPTM(spectrum, peptide);
+			match = new Match_IMP_VariMod(spectrum, peptide);
 			imp = match.calculateIMP(match.difference, i);
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 		}
 	}
 	
-	public MatchPTM(Spectrum spectrum, Peptide peptide) {
+	public Match_IMP_VariMod(Spectrum spectrum, Peptide peptide) {
 		super(spectrum, peptide, false);
 		difference = spectrum.getMass() - peptide.getMass();
 		calculateScore();
@@ -63,6 +63,8 @@ public class MatchPTM extends Match {
 	public void calculateScore() {
 		score = -Math.log(calculateIMP());
 	}
+	
+	public String getScoringMethodName() {return "IMP VariMod";}
 	
 	public double calculateIMP() {
 		if (impValue < 0) {

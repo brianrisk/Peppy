@@ -129,6 +129,7 @@ public class Peppy {
 	}
 	
 	public static void init() {
+		System.setProperty("java.awt.headless", "true"); 
 		init("properties.txt");
 	}
 	

@@ -32,7 +32,7 @@ public class ScoringThreadPTM implements Runnable {
 		
 		while (peptide != null) {
 			
-			ArrayList<MatchPTM> matchesForOneSpectrum = new ArrayList<MatchPTM>();
+			ArrayList<Match_IMP_VariMod> matchesForOneSpectrum = new ArrayList<Match_IMP_VariMod>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			double lowestSpectrumMassToConsider = peptide.getMass() - 40;
@@ -49,7 +49,7 @@ public class ScoringThreadPTM implements Runnable {
 			//examine only peptides in our designated mass range
 			for (int spectrumIndex = firstSpectrumIndex; spectrumIndex < lastSpectrumIndex; spectrumIndex++) {
 				Spectrum spectrum = spectra.get(spectrumIndex);
-				MatchPTM match = new MatchPTM(spectrum, peptide);
+				Match_IMP_VariMod match = new Match_IMP_VariMod(spectrum, peptide);
 				if (match.getScore() == 1.0) {
 					continue;
 				}
@@ -57,9 +57,9 @@ public class ScoringThreadPTM implements Runnable {
 			}
 			
 			//collect the top maximumNumberOfMatchesForASpectrum
-			MatchPTM.setSortParameter(MatchPTM.SORT_BY_SCORE);
+			Match_IMP_VariMod.setSortParameter(Match_IMP_VariMod.SORT_BY_SCORE);
 			Collections.sort(matchesForOneSpectrum);
-			ArrayList<MatchPTM> topMatches = new ArrayList<MatchPTM>();
+			ArrayList<Match_IMP_VariMod> topMatches = new ArrayList<Match_IMP_VariMod>();
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
 			for (int i = 0; i < max; i++) {
@@ -69,9 +69,9 @@ public class ScoringThreadPTM implements Runnable {
 			//We may want to reduce the number of duplicate matches
 			if (Properties.reduceDuplicateMatches && max > 1) {
 				for (int i = 0; i < topMatches.size(); i++) {
-					MatchPTM matchA = topMatches.get(i);
+					Match_IMP_VariMod matchA = topMatches.get(i);
 					for (int j = i + 1; j < topMatches.size(); j++) {
-						MatchPTM matchB = topMatches.get(j);
+						Match_IMP_VariMod matchB = topMatches.get(j);
 						if (matchA.equals(matchB)) {
 							topMatches.remove(j);
 							j--;

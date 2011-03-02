@@ -72,7 +72,7 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.defaultScore = Properties.DEFAULT_SCORE_TANDEM_FIT;
+		Properties.defaultScore = Properties.DEFAULT_SCORE_IMP;
 
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");

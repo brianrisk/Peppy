@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import Peppy.Definitions;
 import Peppy.Match;
-import Peppy.MatchPTM;
+import Peppy.Match_IMP_VariMod;
 import Peppy.Modification;
 import Peppy.Peak;
 import Peppy.Peptide;
@@ -31,15 +31,15 @@ public class MatchHTMLPage extends HTMLPage {
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
 		if (match.hasModification()) {
-			MatchPTM matchPTM = (MatchPTM) match;
+			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) match;
 			//modification index
 			spectrumScript.append("modificationIndex = ");
-			spectrumScript.append(matchPTM.getModificationIndex());
+			spectrumScript.append(match_IMP_VariMod.getModificationIndex());
 			spectrumScript.append(";");
 			
 			//modification index
 			spectrumScript.append("modificationMass = ");
-			spectrumScript.append(matchPTM.getDifference());
+			spectrumScript.append(match_IMP_VariMod.getDifference());
 			spectrumScript.append(";");
 		} else {
 			spectrumScript.append("modificationIndex = -1; modificationMass = 0;");
@@ -75,8 +75,7 @@ public class MatchHTMLPage extends HTMLPage {
 		spectrumScript.append("var peakIntensities = [");
 		ArrayList<Modification> modifications = match.getModifications();
 		for (int i = 0; i < modifications.size(); i++) {
-			Modification modification = modifications.get(i);
-			spectrumScript.append(modification.getMonoMass());
+			spectrumScript.append(modifications.get(i).getMonoMass());
 			if (i < peaks.size() - 1) spectrumScript.append(", ");
 		}
 		spectrumScript.append("];");
@@ -99,7 +98,7 @@ public class MatchHTMLPage extends HTMLPage {
 		
 		if (match.hasModification()) {
 			//this is a Modification match, make it so
-			MatchPTM matchPTM = (MatchPTM) match;
+			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) match;
 			
 			//details table
 			print("<table valign=\"top\" width=\"95%\">");
@@ -107,13 +106,12 @@ public class MatchHTMLPage extends HTMLPage {
 			print("<td>");
 			
 			printH2("Modification properties");
-			printP("mass difference: " + matchPTM.getDifference());
+			printP("mass difference: " + match_IMP_VariMod.getDifference());
 			
 			//print the probable modifications
 			ArrayList<Modification> potentialModifications = new ArrayList<Modification>(); 
-			ArrayList<Modification> modifications = Definitions.modifications;
-			for (Modification pm: modifications) {
-				if (Math.abs(matchPTM.getDifference() - pm.getMonoMass()) < 0.1) {
+			for (Modification pm: Definitions.modifications) {
+				if (Math.abs(match_IMP_VariMod.getDifference() - pm.getMonoMass()) < 0.1) {
 					potentialModifications.add(pm);
 				}
 			}
@@ -140,8 +138,8 @@ public class MatchHTMLPage extends HTMLPage {
 			//printing the modification possibility links
 			
 			for (int i= 0; i < acidString.length(); i++) {
-				MatchPTM indexModificationMatch = new MatchPTM(spectrum, peptide);
-				double indexIMP = indexModificationMatch.calculateIMP(matchPTM.getDifference(), i);
+				Match_IMP_VariMod indexModificationMatch = new Match_IMP_VariMod(spectrum, peptide);
+				double indexIMP = indexModificationMatch.calculateIMP(match_IMP_VariMod.getDifference(), i);
 				
 				//building the link
 				StringBuffer modificationLink = new StringBuffer();

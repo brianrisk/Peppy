@@ -199,7 +199,7 @@ public class TestSetCharacteristics {
 			}
 			//adding to the array list
 			if (validPeptideFile) {
-				correctMatches.add(new Match(spectrum, new Peptide(correctAcidSequence)));
+				correctMatches.add(Match.createMatch(spectrum, new Peptide(correctAcidSequence)));
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
