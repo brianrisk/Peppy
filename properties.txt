@@ -1,60 +1,58 @@
 ##FASTA files can be either DNA or amino acid sequences
-isSequenceFileDNA true
+isSequenceFileDNA false
 
 ##This could be a directory or a file
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
+//sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
 
 
 
 //This could be a directory or a file
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra bad E values
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
 
 //where we store our reports
 reportDirectory reports
+reportDirectoryTitle report
 
-//can be "HMM_Score" or "TandemFit"
-defaultScore TandemFit
+//Scoring Method
+scoringMethodName Peppy.Match_IMP
+//scoringMethodName Peppy.Match_HMM
 
 //digest only inside ORFs?
 onlyUsePeptidesInOpenReadingFrames false
 
-//spectrum cleaning
-localMaximaCleaning false
-highIntensityCleaning true
-
-//how to calculate our ion masses
-leftIonDifference 1.0
-rightIonDifference 1.0
-
 //limit returned matches by confidence
-eValueCutOff 0.01
-useEValueCutOff true
+eValueCutOff 0.025191364253861304
+useEValueCutOff true	
 
 //a preference for digestion of large DNA windows
 digestionWindowSize 25000000
 
 //how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 2.0
+spectrumToPeptideMassError 0.2
+//spectrumToPeptideMassError 2.0
 
 //TandemFit property
 peakDifferenceThreshold 0.3
 
 //Report variables
-createHTMLReport true
+createHTMLReport false
 generateNeighborhoodReport false
 generateSequenceReport false
-generateSpectrumReport false
+generateSpectrumReport true
 
 
 //how many processors does your computer have?  This number should be that number.
@@ -66,8 +64,14 @@ peptideMassThreshold 500.0
 
 numberOfMissedCleavages 2
 
+//splicing
+useSpliceVariants false
+sequenceRegionStart 35160417
+sequenceRegionStop 35253949
+
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
-//it will produce (at most) 35 matches per spectrum
+//it will produce (at least) 35 matches per spectrum
+//the final number of results also varies depending on the digestionWindowSize
 maximumNumberOfMatchesForASpectrum 2
 
 

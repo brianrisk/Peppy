@@ -113,9 +113,6 @@ public class Peppy {
 
 	public static void init(String propertiesFile) {
 		Properties.loadProperties(propertiesFile);
-		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
-			HMMScore.HMMClass.HmmSetUp();
-		}
 	}
 	
 	

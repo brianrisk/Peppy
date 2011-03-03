@@ -31,8 +31,7 @@ public class FPR {
 		nfPercent.setMaximumFractionDigits(2);
 		
 		//What scoring mechanism?
-		String scoreName = "TandemFit";
-		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) scoreName = "HMM_Score";
+		String scoreName = Properties.scoringMethodName;
 		U.p("running report for " + scoreName);
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point

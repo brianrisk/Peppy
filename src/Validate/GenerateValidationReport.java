@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 
 import Math.MathFunctions;
 import Peppy.Match;
+import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
@@ -72,7 +73,8 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.defaultScore = Properties.DEFAULT_SCORE_IMP;
+		Properties.scoringMethodName = "Peppy.Match_IMP";
+		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("uniprot_sprot.fasta");
@@ -150,10 +152,7 @@ public class GenerateValidationReport {
 			pw.println("<h1>Validation Report</h1>");
 			
 			pw.println("<br>");
-			String scoringMethod = "TandemFit";
-			if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
-				scoringMethod = "HMM_Score";
-			}
+			String scoringMethod = Properties.scoringMethodName;
 			pw.println("Scoring method: " + scoringMethod);
 			
 			pw.println("<br>");

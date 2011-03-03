@@ -11,6 +11,12 @@ public class Match_IMP_VariMod extends Match {
 	//this is which amino acid we think has the modification
 	boolean [] potentialPlacesForModification;
 	
+	public Match_IMP_VariMod(Spectrum spectrum, Peptide peptide) {
+		setSpectrum(spectrum);
+		setPeptide(peptide);
+		calculateScore();
+	}
+	
 	public static void test() {
 		//load our weird spectrum
 //		Spectrum spectrum = Spectrum.loadSpectra("/Users/risk2/PeppyOverflow/tests/kapp-just-modified/spectra/JNA-and-JGP-AAP-27Aug03_HUPO.1948.1948.1.dta").get(0);
@@ -53,13 +59,10 @@ public class Match_IMP_VariMod extends Match {
 		}
 	}
 	
-	public Match_IMP_VariMod(Spectrum spectrum, Peptide peptide) {
-		super(spectrum, peptide, false);
-		difference = spectrum.getMass() - peptide.getMass();
-		calculateScore();
-	}
+
 	
 	public void calculateScore() {
+		difference = spectrum.getMass() - peptide.getMass();
 		score = -Math.log(calculateIMP());
 	}
 	

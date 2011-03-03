@@ -68,7 +68,7 @@ public class TextReporter {
 			sb = new StringBuffer();
 			sb.append("Scoring Uyetm Used");
 			sb.append('\t');
-			sb.append(Properties.defaultScore);
+			sb.append(Properties.scoringMethodName);
 			pw.println(sb);
 			sb = new StringBuffer();
 			sb.append("Number of Missed Cleavages");
@@ -123,8 +123,7 @@ public class TextReporter {
 			} else {
 				pw.println("> analysis-type: protein");
 			}
-			if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) pw.println("> scoring method: HMM_Score");
-			if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) pw.println("> scoring method: TandemFit");
+			pw.println("> scoring method:" + Properties.scoringMethodName);
 			
 			//sorting our matches by spectrum then score
 			Match.setSortParameter(Match.SORT_BY_E_VALUE);

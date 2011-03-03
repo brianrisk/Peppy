@@ -6,14 +6,14 @@ public class DNA_DigestionThread implements Runnable {
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 	DNA_Sequence nucleotideSequence;
 	byte frame;
-	boolean forwards;
+	boolean forwardsStrand;
 	int startIndex;
 	int stopIndex;
-	boolean reverse;
+	boolean reverseDatabase;
 
 	public void run() {
 		//go through each character in the line, skipping ahead "frame" characters
-		if (forwards) {
+		if (forwardsStrand) {
 			digest(startIndex + frame, stopIndex);
 		} else {
 			digest(stopIndex - frame - 1, startIndex - 1);	
@@ -24,17 +24,17 @@ public class DNA_DigestionThread implements Runnable {
 	/**
 	 * @param nucleotideSequence
 	 * @param frame
-	 * @param forwards
+	 * @param forwardsStrand
 	 */
 	public DNA_DigestionThread(DNA_Sequence nucleotideSequence,
-			byte frame, boolean forwards, int startIndex, int stopIndex, boolean reverse) {
+			byte frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
 		if (startIndex < 0) startIndex = 0;
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
-		this.forwards = forwards;
+		this.forwardsStrand = forwardsStrand;
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
-		this.reverse = reverse;
+		this.reverseDatabase = reverseDatabase;
 	}
 	
 	
@@ -65,18 +65,18 @@ public class DNA_DigestionThread implements Runnable {
 		Sequence sequence = nucleotideSequence.getParentSequence();
 		String name = sequence.getSequenceFile().getName();
 		int increment = 1;
-		if (!forwards) increment = -1;
+		if (!forwardsStrand) increment = -1;
 		int index;
 		int proteinStart = startPosition;
 		for (index = startPosition; index != stopPosition; index += increment) {
 			codon[mod] = nucleotideSequence.getSequence().charAt(index);
 			if (mod == 2) {
-				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwards)];
+				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwardsStrand)];
 				buildingProtein.append(aminoAcid);
 				if (aminoAcid == '.') {
 					if (buildingProtein.length() > 3) {
-						if (reverse) buildingProtein.reverse();
-						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwards, sequence));
+						if (reverseDatabase) buildingProtein.reverse();
+						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwardsStrand, sequence));
 					}
 					buildingProtein = new StringBuffer();
 					proteinStart = index + 1;
@@ -90,7 +90,7 @@ public class DNA_DigestionThread implements Runnable {
 		}
 		
 		if (buildingProtein.length() > 3) {
-			proteins.add(new Protein(name, index, buildingProtein.toString(), false, -1, -1, forwards, sequence));
+			proteins.add(new Protein(name, index, buildingProtein.toString(), false, -1, -1, forwardsStrand, sequence));
 		}
 			
 	

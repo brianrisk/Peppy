@@ -4,9 +4,6 @@ import Math.MathFunctions;
 
 public class Match_TandemFit extends Match{
 	
-	public Match_TandemFit(Spectrum spectrum, Peptide peptide) {
-		super(spectrum, peptide);
-	}
 	
 	public String getScoringMethodName() {return "TandemFit";}
 

@@ -74,8 +74,6 @@ public class Peppy_VariMod extends Peppy{
 	}
 	
 	
-
-	
 	public static void runPeppyPTM(String [] args) {
 		U.p("Peppy+ PTM");
 		U.startStopwatch();

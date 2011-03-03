@@ -43,37 +43,30 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	
 	//default is that we sort matches by score
 	private static int sortParameter = SORT_BY_SCORE;
-	
-	public Match(Spectrum spectrum, Peptide peptide) {
-		this(spectrum, peptide, true);
-	}
-	
-	public Match(Spectrum spectrum, Peptide peptide, boolean calculateScore) {
-		this.spectrum = spectrum;
-		this.peptide = peptide;
-		if (calculateScore) calculateScore();
-	}
+
 	
 	public abstract void calculateScore();
 	public abstract String getScoringMethodName();
 	
-	public static Match createMatch(Spectrum spectrum, Peptide peptide) {
-		if (Properties.defaultScore == Properties.DEFAULT_SCORE_IMP) {
-			return new Match_IMP(spectrum, peptide);
-		} else {
-			if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
-				return new Match_TandemFit(spectrum, peptide);
-			} else {
-				if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
-					return new Match_HMM(spectrum, peptide);
-				} else {
-					U.p("ERROR: undefined scoring method");
-					System.exit(1);
-				}
-			}
-		}
-		return null;
-	}
+//	public abstract Match createMatch(Spectrum spectrum, Peptide peptide);
+	
+//	public static Match createMatch(Spectrum spectrum, Peptide peptide) {
+//		if (Properties.defaultScore == Properties.DEFAULT_SCORE_IMP) {
+//			return new Match_IMP(spectrum, peptide);
+//		} else {
+//			if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
+//				return new Match_TandemFit(spectrum, peptide);
+//			} else {
+//				if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
+//					return new Match_HMM(spectrum, peptide);
+//				} else {
+//					U.p("ERROR: undefined scoring method");
+//					System.exit(1);
+//				}
+//			}
+//		}
+//		return null;
+//	}
 	
 	
 	public double calculateIMP() {
@@ -108,6 +101,14 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return impValue;
 	}
 	
+	public void setSpectrum(Spectrum spectrum) {
+		this.spectrum = spectrum;
+	}
+
+	public void setPeptide(Peptide peptide) {
+		this.peptide = peptide;
+	}
+
 	/**
 	 * Here our y and b ion matches have been found so what remains is to calculate the IMP
 	 * 

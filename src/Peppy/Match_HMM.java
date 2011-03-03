@@ -3,9 +3,9 @@ package Peppy;
 import HMMScore.HMMClass;
 
 public class Match_HMM extends Match {
-
-	public Match_HMM(Spectrum spectrum, Peptide peptide) {
-		super(spectrum, peptide);
+	
+	static {
+		HMMScore.HMMClass.HmmSetUp();
 	}
 
 	@Override
@@ -14,6 +14,7 @@ public class Match_HMM extends Match {
 		score = scorer.score();
 	}
 	
+	@Override
 	public String getScoringMethodName() {return "HMM_score";}
 
 

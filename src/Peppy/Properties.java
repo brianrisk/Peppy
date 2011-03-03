@@ -17,13 +17,14 @@ import Utilities.U;
 public class Properties {
 	
 	//how many processors does your computer have?  This number should be that number.
-	public static int numberOfThreads = 16;
+	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 	
-	//which scoring mechanism to use?
-	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
-	public final static int DEFAULT_SCORE_HMM = 1;
-	public final static int DEFAULT_SCORE_IMP = 2;
-	public static int defaultScore = DEFAULT_SCORE_IMP;
+	//Define our scoring method
+	public static String scoringMethodName;
+	public static MatchConstructor matchConstructor;
+	
+	//TODO need to set up modification possibilities
+	public static ModificationPossibilities modificationPossibilities = null;
 
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
@@ -149,9 +150,6 @@ public class Properties {
 		if (line.indexOf(" ") == -1) return;
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
-		if (propertyName.equals("numberOfThreads")) {
-			numberOfThreads = Integer.valueOf(propertyValue);
-		}
 		
 		//sequence digestion
 		if (propertyName.equals("numberOfMissedCleavages")) 
@@ -189,16 +187,11 @@ public class Properties {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
 		
-		if (propertyName.equals("defaultScore")) {
-			if (propertyValue.equals("HMM_Score")) {
-				defaultScore = DEFAULT_SCORE_HMM;
-			}
-			if (propertyValue.equals("IMP")) {
-				defaultScore = DEFAULT_SCORE_IMP;
-			}
-			if (propertyValue.equals("TandemFit")) {
-				defaultScore = DEFAULT_SCORE_TANDEM_FIT;
-			}
+		
+		//Scoring method
+		if (propertyName.equals("scoringMethodName")) {
+			scoringMethodName = propertyValue;
+			matchConstructor = new MatchConstructor(scoringMethodName);
 		}
 		
 		if (propertyName.equals("leftIonDifference"))

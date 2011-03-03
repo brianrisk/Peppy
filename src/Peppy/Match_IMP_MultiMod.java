@@ -6,12 +6,6 @@ public class Match_IMP_MultiMod extends Match {
 	
 	double bestIMP;
 	Modification [] bestModifications;
-	ModificationPossibilities modificationPossibilities;
-
-	public Match_IMP_MultiMod(Spectrum spectrum, Peptide peptide, ModificationPossibilities modificationPossibilities) {
-		super(spectrum, peptide, false);
-		this.modificationPossibilities = modificationPossibilities;
-	}
 	
 	public void calculateScore() {
 		findBestIMP(Definitions.WATER_MONO, 0, 0, new Modification[peptide.getLength()]);
@@ -32,7 +26,7 @@ public class Match_IMP_MultiMod extends Match {
 	 */
 	private void findBestIMP(double massTotal, double modificationMassTotal, int index, Modification [] modifications) {
 		// get the list of possible modifications for the amino acid at this index
-		ArrayList<Modification> acidModifications = getModificationsForAminoAcid(peptide.getAcidSequence()[index]);
+		ArrayList<Modification> acidModifications = Properties.modificationPossibilities.getModificationList(peptide.getAcidSequence()[index]);
 		
 		//variables
 		int newIndex = index + 1;
@@ -82,10 +76,7 @@ public class Match_IMP_MultiMod extends Match {
 		}
 	}
 	
-	private ArrayList<Modification> getModificationsForAminoAcid(byte aminoAcid) {
-		return modificationPossibilities.getModificationList(aminoAcid);
-	}
-	
+
 	/**
 	 * This eventually calls Match's calculateIMP, but first calculates b and y ions
 	 * given the list of modifications.

@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import Peppy.Match;
 import Peppy.Peptide;
+import Peppy.Properties;
 import Utilities.U;
 
 /**
@@ -76,7 +77,7 @@ public class MatchContainer implements Comparable<MatchContainer>{
 			
 			//If this match is not the true match:
 			if(!isTrue) {
-				trueMatch = Match.createMatch(match.getSpectrum(), new Peptide(this.correctAcidSequence));
+				trueMatch = Properties.matchConstructor.createMatch(match.getSpectrum(), new Peptide(this.correctAcidSequence));
 				double trueEValue = match.getSpectrum().getEValue(trueMatch.getScore());
 				trueMatch.setEValue(trueEValue);
 				

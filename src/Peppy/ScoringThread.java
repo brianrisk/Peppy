@@ -22,6 +22,7 @@ public class ScoringThread implements Runnable {
 		this.scoringThreadServer = scoringThreadServer;
 		this.sequence = sequence;
 	}
+	
 
 	public void run() {
 		
@@ -45,11 +46,10 @@ public class ScoringThread implements Runnable {
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
 				
-				Match match = Match.createMatch(spectrum, peptide);
+				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
 
-				if (match.getScore() == 0.0) {
-					continue;
-				}
+				if (match.getScore() == 0.0) continue;
+				
 				matchesForOneSpectrum.add(match);
 			}
 			
