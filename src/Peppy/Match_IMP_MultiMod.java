@@ -2,8 +2,6 @@ package Peppy;
 
 import java.util.ArrayList;
 
-import Math.MathFunctions;
-
 public class Match_IMP_MultiMod extends Match {
 	
 	double bestIMP;
@@ -88,7 +86,14 @@ public class Match_IMP_MultiMod extends Match {
 		return modificationPossibilities.getModificationList(aminoAcid);
 	}
 	
-	
+	/**
+	 * This eventually calls Match's calculateIMP, but first calculates b and y ions
+	 * given the list of modifications.
+	 * 
+	 * @param modifications
+	 * @param modificationMassTotal
+	 * @return
+	 */
 	public double calculateIMP(Modification [] modifications, double modificationMassTotal) {
 		byte [] acidSequence = peptide.getAcidSequence();
 
@@ -175,113 +180,7 @@ public class Match_IMP_MultiMod extends Match {
 			peakIndex++;
 		}
 		
-		//if 0 matches so far, just get out.
-		if (!atLeastOneMatch) {
-			impValue = 1;
-			return impValue;
-		}
-		
-		//find out ionMatchTally and intensity distributions
-		int totalIonsAbove50 = 0;
-		int totalIonsAbove25 = 0;
-		int totalIonsAbove12 = 0;
-		int totalIonsAbove06 = 0;
-		double totalMatchingIntensity = 0.0;
-		boolean yIonMatch, bIonMatch, ionMatch, previousIonMatch = false;
-		int acidMatchTally = 0;
-		int consecutiveAcidTally = 0;
-		for (i = 0; i < peptideLengthMinusOne; i++) {
-			yIonMatch = yIonMatchesWithHighestIntensity[i] > 0.0;
-			bIonMatch = bIonMatchesWithHighestIntensity[i] > 0.0;
-			ionMatch = bIonMatch || yIonMatch;
-			if (ionMatch) acidMatchTally++;
-			if (previousIonMatch && ionMatch) consecutiveAcidTally++;
-			if (yIonMatch) {
-				ionMatchTally++;
-				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
-				if (yIonMatchesWithHighestIntensity[i] > spectrum.getMedianIntensity()) {
-					totalIonsAbove50++;
-					if (yIonMatchesWithHighestIntensity[i] > spectrum.getIntensity25Percent()) {
-						totalIonsAbove25++;
-						if (yIonMatchesWithHighestIntensity[i] > spectrum.getIntensity12Percent()) {
-							totalIonsAbove12++;
-							if (yIonMatchesWithHighestIntensity[i] > spectrum.getIntensity06Percent()) {
-								totalIonsAbove06++;
-							}
-						}
-					}
-				}
-			}
-			if (bIonMatch) {
-				ionMatchTally++;
-				totalMatchingIntensity += bIonMatchesWithHighestIntensity[i];
-				if (bIonMatchesWithHighestIntensity[i] > spectrum.getMedianIntensity()) {
-					totalIonsAbove50++;
-					if (bIonMatchesWithHighestIntensity[i] > spectrum.getIntensity25Percent()) {
-						totalIonsAbove25++;
-						if (bIonMatchesWithHighestIntensity[i] > spectrum.getIntensity12Percent()) {
-							totalIonsAbove12++;
-							if (bIonMatchesWithHighestIntensity[i] > spectrum.getIntensity06Percent()) {
-								totalIonsAbove06++;
-							}
-						}
-					}
-				}
-			}
-			previousIonMatch = ionMatch;
-			
-		}
-		
-		
-		//Variables for binomial probabilities
-		int n;
-		int k;
-		double p;
-		
-		//peak match probability is the binomial distribution
-		n = acidSequence.length * 2;
-		k = ionMatchTally;
-		p = spectrum.getCoverage();
-		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
-		
-		
-		if (peakMatchProbability > 0.5) {
-			impValue = 1;
-			return impValue;
-		}
-		
-		//consecutive match probability
-		n = peptideLengthMinusOne;
-		k = consecutiveAcidTally;
-		p = (double) acidMatchTally / peptideLengthMinusOne;
-		double consecutiveProbability = MathFunctions.getBinomialProbability(n, k, p);
-		
-		
-		//probability of ions being above thresholds
-		double intensityProbability = 1;
-		if (ionMatchTally > 0) {
-			n = ionMatchTally;
-			k = totalIonsAbove50;
-			intensityProbability = MathFunctions.getCachedBinomialProbability50(n, k);
-			if (totalIonsAbove50 > 0) {
-				n = totalIonsAbove50;
-				k = totalIonsAbove25;
-				intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-				if (totalIonsAbove25 > 0) {
-					n = totalIonsAbove25;
-					k = totalIonsAbove12;
-					intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-					if (totalIonsAbove12 > 0) {
-						n = totalIonsAbove12;
-						k = totalIonsAbove06;
-						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-					}
-				}
-			}
-		}
-		
-		impValue =  peakMatchProbability  * intensityProbability * consecutiveProbability;
-		return impValue;
+		return calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
 	}
 
 }

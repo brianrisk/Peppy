@@ -7,9 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import Peppy.Properties;
-import Utilities.U;
-
 public abstract class HTMLPage {
 	
 

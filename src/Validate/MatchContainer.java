@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import Peppy.Peptide;
 import Peppy.Match;
+import Peppy.Peptide;
 import Utilities.U;
 
 /**

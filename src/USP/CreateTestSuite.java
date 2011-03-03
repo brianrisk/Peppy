@@ -12,7 +12,6 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
-import Peppy.ScoringThreadServer;
 import Peppy.Spectrum;
 import Utilities.U;
 

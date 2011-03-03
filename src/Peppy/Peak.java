@@ -1,5 +1,4 @@
 package Peppy;
-import java.awt.Color;
 
 /**
  * A peak is a data point in a spectrum.

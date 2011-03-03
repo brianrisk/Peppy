@@ -1,6 +1,5 @@
 package Utilities;
 
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * A basic utility class.

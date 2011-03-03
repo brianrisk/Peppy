@@ -1,7 +1,7 @@
 package HMMScore;
 
-import java.util.*;
-import java.io.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class LSFitting {
 

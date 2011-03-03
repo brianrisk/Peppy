@@ -1,7 +1,10 @@
 package HMMScore;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class Reader {
 

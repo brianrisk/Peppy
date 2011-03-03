@@ -1,10 +1,8 @@
 package Validate;
 
-import java.io.File;
-
+import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Spectrum;
-import Peppy.Match;
 import Utilities.U;
 
 public class ScoreDebugging {

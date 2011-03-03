@@ -1,13 +1,11 @@
 package Reports;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Peak;
-import Peppy.Properties;
 import Peppy.Spectrum;
 
 public class SpectrumHTMLPage extends HTMLPage {

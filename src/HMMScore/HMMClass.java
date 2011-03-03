@@ -12,7 +12,6 @@ import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;
-import Utilities.U;
 
 public class HMMClass {
 	private static int numberOfState = Defines.numberOfIons + 1;

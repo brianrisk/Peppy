@@ -8,8 +8,6 @@ import Reports.ProteinsHTMLPage;
 import Utilities.U;
 
 
-
-
 /**
  * PeppyPTM
  * An extension of Peppy to include protein modifications
@@ -61,7 +59,6 @@ public class Peppy_VariMod extends Peppy{
 		
 		double imp;
 		double bestIMP = Double.MAX_VALUE;
-		int bestIndex = 0;
 		Match_IMP_VariMod match_IMP_VariMod;
 		for (int i= 0; i < acidString.length(); i++) {
 			match_IMP_VariMod = new Match_IMP_VariMod(spectrum, peptide);
@@ -69,7 +66,6 @@ public class Peppy_VariMod extends Peppy{
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 			if (imp < bestIMP) {
 				bestIMP = imp;
-				bestIndex = i;
 			}
 		}
 		
