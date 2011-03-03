@@ -11,12 +11,10 @@ import Peppy.Protein;
 
 public class PeptidesWithModificaitonsHTMLPage extends HTMLPage {
 	
-	private ArrayList<Protein> proteins;
 	private ArrayList<Match_IMP_VariMod> matchesPTM;
 	
 	public PeptidesWithModificaitonsHTMLPage(ArrayList<Protein> proteins, File destinationFile) {
 		super(destinationFile);
-		this.proteins = proteins;
 		matchesPTM = new ArrayList<Match_IMP_VariMod>();
 		for (Protein protein: proteins) {
 			matchesPTM.addAll(protein.getMatchesWithModifications());

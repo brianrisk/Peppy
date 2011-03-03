@@ -350,31 +350,6 @@ public class GenerateValidationReport {
 			e.printStackTrace();
 		}
 		
-//		//Visualize the ion matches for all incorrect matches
-//		for (TestSet test: tests) {
-//			generateWrongReport(test);
-//		}
-//		
-//		
-//		//Report on reverse database
-//		for (TestSet test: tests) {
-//			U.p();
-//			U.p(test.getName());
-//			ArrayList<Match> falsePositiveMatches = test.getFalsePositiveMatches();
-//			Match.setSortParameter(Match.SORT_BY_E_VALUE);
-//			Collections.sort(falsePositiveMatches);
-//			int testSize = falsePositiveMatches.size();
-//			int level05 = (int) (testSize * 0.05);
-//			int level25 = (int) (testSize * 0.25);
-//			int level50 = (int) (testSize * 0.50);
-//			int level75 = (int) (testSize * 0.75);
-//			int level95 = (int) (testSize * 0.95);
-//			U.p(" 5%: "+ falsePositiveMatches.get(level05).getEValue());
-//			U.p("25%: "+ falsePositiveMatches.get(level25).getEValue());
-//			U.p("50%: "+ falsePositiveMatches.get(level50).getEValue());
-//			U.p("75%: "+ falsePositiveMatches.get(level75).getEValue());
-//			U.p("95%: "+ falsePositiveMatches.get(level95).getEValue());
-//		}
 	}
 	
 	public static void createResultsFiles() {
@@ -531,10 +506,7 @@ public class GenerateValidationReport {
 		String testName = test.getName();
 		ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
 		U.p("printing out all the spectra that we got wrong and comparing the two different matches");
-		
-		int width = 1000;
-		int height = 200;
-		
+
 		File testFileFolder = new File(reportFolder, testName);
 		testFileFolder.mkdirs();
 		File testFile = new File(testFileFolder, "wrong.html");
@@ -556,17 +528,13 @@ public class GenerateValidationReport {
 			
 			int imageIndex = 0;
 			for (MatchContainer matchContainer: testedMatches) {
-				Peptide correctPeptide = null;
-				correctPeptide = new Peptide(matchContainer.getCorrectAcidSequence());
 				Match ourMatch = matchContainer.getMatch();
 				Match trueMatch = matchContainer.getTrueMatch();
 				if (!matchContainer.isTrue()) {
 					
 					pw.println("<tr>");
 					
-//					pw.println("<td>");
-//					pw.println(matchContainer.isTrue());
-//					pw.println("</td>");
+
 					pw.println("<td>");
 					pw.println(ourMatch.getEValue());
 					pw.println("</td>");
@@ -574,10 +542,7 @@ public class GenerateValidationReport {
 					pw.println(ourMatch.getSpectrum().getFile().getName());
 					pw.println("</td>");
 	
-	//					if (checkToSeeIfPeptideIsInDatabase) {
-	//						pw.println("Correct peptide is in the database: " + isPeptidePresentInList(correctPeptide, peptides));
-	//						pw.println("<br>");
-	//					}
+
 					pw.println("<td>");
 					pw.println(ourMatch.getIonMatchTally());
 					pw.println("<br>" + trueMatch.getIonMatchTally());
@@ -586,7 +551,6 @@ public class GenerateValidationReport {
 					//creating the image of our match
 					//TODO needs to be redone
 					
-					//don't forget to increment that image index, Brian!
 					imageIndex++;
 					
 					pw.println("<td>");

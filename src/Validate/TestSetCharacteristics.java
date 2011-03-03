@@ -163,6 +163,10 @@ public class TestSetCharacteristics {
 		return total;
 	}
 	
+	public String getTestName() {
+		return testName;
+	}
+
 	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
