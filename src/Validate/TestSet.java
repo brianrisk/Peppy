@@ -54,22 +54,8 @@ public class TestSet {
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
 		
-
-//		//load "correct" matches as defined by the test set
 		correctMatches = loadCorrectMatches();
 		
-		//load our spectra from our correct matches as not all matches may be valid
-		//and the correct 
-		//remove spectra that don't have a proper match in our database
-		//first remove spectra which do not represent peptides in our given database
-//		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
-//		for (Match match: correctMatches) {
-//			Peptide peptide = match.getPeptide();
-//			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) != -1) {
-//				reducedSpectra.add(match.getSpectrum());
-//			}
-//		}
-//		spectra = reducedSpectra;
 		setSize = spectra.size();	
 	}
 	
