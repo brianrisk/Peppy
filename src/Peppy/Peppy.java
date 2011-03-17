@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -30,7 +31,6 @@ public class Peppy {
 		printGreeting();
 		init(args);
 		runJobs(args);
-//		new Peppy(args);
 //		exportPeptideList();
 		U.p("done");
 	}
@@ -61,7 +61,7 @@ public class Peppy {
 			
 			U.p("getting matches...");
 			//TODO get rid of this getMatches function when this is overhauled
-			matches = getMatches(peptides, spectra, sequenceFile);
+			matches = getMatchesWithPeptides(peptides, spectra);
 			
 		} else {	
 			matches = getMatches(sequences, spectra);
@@ -70,20 +70,23 @@ public class Peppy {
 		
 		//create new report directory
 		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
-		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
-			U.p("creating HTML reports");
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
-			report.generateFullReport();
-		}
 		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
 		textReport.generatePropertiesFile();
 		
+		
+		if (Properties.createHTMLReport) {
+			U.p("creating HTML reports");
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
+			report.generateFullReport();
+		}	
+		
 		U.p();
 		U.stopStopwatch();
 	}
+	
 	
 	public static void runJobs(String [] args) {
 		File jobsDir = new File("jobs");
@@ -170,35 +173,72 @@ public class Peppy {
 				spectraSegment.add(spectra.get(i));
 			}
 			
-			for (Sequence sequence: sequences) {
-				U.p("working on sequence: " +sequence.getSequenceFile().getName());
-				
-				ArrayList<Peptide> peptides;
-				if (Properties.isSequenceFileDNA) {
-					peptides = sequence.extractMorePeptides(isReverse);
-					//continually extract peptides from the sequence until there aren't anymore
-					while (peptides != null) {
+			if (Properties.sequenceFilesContainMultipleSequences) {
+				U.p("Processing all sequences at once");
+				ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+				Sequence sequence;
+				double percentComplete;
+				NumberFormat nfPercent = NumberFormat.getPercentInstance();
+				nfPercent.setMaximumFractionDigits(2);
+				for (int i = 0; i < sequences.size(); i++) {
+					sequence = sequences.get(i);
+					peptides.addAll(sequence.extractAllPeptides(isReverse));
+					
+					//there may be a lot of peptides, so this segments the task
+					if (peptides.size() > 10000000) {
+						percentComplete = (double) i / sequences.size();
+						U.p(nfPercent.format(percentComplete) + " percent complete"); 
 						peptideTally += peptides.size();
-						//This is where the bulk of the processing in long jobs takes
-						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment, sequence)).getMatches();
+						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
 						//Possible to add only matches with a decent e value
 						evaluateMatches(newMatches, segmentMatches);
-						//free up the memory of the old peptide arraylist
 						peptides.clear();
 						System.gc();
-						peptides = sequence.extractMorePeptides(isReverse);
+						removeDuplicateMatches(segmentMatches);
 					}
-					sequence.reset();
-					removeDuplicateMatches(segmentMatches);
-				} else {
-					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
-					peptideTally += peptides.size();
-					//This is where the bulk of the processing in long jobs takes
-					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment, sequence)).getMatches();
-					//Add only matches with a decent e value
-					evaluateMatches(newMatches, segmentMatches);
-				}		
+				}
+				U.p("evaulating for " + peptides.size() + " peptide subset");
+				peptideTally += peptides.size();
+				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+				//Possible to add only matches with a decent e value
+				evaluateMatches(newMatches, segmentMatches);
+				peptides.clear();
+				System.gc();
+				removeDuplicateMatches(segmentMatches);
+
+			} else {
+				for (Sequence sequence: sequences) {
+					U.p("working on sequence: " +sequence.getSequenceFile().getName());
+					
+					ArrayList<Peptide> peptides;
+					if (Properties.isSequenceFileDNA) {
+						peptides = sequence.extractMorePeptides(isReverse);
+						//continually extract peptides from the sequence until there aren't anymore
+						while (peptides != null) {
+							peptideTally += peptides.size();
+							//This is where the bulk of the processing in long jobs takes
+							ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+							//Possible to add only matches with a decent e value
+							evaluateMatches(newMatches, segmentMatches);
+							//free up the memory of the old peptide arraylist
+							peptides.clear();
+							System.gc();
+							peptides = sequence.extractMorePeptides(isReverse);
+						}
+						sequence.reset();
+						removeDuplicateMatches(segmentMatches);
+					} else {
+						peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
+						peptideTally += peptides.size();
+						//This is where the bulk of the processing in long jobs takes
+						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+						//Add only matches with a decent e value
+						evaluateMatches(newMatches, segmentMatches);
+					}		
+				}
 			}
+			
+			
 			assignConfidenceValuesToMatches(segmentMatches);
 			evaluateMatches(segmentMatches, matches);
 			
@@ -222,12 +262,12 @@ public class Peppy {
 	 * @param sequence
 	 * @return
 	 */
-	public static ArrayList<Match> getMatches(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
+	public static ArrayList<Match> getMatchesWithPeptides(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
 		ArrayList<Match> matches = new ArrayList<Match>() ;
 		peptideTally += peptides.size();
 		
 		//This is where the bulk of the processing in long jobs takes
-		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
+		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
 		//Add only matches with a decent e value
 		evaluateMatches(newMatches, matches);

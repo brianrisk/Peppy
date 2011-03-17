@@ -188,6 +188,8 @@ public class Protein implements Comparable<Protein>{
 	
 	public ArrayList<Peptide> digest() {
 		peptides = new ArrayList<Peptide>();
+		
+		//if our peptide has only 3 acids, return an empty list
 		if (acidString.length() < 4) return peptides;
 		
 		char aminoAcid = acidString.charAt(0);

@@ -63,7 +63,7 @@ public class DNA_DigestionThread implements Runnable {
 		int mod = 0;
 		StringBuffer buildingProtein = new StringBuffer();
 		Sequence sequence = nucleotideSequence.getParentSequence();
-		String name = sequence.getSequenceFile().getName();
+		String name = nucleotideSequence.getSequenceDescription();
 		int increment = 1;
 		if (!forwardsStrand) increment = -1;
 		int index;

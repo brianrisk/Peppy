@@ -65,7 +65,7 @@ public class CreateTestSuite {
 		Properties.spectrumToPeptideMassError = 0.01;
 		
 		//Get the  matches
-		ArrayList<Match> matches  = Peppy.getMatches(peptides, spectra, null);
+		ArrayList<Match> matches  = Peppy.getMatchesWithPeptides(peptides, spectra);
 		
 		//save to appropriate files
 		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
@@ -108,7 +108,7 @@ public class CreateTestSuite {
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		
 		//Get the matches
-		ArrayList<Match> matches  = Peppy.getMatches(peptides, spectra, null);
+		ArrayList<Match> matches  = Peppy.getMatchesWithPeptides(peptides, spectra);
 		
 		//save to appropriate files
 		for (Match match: matches) {

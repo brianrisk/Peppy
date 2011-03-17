@@ -30,6 +30,10 @@ public class EValueCalculator {
 	private double b;
 	private int numberOfMatches = 0;
 	
+	public int getNumberOfMatches() {
+		return numberOfMatches;
+	}
+
 	public EValueCalculator(ArrayList<? extends HasEValue> values, ArrayList<? extends HasEValue> topValues) {
 		addScores(values, topValues);
 	}

@@ -62,7 +62,7 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();
-		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
+		positiveMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
 		timeToComplete = U.millisecondsToString(timeElapsed);
@@ -122,7 +122,7 @@ public class TestSet {
 			spectrum.clearEValues();
 		}
 		//get the matches
-		topReverseMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
+		topReverseMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
 		//Sort matches by e value	
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
