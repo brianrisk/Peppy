@@ -1,13 +1,15 @@
 package Peppy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Match_IMP_MultiMod extends Match {
 	
-	double bestIMP;
+	double bestIMP = 1;
 	Modification [] bestModifications;
 	
 	public void calculateScore() {
+		bestModifications = new Modification[peptide.getLength()];
 		findBestIMP(Definitions.WATER_MONO, 0, 0, new Modification[peptide.getLength()]);
 		impValue = bestIMP;
 		score = -Math.log(bestIMP);
@@ -40,6 +42,8 @@ public class Match_IMP_MultiMod extends Match {
 			modifications[index] = modification;
 			newMassTotal = newMassWithoutMod + modification.getMonoMass();
 			newModificationMassTotal = modificationMassTotal + modification.getMonoMass();
+			
+			//if theoretical peptide mass is too heavy, exit
 			if (newMassTotal > spectrum.getMassPlusMargin()) {
 				return;
 			} else {
@@ -48,6 +52,7 @@ public class Match_IMP_MultiMod extends Match {
 				 * calculate all IMPs and set the best IMP and the modification array
 				 * if necessary.
 				 */
+				
 				if (index == peptide.getLengthMinusOne()) {
 					//since this is the final amino acid, the mass sum should be close to our precursor
 					if (newMassTotal < spectrum.getMassMinusMargin()) {
@@ -55,14 +60,12 @@ public class Match_IMP_MultiMod extends Match {
 					}
 					
 					imp = calculateIMP(modifications, newModificationMassTotal);
-					//if IMP is less than 0, that means it is an invalid match
-					if (imp > 0) {
-						if (imp < bestIMP) {
-							bestIMP = imp;
-							//save the modifications
-							for (int i = 0; i < modifications.length; i++) {
-								bestModifications[i] = modifications[i];
-							}
+					
+					if (imp < bestIMP) {
+						bestIMP = imp;
+						//save the modifications
+						for (int i = 0; i < modifications.length; i++) {
+							bestModifications[i] = modifications[i];
 						}
 					}
 				}
@@ -173,5 +176,10 @@ public class Match_IMP_MultiMod extends Match {
 		
 		return calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
 	}
+
+	public Modification [] getModifications() {
+		return bestModifications;
+	}
+	
 
 }

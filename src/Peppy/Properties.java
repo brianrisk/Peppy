@@ -24,7 +24,7 @@ public class Properties {
 	public static MatchConstructor matchConstructor;
 	
 	//TODO need to set up modification possibilities
-	public static ModificationPossibilities modificationPossibilities = null;
+	public static ModificationPossibilities modificationPossibilities = new ModificationPossibilities();
 
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
@@ -82,6 +82,9 @@ public class Properties {
 	//FASTA files can be either DNA or amino acid sequences
 	public static boolean isSequenceFileDNA = true;
 	
+	//do the sequence files contain many sequences?
+	public static boolean sequenceFilesContainMultipleSequences = false;
+	
 	//HMM Score parameter file folder
 	public static File HMMScoreParametersFile = new File("resources/HMMScore/ParamFiles");
 	
@@ -111,7 +114,7 @@ public class Properties {
 	public static int locusNeighborhood = 3000;
 	
 	//Multiple Modifications
-	public static double multiModPrecursorMargin = 0.006;
+	public static double multiModPrecursorMargin = 0.1;
 	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
@@ -186,6 +189,10 @@ public class Properties {
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
+		if (propertyName.equals("sequenceFilesContainMultipleSequences")) {
+			sequenceFilesContainMultipleSequences = Boolean.valueOf(propertyValue);
+		}
+		
 		
 		
 		//Scoring method

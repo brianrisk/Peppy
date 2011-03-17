@@ -5,13 +5,22 @@ import java.util.ArrayList;
 import Utilities.U;
 
 public class ModificationPossibilities {
-	@SuppressWarnings("unchecked")
+	
 	ArrayList[] modificationsArray;
 	
+	public static void main(String args[]) {
+		new ModificationPossibilities();
+	}
+	
 	public ModificationPossibilities() {
+		
+		//initializes our modifications array
 		modificationsArray = new ArrayList[AminoAcids.getNumberOfAminoAcids()];
 		for (int i = 0; i < AminoAcids.getNumberOfAminoAcids(); i++) {
-			modificationsArray[i] = new ArrayList<Modification>();
+			ArrayList<Modification> mods = new ArrayList<Modification>();
+			//add the fact that any amino acid may have NO modification
+			mods.add(new Modification());
+			modificationsArray[i] = mods;
 		}
 		
 		//TODO remove later
@@ -21,19 +30,19 @@ public class ModificationPossibilities {
 		addModificationToAminoAcid("Acetylation", AminoAcids.K);
 		addModificationToAminoAcid("Acetylation", AminoAcids.R);
 		//ADP ribosylation	E
-		addModificationToAminoAcid("ADP ribosylation", AminoAcids.E);
+		addModificationToAminoAcid("ADP Ribose addition", AminoAcids.E);
 		//Biotinylation	K
 		addModificationToAminoAcid("Biotinylation", AminoAcids.K);
 		//Butyrylation	K
-		addModificationToAminoAcid("Butyrylation", AminoAcids.K);
+//		addModificationToAminoAcid("Butyrylation", AminoAcids.K);
 		//Dimethylation	K, R
-		addModificationToAminoAcid("Dimethylation", AminoAcids.K);
-		addModificationToAminoAcid("Dimethylation", AminoAcids.R);
+		addModificationToAminoAcid("Di-methylation", AminoAcids.K);
+		addModificationToAminoAcid("Di-methylation", AminoAcids.R);
 		//Methylation	K, R
 		addModificationToAminoAcid("Methylation", AminoAcids.K);
 		addModificationToAminoAcid("Methylation", AminoAcids.R);
 		//Oxidation	M
-		addModificationToAminoAcid("Oxidation", AminoAcids.M);
+		addModificationToAminoAcid("Oxidation or Hydroxylation", AminoAcids.M);
 		//Palmitoylation	K
 		addModificationToAminoAcid("Palmitoylation", AminoAcids.K);
 		//Phosphorylation	S, T, Y
@@ -41,13 +50,13 @@ public class ModificationPossibilities {
 		addModificationToAminoAcid("Phosphorylation", AminoAcids.T);
 		addModificationToAminoAcid("Phosphorylation", AminoAcids.Y);
 		//Propionylation	K
-		addModificationToAminoAcid("Propionylation", AminoAcids.K);
+		addModificationToAminoAcid("Propionate labeling reagent light form (N-term & K)", AminoAcids.K);
 		//Sumoylation1	K
-		addModificationToAminoAcid("Sumoylation1", AminoAcids.K);
+		addModificationToAminoAcid("Sumo mutant Smt3-WT tail following trypsin digestion", AminoAcids.K);
 		//Trimethylation	K
-		addModificationToAminoAcid("Trimethylation", AminoAcids.K);
+		addModificationToAminoAcid("Tri-methylation", AminoAcids.K);
 		//ubiquitinylation	K
-		addModificationToAminoAcid("ubiquitinylation", AminoAcids.K);
+		addModificationToAminoAcid("ubiquitinylation residue", AminoAcids.K);
 
 	}
 	
@@ -63,7 +72,7 @@ public class ModificationPossibilities {
 	
 	public static Modification getModification(String modificationName) {
 		for (Modification modification: Definitions.modifications) {
-			if (modification.getPSI_MSname().equalsIgnoreCase(modificationName)) {
+			if (modification.getDescription().equalsIgnoreCase(modificationName)) {
 				return modification;
 			}
 		}

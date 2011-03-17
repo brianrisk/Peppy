@@ -75,13 +75,13 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-//					if (Peppy.Properties.useEValueCutOff) {
+					if (Peppy.Properties.useEValueCutOff) {
 						if (match.getEValue() < Peppy.Properties.eValueCutOff) {
 							bestMatches.add(match);
 						}
-//					} else {
-//						bestMatches.add(match);
-//					}
+					} else {
+						bestMatches.add(match);
+					}
 				} else {
 					matchRank++;
 				}
@@ -95,7 +95,7 @@ public class HTMLReporter {
 			
 			//sort our best matches by score ratio
 //			Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
+			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(bestMatches);
 			
 			//set up our main index file
@@ -109,7 +109,11 @@ public class HTMLReporter {
 			NumberFormat nfPercent = NumberFormat.getPercentInstance();
 			nfPercent.setMaximumFractionDigits(2);
 			
-			for (int i = 0; i < bestMatches.size(); i++) {
+			//limit how many we will display
+			int maxDisplay = 1000;
+			if (maxDisplay > bestMatches.size()) maxDisplay = bestMatches.size();
+			
+			for (int i = 0; i < maxDisplay; i++) {
 				Match match = bestMatches.get(i);
 				StringBuffer sb = new StringBuffer();
 				sb.append("<tr>");
@@ -135,16 +139,21 @@ public class HTMLReporter {
 //				sb.append(match.getSpectrum().getFile().getAbsolutePath());
 //				sb.append("</td>");
 				
-				sb.append("<td><nobr>");
-				if (sequences != null) {
-					sb.append("<a href=\"sequences/");
-					sb.append(match.getPeptide().getParentSequence().getId());
-					sb.append(Properties.reportWebSuffix);
-					sb.append("\">");
-					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
-					sb.append("</a> ");
+				
+				sb.append("<td>");
+				if (match.getPeptide().getParentSequence() != null) {
+					sb.append("<nobr>");
+					if (sequences != null) {
+						sb.append("<a href=\"sequences/");
+						sb.append(match.getPeptide().getParentSequence().getId());
+						sb.append(Properties.reportWebSuffix);
+						sb.append("\">");
+						sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
+						sb.append("</a> ");
+					}
+					sb.append("</nobr>");
 				}
-				sb.append("</nobr></td>");
+				sb.append("</td>");
 				
 				sb.append("<td>");
 				sb.append("<a href=\"neighborhoods/");
@@ -167,6 +176,10 @@ public class HTMLReporter {
 				
 				sb.append("<td>");
 				sb.append(match.getPeptide().isSpliced());
+				sb.append("</td>");
+				
+				sb.append("<td>");
+				sb.append(match.getNumberOfModifications());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -334,10 +347,20 @@ public class HTMLReporter {
 //	}
 	
 	public void generateSpectrumReport(Spectrum spectrum) {
+		//set up our files and folders
 		File sequenceDirectory = new File(reportDir, "spectra");
 		sequenceDirectory.mkdirs();
 		File indexFile = new File(sequenceDirectory, spectrum.getId() + Properties.reportWebSuffix);
-		SpectrumHTMLPage page = new SpectrumHTMLPage(spectrum, matches, indexFile);
+		
+		//our report object
+		HTMLPage page;
+		
+		//select which type of spectrum report to give
+		if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
+			page = new SpectrumMultiMod(spectrum, matches, indexFile);
+		} else {
+			page = new SpectrumHTMLPage(spectrum, matches, indexFile);
+		}
 		page.makePage();
 	}
 	

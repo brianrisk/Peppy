@@ -73,9 +73,9 @@ public class MatchHTMLPage extends HTMLPage {
 		//print the modifications array
 		spectrumScript.append("];");
 		spectrumScript.append("var peakIntensities = [");
-		ArrayList<Modification> modifications = match.getModifications();
-		for (int i = 0; i < modifications.size(); i++) {
-			spectrumScript.append(modifications.get(i).getMonoMass());
+		Modification [] modifications = match.getModifications();
+		for (int i = 0; i < modifications.length; i++) {
+			spectrumScript.append(modifications[i].getMonoMass());
 			if (i < peaks.size() - 1) spectrumScript.append(", ");
 		}
 		spectrumScript.append("];");

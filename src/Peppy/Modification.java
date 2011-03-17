@@ -18,6 +18,17 @@ public class Modification implements Comparable<Modification>{
 	double averageMass;
 	String compositioin;
 	
+	//no modification
+	public Modification() {
+		accessionNumber = -1;
+		PSI_MSname = "none";
+		interimName = "none";
+		description = "none";
+		monoMass = 0;
+		averageMass = 0;
+		compositioin = "";
+	}
+	
 	/**
 	 * builds a ProteinModification from string from the ptm file
 	 * @param line
@@ -35,6 +46,8 @@ public class Modification implements Comparable<Modification>{
 	
 	public static ArrayList<Modification> getProteinModificationsFromFile(File file) {
 		ArrayList<Modification> out = new ArrayList<Modification>();
+		//add the null modification
+		out.add(new Modification());
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();

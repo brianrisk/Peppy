@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Math.MathFunctions;
+import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -10,17 +11,15 @@ public class ScoringThread implements Runnable {
 	ArrayList<Peptide> peptides;
 	Spectrum spectrum;
 	ScoringThreadServer scoringThreadServer;
-	Sequence sequence;
 	
 	/**
 	 * @param peptides
 	 * @param spectrum
 	 */
-	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer, Sequence sequence) {
+	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer) {
 		this.spectrum = spectrum;
 		this.peptides = peptides;
 		this.scoringThreadServer = scoringThreadServer;
-		this.sequence = sequence;
 	}
 	
 
@@ -31,16 +30,23 @@ public class ScoringThread implements Runnable {
 			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-			double lowestPeptideMassToConsider = spectrum.getMass() - Properties.spectrumToPeptideMassError;
-			int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
-			firstPeptideIndex -= 8;
-			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
+			int firstPeptideIndex;
+			if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
+				firstPeptideIndex = 0;
+			} else {
+				double lowestPeptideMassToConsider = spectrum.getMass() - Properties.spectrumToPeptideMassError;
+				firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
+				firstPeptideIndex -= 8;
+				if (firstPeptideIndex < 0) firstPeptideIndex = 0;
+			}
+			
 			
 			//find the last index, compensate for rounding error
 			double highestPeptideMassToConsider = spectrum.getMass() + Properties.spectrumToPeptideMassError;
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
 			lastPeptideIndex += 8;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
+			
 			
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {

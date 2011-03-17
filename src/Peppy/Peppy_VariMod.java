@@ -23,56 +23,6 @@ public class Peppy_VariMod extends Peppy{
 		U.p("done");
 	}
 	
-	public static void findPeptidePTM() {
-		U.p("Peppy+ finding PTM");
-		U.startStopwatch();
-		
-		//Load our spectra
-		U.p("loading spectra...");
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-		Collections.sort(spectra);
-		
-		//initialize our ArrayList of matches
-		ArrayList<Match_IMP_VariMod> matches = new ArrayList<Match_IMP_VariMod>();
-			
-		//Set up our peptides
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-//		Peptide thePeptide = new Peptide("AAHSEGNTTAGLDMR");
-		Peptide thePeptide = new Peptide("LYVGNIPFGITEEAMMDFFNAQMR");
-		peptides.add(thePeptide);
-		
-		matches = (new ScoringThreadServerPTM(peptides, spectra)).getMatches();
-		Collections.sort(matches);
-		U.p("number of matches: " + matches.size());
-		
-		Match_IMP_VariMod match = matches.get(0);
-		Spectrum spectrum = match.getSpectrum();
-		Peptide peptide = match.getPeptide();
-		String acidString = peptide.getAcidSequenceString();
-		U.p("higest matching spectum: " +match.getSpectrum().getFile().getName());
-		
-		double difference = ( match.getSpectrum().getMass() - match.getPeptide().getMass());
-		U.p("difference: " + difference);
-		U.p("raw score: " + match.getScore());
-		U.p("second score: " + matches.get(1).getScore());
-		
-		double imp;
-		double bestIMP = Double.MAX_VALUE;
-		Match_IMP_VariMod match_IMP_VariMod;
-		for (int i= 0; i < acidString.length(); i++) {
-			match_IMP_VariMod = new Match_IMP_VariMod(spectrum, peptide);
-			imp = match_IMP_VariMod.calculateIMP(match_IMP_VariMod.difference, i);
-			U.p(i + " " + acidString.charAt(i) + ": " + imp);
-			if (imp < bestIMP) {
-				bestIMP = imp;
-			}
-		}
-		
-		U.p();
-		U.stopStopwatch();
-	}
-	
 	
 	public static void runPeppyPTM(String [] args) {
 		U.p("Peppy+ PTM");
@@ -109,7 +59,7 @@ public class Peppy_VariMod extends Peppy{
 		
 		//get the matches
 		U.p("finding matches");
-		unModifiedMatches = getMatches(proteinPeptides, spectra, null);
+		unModifiedMatches = getMatchesWithPeptides(proteinPeptides, spectra);
 		
 		//double check e values
 		assignConfidenceValuesToMatches(unModifiedMatches);

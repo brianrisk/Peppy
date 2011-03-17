@@ -483,8 +483,18 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return false;
 	}
 	
-	public ArrayList<Modification> getModifications() {
-		return new ArrayList<Modification>(peptide.getLength());
+	public Modification [] getModifications() {
+		return new Modification [peptide.getLength()];
+	}
+	
+	public int getNumberOfModifications() {
+		int tally = 0;
+		for (Modification mod: getModifications()) {
+			if (mod == null) continue;
+			if (mod.getMonoMass() == 0) continue;
+			tally++;
+		}
+		return tally;
 	}
 
 }

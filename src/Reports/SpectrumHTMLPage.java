@@ -101,7 +101,9 @@ public class SpectrumHTMLPage extends HTMLPage {
 		printTD(peptideLine.toString());
 		
 		//sequence name
-		printTD(match.getPeptide().getParentSequence().getSequenceFile().getName());
+		if (match.getPeptide().getParentSequence() != null) {
+			printTD(match.getPeptide().getParentSequence().getSequenceFile().getName());
+		}
 		
 		//start / stop
 		printTD( match.getPeptide().getStartIndex() + ", " + match.getPeptide().getStopIndex());
