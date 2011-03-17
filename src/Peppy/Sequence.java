@@ -90,8 +90,8 @@ public class Sequence {
 		
 		//create the threads and start them engines!
 		ArrayList<Thread> threads = new ArrayList<Thread>();
-		for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
-			Thread thread = new Thread(digestors.get(digestorIndex));
+		for (DNA_DigestionThread digestor: digestors) {
+			Thread thread = new Thread(digestor);
 			thread.start();
 			threads.add(thread);
 		}

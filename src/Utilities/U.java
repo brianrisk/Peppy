@@ -153,25 +153,6 @@ public class U {
 	    }
 	  }
 	
-	
-	public static void appendFile(PrintWriter pw, File file) {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line = br.readLine();
-			while (line != null) {
-				pw.println(line);
-				line = br.readLine();
-			}
-			br.close();
-		} catch (FileNotFoundException e) {
-			U.p("could not append file: " + file.getName());
-			e.printStackTrace();
-		} catch (IOException e) {
-			U.p("could not read file: " + file.getName());
-			e.printStackTrace();
-		}
-	}
-	
 	public static double log(double base, double of) {
 		return Math.log(of) / Math.log(base);
 	}

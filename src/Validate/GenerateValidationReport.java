@@ -21,6 +21,7 @@ import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
+import Reports.ReportStrings;
 import Utilities.U;
 
 public class GenerateValidationReport {
@@ -515,7 +516,8 @@ public class GenerateValidationReport {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(testFile)));
 			
 			//print the header of the file
-			U.appendFile(pw, Properties.reportWebHeaderFile);
+			pw.println(ReportStrings.getHeader());
+			
 			pw.println("number of matches: " + testedMatches.size());
 			pw.println("<table border=1 cellspacing=0>");
 //			pw.println("<th>isTrue</th>");

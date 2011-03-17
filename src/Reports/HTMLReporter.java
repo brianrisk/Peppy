@@ -100,10 +100,16 @@ public class HTMLReporter {
 			
 			//set up our main index file
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-			U.appendFile(pw, Properties.reportWebHeaderFile);
+			//HTML header
+			pw.println(ReportStrings.getHeader());
+			
+			//Title
 			pw.println("<h1>Best match for each spectrum</h1>");
 			pw.println("<p>Number of spectra with quality matches: " + bestMatches.size() + "</p>");
-			U.appendFile(pw, Properties.reportWebTableHeader);
+			
+			//table header
+			pw.println(ReportStrings.getTableHeader());
+			
 			NumberFormat nfDecimal = NumberFormat.getInstance();
 			nfDecimal.setMaximumFractionDigits(4);
 			NumberFormat nfPercent = NumberFormat.getPercentInstance();
@@ -212,7 +218,7 @@ public class HTMLReporter {
 				}
 			}
 			
-			U.appendFile(pw, Properties.reportWebFooterFile);
+			pw.println(ReportStrings.getFooter());
 			pw.flush();
 			pw.close();
 			
@@ -247,17 +253,17 @@ public class HTMLReporter {
 		try {
 			neighborhoodDirectory.mkdirs();
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-			U.appendFile(pw, Properties.reportWebHeaderSubFile);
+			pw.println(ReportStrings.getHeader());
 			
 			//print the best match for each spectrum
 			pw.println("<h1>Matches in the neighborhood of " + match.getPeptide().getStartIndex() + "</h1>");
-			U.appendFile(pw, Properties.reportWebTableHeader);
+			pw.println(ReportStrings.getTableHeader());
 			Collections.sort(theseMatches);
 			for (int i = 0; i < theseMatches.size(); i++) {
 				pw.println(getTableRow(theseMatches.get(i), i));
 			}
 			
-			U.appendFile(pw, Properties.reportWebFooterFile);
+			pw.println(ReportStrings.getFooter());
 			pw.flush();
 			pw.close();
 			
