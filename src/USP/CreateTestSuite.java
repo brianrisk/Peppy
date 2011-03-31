@@ -1,7 +1,9 @@
 package USP;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,7 +38,8 @@ public class CreateTestSuite {
 		//Opening message
 		U.p("Creating the necessary files for our USP test suite");
 //		createSuiteFromUSPDatabase();
-		createSuiteFromTopX(10);
+//		createSuiteFromTopX(10);
+		createSuiteWithClosePrecursors();
 		
 		U.p("Done!");
 	}
@@ -49,7 +52,6 @@ public class CreateTestSuite {
 	public static void createSuiteFromTopX(int x) {
 		//set our properties
 		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
-		Properties.maximumNumberOfMatchesForASpectrum = x;
 		
 		//Load our spectra
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -129,6 +131,70 @@ public class CreateTestSuite {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void createSuiteWithClosePrecursors() {
+		//set our properties
+		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		
+		//load the peptides from the database
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		File uniqePeptidesFile = new File("/Users/risk2/PeppyOverflow/USP/peptide-unique-mass-list.txt");
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(uniqePeptidesFile));
+			String peptideLine;
+			peptideLine = br.readLine();
+			while (peptideLine != null) {
+				peptideLine = peptideLine.trim();
+				if (!peptideLine.equals("")) {
+					peptides.add(new Peptide(peptideLine));
+				}
+				peptideLine = br.readLine();
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		U.p("laded " + peptides.size() + " peptides");
+		
+		//Load our spectra
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+
+		
+		//make test directory
+		File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP-0.06 precursor tolerance/spectra/");
+		File peptideFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP-0.06 precursor tolerance/peptides/");
+		spectraFolder.mkdirs();
+		peptideFolder.mkdirs();
+	
+		
+		//go through each spectrum, find those which have close precursor to peptide
+		for (Spectrum spectrum: spectra) {
+			
+			for (Peptide peptide: peptides) {
+				
+				if (Math.abs(spectrum.getMass() - peptide.getMass()) < 0.06) {
+					//save the peptide file
+					File peptideFile = new File(peptideFolder, spectrum.getFile().getName());
+					PrintWriter pw;
+					try {
+						pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
+						pw.println(peptide.getAcidSequenceString());
+						pw.flush();
+						pw.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+					//copy the spectrum file
+					File spectraFile = new File(spectraFolder, spectrum.getFile().getName());
+					U.copyfile(spectrum.getFile(), spectraFile);
+					break;
+				}
+			}
+		}
+		
 	}
 
 }

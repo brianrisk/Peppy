@@ -53,29 +53,40 @@ public class Sequence {
 		DNA_Sequence nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 		
 		//if this is the first time we've tried to extract peptides
-		if (stopIndex == 0) {
-			stopIndex = startIndex + Properties.digestionWindowSize;
-		} else {
-		
-			//if we've reached the end of the nucleotide sequence
-			if (stopIndex == nucleotideSequence.getSequence().length()) {
-				startIndex = 0;
-				stopIndex = Properties.digestionWindowSize;
-				nucleotideSequenceIndex++;
-				if (nucleotideSequenceIndex >= nucleotideSequences.size()) {
-					//returning null as signal that we have reached the end
-					return null;
-				} else {
-					nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
-				}
+		if (!Properties.useSequenceRegion) {
+			if (stopIndex == 0) {
+				stopIndex = startIndex + Properties.digestionWindowSize;
 			} else {
-				startIndex += Properties.digestionWindowSize;
-				stopIndex += Properties.digestionWindowSize;
+			
+				//if we've reached the end of the nucleotide sequence
+				if (stopIndex == nucleotideSequence.getSequence().length()) {
+					startIndex = 0;
+					stopIndex = Properties.digestionWindowSize;
+					nucleotideSequenceIndex++;
+					if (nucleotideSequenceIndex >= nucleotideSequences.size()) {
+						//returning null as signal that we have reached the end
+						return null;
+					} else {
+						nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+					}
+				} else {
+					startIndex += Properties.digestionWindowSize;
+					stopIndex += Properties.digestionWindowSize;
+				}
 			}
-		}
-		//overshoot correction
-		if (stopIndex > nucleotideSequence.getSequence().length()) {
-			stopIndex = nucleotideSequence.getSequence().length();
+			//overshoot correction
+			if (stopIndex > nucleotideSequence.getSequence().length()) {
+				stopIndex = nucleotideSequence.getSequence().length();
+			}
+		} else {
+			//if we've already extracted the region
+			if (stopIndex == Properties.sequenceRegionStop) {
+				//signal that we've finished
+				return null;
+			} else {
+				startIndex = Properties.sequenceRegionStart;
+				stopIndex = Properties.sequenceRegionStop;
+			}
 		}
 		
 		
@@ -85,11 +96,13 @@ public class Sequence {
 		ArrayList<DNA_DigestionThread> digestors = new ArrayList<DNA_DigestionThread>();
 		for (byte frame = 0; frame < 3; frame++) {
 			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, reverse));
-			digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, reverse));
+			if (!Properties.useOnlyForwardsFrames) {
+				digestors.add(new DNA_DigestionThread(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, reverse));
+			}
 		}
 		
 		//create the threads and start them engines!
-		ArrayList<Thread> threads = new ArrayList<Thread>();
+		ArrayList<Thread> threads = new ArrayList<Thread>(); 
 		for (DNA_DigestionThread digestor: digestors) {
 			Thread thread = new Thread(digestor);
 			thread.start();

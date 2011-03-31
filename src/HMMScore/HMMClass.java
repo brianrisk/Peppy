@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import Peppy.AminoAcids;
 import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Properties;
@@ -782,7 +783,7 @@ public class HMMClass {
 		double peptideMass = calculatePeptideMass(sequence);
 		for (i = 0; i < seqLen; i++) {
 			Aacid = sequence.charAt(i);
-			acidMass = Definitions.getAminoAcidWeightMono(Aacid);
+			acidMass = AminoAcids.getWeightMono(Aacid);
 			if (i < seqLen - 1) {
 				AnextAcid = sequence.charAt(i + 1);
 				if (i == 0)
@@ -891,13 +892,13 @@ public class HMMClass {
 		for (i = 1; i < seqLen - 2; i++) {
 			prevCTerAcid = sequence.charAt(i - 1);
 			prevAcid = sequence.charAt(i);
-			prevAcidMass = Definitions.getAminoAcidWeightMono(prevAcid);
+			prevAcidMass = AminoAcids.getWeightMono(prevAcid);
 			currentFrag = prevAcidMass + hydrogenMass;
 			for (j = i + 1; j < seqLen - 1; j++) {
 				currentIndex += i;
 				currentAcid = sequence.charAt(j);
 				nextNTerAcid = sequence.charAt(j + 1);
-				currentAcidMass = Definitions.getAminoAcidWeightMono(currentAcid); // [
+				currentAcidMass = AminoAcids.getWeightMono(currentAcid); // [
 				// [residueMasses
 				// objectForKey:currentAcid]
 				// floatValue];
@@ -1136,7 +1137,7 @@ public class HMMClass {
 		char acid;
 		for (i = 0; i < seqLen; i++) {
 			acid = sequence.charAt(i); // [sequence objectAtIndex:i];
-			acidMass = Definitions.getAminoAcidWeightMono(acid);
+			acidMass = AminoAcids.getWeightMono(acid);
 			; // [residueMasses objectForKey:acid] ;
 			peptideMass += acidMass;
 		}

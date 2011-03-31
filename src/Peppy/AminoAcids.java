@@ -1,5 +1,7 @@
 package Peppy;
 
+import Utilities.U;
+
 
 
 public class AminoAcids {
@@ -30,10 +32,14 @@ public class AminoAcids {
 	public static final byte Y = tracker++;
 	
 	
-	public static final double [] weightsMono = new double[acids.length];
-	public static final double [] weightsAverage = new double[acids.length];
+	private static double [] weightsMono = new double[acids.length];
+	private static double [] weightsAverage = new double[acids.length];
 	
 	static {
+		init();
+	}
+	
+	public static void init(){
 		weightsMono[STOP] = 0.0;
 		weightsMono[A] = 71.03711;
 		weightsMono[C] = 103.00919;
@@ -77,16 +83,32 @@ public class AminoAcids {
 		weightsAverage[V] = 99.1326;
 		weightsAverage[W] = 186.2133;
 		weightsAverage[Y] = 163.176;
+		
+		if(Properties.useIsotopeLabeling) {
+			U.p("amino acid weights adjusted for labeling");
+			weightsMono[K] = 136.109159;
+			weightsAverage[K] = 136.1169;
+			weightsMono[R] = 166.109379;
+			weightsAverage[R] = 166.1172;	
+		}
 	}
 	
 	
 	public static double getWeightMono(byte acid) {
 		return weightsMono[acid];
 	}
+	
+	public static double getWeightMono(char acid) {
+		return getWeightMono(getAminoAcidByte(acid));
+	}
 
 	
 	public static double getWeightAverage(byte acid) {
 		return weightsAverage[acid];
+	}
+	
+	public static double getWeightAverage(char acid) {
+		return getWeightAverage(getAminoAcidByte(acid));
 	}
 	
 	
@@ -119,7 +141,7 @@ public class AminoAcids {
 		if (acid == 'W') return W;
 		if (acid == 'Y') return Y;
 //		U.p("an invalid acid was found: " + acid);
-		return -1;
+		throw new Error("Invalid amino acid character: " + acid);
 	}
 	
 	public static boolean isValid(byte acid) {

@@ -48,64 +48,85 @@ public class TextReporter {
 	public void generatePropertiesFile() {	
 		reportDir.mkdirs();
 		//set up our main index file
-		File paramFile = new File(reportDir, Properties.spectraDirectoryOrFile.getName()+".Parameter");
-		try {	
+		File ppropertiesFile = new File(reportDir, "properties.txt");
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
 			
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(paramFile)));
+			pw.println("##FASTA files can be either DNA or amino acid sequences ");
+			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
+			pw.println("sequenceFilesContainMultipleSequences " + Properties.sequenceFilesContainMultipleSequences);
+			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
+			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
+			pw.println();
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
+			pw.println();
+			pw.println();
+			pw.println("//Scoring Method ");
+			pw.println("scoringMethodName " + Properties.scoringMethodName);
+			pw.println();
+			pw.println();
+			pw.println("//digest only part of a sequence ");
+			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
+			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
+			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
+			pw.println();
+			pw.println("//digest only inside ORFs? ");
+			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
+			pw.println();
+			pw.println("//limit returned matches by confidence ");
+			pw.println("useEValueCutOff " + Properties.useEValueCutOff);
+			pw.println("eValueCutOff " + Properties.eValueCutOff);
+			pw.println();
+			pw.println("//a preference for digestion of large DNA windows ");
+			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
+			pw.println();
+			pw.println("//how much precursor mass / theoretical mass difference should we tolerate? ");
+			pw.println("spectrumToPeptideMassError " + Properties.spectrumToPeptideMassError);
+			pw.println("//spectrumToPeptideMassError ");
+			pw.println();
+			pw.println("//TandemFit property ");
+			pw.println("peakDifferenceThreshold " + Properties.peakDifferenceThreshold);
+			pw.println();
+			pw.println("//Report variables ");
+			pw.println("createHTMLReport " + Properties.createHTMLReport);
+			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
+			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
+			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
+			pw.println();
+			pw.println("//no fragments that weigh less than this will be admitted into the fragment list ");
+			pw.println("//units are daltons. ");
+			pw.println("peptideMassThreshold " + Properties.peptideMassThreshold);
+			pw.println();
+			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
+			pw.println();
+			pw.println("//splicing ");
+			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
+			pw.println();
+			pw.println("//This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
+			pw.println("//it will produce (at least) 35 matches per spectrum ");
+			pw.println("//the final number of results also varies depending on the digestionWindowSize ");
+			pw.println("maximumNumberOfMatchesForASpectrum " + Properties.maximumNumberOfMatchesForASpectrum);
+			pw.println();
+			pw.println("//where we store our reports ");
+			pw.println("reportDirectory " + Properties.reportDirectory);
+			pw.println("reportDirectoryTitle " + Properties.reportDirectoryTitle);
+			pw.println();
+			pw.println();
 
-			StringBuffer sb;
-			//print header
-			sb = new StringBuffer();
-			sb.append("Spectrum FileName or Directory");
-			sb.append('\t');
-			sb.append(Properties.spectraDirectoryOrFile.getName());
-			pw.println(sb);
-			sb = new StringBuffer();
-			sb.append("Sequence FileName or Directory");
-			sb.append('\t');
-			sb.append(Properties.sequenceDirectoryOrFile.getName());
-			pw.println(sb);
-			sb = new StringBuffer();
-			sb.append("Scoring Uyetm Used");
-			sb.append('\t');
-			sb.append(Properties.scoringMethodName);
-			pw.println(sb);
-			sb = new StringBuffer();
-			sb.append("Number of Missed Cleavages");
-			sb.append('\t');
-			sb.append(Properties.numberOfMissedCleavages);
-			pw.println(sb);
-			sb = new StringBuffer();
-			sb.append("Precursor Mass Threshold");
-			sb.append('\t');
-			sb.append(Properties.spectrumToPeptideMassError);
-			pw.println(sb);
-			sb = new StringBuffer();
-			sb.append("MS/MS Mass Threshold");
-			sb.append('\t');
-			sb.append(Properties.peakDifferenceThreshold);
-			pw.println(sb);
-			sb = new StringBuffer();
-			if (Properties.useEValueCutOff) {
-				sb = new StringBuffer();
-				sb.append("EValue Cutoff Used");
-				sb.append('\t');
-				sb.append(Properties.eValueCutOff);
-				pw.println(sb);
-			}
 			pw.flush();
 			pw.close();
-
-			
-	} catch (FileNotFoundException e) {
-			U.p("could not find file: " + paramFile.getName());
-			e.printStackTrace();
 		} catch (IOException e) {
-			U.p("could not read file: " + paramFile.getName());
 			e.printStackTrace();
-		}
-			
+		}	
 	}
+	
+	
 	
 	public void generateFullReport() {	
 		reportDir.mkdirs();
@@ -116,7 +137,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 6");
+			pw.println("format version 7");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -174,6 +195,8 @@ public class TextReporter {
 			sb.append("Rank Count");
 			sb.append('\t');
 			sb.append("Ion Count");	
+			sb.append('\t');
+			sb.append("Labeled");	
 			pw.println(sb);		
 			
 			//print rows
@@ -221,6 +244,8 @@ public class TextReporter {
 					sb.append(match.repeatCount);
 					sb.append('\t');
 					sb.append(match.getIonMatchTally());
+					sb.append('\t');
+					sb.append(match.isIsotopeLabeled());
 					pw.println(sb);
 				}
 			}

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Peppy.AminoAcids;
 import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.Peak;
@@ -94,7 +95,7 @@ public class TestSetCharacteristics {
 			/* y-ion  */
 			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
-				theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+				theoreticalPeakMass -= AminoAcids.getWeightMono(peptideString.charAt(i));
 				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 				maxIntensity = -1;
@@ -117,7 +118,7 @@ public class TestSetCharacteristics {
 			/* b-ion  */
 			theoreticalPeakMass = Properties.leftIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
-				theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+				theoreticalPeakMass += AminoAcids.getWeightMono(peptideString.charAt(i));
 				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 				maxIntensity = -1;

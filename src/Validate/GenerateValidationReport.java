@@ -21,6 +21,7 @@ import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ProteinDigestion;
+import Peppy.Sequence;
 import Reports.ReportStrings;
 import Utilities.U;
 
@@ -74,19 +75,22 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.scoringMethodName = "Peppy.Match_IMP";
+//		Properties.scoringMethodName = "Peppy.Match_IMP";
+		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-
-		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
-//		databaseFile = new File("uniprot_sprot.fasta");
-		Properties.spectrumToPeptideMassError = 2.0;
-		Properties.peakDifferenceThreshold = 0.3;
-
+		
 		//uncomment to use HMM score
-//		Properties.defaultScore = Properties.DEFAULT_SCORE_HMM;
+//		Properties.scoringMethodName = "Peppy.Match_HMM";
+//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 //		HMMScore.HMMClass.HmmSetUp();
 //		Properties.highIntensityCleaning = true;
 //		Properties.peakDifferenceThreshold = 0.5;
+
+		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+		Properties.spectrumToPeptideMassError = 2.0;
+		Properties.peakDifferenceThreshold = 0.3;
+
+		
 		
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
 //		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_09/uniprot_sprot_human.fasta");
@@ -102,10 +106,11 @@ public class GenerateValidationReport {
 		//load the peptides
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
 		
+//		Properties.isSequenceFileDNA = true;
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
-		U.p("forwards database size: " + peptides.size());
-		forwardsDatabaseSize = peptides.size();
+//		U.p("forwards database size: " + peptides.size());
+//		forwardsDatabaseSize = peptides.size();
 		
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
@@ -114,7 +119,8 @@ public class GenerateValidationReport {
 		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
 		tests.add(new TestSet(testDirectoryName, "human", peptides));
 		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+//		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance", peptides));
 
 		for (TestSet test: tests) {
 			U.p("Getting matches for: " + test.getName());

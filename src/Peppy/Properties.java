@@ -20,7 +20,7 @@ public class Properties {
 	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 	
 	//Define our scoring method
-	public static String scoringMethodName;
+	public static String scoringMethodName = "Peppy.Match_IMP";
 	public static MatchConstructor matchConstructor;
 	
 	//TODO need to set up modification possibilities
@@ -33,25 +33,27 @@ public class Properties {
 	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
 	
+	//in some experiments we will have a heavy R and K
+	public static boolean useIsotopeLabeling = false;
+	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
 	public static int peptideMaximumLength = 80;
 	public static int digestionWindowSize = 25000000;
+	public static boolean useSequenceRegion = false;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;
-	public static boolean useSequenceRegion = false;
 	public static int sequenceRegionStart = 0;
 	public static int sequenceRegionStop = 0;
 	
-	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
-	//units are daltons.
+	//mass error tolerances
 	public static double spectrumToPeptideMassError = 2.0;
+	public static double peakDifferenceThreshold = 0.3;
 	
 	//TandemFit
-	public static double peakDifferenceThreshold = 0.5;
 //	public static double peakIntensityExponent = 0.33333333;
 	public static double peakIntensityExponent = 0.30;
 	public static double rightIonDifference = 1.0; //x, y, z ion
@@ -84,6 +86,9 @@ public class Properties {
 	
 	//do the sequence files contain many sequences?
 	public static boolean sequenceFilesContainMultipleSequences = false;
+	
+	//Is the sequence file supposed to be read only in the first frame?
+	public static boolean useOnlyForwardsFrames = false;
 	
 	//HMM Score parameter file folder
 	public static File HMMScoreParametersFile = new File("resources/HMMScore/ParamFiles");
@@ -163,16 +168,19 @@ public class Properties {
 			peptideMassThreshold = Double.valueOf(propertyValue);
 		if (propertyName.equals("digestionWindowSize")) 
 			digestionWindowSize =Integer.valueOf(propertyValue);
-		
-		//splicing
-		if (propertyName.equals("useSpliceVariants"))
-			useSpliceVariants = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("useSequenceRegion"))
 			useSequenceRegion = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStart")) 
 			sequenceRegionStart =Integer.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStop")) 
 			sequenceRegionStop =Integer.valueOf(propertyValue);
+		if (propertyName.equals("useIsotopeLabeling"))
+			useIsotopeLabeling = Boolean.valueOf(propertyValue);
+		
+		//splicing
+		if (propertyName.equals("useSpliceVariants"))
+			useSpliceVariants = Boolean.valueOf(propertyValue);
+		
 		
 		
 		//spectrum cleaning
@@ -192,6 +200,10 @@ public class Properties {
 		if (propertyName.equals("sequenceFilesContainMultipleSequences")) {
 			sequenceFilesContainMultipleSequences = Boolean.valueOf(propertyValue);
 		}
+		if (propertyName.equals("useOnlyForwardsFrames")) {
+			useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
+		}
+		
 		
 		
 		

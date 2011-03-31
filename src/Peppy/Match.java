@@ -1,7 +1,5 @@
 package Peppy;
 
-import java.util.ArrayList;
-
 import Math.HasEValue;
 import Math.MathFunctions;
 import Utilities.U;
@@ -21,6 +19,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	
 	protected double score = 0.0;
 	protected int ionMatchTally = 0;
+	
+	private boolean isIsotopeLabeled = Properties.useIsotopeLabeling;
 	
 	public double scoreRatio = -1;
 	public int repeatCount = 0; 
@@ -457,6 +457,9 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return ionMatchTally;
 	}
 
+	public boolean isIsotopeLabeled() {
+		return isIsotopeLabeled;
+	}
 	public static void setSortParameter(int sortParameter) {
 		Match.sortParameter = sortParameter;
 	}

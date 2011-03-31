@@ -64,6 +64,12 @@ public class Peppy {
 			matches = getMatchesWithPeptides(peptides, spectra);
 			
 		} else {	
+			if (Properties.useSequenceRegion) {
+				U.p("digesting on part of sequence");
+				ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
+				oneSequenceList.add(sequences.get(0));
+				sequences = oneSequenceList;
+			}
 			matches = getMatches(sequences, spectra);
 			U.p("peptide tally: " + peptideTally);
 		}
@@ -107,7 +113,7 @@ public class Peppy {
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
 				init(args);
-				Properties.loadProperties(jobFiles.get(i));
+				init(jobFiles.get(i).getAbsolutePath());
 				runPeppy(null);
 			}
 		}
@@ -115,22 +121,19 @@ public class Peppy {
 
 
 	public static void init(String propertiesFile) {
+		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties(propertiesFile);
+		AminoAcids.init();
 	}
 	
 	
 	public static void init(String [] args) {
 		if (args.length == 0) {
-			init();
+			init("properties.txt");
 		} else {
 			init(args[0]);
 			U.p("Initializing with properties file: " + args[0]);
 		}
-	}
-	
-	public static void init() {
-		System.setProperty("java.awt.headless", "true"); 
-		init("properties.txt");
 	}
 	
 	

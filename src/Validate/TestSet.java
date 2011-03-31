@@ -315,7 +315,7 @@ public class TestSet {
 			if (correctAcidSequence == null) {
 				validPeptideFile = false;
 			}
-			correctAcidSequence = correctAcidSequence.trim();
+			correctAcidSequence = correctAcidSequence.trim().toUpperCase();
 			if (correctAcidSequence.equals("")) {
 				validPeptideFile = false;
 			}
