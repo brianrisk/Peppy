@@ -409,18 +409,14 @@ public class Peppy {
 	 * @param matches
 	 */
 	public static void evaluateMatches(ArrayList<Match> newMatches, ArrayList<Match> matches) {	
-		if (Properties.useEValueCutOff) {
-			for (Match match: newMatches) {
-				//The match E value should be less than our cutoff
-				if (match.getEValue() <= Properties.eValueCutOff) {
-					//the match IMP value should always be less than its E value
-					if (match.calculateIMP() < match.getEValue()) {
-						matches.add(match);
-					}
+		for (Match match: newMatches) {
+			//The match E value should be less than our cutoff
+			if (match.getEValue() <= Properties.eValueCutOff) {
+				//the match IMP value should always be less than its E value
+				if (match.calculateIMP() < match.getEValue()) {
+					matches.add(match);
 				}
 			}
-		} else {
-			matches.addAll(newMatches);
 		}
 	}
 

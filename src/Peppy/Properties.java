@@ -72,8 +72,7 @@ public class Properties {
 	public static int maximumNumberOfMatchesForASpectrum = 5;
 	
 	//e value cut off
-	public static double eValueCutOff = 0.03359587957603186;
-	public static boolean useEValueCutOff = true;
+	public static double eValueCutOff = 0.1;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -221,9 +220,7 @@ public class Properties {
 		//e value
 		if (propertyName.equals("eValueCutOff")) 
 			eValueCutOff = Double.valueOf(propertyValue);
-		if (propertyName.equals("useEValueCutOff")) 
-			useEValueCutOff = Boolean.valueOf(propertyValue);
-		
+
 		//matches
 		if (propertyName.equals("spectrumToPeptideMassError")) 
 			spectrumToPeptideMassError = Double.valueOf(propertyValue);

@@ -75,11 +75,7 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-					if (Peppy.Properties.useEValueCutOff) {
-						if (match.getEValue() < Peppy.Properties.eValueCutOff) {
-							bestMatches.add(match);
-						}
-					} else {
+					if (match.getEValue() < Peppy.Properties.eValueCutOff) {
 						bestMatches.add(match);
 					}
 				} else {

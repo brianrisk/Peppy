@@ -80,7 +80,6 @@ public class TextReporter {
 			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
 			pw.println();
 			pw.println("//limit returned matches by confidence ");
-			pw.println("useEValueCutOff " + Properties.useEValueCutOff);
 			pw.println("eValueCutOff " + Properties.eValueCutOff);
 			pw.println();
 			pw.println("//a preference for digestion of large DNA windows ");
@@ -201,7 +200,7 @@ public class TextReporter {
 			
 			//print rows
 			for (Match match: matches) {;
-				if (!Properties.useEValueCutOff || match.getEValue() <= Properties.eValueCutOff) {
+				if (match.getEValue() <= Properties.eValueCutOff) {
 					sb = new StringBuffer();
 					sb.append(match.getSpectrum().getId());
 					sb.append('\t');
