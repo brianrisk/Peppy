@@ -31,6 +31,7 @@ public class TestSet {
 	private ArrayList<Match> correctMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
 	private int setSize = -1;
+	private double averageNumberOfPeaksPerSpectrum;
 	
 	//statistics
 	private int topRankTrueTally = 0;
@@ -57,8 +58,18 @@ public class TestSet {
 		correctMatches = loadCorrectMatches();
 		
 		setSize = spectra.size();	
+		
+		averageNumberOfPeaksPerSpectrum = 0;
+		for (Spectrum spectrum: spectra) {
+			averageNumberOfPeaksPerSpectrum += spectrum.getPeakCount();
+		}
+		averageNumberOfPeaksPerSpectrum /= spectra.size();
 	}
 	
+	public double getAverageNumberOfPeaksPerSpectrum() {
+		return averageNumberOfPeaksPerSpectrum;
+	}
+
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();

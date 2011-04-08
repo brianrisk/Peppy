@@ -45,92 +45,10 @@ public class TextReporter {
 		this.reportDir = reportDir;
 	}
 
-	public void generatePropertiesFile() {	
-		reportDir.mkdirs();
-		//set up our main index file
-		File ppropertiesFile = new File(reportDir, "properties.txt");
-		PrintWriter pw;
-		try {
-			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
-			
-			pw.println("##FASTA files can be either DNA or amino acid sequences ");
-			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
-			pw.println("sequenceFilesContainMultipleSequences " + Properties.sequenceFilesContainMultipleSequences);
-			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
-			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
-			pw.println();
-			pw.println("##This could be a directory or a file ");
-			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
-			pw.println();
-			pw.println();
-			pw.println("##This could be a directory or a file ");
-			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
-			pw.println();
-			pw.println();
-			pw.println("//Scoring Method ");
-			pw.println("scoringMethodName " + Properties.scoringMethodName);
-			pw.println();
-			pw.println();
-			pw.println("//digest only part of a sequence ");
-			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
-			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
-			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
-			pw.println();
-			pw.println("//digest only inside ORFs? ");
-			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
-			pw.println();
-			pw.println("//limit returned matches by confidence ");
-			pw.println("eValueCutOff " + Properties.eValueCutOff);
-			pw.println();
-			pw.println("//a preference for digestion of large DNA windows ");
-			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
-			pw.println();
-			pw.println("//how much precursor mass / theoretical mass difference should we tolerate? ");
-			pw.println("spectrumToPeptideMassError " + Properties.spectrumToPeptideMassError);
-			pw.println("//spectrumToPeptideMassError ");
-			pw.println();
-			pw.println("//TandemFit property ");
-			pw.println("peakDifferenceThreshold " + Properties.peakDifferenceThreshold);
-			pw.println();
-			pw.println("//Report variables ");
-			pw.println("createHTMLReport " + Properties.createHTMLReport);
-			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
-			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
-			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
-			pw.println();
-			pw.println("//no fragments that weigh less than this will be admitted into the fragment list ");
-			pw.println("//units are daltons. ");
-			pw.println("peptideMassThreshold " + Properties.peptideMassThreshold);
-			pw.println();
-			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
-			pw.println();
-			pw.println("//splicing ");
-			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
-			pw.println();
-			pw.println("//This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
-			pw.println("//it will produce (at least) 35 matches per spectrum ");
-			pw.println("//the final number of results also varies depending on the digestionWindowSize ");
-			pw.println("maximumNumberOfMatchesForASpectrum " + Properties.maximumNumberOfMatchesForASpectrum);
-			pw.println();
-			pw.println("//where we store our reports ");
-			pw.println("reportDirectory " + Properties.reportDirectory);
-			pw.println("reportDirectoryTitle " + Properties.reportDirectoryTitle);
-			pw.println();
-			pw.println();
-
-			pw.flush();
-			pw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
-	}
-	
-	
-	
 	public void generateFullReport() {	
 		reportDir.mkdirs();
 		//set up our main index file
-		File reportFile = new File(reportDir, Properties.spectraDirectoryOrFile.getName() + ".txt");
+		File reportFile = new File(reportDir, reportDir.getName() + "_report.txt");
 		try {	
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));

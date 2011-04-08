@@ -1,9 +1,12 @@
 package Peppy;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import Utilities.U;
 
@@ -54,8 +57,8 @@ public class Properties {
 	public static double peakDifferenceThreshold = 0.3;
 	
 	//TandemFit
-//	public static double peakIntensityExponent = 0.33333333;
-	public static double peakIntensityExponent = 0.30;
+	public static double peakIntensityExponent = 0.33333333;
+//	public static double peakIntensityExponent = 0.30;
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
 //	public static double YBtrue = 1.1;
@@ -94,7 +97,6 @@ public class Properties {
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
-	public static String reportDirectoryTitle = "report";
 	
 	//where we put our validation report
 	public static File validationDirectory = new File("validation");
@@ -228,8 +230,6 @@ public class Properties {
 			peakDifferenceThreshold = Double.valueOf(propertyValue);
 		
 		//reports
-		if (propertyName.equals("reportDirectoryTitle")) 
-			reportDirectoryTitle =propertyValue;
 		if (propertyName.equals("reportDirectory")) 
 			reportDirectory = new File(propertyValue);
 		if (propertyName.equals("createHTMLReport")) 
@@ -246,6 +246,86 @@ public class Properties {
 			multiModPrecursorMargin = Double.valueOf(propertyValue);
 		
 		
+	}
+
+
+	public static void generatePropertiesFile(File reportDir) {	
+		reportDir.mkdirs();
+		//set up our main index file
+		File ppropertiesFile = new File(reportDir, reportDir.getName() + "_properties.txt");
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
+			
+			pw.println("##FASTA files can be either DNA or amino acid sequences ");
+			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
+			pw.println("sequenceFilesContainMultipleSequences " + Properties.sequenceFilesContainMultipleSequences);
+			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
+			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
+			pw.println();
+			pw.println("//Scoring Method ");
+			pw.println("scoringMethodName " + Properties.scoringMethodName);
+			pw.println();
+			pw.println("//retain 100 most intense peaks");
+			pw.println("highIntensityCleaning " + Properties.highIntensityCleaning);
+			pw.println();
+			pw.println("//digest only part of a sequence ");
+			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
+			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
+			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
+			pw.println();
+			pw.println("//digest only inside ORFs? ");
+			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
+			pw.println();
+			pw.println("//limit returned matches by confidence ");
+			pw.println("eValueCutOff " + Properties.eValueCutOff);
+			pw.println();
+			pw.println("//a preference for digestion of large DNA windows ");
+			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
+			pw.println();
+			pw.println("//how much precursor mass / theoretical mass difference should we tolerate? ");
+			pw.println("spectrumToPeptideMassError " + Properties.spectrumToPeptideMassError);
+			pw.println("//spectrumToPeptideMassError ");
+			pw.println();
+			pw.println("//TandemFit property ");
+			pw.println("peakDifferenceThreshold " + Properties.peakDifferenceThreshold);
+			pw.println();
+			pw.println("//Report variables ");
+			pw.println("createHTMLReport " + Properties.createHTMLReport);
+			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
+			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
+			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
+			pw.println();
+			pw.println("//no fragments that weigh less than this will be admitted into the fragment list ");
+			pw.println("//units are daltons. ");
+			pw.println("peptideMassThreshold " + Properties.peptideMassThreshold);
+			pw.println();
+			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
+			pw.println();
+			pw.println("//splicing ");
+			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
+			pw.println();
+			pw.println("//This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
+			pw.println("//it will produce (at least) 35 matches per spectrum ");
+			pw.println("//the final number of results also varies depending on the digestionWindowSize ");
+			pw.println("maximumNumberOfMatchesForASpectrum " + Properties.maximumNumberOfMatchesForASpectrum);
+			pw.println();
+			pw.println("//where we store our reports ");
+			pw.println("reportDirectory " + Properties.reportDirectory);
+			pw.println();
+			pw.println();
+	
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 	
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
+import Peppy.Match_IMP_VariMod;
 import Peppy.Peak;
 import Peppy.Spectrum;
 
@@ -26,8 +27,6 @@ public class SpectrumHTMLPage extends HTMLPage {
 		//build spectrum script for header
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
-		spectrumScript.append("modificationIndex = -1;modificationMass = 0; ");
-		spectrumScript.append("var lock = false;");
 		spectrumScript.append("var acidSequence = '");
 		spectrumScript.append(theseMatches.get(0).getPeptide().getAcidSequenceString());
 		spectrumScript.append("';");
@@ -48,8 +47,28 @@ public class SpectrumHTMLPage extends HTMLPage {
 			if (i < peaks.size() - 1) spectrumScript.append(", ");
 		}
 		spectrumScript.append("];");
+		
+		if (theseMatches.get(0).hasModification()) {
+			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) theseMatches.get(0);
+			spectrumScript.append("var modifications = [");
+			for (int i = 0; i < theseMatches.get(0).getPeptide().getLength(); i++) {
+				if (i == match_IMP_VariMod.getModificationIndex()) {
+					spectrumScript.append(match_IMP_VariMod.getModificationMass());
+				} else {
+					spectrumScript.append("0");
+				}
+				if (i <  theseMatches.get(0).getPeptide().getLength() - 1) spectrumScript.append(", ");
+			}
+			spectrumScript.append("];");
+		} else {
+			spectrumScript.append("var modifications = [];");
+		}
+		
+
+		
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/pvs-control.js\"></script>");
 //		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
 		
 		//print header
@@ -66,7 +85,7 @@ public class SpectrumHTMLPage extends HTMLPage {
 //		printP("<img src=\"" + histogramFile.getName() + "\">");
 		
 		//spectrum
-		printP("<canvas data-processing-sources=\"http://proteomics.me/resources/ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 		//Our table
@@ -93,9 +112,9 @@ public class SpectrumHTMLPage extends HTMLPage {
 		
 		//peptide sequence
 		StringBuffer peptideLine = new StringBuffer();
-		peptideLine.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"javascript:if (!lock) {acidSequence='");
+		peptideLine.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:changePeptide('");
 		peptideLine.append(match.getPeptide().getAcidSequenceString());
-		peptideLine.append("';} return false;\">");
+		peptideLine.append("');} return false;\">");
 		peptideLine.append(match.getPeptide().getAcidSequenceString());
 		peptideLine.append("</a>");
 		printTD(peptideLine.toString());

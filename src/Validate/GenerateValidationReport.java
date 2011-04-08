@@ -119,7 +119,7 @@ public class GenerateValidationReport {
 		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
 		tests.add(new TestSet(testDirectoryName, "human", peptides));
 		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+		tests.add(new TestSet(testDirectoryName, "USP", peptides));
 //		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance", peptides));
 
 		for (TestSet test: tests) {
@@ -191,6 +191,13 @@ public class GenerateValidationReport {
 			pw.println("<td># spectra in the set</td>");
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + testSet.getSetSize() + "</td>");
+			}
+			
+			//average number of peaks per spectrum
+			pw.println("<tr>");
+			pw.println("<td>Average # of peaks / spectrum</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getAverageNumberOfPeaksPerSpectrum() + "</td>");
 			}
 			
 			//Time to complete

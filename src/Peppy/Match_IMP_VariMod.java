@@ -5,7 +5,7 @@ import Utilities.U;
 public class Match_IMP_VariMod extends Match {
 	
 	//Peptide/Spectrum difference in mass
-	double difference;
+	double modificationMass;
 	int modificationIndex = 0;
 	
 	//this is which amino acid we think has the modification
@@ -54,7 +54,7 @@ public class Match_IMP_VariMod extends Match {
 		double imp;
 		for (int i= 0; i < acidString.length(); i++) {
 			match = new Match_IMP_VariMod(spectrum, peptide);
-			imp = match.calculateIMP(match.difference, i);
+			imp = match.calculateIMP(match.modificationMass, i);
 			U.p(i + " " + acidString.charAt(i) + ": " + imp);
 		}
 	}
@@ -62,7 +62,7 @@ public class Match_IMP_VariMod extends Match {
 
 	
 	public void calculateScore() {
-		difference = spectrum.getMass() - peptide.getMass();
+		modificationMass = spectrum.getMass() - peptide.getMass();
 		score = -Math.log(calculateIMP());
 	}
 	
@@ -70,13 +70,13 @@ public class Match_IMP_VariMod extends Match {
 	
 	public double calculateIMP() {
 		if (impValue < 0) {
-			double impValue1 = calculateIMP(difference, 0);
-			double impValue2 = calculateIMP(difference, peptide.getAcidSequence().length - 1);
+			double impValue1 = calculateIMP(modificationMass, 0);
+			double impValue2 = calculateIMP(modificationMass, peptide.getAcidSequence().length - 1);
 			if (impValue1 < 1.0E-9 || impValue2 < 1.0E-9) {
 				double bestIMP = impValue1;
 				double tempIMP;
 				for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
-					tempIMP = calculateIMP(difference, i);
+					tempIMP = calculateIMP(modificationMass, i);
 					if (tempIMP < bestIMP) {
 						bestIMP = tempIMP;
 						modificationIndex = i;
@@ -195,7 +195,7 @@ public class Match_IMP_VariMod extends Match {
 		return calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
 	}
 	
-	public double getDifference() {return difference;}
+	public double getModificationMass() {return modificationMass;}
 	
 	public int getModificationIndex() {
 		return modificationIndex;

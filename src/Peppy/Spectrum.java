@@ -278,10 +278,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		//before we mess with the peak data, let's make sure we have the MD5
 		MD5 = getMD5();
 		
-		cleanWithWindow();
-		
-		if (Properties.highIntensityCleaning) 
+		if (Properties.highIntensityCleaning) {
 			cleanPeaksKeepingHighIntensity();
+		} else {
+			cleanWithWindow();
+		}
 		
 		//take exponent of peak intensities
 //		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {

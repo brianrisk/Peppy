@@ -30,24 +30,23 @@ public class MatchHTMLPage extends HTMLPage {
 		//build spectrum script for header
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
+		//TODO this only accounts for vari_mods when this could be a multi mod
 		if (match.hasModification()) {
 			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) match;
-			//modification index
-			spectrumScript.append("modificationIndex = ");
-			spectrumScript.append(match_IMP_VariMod.getModificationIndex());
-			spectrumScript.append(";");
-			
-			//modification index
-			spectrumScript.append("modificationMass = ");
-			spectrumScript.append(match_IMP_VariMod.getDifference());
-			spectrumScript.append(";");
+			spectrumScript.append("var modifications = [");
+			for (int i = 0; i < peptide.getLength(); i++) {
+				if (i == match_IMP_VariMod.getModificationIndex()) {
+					spectrumScript.append(match_IMP_VariMod.getModificationMass());
+				} else {
+					spectrumScript.append("0");
+				}
+				if (i <  peptide.getLength() - 1) spectrumScript.append(", ");
+			}
+			spectrumScript.append("];");
 		} else {
-			spectrumScript.append("modificationIndex = -1; modificationMass = 0;");
+			spectrumScript.append("var modifications = [];");
 		}
-		spectrumScript.append("var lock = false;");
-		spectrumScript.append("var acidSequence = '");
-		spectrumScript.append(acidString);
-		spectrumScript.append("';");
+		spectrumScript.append("var acidSequence = '" + acidString + "';");
 		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
 		spectrumScript.append("var spectrumMaxIntensity = " + spectrum.getMaxIntensity() + ";");
 		
@@ -80,15 +79,50 @@ public class MatchHTMLPage extends HTMLPage {
 		}
 		spectrumScript.append("];");
 		
+
+		spectrumScript.append("function changePeptide() {");
+		spectrumScript.append("	acidSequence = document.forms['acidSequence'].elements['sequence'].value.toUpperCase();");
+		spectrumScript.append("	Processing.getInstanceById('spectrum').markMatchingIons();	");
+		spectrumScript.append("}");
+		spectrumScript.append("");
+		spectrumScript.append("var peakDifferenceThreshold = 0.5;");
+		spectrumScript.append("function changePeakDifferenceThreshold() {");
+		spectrumScript.append("	peakDifferenceThreshold = parseFloat(document.forms['peakThreshold'].elements['value'].value);");
+		spectrumScript.append("	Processing.getInstanceById('spectrum').markMatchingIons();");
+		spectrumScript.append("}");
+		spectrumScript.append("");
+		spectrumScript.append("//alternates between scaled y and not scaled");
+		spectrumScript.append("var scaleYAxis = false;");
+		spectrumScript.append("function toggleYAxisDisplay() {");
+		spectrumScript.append("	if (!scaleYAxis) {");
+		spectrumScript.append("		document.forms['flipScale'].elements['submit'].value = 'un-scale y-axis';");
+		spectrumScript.append("	} else {");
+		spectrumScript.append("		document.forms['flipScale'].elements['submit'].value = 'scale y-axis';");
+		spectrumScript.append("	}");
+		spectrumScript.append("	scaleYAxis = !scaleYAxis;");
+		spectrumScript.append("}");
+		spectrumScript.append("	");
+		spectrumScript.append("");
+		spectrumScript.append("//changes if we see masses for each peak");
+		spectrumScript.append("var displayMasses = false;");
+		spectrumScript.append("function toggleMassDisplay() {");
+		spectrumScript.append("	if (!displayMasses) {");
+		spectrumScript.append("		document.forms['flipMasses'].elements['submit'].value = 'hide masses';");
+		spectrumScript.append("	} else {");
+		spectrumScript.append("		document.forms['flipMasses'].elements['submit'].value = 'show masses';");
+		spectrumScript.append("	}");
+		spectrumScript.append("	displayMasses = !displayMasses;");
+		spectrumScript.append("}");
+		
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.0.0.js\"></script>");
 //		spectrumScript.append("<script src=\"../../processing-1.0.0.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
 		
 		//spectrum
-		printP("<canvas data-processing-sources=\"http://proteomics.me/resources/ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"../../ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 //		printP("from protein: " + peptide.getProtein().getName());
@@ -106,12 +140,12 @@ public class MatchHTMLPage extends HTMLPage {
 			print("<td>");
 			
 			printH2("Modification properties");
-			printP("mass difference: " + match_IMP_VariMod.getDifference());
+			printP("mass difference: " + match_IMP_VariMod.getModificationMass());
 			
 			//print the probable modifications
 			ArrayList<Modification> potentialModifications = new ArrayList<Modification>(); 
 			for (Modification pm: Definitions.modifications) {
-				if (Math.abs(match_IMP_VariMod.getDifference() - pm.getMonoMass()) < 0.1) {
+				if (Math.abs(match_IMP_VariMod.getModificationMass() - pm.getMonoMass()) < 0.1) {
 					potentialModifications.add(pm);
 				}
 			}
@@ -139,7 +173,7 @@ public class MatchHTMLPage extends HTMLPage {
 			
 			for (int i= 0; i < acidString.length(); i++) {
 				Match_IMP_VariMod indexModificationMatch = new Match_IMP_VariMod(spectrum, peptide);
-				double indexIMP = indexModificationMatch.calculateIMP(match_IMP_VariMod.getDifference(), i);
+				double indexIMP = indexModificationMatch.calculateIMP(match_IMP_VariMod.getModificationMass(), i);
 				
 				//building the link
 				StringBuffer modificationLink = new StringBuffer();

@@ -1,42 +1,49 @@
 ##FASTA files can be either DNA or amino acid sequences
-isSequenceFileDNA false
+isSequenceFileDNA true
+sequenceFilesContainMultipleSequences false
+useOnlyForwardsFrames false
+useIsotopeLabeling false
 
 ##This could be a directory or a file
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr1.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
 
 
-
-//This could be a directory or a file
+##This could be a directory or a file
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra bad E values
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
 
-//where we store our reports
-reportDirectory reports
-reportDirectoryTitle report
-
 //Scoring Method
 scoringMethodName Peppy.Match_IMP
+//scoringMethodName Peppy.Match_TandemFit
 //scoringMethodName Peppy.Match_HMM
+//scoringMethodName Peppy.Match_IMP_MultiMod
+
+//digest only part of a sequence
+useSequenceRegion false
+sequenceRegionStart 35160417
+sequenceRegionStop 35253949
 
 //digest only inside ORFs?
 onlyUsePeptidesInOpenReadingFrames false
 
 //limit returned matches by confidence
-eValueCutOff 0.025191364253861304
-useEValueCutOff true	
+useEValueCutOff true
+eValueCutOff 0.03359587957603186
 
 //a preference for digestion of large DNA windows
 digestionWindowSize 25000000
@@ -49,14 +56,10 @@ spectrumToPeptideMassError 0.2
 peakDifferenceThreshold 0.3
 
 //Report variables
-createHTMLReport false
+createHTMLReport true
 generateNeighborhoodReport false
 generateSequenceReport false
 generateSpectrumReport true
-
-
-//how many processors does your computer have?  This number should be that number.
-numberOfThreads 16
 
 //no fragments that weigh less than this will be admitted into the fragment list
 //units are daltons.
@@ -66,12 +69,14 @@ numberOfMissedCleavages 2
 
 //splicing
 useSpliceVariants false
-sequenceRegionStart 35160417
-sequenceRegionStop 35253949
 
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
 //it will produce (at least) 35 matches per spectrum
 //the final number of results also varies depending on the digestionWindowSize
-maximumNumberOfMatchesForASpectrum 2
+maximumNumberOfMatchesForASpectrum 5
+
+//where we store our reports
+reportDirectory reports
+reportDirectoryTitle report
 
 

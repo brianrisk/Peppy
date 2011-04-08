@@ -32,12 +32,44 @@ public class Peppy {
 		init(args);
 		runJobs(args);
 //		exportPeptideList();
+//		checkSequences();
 		U.p("done");
+	}
+	
+	public static void checkSequences() {
+		U.p("making sure we have the correct start and stop locations");
+		Properties.isSequenceFileDNA = true;
+		Properties.numberOfMissedCleavages = 0;
+		ArrayList<Sequence> sequences = Sequence.loadSequences(new File("/Users/risk2/PeppyOverflow/sequences HG19/chr12.fa"));
+		Sequence sequence = sequences.get(0);
+		ArrayList<Peptide> peptides;
+
+		peptides = sequence.extractMorePeptides(false);
+		//continually extract peptides from the sequence until there aren't anymore
+		while (peptides != null) {
+			for (Peptide peptide: peptides) {
+				if (peptide.equals("STDYGIFQINSR") || peptide.equals("NMQDMVEDYR")) {
+					U.p (peptide.getAcidSequenceString() + ": " + peptide.getStartIndex() + "\t" + peptide.getStopIndex());
+				}
+			}
+			peptides.clear();
+			System.gc();
+			peptides = sequence.extractMorePeptides(false);
+		}
+		U.p("done");
+		
 	}
 	
 	public static void runPeppy(String [] args) {
 		U.startStopwatch();
 		peptideTally = 0;
+		
+		//create new report directory
+		File reportDir = new File(Properties.reportDirectory, Properties.spectraDirectoryOrFile.getName() + "_" + System.currentTimeMillis());
+		
+		//save our properties
+		Properties.generatePropertiesFile(reportDir);
+		
 		//Load our spectra
 		U.p("loading spectra...");
 		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
@@ -74,13 +106,12 @@ public class Peppy {
 			U.p("peptide tally: " + peptideTally);
 		}
 		
-		//create new report directory
-		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
+		
 		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
-		textReport.generatePropertiesFile();
+		
 		
 		
 		if (Properties.createHTMLReport) {
@@ -470,6 +501,11 @@ public class Peppy {
 		U.p("Proteogenomic mapping software.");
 		U.p("Developed 2010 by the Giddings Lab");
 		U.p();
+		
+
+//		U.p("Peppy Copyright (C) 2011 Brian Risk");
+//		U.p("This program comes with ABSOLUTELY NO WARRANTY;");
+
 	}
 	
 

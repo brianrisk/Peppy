@@ -101,7 +101,7 @@ public class Peppy_VariMod extends Peppy{
 		ArrayList<Match_IMP_VariMod> topMatchesPTM = new ArrayList<Match_IMP_VariMod>();
 		for (int i = 0; i < matchesPTM.size(); i++) {
 			topMatch = matchesPTM.get(i);
-			if (topMatch.getDifference() > 2) {
+			if (topMatch.getModificationMass() > 2) {
 				if (topMatch.getScore() >= 21) {
 					topMatchesPTM.add(topMatch);
 				}

@@ -63,6 +63,7 @@ public class Match_TandemFit extends Match{
 		//if 0 matches so far, just get out.
 		if (!atLeastOneMatch) {
 			score = 0.0;
+			return;
 		}
 			
 		
@@ -97,41 +98,35 @@ public class Match_TandemFit extends Match{
 		//if 0 matches so far, just get out.
 		if (!atLeastOneMatch) {
 			score = 0.0;
+			return;
 		}
 		
 		//find out final tally
 		boolean yIonTrue, bIonTrue;
-		double amountToAdd;
+		double siblingSum = 0, noSiblingSum = 0;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			
 			yIonTrue = yIonMatchesWithHighestIntensity[i] > 0.0;
 			bIonTrue = bIonMatchesWithHighestIntensity[i] > 0.0;
 			if (yIonTrue) {
-//				score += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				if (bIonTrue) {
-//					amountToAdd =  1.17 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-					amountToAdd =  Properties.YBtrue * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					siblingSum += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				} else {
-//					amountToAdd =  1.43 * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-					amountToAdd =  Properties.YBfalse * Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					noSiblingSum += Math.pow(yIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				}
-//				amountToAdd *=  1.3;
-				score += amountToAdd;
 				ionMatchTally++;
 			}
 			if (bIonTrue) {
-				//count b-ions less if not y-ion present, more if present
 				if (yIonTrue) {
-//					amountToAdd =  1.1 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-					amountToAdd =  Properties.BYtrue * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					siblingSum += Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				} else {
-//					amountToAdd =  0.9 * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
-					amountToAdd =  Properties.BYfalse * Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
+					noSiblingSum += Math.pow(bIonMatchesWithHighestIntensity[i], Properties.peakIntensityExponent);
 				}
-				score += amountToAdd;
 				ionMatchTally++;
 			}
 		}
+		score = 1.1 * siblingSum + 0.9 * noSiblingSum;
+		
 		//This slightly punishes for peptides with many amino acids as they have a slightly higher
 		//probability of getting alignments by chance
 		score /= MathFunctions.cachedLog(acidSequence.length);
