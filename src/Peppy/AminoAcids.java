@@ -140,8 +140,8 @@ public class AminoAcids {
 		if (acid == 'V') return V;
 		if (acid == 'W') return W;
 		if (acid == 'Y') return Y;
-//		U.p("an invalid acid was found: " + acid);
-		throw new Error("Invalid amino acid character: " + acid);
+		return STOP;
+//		throw new Error("Invalid amino acid character: " + acid);
 	}
 	
 	public static boolean isValid(byte acid) {

@@ -88,6 +88,7 @@ public class RNA_Sequence {
 		for (int i = start; i < stop; i++) {
 			RNA_5to3[i - start] = DNAtoRNA(DNAsequence.charAt(i));
 		}
+
 		//convert the RNA to the compliment
 		for (int i = 0; i < length; i++) {
 			//note that I'm putting it in reverse order
@@ -212,7 +213,6 @@ public class RNA_Sequence {
 				if (probability < beliveableStartProbability) continue;
 				
 				startSites[i] = true;
-				
 			}
 		}
 		
