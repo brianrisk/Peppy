@@ -228,7 +228,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		
 		//this is a normalizing factor as a true match with a long peptide will get a greater
 		//score than a true match with a short pepitide, though they are equally true
-		impValue *= MathFunctions.cachedLog(peptide.getAcidSequence().length);
+		//impValue *= MathFunctions.cachedLog(peptide.getAcidSequence().length);
 		if (impValue > 1) impValue = 1;
 		return impValue;
 	}
@@ -236,7 +236,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	
 	
 	
-	private double [] findYIons(int peptideLengthMinusOne, double [] theoreticalPeaksLeft, double [] theoreticalPeaksRight) {
+	protected double [] findYIons(int peptideLengthMinusOne, double [] theoreticalPeaksLeft, double [] theoreticalPeaksRight) {
 		byte [] acidSequence = peptide.getAcidSequence();
 		
 		int i;
@@ -284,7 +284,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return yIonMatchesWithHighestIntensity;
 	}
 
-	private double [] findBIons(int peptideLengthMinusOne, double [] theoreticalPeaksLeft, double [] theoreticalPeaksRight) {
+	protected double [] findBIons(int peptideLengthMinusOne, double [] theoreticalPeaksLeft, double [] theoreticalPeaksRight) {
 		byte [] acidSequence = peptide.getAcidSequence();
 		
 		int i;

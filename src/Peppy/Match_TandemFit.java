@@ -8,103 +8,39 @@ public class Match_TandemFit extends Match{
 	public String getScoringMethodName() {return "TandemFit";}
 
 	public void calculateScore() {
-		byte [] acidSequence = peptide.getAcidSequence();
-
-		int i;
-		boolean atLeastOneMatch = false;
-		double theoreticalPeakMassLeft, peakMass;
-		int peakIndex, seqIndex;
+		/*
+		 * PART 1:  Find matching peaks
+		 */
 		ionMatchTally = 0;
+		byte [] acidSequence = peptide.getAcidSequence();
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
 		int peptideLengthMinusOne = acidSequence.length - 1;
+		if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
 		
-		double [] bIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
-		double [] yIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
-
-		//find the ranges around our theoretical peptides where we
-		//count spectrum peaks
+		//will hold our peak boundaries
 		double [] theoreticalPeaksLeft = new double[peptideLengthMinusOne];
 		double [] theoreticalPeaksRight = new double[peptideLengthMinusOne];
 		
+		//find y ions
+		double [] yIonMatchesWithHighestIntensity = findYIons(peptideLengthMinusOne, theoreticalPeaksLeft, theoreticalPeaksRight);
 		
-		/* y-ion  */
-		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMassLeft = peptide.getMass() + Properties.rightIonDifference - Properties.peakDifferenceThreshold;
-		double peakDifferenceThresholdArea = Properties.peakDifferenceThreshold + Properties.peakDifferenceThreshold;
-		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMassLeft -= AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMassLeft;
-			theoreticalPeaksRight[i] = theoreticalPeakMassLeft + peakDifferenceThresholdArea;
-		}
-		
-		peakIndex = spectrum.getPeakCount() - 1;
-		seqIndex = 0;
-		while (peakIndex >= 0) {
-			peakMass = spectrum.getPeak(peakIndex).getMass();
-			spectrum.getPeak(peakIndex).used = false;
-			while (peakMass < theoreticalPeaksLeft[seqIndex]) {
-				seqIndex++;
-				if (seqIndex == peptideLengthMinusOne) break;
-			}
-			if (seqIndex == peptideLengthMinusOne) break;
-			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-				spectrum.getPeak(peakIndex).used = true;
-				atLeastOneMatch = true;
-				if (yIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
-					yIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
-				}
-			}
-			
-			peakIndex--;
-		}
-
-		//if 0 matches so far, just get out.
-		if (!atLeastOneMatch) {
-			score = 0.0;
-			return;
-		}
-			
-		
-		/* b-ion  */
-		theoreticalPeakMassLeft = Properties.leftIonDifference  - Properties.peakDifferenceThreshold;
-		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMassLeft += AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMassLeft;
-			theoreticalPeaksRight[i] = theoreticalPeakMassLeft + peakDifferenceThresholdArea;
-		}
-		
-		peakIndex = 0;
-		seqIndex = 0;
-		while (peakIndex < spectrum.getPeakCount()) {
-			if (!spectrum.getPeak(peakIndex).used) {
-				peakMass = spectrum.getPeak(peakIndex).getMass();
-				while (peakMass > theoreticalPeaksRight[seqIndex]) {
-					seqIndex++;
-					if (seqIndex == peptideLengthMinusOne) break;
-				}
-				if (seqIndex == peptideLengthMinusOne) break;
-				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-					atLeastOneMatch = true;
-					if (bIonMatchesWithHighestIntensity[seqIndex] < spectrum.getPeak(peakIndex).getIntensity()) {
-						bIonMatchesWithHighestIntensity[seqIndex] = spectrum.getPeak(peakIndex).getIntensity();
-					}
-				}
-			}
-			peakIndex++;
-		}
-		
-		//if 0 matches so far, just get out.
-		if (!atLeastOneMatch) {
-			score = 0.0;
+		//if null is returned, that means no y ions match, which is automatic disqualification
+		if (yIonMatchesWithHighestIntensity == null) {
+			score = 0;
 			return;
 		}
 		
-		//find out final tally
+		//find b ions
+		double [] bIonMatchesWithHighestIntensity = findBIons(peptideLengthMinusOne, theoreticalPeaksLeft, theoreticalPeaksRight);
+		
+		/*
+		 * PART 2: Apply TandemFit formula
+		 */
 		boolean yIonTrue, bIonTrue;
 		double siblingSum = 0, noSiblingSum = 0;
-		for (i = 0; i < peptideLengthMinusOne; i++) {
+		for (int i = 0; i < peptideLengthMinusOne; i++) {
 			
 			yIonTrue = yIonMatchesWithHighestIntensity[i] > 0.0;
 			bIonTrue = bIonMatchesWithHighestIntensity[i] > 0.0;
