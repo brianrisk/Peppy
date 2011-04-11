@@ -79,7 +79,7 @@ public class Peppy {
 		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
+		ArrayList<Match> matches = null;
 		
 		if (Properties.useSpliceVariants) {
 			//gets the first nucleotide sequence in the first sequence file
@@ -168,6 +168,11 @@ public class Peppy {
 	}
 	
 	
+	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		return getMatches(sequences, spectra, true);
+	}
+	
+	
 	/**
 	 * Assumes that we are doing the normal, forwards digestion of our sequences
 	 * @param sequences
@@ -177,12 +182,7 @@ public class Peppy {
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
 		return getMatches(sequences, spectra, false);
 	}
-	
-	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
-		return getMatches(sequences, spectra, true);
-	}
-	
-	
+
 	/**
 	 * 
 	 * @param sequences our list of sequences where we will be getting our peptides
@@ -284,6 +284,7 @@ public class Peppy {
 			
 		}
 		assignRankToMatches(matches);
+		removeMatchesWithLowRank(matches);
 		assignRepeatedPeptideCount(matches);	
 		
 		return matches;
@@ -422,6 +423,19 @@ public class Peppy {
 			if (!areEqual) {
 				previousMatch = match;
 				previousSpectrumID = spectrumID;
+			}
+		}
+	}
+	
+	private static void removeMatchesWithLowRank(ArrayList<Match> matches) {
+		int numberOfMatches = matches.size();
+		Match match;
+		for (int i = 1; i < numberOfMatches; i++) {
+			match = matches.get(i);
+			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+				matches.remove(i);
+				i--;
+				numberOfMatches--;
 			}
 		}
 	}
