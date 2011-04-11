@@ -75,8 +75,8 @@ public class GenerateValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-//		Properties.scoringMethodName = "Peppy.Match_IMP";
-		Properties.scoringMethodName = "Peppy.Match_TandemFit";
+		Properties.scoringMethodName = "Peppy.Match_IMP";
+//		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
 		//uncomment to use HMM score
@@ -102,7 +102,7 @@ public class GenerateValidationReport {
 	 * Completes a search on all test sets in our list using the correct (forward) digestion of our protein database.
 	 */
 	public static void forwards() {
-		Properties.maximumNumberOfMatchesForASpectrum = 10;
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		//load the peptides
 		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
 		

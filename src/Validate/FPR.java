@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Random;
 
 import Peppy.Match;
@@ -130,20 +131,29 @@ public class FPR {
 		percent05 = (double) total05/ setSize;
 		
 		//find peptide spectrum mass differences
-		double averageMassDifference = 0;
 		double averageAbsMassDifference = 0;
 		double lowestMassDifference = Double.MAX_VALUE;
 		double highestMassDifference = Double.MIN_VALUE;
 		double massDifference;
 		for (int i = 0; i < total01; i++) {
 			massDifference = forwardsMatches.get(i).getSpectrum().getMass() - forwardsMatches.get(i).getPeptide().getMass();
-			averageMassDifference += massDifference;
 			averageAbsMassDifference += Math.abs(massDifference);
 			if (lowestMassDifference > massDifference) lowestMassDifference = massDifference;
 			if (highestMassDifference < massDifference) highestMassDifference = massDifference;
 		}
-		averageMassDifference /= total01;
 		averageAbsMassDifference /= total01;
+		
+		//find number of spectra with matches in this range
+		Hashtable<Integer, Integer> uniqueSpectrumIDsOnePercent = new Hashtable<Integer, Integer>();
+		for (int i = 0; i < total01; i++) {
+			Integer ID = new Integer(forwardsMatches.get(i).getSpectrum().getId());
+			uniqueSpectrumIDsOnePercent.put(ID, ID);
+		}
+		Hashtable<Integer, Integer> uniqueSpectrumIDsFivePercent = new Hashtable<Integer, Integer>();
+		for (int i = 0; i < total01; i++) {
+			Integer ID = new Integer(forwardsMatches.get(i).getSpectrum().getId());
+			uniqueSpectrumIDsFivePercent.put(ID, ID);
+		}
 			
 		File fprFile = new File("FPR-" + scoreName + ".txt");
 		try {
@@ -160,16 +170,21 @@ public class FPR {
 			pw.println("database: " + Properties.sequenceDirectoryOrFile.getName());
 			pw.println("1% FPR: " + fpr01);
 			pw.println("percent found at 1% FPR: " + nfPercent.format(percent01));
+			pw.println("number of unique spectra at 1%: " + uniqueSpectrumIDsOnePercent.size());
+			pw.println();
 			pw.println("5% FPR: " + fpr05);
 			pw.println("percent found at 5% FPR: " + nfPercent.format(percent05));
+			pw.println("number of unique spectra at 5%: " + uniqueSpectrumIDsFivePercent.size());
 			pw.println();
 			
 			//print peptide/spectrum mass differences
-			pw.println("average mass difference: " + averageMassDifference);
+			pw.println("mass stats at 1%:");
 			pw.println("average absolute value of mass difference: " + averageAbsMassDifference);
 			pw.println("lowest mass difference: " + lowestMassDifference);
 			pw.println("higest mass difference: " + highestMassDifference);
 			pw.println();
+			
+			
 
 			pw.flush();
 			pw.close();
