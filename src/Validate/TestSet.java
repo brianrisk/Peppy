@@ -26,7 +26,7 @@ public class TestSet {
 	private ArrayList<Spectrum> spectra;
 	private ArrayList<MatchContainer> topForwardsTestedMatches = null;
 	private ArrayList<Match> topForwardsMatches = null;
-	private ArrayList<Match> positiveMatches = null;
+	private ArrayList<Match> positiveMatches = new ArrayList<Match>();
 	private ArrayList<Match> topReverseMatches = null;
 	private ArrayList<Match> correctMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
@@ -44,16 +44,17 @@ public class TestSet {
 	//PR curve
 	private double areaUnderPRCurve = 0;
 	
-	long timeElapsed;
+	long timeElapsed = 0;
 	String timeToComplete = "";
 	double milisecondsPerSpectrum;
 	
 
-	public TestSet(String testDirectoryName, String testName, ArrayList<Peptide> peptides) {
+	public TestSet(String testDirectoryName, String testName) {
 		this.testName = testName;
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+
 		
 		correctMatches = loadCorrectMatches();
 		
@@ -73,51 +74,11 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		//get the matches
 		long startTimeMilliseconds = System.currentTimeMillis();
-		positiveMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		if (matches != null) positiveMatches.addAll(matches);
 		long stopTimeMilliseconds = System.currentTimeMillis();
-		timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
-		timeToComplete = U.millisecondsToString(timeElapsed);
-		milisecondsPerSpectrum = (double) timeElapsed / setSize;
-		
-		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
-		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
-//		Match.setSortParameter(Match.SORT_BY_P_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
-//		Match.setSortParameter(Match.SORT_BY_SCORE);
-		Collections.sort(positiveMatches);
-		
-		//See which of the positive matches are true
-		testedMatches = new ArrayList<MatchContainer>();
-		for (Match match: positiveMatches) {
-			if (match == null) U.p("null match?  What?");
-			testedMatches.add(new MatchContainer(match));
-		}
-		//Sort MatchContainer by e value (default)	
-		Collections.sort(testedMatches);
-		
-		//find the #1 ranked match for each spectrum
-		topForwardsMatches = new ArrayList<Match>();
-		topForwardsTestedMatches = new ArrayList<MatchContainer>();
-		for (Match match: positiveMatches) {
-			if (match.rank == 1) {
-				topForwardsMatches.add(match);
-				topForwardsTestedMatches.add(new MatchContainer(match));
-			}
-		}
-		//should already be ordered, but what the hell, right?
-		Collections.sort(topForwardsMatches);
-		Collections.sort(topForwardsTestedMatches);
-			
-		
-		
-		calculateStastics();
+		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
 	}
-
 
 	/**
 	 * Here the peptide list is probably from a reverse database.
@@ -155,8 +116,51 @@ public class TestSet {
 	/**
 	 * This should be called only after our set of matches has been found
 	 */
-	private void calculateStastics() {
-		//stats for tested matches
+	public void calculateStastics() {
+		
+		//track out time
+		timeToComplete = U.millisecondsToString(timeElapsed);
+		milisecondsPerSpectrum = (double) timeElapsed / setSize;
+		
+		//Do a little house cleaning first
+		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
+		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+		Peppy.Peppy.removeMatchesWithLowRank(positiveMatches);
+		
+		//sorting by confidence
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
+//		Match.setSortParameter(Match.SORT_BY_P_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE);
+		Collections.sort(positiveMatches);
+		
+		//See which of the positive matches are true
+		testedMatches = new ArrayList<MatchContainer>();
+		for (Match match: positiveMatches) {
+			if (match == null) U.p("null match?  What?");
+			testedMatches.add(new MatchContainer(match));
+		}
+		//Sort MatchContainer by e value (default)	
+		Collections.sort(testedMatches);
+		
+		//find the #1 ranked match for each spectrum
+		topForwardsMatches = new ArrayList<Match>();
+		topForwardsTestedMatches = new ArrayList<MatchContainer>();
+		for (Match match: positiveMatches) {
+			if (match.rank == 1) {
+				topForwardsMatches.add(match);
+				topForwardsTestedMatches.add(new MatchContainer(match));
+			}
+		}
+		//should already be ordered, but what the hell, right?
+		Collections.sort(topForwardsMatches);
+		Collections.sort(topForwardsTestedMatches);
+			
+		
 		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
 				topRankTrueTally++;

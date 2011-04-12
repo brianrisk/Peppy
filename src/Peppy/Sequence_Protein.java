@@ -82,6 +82,7 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
+		if (proteins.size() == 0) return null;
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		for (Protein protein: proteins) {
 			peptides.addAll(protein.digest());
@@ -96,7 +97,6 @@ public class Sequence_Protein extends Sequence {
 			String line = reader.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
-			int proteinIndex = 0;
 			while (line != null) {
 				//this symbol means we've reached the beginning of a new protein and
 				//the one we've been working on has ended
@@ -117,7 +117,6 @@ public class Sequence_Protein extends Sequence {
 					}
 					
 					buffy = new StringBuffer(); 
-					proteinIndex++;
 				} else {
 					buffy.append(line);
 				}

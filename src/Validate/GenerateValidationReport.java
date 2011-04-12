@@ -66,6 +66,8 @@ public class GenerateValidationReport {
 			e.printStackTrace();
 		}
 		
+
+		
 //		Properties.peakDifferenceThreshold = 0.3;
 		
 		//how many missed cleavages when we digest
@@ -91,9 +93,20 @@ public class GenerateValidationReport {
 		Properties.peakDifferenceThreshold = 0.3;
 
 		
-		
-//		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_varsplic.fasta");
-//		databaseFile = new File("/Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_09/uniprot_sprot_human.fasta");
+		//set up which tests we will perform
+		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+//		String testDirectoryName = "tests/";
+		tests = new ArrayList<TestSet>();
+		tests.add(new TestSet(testDirectoryName, "ecoli"));
+		tests.add(new TestSet(testDirectoryName, "human"));
+		tests.add(new TestSet(testDirectoryName, "aurum"));	
+		tests.add(new TestSet(testDirectoryName, "USP"));
+//		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance"));
+//		Properties.isSequenceFileDNA = true;
+//		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
+//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
+//		U.p("forwards database size: " + peptides.size());
+//		forwardsDatabaseSize = peptides.size();
 		
 	}
 	
@@ -103,30 +116,30 @@ public class GenerateValidationReport {
 	 */
 	public static void forwards() {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		//load the peptides
-		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
-		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
-		
-//		Properties.isSequenceFileDNA = true;
-//		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
-//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
-//		U.p("forwards database size: " + peptides.size());
-//		forwardsDatabaseSize = peptides.size();
-		
-		//set up which tests we will perform
-		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-//		String testDirectoryName = "tests/";
-		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
-		tests.add(new TestSet(testDirectoryName, "human", peptides));
-		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-		tests.add(new TestSet(testDirectoryName, "USP", peptides));
-//		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance", peptides));
 
+		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
+		
+		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
+
+		while (peptides.size() > 0) {
+			for (TestSet test: tests) {
+				U.p("Getting matches for: " + test.getName());
+				test.findPositiveMatches(peptides);
+			}	
+			peptides = sequence.extractMorePeptides(false);
+		}
+		
 		for (TestSet test: tests) {
-			U.p("Getting matches for: " + test.getName());
-			test.findPositiveMatches(peptides);
-		}	
+			test.calculateStastics();
+		}
+		
+		
+//		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
+//		for (TestSet test: tests) {
+//			U.p("Getting matches for: " + test.getName());
+//			test.findPositiveMatches(peptides);
+//			test.calculateStastics();
+//		}	
 	}
 	
 	/**
@@ -462,13 +475,20 @@ public class GenerateValidationReport {
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-		tests.add(new TestSet(testDirectoryName, "ecoli", peptides));
-//		tests.add(new TestSet(testDirectoryName,"human", peptides));
-//		tests.add(new TestSet(testDirectoryName, "aurum", peptides));	
-//		tests.add(new TestSet(testDirectoryName, "USP", peptides));
+		tests.add(new TestSet(testDirectoryName, "ecoli"));
+//		tests.add(new TestSet(testDirectoryName,"human"));
+//		tests.add(new TestSet(testDirectoryName, "aurum"));	
+//		tests.add(new TestSet(testDirectoryName, "USP"));
+		
+		while (peptides.size() > 0) {
+			for (TestSet test: tests) {
+				test.findPositiveMatches(peptides);
+			}	
+			peptides = sequence.extractMorePeptides(false);
+		}
 		
 		for (TestSet test: tests) {
-			test.findPositiveMatches(peptides);
+			test.calculateStastics();
 			generateWrongReport(test);
 		}
 	}

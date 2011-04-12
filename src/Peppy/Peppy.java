@@ -244,8 +244,9 @@ public class Peppy {
 				for (Sequence sequence: sequences) {
 					U.p("working on sequence: " +sequence.getSequenceFile().getName());
 					
-					ArrayList<Peptide> peptides;
-					peptides = sequence.extractMorePeptides(isReverse);
+					//extract the first batch of peptides
+					ArrayList<Peptide> peptides = sequence.extractMorePeptides(isReverse);
+					
 					//continually extract peptides from the sequence until there aren't anymore
 					while (peptides != null) {
 						peptideTally += peptides.size();
@@ -324,9 +325,10 @@ public class Peppy {
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				rank = 1;
-			}
-			if (match.getScore() == previousMatch.getScore()) {
-				rank = previousMatch.rank;
+			} else {
+				if (match.getScore() == previousMatch.getScore()) {
+					rank = previousMatch.rank;
+				}
 			}
 			match.rank = rank;
 			rank++;
@@ -418,7 +420,7 @@ public class Peppy {
 		}
 	}
 	
-	private static void removeMatchesWithLowRank(ArrayList<Match> matches) {
+	public static void removeMatchesWithLowRank(ArrayList<Match> matches) {
 		int numberOfMatches = matches.size();
 		Match match;
 		for (int i = 1; i < numberOfMatches; i++) {

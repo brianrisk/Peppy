@@ -151,7 +151,7 @@ public class FPR {
 			uniqueSpectrumIDsOnePercent.put(ID, ID);
 		}
 		Hashtable<Integer, Integer> uniqueSpectrumIDsFivePercent = new Hashtable<Integer, Integer>();
-		for (int i = 0; i < total01; i++) {
+		for (int i = 0; i < total05; i++) {
 			Integer ID = new Integer(forwardsMatches.get(i).getSpectrum().getId());
 			uniqueSpectrumIDsFivePercent.put(ID, ID);
 		}
