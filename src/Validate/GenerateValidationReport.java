@@ -21,7 +21,6 @@ import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;
-import Peppy.Sequence_DNA;
 import Reports.ReportStrings;
 import Utilities.U;
 
@@ -71,7 +70,7 @@ public class GenerateValidationReport {
 //		Properties.peakDifferenceThreshold = 0.3;
 		
 		//how many missed cleavages when we digest
-		Properties.numberOfMissedCleavages = 1;
+		Properties.numberOfMissedCleavages = 2;
 		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
@@ -127,6 +126,7 @@ public class GenerateValidationReport {
 				test.findPositiveMatches(peptides);
 			}	
 			peptides = sequence.extractMorePeptides(false);
+			if (peptides == null) break;
 		}
 		
 		for (TestSet test: tests) {
@@ -213,13 +213,6 @@ public class GenerateValidationReport {
 			pw.println("<td>Average # of peaks / spectrum</td>");
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + testSet.getAverageNumberOfPeaksPerSpectrum() + "</td>");
-			}
-			
-			//Time to complete
-			pw.println("<tr>");
-			pw.println("<td>Time to complete</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getTimeToComplete() + "</td>");
 			}
 			
 			//Milliseconds per spectrum
@@ -485,6 +478,7 @@ public class GenerateValidationReport {
 				test.findPositiveMatches(peptides);
 			}	
 			peptides = sequence.extractMorePeptides(false);
+			if (peptides == null) break;
 		}
 		
 		for (TestSet test: tests) {

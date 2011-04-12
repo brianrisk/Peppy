@@ -28,7 +28,6 @@ public class TestSet {
 	private ArrayList<Match> topForwardsMatches = null;
 	private ArrayList<Match> positiveMatches = new ArrayList<Match>();
 	private ArrayList<Match> topReverseMatches = null;
-	private ArrayList<Match> correctMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
 	private int setSize = -1;
 	private double averageNumberOfPeaksPerSpectrum;
@@ -45,7 +44,6 @@ public class TestSet {
 	private double areaUnderPRCurve = 0;
 	
 	long timeElapsed = 0;
-	String timeToComplete = "";
 	double milisecondsPerSpectrum;
 	
 
@@ -54,9 +52,6 @@ public class TestSet {
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
-
-		
-		correctMatches = loadCorrectMatches();
 		
 		setSize = spectra.size();	
 		
@@ -119,7 +114,6 @@ public class TestSet {
 	public void calculateStastics() {
 		
 		//track out time
-		timeToComplete = U.millisecondsToString(timeElapsed);
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
 		
 		//Do a little house cleaning first
@@ -258,6 +252,7 @@ public class TestSet {
 			
 		}
 
+	@SuppressWarnings("unused")
 	private ArrayList<Peptide> loadCorrectPeptides() {
 		ArrayList<Peptide> correctPeptides = new ArrayList<Peptide>();
 		for(Spectrum spectrum: spectra) {
@@ -300,6 +295,7 @@ public class TestSet {
 		return correctPeptides;
 	}
 	
+	@SuppressWarnings("unused")
 	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
@@ -391,10 +387,6 @@ public class TestSet {
 
 	public long getTimeElapsed() {
 		return timeElapsed;
-	}
-
-	public String getTimeToComplete() {
-		return timeToComplete;
 	}
 
 	public int getSetSize() {

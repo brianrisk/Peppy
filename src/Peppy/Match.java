@@ -2,7 +2,6 @@ package Peppy;
 
 import Math.HasEValue;
 import Math.MathFunctions;
-import Utilities.U;
 
 /**
  * An abstract object which can be extended to implement scoring mechanisms
@@ -125,13 +124,13 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		double totalMatchingIntensity = 0.0;
 		boolean yIonMatch, bIonMatch, ionMatch = false;
 		int acidMatchTally = 0;
-		int yGreaterThanBTally = 0;
+		int appropriateIonIsMoreIntenseTally = 0;
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
 			yIonMatch = yIonMatchesWithHighestIntensity[i] > 0.0;
 			bIonMatch = bIonMatchesWithHighestIntensity[i] > 0.0;
 			ionMatch = bIonMatch || yIonMatch;
 			if (ionMatch) acidMatchTally++;
-			if (yIonMatchesWithHighestIntensity[i] > bIonMatchesWithHighestIntensity[i]) yGreaterThanBTally++;
+			if (yIonMatchesWithHighestIntensity[i] > bIonMatchesWithHighestIntensity[i]) appropriateIonIsMoreIntenseTally++;
 			if (yIonMatch) {
 				ionMatchTally++;
 				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
@@ -185,8 +184,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		
 		//y greater than b probability
 		n = peptideLengthMinusOne;
-		k = yGreaterThanBTally;
-		double yGreaterThanBProbability = MathFunctions.getCachedBinomialProbability50(n, k);
+		k = appropriateIonIsMoreIntenseTally;
+		double appropriateIonIsMoreIntenseProbablity = MathFunctions.getCachedBinomialProbability50(n, k);
 		
 		
 		//probability of ions being above thresholds
@@ -224,7 +223,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 //		totalMatchingIntensityProbability = Math.exp(totalMatchingIntensityProbability - totalPeakCombnations);
 //		U.p(totalMatchingIntensityProbability);
 		
-		impValue =  peakMatchProbability  * intensityProbability * yGreaterThanBProbability;
+		impValue =  peakMatchProbability  * intensityProbability * appropriateIonIsMoreIntenseProbablity;
 		
 		//this is a normalizing factor as a true match with a long peptide will get a greater
 		//score than a true match with a short pepitide, though they are equally true

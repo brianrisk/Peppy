@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Math.MathFunctions;
-import Utilities.U;
 
 
 public class ScoringThread implements Runnable {

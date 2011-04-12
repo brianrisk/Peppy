@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import Peppy.AminoAcids;
-import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;

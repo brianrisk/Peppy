@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.AminoAcids;
-import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.Peak;
 import Peppy.Peptide;
