@@ -13,7 +13,7 @@ import Peppy.Match;
 import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.ProteinDigestion;
+import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -58,10 +58,12 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		Sequence_Protein sequence = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 		//load the correct peptide set
-		ArrayList<Peptide> correctPeptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		Sequence_Protein sequenceCorrect = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> correctPeptides = sequenceCorrect.extractAllPeptides(false);
 		
 		//restrict the precursors since they should be pretty accurate
 		Properties.spectrumToPeptideMassError = 0.01;
@@ -107,7 +109,8 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//load the peptides from the database
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		Sequence_Protein sequence = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 		//Get the matches
 		ArrayList<Match> matches  = Peppy.getMatchesWithPeptides(peptides, spectra);

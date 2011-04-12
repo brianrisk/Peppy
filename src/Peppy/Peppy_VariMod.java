@@ -16,14 +16,14 @@ import Utilities.U;
  */
 public class Peppy_VariMod extends Peppy{
 	
-	
+	/*
 	public static void main(String [] args) {
 		init(args);
 		runPeppyPTM(args);
 		U.p("done");
 	}
 	
-	
+
 	public static void runPeppyPTM(String [] args) {
 		U.p("Peppy+ PTM");
 		U.startStopwatch();
@@ -35,7 +35,7 @@ public class Peppy_VariMod extends Peppy{
 		
 		//Get references to our sequence files
 		//These should be protein databases such as UniProt
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
 		ArrayList<Match> unModifiedMatches = new ArrayList<Match>();
@@ -49,12 +49,12 @@ public class Peppy_VariMod extends Peppy{
 		//loop through sequences, get proteins
 		U.p("loading proteins");
 		for (Sequence sequence: sequences) {
-			proteins.addAll(ProteinDigestion.getProteinsFromDatabase(sequence.getSequenceFile()));
+			proteins.addAll(Sequence_Protein.getProteinsFromDatabase(sequence.getSequenceFile()));
 		}
 		
 		//digest peptides from all those proteins
 		U.p("digesting proteins");
-		proteinPeptides = ProteinDigestion.getPeptidesFromListOfProteins(proteins);
+		proteinPeptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins);
 		U.p(proteinPeptides.size() + " peptides created");
 		
 		//get the matches
@@ -131,7 +131,7 @@ public class Peppy_VariMod extends Peppy{
 		U.p();
 		U.stopStopwatch();
 	}
-	
+	*/
 	
 	
 

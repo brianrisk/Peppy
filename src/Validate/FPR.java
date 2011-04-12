@@ -16,6 +16,7 @@ import Peppy.Match;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -36,7 +37,7 @@ public class FPR {
 		U.p("running report for " + scoreName);
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//Loading a subset of our spectra
 		U.p("loading spectral files...");
@@ -67,7 +68,7 @@ public class FPR {
 		Collections.sort(forwardsMatches);
 		
 		//need to initialize things now that we have found matches
-		sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		for (Spectrum spectrum: spectra) {
 			spectrum.clearEValues();
 		}

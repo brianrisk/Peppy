@@ -14,6 +14,7 @@ import Peppy.DNA_Sequence;
 import Peppy.Definitions;
 import Peppy.Properties;
 import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Utilities.U;
 
 public class HilbertCurve {
@@ -65,9 +66,9 @@ public class HilbertCurve {
 	 */
 	public HilbertCurve() {
 		//get our sequence
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		Sequence sequence = sequences.get(0);
-		DNA_Sequence dnaSequence = sequence.getNucleotideSequences().get(0);
+		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		Sequence_DNA sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
+		DNA_Sequence dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
 		String dna = dnaSequence.getSequence();		
 		int sequenceIndexStart = 0;
 		int sequenceIndexStop = dna.length();

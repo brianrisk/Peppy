@@ -20,8 +20,8 @@ import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.ProteinDigestion;
-import Peppy.Sequence;
+import Peppy.Sequence_Protein;
+import Peppy.Sequence_DNA;
 import Reports.ReportStrings;
 import Utilities.U;
 
@@ -104,7 +104,8 @@ public class GenerateValidationReport {
 	public static void forwards() {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		//load the peptides
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
+		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 //		Properties.isSequenceFileDNA = true;
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
@@ -136,7 +137,8 @@ public class GenerateValidationReport {
 		//We only want one match per spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile, true);
+		Sequence_Protein proteinSequence = new Sequence_Protein(databaseFile);
+		ArrayList<Peptide> peptides = proteinSequence.extractAllPeptides(false);
 		reverseDatabaseSize = peptides.size();
 		
 		for (TestSet test: tests) {
@@ -452,7 +454,9 @@ public class GenerateValidationReport {
 	 */
 	public static void makeOnlyWrongReport() {
 		U.p("wrong report");
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
+		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
+		
 		U.p("forwards database size: " + peptides.size());
 
 		//set up which tests we will perform

@@ -36,7 +36,7 @@ public class HTMLReporter {
 	/**
 	 * @param matches
 	 * @param spectra
-	 * @param sequences
+	 * @param sequence_DNAs
 	 */
 	public HTMLReporter(ArrayList<Match> matches,
 			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {

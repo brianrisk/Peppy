@@ -9,11 +9,11 @@ public class DNA_Sequence {
 	
 	private String sequenceDescription;
 	private String sequence;
-	private Sequence parentSequence;
+	private Sequence_DNA parentSequence;
 	
 
 	
-	public DNA_Sequence(String sequenceDescription, String sequence, Sequence parentSequence) {
+	public DNA_Sequence(String sequenceDescription, String sequence, Sequence_DNA parentSequence) {
 		this.sequenceDescription = sequenceDescription;
 		this.sequence = sequence;
 		this.parentSequence = parentSequence;
@@ -28,7 +28,7 @@ public class DNA_Sequence {
 		return sequence;
 	}
 	
-	public Sequence getParentSequence() {
+	public Sequence_DNA getParentSequence() {
 		return parentSequence;
 	}
 

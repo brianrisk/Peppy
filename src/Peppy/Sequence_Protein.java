@@ -18,12 +18,43 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class ProteinDigestion {
+public class Sequence_Protein extends Sequence {
 	
-	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile) {
-		return getPeptidesFromDatabase(proteinFile, false);
+	//private final int maxProteinSize = 277882;
+	private final int maxProteinSize = 150000;
+	BufferedReader reader = null;
+	ArrayList<Protein> proteins = null;
+	
+	public Sequence_Protein(File proteinFile) {
+		this.sequenceFile = proteinFile;
+		try {
+			reader = new BufferedReader(new FileReader(proteinFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	public void reset() {
+		proteins = null;
+		try {
+			reader = new BufferedReader(new FileReader(sequenceFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public  ArrayList<Peptide> extractAllPeptides(boolean isReverse) {
+		getProteinsFromDatabase(isReverse, false);
+		return getPeptidesFromListOfProteins(proteins);	
+	}
+	
+	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
+		getProteinsFromDatabase(isReverse, true);
+		return getPeptidesFromListOfProteins(proteins);	
+	}
+	
+
+
 	/**
 	 * This method, right here, it's for reverse database searches for things like
 	 * False Positive Rates and the like.  So, only used for stats purposes, not
@@ -31,8 +62,9 @@ public class ProteinDigestion {
 	 * @param proteinFile
 	 * @return
 	 */
-	public static ArrayList<Peptide> getPeptidesFromReverseDatabase(File proteinFile) {
-		return getPeptidesFromDatabase(proteinFile, true);
+	public  ArrayList<Peptide> getAllPeptidesFromReverseDatabase(File proteinFile) {
+		getProteinsFromDatabase(true, false);
+		return getPeptidesFromListOfProteins(proteins);	
 	}
 	
 	/**
@@ -41,21 +73,12 @@ public class ProteinDigestion {
 	 * @param isReverse
 	 * @return
 	 */
-	private static ArrayList<Protein> getProteinsFromDatabase(File proteinFile, boolean isReverse) {
-		if (proteinFile.getName().toLowerCase().endsWith("fa")) return getProteinsFromFASTA(proteinFile, isReverse);
-		if (proteinFile.getName().toLowerCase().endsWith("fsa")) return getProteinsFromFASTA(proteinFile, isReverse);
-		if (proteinFile.getName().toLowerCase().endsWith("fasta")) return getProteinsFromFASTA(proteinFile, isReverse);
-		if (proteinFile.getName().toLowerCase().endsWith("dat")) return getProteinsFromUniprotDAT(proteinFile, isReverse);
+	private ArrayList<Protein> getProteinsFromDatabase(boolean isReverse, boolean limitAmount) {
+		if (sequenceFile.getName().toLowerCase().endsWith("fa")) return getProteinsFromFASTA(isReverse, limitAmount);
+		if (sequenceFile.getName().toLowerCase().endsWith("fsa")) return getProteinsFromFASTA(isReverse, limitAmount);
+		if (sequenceFile.getName().toLowerCase().endsWith("fasta")) return getProteinsFromFASTA(isReverse, limitAmount);
+		if (sequenceFile.getName().toLowerCase().endsWith("dat")) return getProteinsFromUniprotDAT(isReverse, limitAmount);
 		return null;
-	}
-	
-	public static ArrayList<Protein> getProteinsFromDatabase(File proteinFile) {
-		return getProteinsFromDatabase(proteinFile, false);
-	}
-	
-	public static ArrayList<Peptide> getPeptidesFromDatabase(File proteinFile, boolean isReverse) {
-		ArrayList<Protein> proteins = getProteinsFromDatabase(proteinFile, isReverse);
-		return getPeptidesFromListOfProteins(proteins);	
 	}
 	
 	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
@@ -67,11 +90,10 @@ public class ProteinDigestion {
 		return peptides;
 	}
 	
-	private static ArrayList<Protein> getProteinsFromFASTA(File proteinFile, boolean isReverse) {
-		ArrayList<Protein> proteins = new ArrayList<Protein>();
+	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
+		proteins = new ArrayList<Protein>();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
-			String line = br.readLine();
+			String line = reader.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			int proteinIndex = 0;
@@ -99,10 +121,11 @@ public class ProteinDigestion {
 				} else {
 					buffy.append(line);
 				}
-				line = br.readLine();
+				if (limitAmount) {
+					if (proteins.size() > maxProteinSize) return proteins;
+				}
+				line = reader.readLine();
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -114,15 +137,15 @@ public class ProteinDigestion {
 	 * @param proteinFile
 	 * @return
 	 */
-	private static ArrayList<Protein> getProteinsFromUniprotDAT(File proteinFile, boolean reverse) {
-		ArrayList<Protein> proteins = new ArrayList<Protein>();
+	private ArrayList<Protein> getProteinsFromUniprotDAT(boolean reverse, boolean limitAmount) {
+		proteins = new ArrayList<Protein>();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(proteinFile));
-			String line = br.readLine();
+			String line;
+			line = reader.readLine();
 			StringBuffer buffy = new StringBuffer();
 			String proteinName = "";
 			boolean inSequence = false;
-			while (line != null) {
+			while (line != null) {				
 				if (line.startsWith("ID")) {
 					proteinName = "NOT DEFINED";
 					buffy = new StringBuffer(); 
@@ -153,12 +176,14 @@ public class ProteinDigestion {
 					if (reverse) buffy.reverse();
 					proteins.add(new Protein(proteinName, buffy.toString()));
 				}
+				if (limitAmount) {
+					if (proteins.size() > maxProteinSize) return proteins;
+				}
 				//read a new line
-				line = br.readLine();
+				line = reader.readLine();
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return proteins;

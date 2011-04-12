@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import Utilities.U;
 
@@ -19,7 +18,7 @@ import Utilities.U;
  */
 public class AltSpliceTool {
 	
-	static Sequence sequence;
+	static Sequence_DNA sequence_DNA;
 	static int startIndex;
 	static int stopIndex;
 	
@@ -70,15 +69,15 @@ public class AltSpliceTool {
 		}
 		
 		//Now that the values have been checked, s up our variables
-		ArrayList<Sequence> sequences = Sequence.loadSequences(chromosomeFile);
-		sequence = sequences.get(0);
+		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(chromosomeFile);
+		sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
 		startIndex = startLocationInteger.intValue();
 		stopIndex = stopLocationInteger.intValue();
 		String chrName = U.getFileNameWithoutSuffix(chromosomeFile);
 		
 		//performing alt splicing
 		U.p("digesting " + chrName + " from " + startIndex + " to " + stopIndex + "...");
-		RNA_Sequence rna = new RNA_Sequence(sequence.getNucleotideSequences().get(0), startIndex, stopIndex);
+		RNA_Sequence rna = new RNA_Sequence(sequence_DNA.getNucleotideSequences().get(0), startIndex, stopIndex);
 		rna.printStats();
 		RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
 		ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();

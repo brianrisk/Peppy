@@ -40,7 +40,7 @@ public class Peppy {
 		U.p("making sure we have the correct start and stop locations");
 		Properties.isSequenceFileDNA = true;
 		Properties.numberOfMissedCleavages = 0;
-		ArrayList<Sequence> sequences = Sequence.loadSequences(new File("/Users/risk2/PeppyOverflow/sequences HG19/chr12.fa"));
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(new File("/Users/risk2/PeppyOverflow/sequences HG19/chr12.fa"));
 		Sequence sequence = sequences.get(0);
 		ArrayList<Peptide> peptides;
 
@@ -76,14 +76,14 @@ public class Peppy {
 		U.p("loaded " +spectra.size() + " spectra.");
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
 		ArrayList<Match> matches = null;
 		
 		if (Properties.useSpliceVariants) {
 			//gets the first nucleotide sequence in the first sequence file
-			Sequence sequenceFile = sequences.get(0);
+			Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
 			RNA_Sequence rna = new RNA_Sequence(sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
 			
 			U.p("digesting...");
@@ -245,30 +245,21 @@ public class Peppy {
 					U.p("working on sequence: " +sequence.getSequenceFile().getName());
 					
 					ArrayList<Peptide> peptides;
-					if (Properties.isSequenceFileDNA) {
-						peptides = sequence.extractMorePeptides(isReverse);
-						//continually extract peptides from the sequence until there aren't anymore
-						while (peptides != null) {
-							peptideTally += peptides.size();
-							//This is where the bulk of the processing in long jobs takes
-							ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-							//Possible to add only matches with a decent e value
-							evaluateMatches(newMatches, segmentMatches);
-							//free up the memory of the old peptide arraylist
-							peptides.clear();
-							System.gc();
-							peptides = sequence.extractMorePeptides(isReverse);
-						}
-						sequence.reset();
-						removeDuplicateMatches(segmentMatches);
-					} else {
-						peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), isReverse);
+					peptides = sequence.extractMorePeptides(isReverse);
+					//continually extract peptides from the sequence until there aren't anymore
+					while (peptides != null) {
 						peptideTally += peptides.size();
 						//This is where the bulk of the processing in long jobs takes
 						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-						//Add only matches with a decent e value
+						//Possible to add only matches with a decent e value
 						evaluateMatches(newMatches, segmentMatches);
-					}		
+						//free up the memory of the old peptide arraylist
+						peptides.clear();
+						System.gc();
+						peptides = sequence.extractMorePeptides(isReverse);
+					}
+					sequence.reset();
+					removeDuplicateMatches(segmentMatches);
 				}
 			}
 			
@@ -294,7 +285,7 @@ public class Peppy {
 	 * Gets matches where a list of peptides is already derived
 	 * @param peptides
 	 * @param spectra
-	 * @param sequence
+	 * @param sequence_DNA
 	 * @return
 	 */
 	public static ArrayList<Match> getMatchesWithPeptides(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
@@ -473,7 +464,7 @@ public class Peppy {
 	private static void exportPeptideList() {
 		U.p("exporting peptide list");
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		try {
 			//loop through each sequence in the sequences ArrayList
@@ -484,21 +475,13 @@ public class Peppy {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
 				
 				ArrayList<Peptide> peptides = null;
-				if (Properties.isSequenceFileDNA) {
-					peptides = sequence.extractMorePeptides(false);
-					while (peptides != null) {
-						for (Peptide peptide: peptides) {
-							pw.println(peptide);
-						}
-						peptides = sequence.extractMorePeptides(false);
-					}
-				} else {
-					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
+				peptides = sequence.extractMorePeptides(false);
+				while (peptides != null) {
 					for (Peptide peptide: peptides) {
 						pw.println(peptide);
 					}
+					peptides = sequence.extractMorePeptides(false);
 				}
-				
 				peptides = null;
 				System.gc();
 				pw.flush();

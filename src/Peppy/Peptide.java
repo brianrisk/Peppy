@@ -24,7 +24,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private int intronStartIndex;
 	private int intronStopIndex;
 	private boolean forward;
-	private Sequence parentSequence;
+	private Sequence_DNA parentSequence;
 	private Protein protein;
 	private boolean isSpliced;
 	private boolean isMatched = false;
@@ -54,7 +54,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.lengthMinusOne = this.acidSequence.length - 1;
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, boolean isSpliced) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -67,7 +67,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.lengthMinusOne = this.acidSequence.length - 1;
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -253,7 +253,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	/**
 	 * @return the parentSequence
 	 */
-	public Sequence getParentSequence() {
+	public Sequence_DNA getParentSequence() {
 		return parentSequence;
 	}
 	

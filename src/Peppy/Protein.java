@@ -22,7 +22,7 @@ public class Protein implements Comparable<Protein>{
 	private int intronStop = -1;
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
-	private Sequence sequence;
+	private Sequence_DNA sequence_DNA;
 	private ArrayList<Match> matchesAll = new ArrayList<Match>();
 	private ArrayList<Match_IMP_VariMod> matchesWithModifications = new ArrayList<Match_IMP_VariMod>();
 	private ArrayList<Match> matchesWithoutModifications = new ArrayList<Match>();
@@ -57,9 +57,9 @@ public class Protein implements Comparable<Protein>{
 	 * @param intronStart
 	 * @param intronStop
 	 * @param isForward
-	 * @param sequence
+	 * @param sequence_DNA
 	 */
-	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence sequence) {
+	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence_DNA sequence_DNA) {
 		this.name = name;
 		this.start = start;
 		this.acidString = acidString;
@@ -67,7 +67,7 @@ public class Protein implements Comparable<Protein>{
 		this.intronStart = intronStart;
 		this.intronStop = intronStop;
 		this.isForward = isForward;
-		this.sequence = sequence;
+		this.sequence_DNA = sequence_DNA;
 	}
 	
 	/**
@@ -410,7 +410,7 @@ public class Protein implements Comparable<Protein>{
 					peptideIntronStartIndex,
 					intronStop,
 					isForward,
-					sequence,
+					sequence_DNA,
 					this,
 					isSpliced);
 			

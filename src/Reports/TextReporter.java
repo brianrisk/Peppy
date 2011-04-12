@@ -12,6 +12,7 @@ import java.util.Collections;
 import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -35,7 +36,7 @@ public class TextReporter {
 	/**
 	 * @param matches
 	 * @param spectra
-	 * @param sequences
+	 * @param sequence_DNAs
 	 */
 	public TextReporter(ArrayList<Match> matches,
 			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
