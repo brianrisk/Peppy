@@ -1,5 +1,6 @@
 	package Validate;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,10 +25,10 @@ import Peppy.Sequence_Protein;
 import Reports.ReportStrings;
 import Utilities.U;
 
-public class GenerateValidationReport {
+public class ValidationReport {
 	
 	public static ArrayList<TestSet> tests;
-	public static File databaseFile;
+	public static File databaseFile = new File("");
 	public static File reportFolder;
 	public static PrintWriter indexWriter;
 	public static boolean doForwards = true;
@@ -40,18 +41,29 @@ public class GenerateValidationReport {
 	 */
 	public static void main(String[] args) {	
 		setUp();
+		addTests();
 		U.startStopwatch();
 		if (doForwards) forwards();
 		if (doReverse) reverse();
 		createReport();
-//		createResultsFiles();
-//		makeOnlyWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
+		
+//		createResultsFiles();
+//		makeOnlyWrongReport();
 //		compareEValueReports();
 	}
 	
-	public static void setUp() {
+	/**
+	 * If a test set has been previously generated and loaded
+	 * @param testSet
+	 */
+	public ValidationReport(ArrayList<TestSet> testSets) {
+		tests = testSets;
+		setUp();
+	}
+	
+	private static void setUp() {
 		System.setProperty("java.awt.headless", "true"); 
 		//Hello, world!
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
@@ -72,41 +84,45 @@ public class GenerateValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
 		
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-		Properties.scoringMethodName = "Peppy.Match_IMP";
+//		Properties.scoringMethodName = "Peppy.Match_IMP";
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
-		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
 		//uncomment to use HMM score
-//		Properties.scoringMethodName = "Peppy.Match_HMM";
-//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-//		HMMScore.HMMClass.HmmSetUp();
-//		Properties.highIntensityCleaning = true;
+		Properties.scoringMethodName = "Peppy.Match_HMM";
+		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+		HMMScore.HMMClass.HmmSetUp();
+		Properties.highIntensityCleaning = true;
 //		Properties.peakDifferenceThreshold = 0.5;
 
-		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
 		Properties.spectrumToPeptideMassError = 2.0;
 		Properties.peakDifferenceThreshold = 0.3;
-
 		
+	}
+	
+	private static void addTests() {
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 //		String testDirectoryName = "tests/";
 		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli"));
-		tests.add(new TestSet(testDirectoryName, "human"));
-		tests.add(new TestSet(testDirectoryName, "aurum"));	
-		tests.add(new TestSet(testDirectoryName, "USP"));
+		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//		tests.add(new TestSet(testDirectoryName, "USP", Color.DARK_GRAY));
 //		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance"));
 //		Properties.isSequenceFileDNA = true;
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
 //		U.p("forwards database size: " + peptides.size());
 //		forwardsDatabaseSize = peptides.size();
-		
 	}
 	
 	
@@ -114,32 +130,33 @@ public class GenerateValidationReport {
 	 * Completes a search on all test sets in our list using the correct (forward) digestion of our protein database.
 	 */
 	public static void forwards() {
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
 
 		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
 		
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
+		forwardsDatabaseSize += peptides.size();
 
 		while (peptides.size() > 0) {
 			for (TestSet test: tests) {
 				U.p("Getting matches for: " + test.getName());
 				test.findPositiveMatches(peptides);
 			}	
+			peptides.clear();
+			System.gc();
 			peptides = sequence.extractMorePeptides(false);
-			if (peptides == null) break;
+			
+			if (peptides == null) {
+				break;
+			} else {
+				forwardsDatabaseSize += peptides.size();
+			}
 		}
 		
 		for (TestSet test: tests) {
+			test.cleanMatches();
 			test.calculateStastics();
 		}
 		
-		
-//		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
-//		for (TestSet test: tests) {
-//			U.p("Getting matches for: " + test.getName());
-//			test.findPositiveMatches(peptides);
-//			test.calculateStastics();
-//		}	
 	}
 	
 	/**
@@ -468,7 +485,7 @@ public class GenerateValidationReport {
 		//set up which tests we will perform
 		tests = new ArrayList<TestSet>();
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-		tests.add(new TestSet(testDirectoryName, "ecoli"));
+		tests.add(new TestSet(testDirectoryName, "ecoli", Color.red));
 //		tests.add(new TestSet(testDirectoryName,"human"));
 //		tests.add(new TestSet(testDirectoryName, "aurum"));	
 //		tests.add(new TestSet(testDirectoryName, "USP"));
@@ -482,6 +499,7 @@ public class GenerateValidationReport {
 		}
 		
 		for (TestSet test: tests) {
+			test.cleanMatches();
 			test.calculateStastics();
 			generateWrongReport(test);
 		}

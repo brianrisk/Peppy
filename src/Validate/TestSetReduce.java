@@ -119,7 +119,7 @@ public class TestSetReduce {
 				}
 				
 				//see that the peptide is in the database
-				if (GenerateValidationReport.isPeptidePresentInList( peptide, peptides) < 0) {
+				if (ValidationReport.isPeptidePresentInList( peptide, peptides) < 0) {
 //					U.p("Peptided not in database: " + peptide.getAcidSequenceString());
 					continue;
 				}

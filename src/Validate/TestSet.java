@@ -23,6 +23,7 @@ import Utilities.U;
 public class TestSet {
 	
 	private String testName;
+	private Color color;
 	private ArrayList<Spectrum> spectra;
 	private ArrayList<MatchContainer> topForwardsTestedMatches = null;
 	private ArrayList<Match> topForwardsMatches = null;
@@ -46,9 +47,15 @@ public class TestSet {
 	long timeElapsed = 0;
 	double milisecondsPerSpectrum;
 	
+	public TestSet(String testDirectoryName, String testName, ArrayList<Match> matches, Color color) {
+		this(testDirectoryName, testName, color);
+		positiveMatches = matches;
+	}
+	
 
-	public TestSet(String testDirectoryName, String testName) {
+	public TestSet(String testDirectoryName, String testName, Color color) {
 		this.testName = testName;
+		this.color = color;
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
@@ -108,29 +115,32 @@ public class TestSet {
 		
 	}
 	
+	public void cleanMatches() {
+		//Do a little house cleaning first
+		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
+		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+		Peppy.Peppy.removeMatchesWithLowRank(positiveMatches);	
+	}
+	
 	/**
 	 * This should be called only after our set of matches has been found
 	 */
 	public void calculateStastics() {
 		
-		//track out time
+		//track r time
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
-		
-		//Do a little house cleaning first
-		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
-		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
-		Peppy.Peppy.removeMatchesWithLowRank(positiveMatches);
-		
+
 		//sorting by confidence
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
 //		Match.setSortParameter(Match.SORT_BY_P_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
 //		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(positiveMatches);
+		
 		
 		//See which of the positive matches are true
 		testedMatches = new ArrayList<MatchContainer>();
@@ -187,7 +197,7 @@ public class TestSet {
 			g.fillRect(0,0,width,height);
 			
 			//setting the line color
-			g.setColor(Color.red);
+			g.setColor(color);
 			
 			int x1 = 0;
 			int x2 = 0;
@@ -208,8 +218,8 @@ public class TestSet {
 				
 				precision = (double) trueCount / (i + 1);
 				recallPrevious = recall;
-//				recall = (double) trueCount / getSetSize();	
-				recall = (double) trueCount / totalTrueTally;	
+				recall = (double) trueCount / getSetSize();	
+//				recall = (double) trueCount / totalTrueTally;	
 				
 				area += (recall - recallPrevious) * precision;
 				
@@ -224,7 +234,7 @@ public class TestSet {
 					x1 = x2_old;
 					
 	//				U.p(trueCount + ", " + precision);
-					g.setColor(Color.red);
+					g.setColor(color);
 	//				g.setStroke(new BasicStroke(2.0f));
 					g.drawLine(x1, y1, x2, y2);
 					//let's fill in the area under the line, yes?
@@ -233,7 +243,7 @@ public class TestSet {
 					polygon.addPoint(x2, y2);
 					polygon.addPoint(x2, height);
 					polygon.addPoint(x1, height);
-					g.setColor(new Color(255,0,0,128));
+					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue() ,128));
 					g.fillPolygon(polygon);
 					
 					//updating variables
@@ -243,7 +253,7 @@ public class TestSet {
 				
 			}
 			//draw final line straight down (just for looks)
-			g.setColor(Color.red);
+			g.setColor(color);
 	//		g.setStroke(new BasicStroke(2.0f));
 			g.drawLine(x2, y1, x2, height);
 			

@@ -76,21 +76,11 @@ public class MatchContainer implements Comparable<MatchContainer>{
 			isTrue = match.getPeptide().equals(correctAcidSequence);
 			
 			//If this match is not the true match:
-			if(!isTrue) {
-				trueMatch = Properties.matchConstructor.createMatch(match.getSpectrum(), new Peptide(this.correctAcidSequence));
-				double trueEValue = match.getSpectrum().getEValue(trueMatch.getScore());
-				trueMatch.setEValue(trueEValue);
-				
-				//if not in database
-//				if (trueMatch.getScore() > match.getScore()) {
-//					isTrue = true;
-//					match = trueMatch;
-//				}
-				//in case the scores are equal
-//				if (trueMatch.getScore() == match.getScore()) {
-//					isTrue = true;
-//				}
-			}
+//			if(!isTrue) {
+//				trueMatch = Properties.matchConstructor.createMatch(match.getSpectrum(), new Peptide(this.correctAcidSequence));
+//				double trueEValue = match.getSpectrum().getEValue(trueMatch.getScore());
+//				trueMatch.setEValue(trueEValue);
+//			}
 		} else {
 			U.p("ERROR: there was not a valid peptide file at " + peptideFile.getName());
 		}
