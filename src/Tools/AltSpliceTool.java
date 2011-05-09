@@ -1,4 +1,4 @@
-package Peppy;
+package Tools;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import Peppy.Definitions;
+import Peppy.Peptide;
+import Peppy.RNA_Digestor;
+import Peppy.RNA_Sequence;
+import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Utilities.U;
 
 /**
