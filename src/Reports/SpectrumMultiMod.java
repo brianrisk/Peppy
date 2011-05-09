@@ -67,8 +67,7 @@ public class SpectrumMultiMod extends HTMLPage {
 		
 		//ending the script
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.0.0.js\"></script>");
-//		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://proteomics.me/resources/processing-1.1.0.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());

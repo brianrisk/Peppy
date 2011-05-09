@@ -112,17 +112,13 @@ public class HTMLReporter {
 			nfPercent.setMaximumFractionDigits(2);
 			
 			//limit how many we will display
-			int maxDisplay = 1000;
+			int maxDisplay = 10000;
 			if (maxDisplay > bestMatches.size()) maxDisplay = bestMatches.size();
 			
 			for (int i = 0; i < maxDisplay; i++) {
 				Match match = bestMatches.get(i);
 				StringBuffer sb = new StringBuffer();
 				sb.append("<tr>");
-				
-				//create animation
-//				U.p(i);
-//				new TandemFitAnimation(match.getSpectrum().getFile().getAbsolutePath(), match.getPeptide().getAcidSequence());
 				
 				sb.append("<td>");
 				sb.append("<a href=\"spectra/");
@@ -178,6 +174,10 @@ public class HTMLReporter {
 				
 				sb.append("<td>");
 				sb.append(match.getPeptide().isSpliced());
+				sb.append("</td>");
+				
+				sb.append("<td>");
+				sb.append(match.getSpectrum().getCharge());
 				sb.append("</td>");
 				
 				sb.append("<td>");

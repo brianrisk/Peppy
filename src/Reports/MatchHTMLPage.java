@@ -80,43 +80,8 @@ public class MatchHTMLPage extends HTMLPage {
 		spectrumScript.append("];");
 		
 
-		spectrumScript.append("function changePeptide() {");
-		spectrumScript.append("	acidSequence = document.forms['acidSequence'].elements['sequence'].value.toUpperCase();");
-		spectrumScript.append("	Processing.getInstanceById('spectrum').markMatchingIons();	");
-		spectrumScript.append("}");
-		spectrumScript.append("");
-		spectrumScript.append("var peakDifferenceThreshold = 0.5;");
-		spectrumScript.append("function changePeakDifferenceThreshold() {");
-		spectrumScript.append("	peakDifferenceThreshold = parseFloat(document.forms['peakThreshold'].elements['value'].value);");
-		spectrumScript.append("	Processing.getInstanceById('spectrum').markMatchingIons();");
-		spectrumScript.append("}");
-		spectrumScript.append("");
-		spectrumScript.append("//alternates between scaled y and not scaled");
-		spectrumScript.append("var scaleYAxis = false;");
-		spectrumScript.append("function toggleYAxisDisplay() {");
-		spectrumScript.append("	if (!scaleYAxis) {");
-		spectrumScript.append("		document.forms['flipScale'].elements['submit'].value = 'un-scale y-axis';");
-		spectrumScript.append("	} else {");
-		spectrumScript.append("		document.forms['flipScale'].elements['submit'].value = 'scale y-axis';");
-		spectrumScript.append("	}");
-		spectrumScript.append("	scaleYAxis = !scaleYAxis;");
-		spectrumScript.append("}");
-		spectrumScript.append("	");
-		spectrumScript.append("");
-		spectrumScript.append("//changes if we see masses for each peak");
-		spectrumScript.append("var displayMasses = false;");
-		spectrumScript.append("function toggleMassDisplay() {");
-		spectrumScript.append("	if (!displayMasses) {");
-		spectrumScript.append("		document.forms['flipMasses'].elements['submit'].value = 'hide masses';");
-		spectrumScript.append("	} else {");
-		spectrumScript.append("		document.forms['flipMasses'].elements['submit'].value = 'show masses';");
-		spectrumScript.append("	}");
-		spectrumScript.append("	displayMasses = !displayMasses;");
-		spectrumScript.append("}");
-		
-		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.0.0.js\"></script>");
-//		spectrumScript.append("<script src=\"../../processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/psv-control.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.1.0.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());

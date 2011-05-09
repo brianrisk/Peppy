@@ -37,6 +37,7 @@ public class ReportStrings {
 		sb.append("            <th scope=\"col\">Stop</th>");
 		sb.append("            <th scope=\"col\">F</th>");
 		sb.append("            <th scope=\"col\">Spliced</th>");
+		sb.append("            <th scope=\"col\">Charge</th>");
 		sb.append("            <th scope=\"col\">Mods</th>");
 		sb.append("            <th scope=\"col\">Score</th>");
 		sb.append("            <th scope=\"col\">ions</th>");

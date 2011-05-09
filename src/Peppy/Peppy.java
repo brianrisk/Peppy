@@ -1,9 +1,5 @@
 package Peppy;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,34 +27,10 @@ public class Peppy {
 		printGreeting();
 		init(args);
 		runJobs(args);
-//		exportPeptideList();
-//		checkSequences();
 		U.p("done");
 	}
 	
-	public static void checkSequences() {
-		U.p("making sure we have the correct start and stop locations");
-		Properties.isSequenceFileDNA = true;
-		Properties.numberOfMissedCleavages = 0;
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(new File("/Users/risk2/PeppyOverflow/sequences HG19/chr12.fa"));
-		Sequence sequence = sequences.get(0);
-		ArrayList<Peptide> peptides;
 
-		peptides = sequence.extractMorePeptides(false);
-		//continually extract peptides from the sequence until there aren't anymore
-		while (peptides != null) {
-			for (Peptide peptide: peptides) {
-				if (peptide.equals("STDYGIFQINSR") || peptide.equals("NMQDMVEDYR")) {
-					U.p (peptide.getAcidSequenceString() + ": " + peptide.getStartIndex() + "\t" + peptide.getStopIndex());
-				}
-			}
-			peptides.clear();
-			System.gc();
-			peptides = sequence.extractMorePeptides(false);
-		}
-		U.p("done");
-		
-	}
 	
 	public static void runPeppy(String [] args) {
 		U.startStopwatch();
@@ -89,7 +61,6 @@ public class Peppy {
 			U.p("digesting...");
 			RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
 			ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
-			U.p("peptide tally: " + peptides.size());
 			
 			U.p("getting matches...");
 			//TODO get rid of this getMatches function when this is overhauled
@@ -103,7 +74,6 @@ public class Peppy {
 				sequences = oneSequenceList;
 			}
 			matches = getMatches(sequences, spectra);
-			U.p("peptide tally: " + peptideTally);
 		}
 		
 		
@@ -120,8 +90,15 @@ public class Peppy {
 			report.generateFullReport();
 		}	
 		
-		U.p();
+		//clear out memory
+		matches.clear();
+		spectra.clear();
+		sequences.clear();
+		System.gc();
+		
+		
 		U.stopStopwatch();
+		U.p();
 	}
 	
 	
@@ -199,6 +176,7 @@ public class Peppy {
 		if (spectraStop > spectra.size()) spectraStop = spectra.size();
 		ArrayList<Match> matches = new ArrayList<Match>();
 		while (true) {
+			U.p("working on spectra " + spectraStart + " to " + spectraStop);
 			ArrayList<Match> segmentMatches = new ArrayList<Match>();
 			
 			//grab our segment of spectra
@@ -228,8 +206,10 @@ public class Peppy {
 						evaluateMatches(newMatches, segmentMatches);
 						peptides.clear();
 						System.gc();
+						
 						removeDuplicateMatches(segmentMatches);
 					}
+					sequence.reset();
 				}
 				U.p("evaulating for " + peptides.size() + " peptide subset");
 				peptideTally += peptides.size();
@@ -267,6 +247,10 @@ public class Peppy {
 			
 			assignConfidenceValuesToMatches(segmentMatches);
 			evaluateMatches(segmentMatches, matches);
+			
+			//clear out memory
+			segmentMatches.clear();
+			System.gc();
 			
 			//increment our spectrum segment markers
 			if (spectraStop == spectra.size()) break;
@@ -455,43 +439,6 @@ public class Peppy {
 					matches.add(match);
 				}
 			}
-		}
-	}
-
-	/**
-	 * saves a file of peptide information
-	 * @param peptides
-	 */
-	@SuppressWarnings("unused")
-	private static void exportPeptideList() {
-		U.p("exporting peptide list");
-		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
-		
-		try {
-			//loop through each sequence in the sequences ArrayList
-			File peptidesFolder = new File ("peptides");
-			peptidesFolder.mkdir();
-			for (Sequence sequence: sequences) {
-				U.p("working on sequence " + sequence.getSequenceFile().getName());
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
-				
-				ArrayList<Peptide> peptides = null;
-				peptides = sequence.extractMorePeptides(false);
-				while (peptides != null) {
-					for (Peptide peptide: peptides) {
-						pw.println(peptide);
-					}
-					peptides = sequence.extractMorePeptides(false);
-				}
-				peptides = null;
-				System.gc();
-				pw.flush();
-				pw.close();
-				U.p(sequence.getSequenceFile().getName() + " digested.");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	

@@ -67,9 +67,8 @@ public class SpectrumHTMLPage extends HTMLPage {
 
 		
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.0.0.js\"></script>");
-		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/pvs-control.js\"></script>");
-//		spectrumScript.append("<script src=\"processing-1.0.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.1.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/psv-control.js\"></script>");
 		
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());

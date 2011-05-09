@@ -28,6 +28,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private boolean isSpliced;
 	private boolean isMatched = false;
 	private int lengthMinusOne;
+	private int cleavageAcidCount;
 	
 	
 	public boolean isMatched() {
@@ -43,27 +44,11 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this.acidSequence = AminoAcids.getByteArrayForString(sequence);
-		this.mass = calculateMass();
-		this.startIndex = 0;
-		this.stopIndex = acidSequence.length;
-		this.forward = true;
-		this.parentSequence = null;
-		this.isSpliced = false;
-		this.lengthMinusOne = this.acidSequence.length - 1;
+		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false);
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, boolean isSpliced) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
-		this.startIndex = startIndex;
-		this.stopIndex = stopIndex;
-		this.intronStartIndex = intronStartIndex;
-		this.intronStopIndex = intronStopIndex;
-		this.forward = forward;
-		this.parentSequence = parentSequence;
-		this.isSpliced = isSpliced;
-		this.lengthMinusOne = this.acidSequence.length - 1;
+		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced);
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced) {
@@ -78,6 +63,13 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.protein = protein;
 		this.isSpliced = isSpliced;
 		this.lengthMinusOne = this.acidSequence.length - 1;
+		
+		cleavageAcidCount = 0;
+		for (int i = 0; i < this.acidSequence.length; i++) {
+			if (this.acidSequence[i] == AminoAcids.K || this.acidSequence[i] == AminoAcids.R) {
+				cleavageAcidCount++;
+			}
+		}
 	}
 
 
@@ -216,25 +208,9 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	}
 
 
-//	/**
-//	 * This returns the start position.  For reporting purposes.  Conforms to standards.
-//	 * @return
-//	 */
-//	public int getSTART() {
-//		if (forward) {
-//			return startIndex;
-//		} else {
-//			return startIndex + 1 - (acidSequence.length() * 3);
-//		}
-//	}
-//	
-//	public int getSTOP() {
-//		if (forward) {
-//			return startIndex + (acidSequence.length() * 3);
-//		} else {
-//			return startIndex + 1;
-//		}
-//	}
+	public int getCleavageAcidCount() {
+		return cleavageAcidCount;
+	}
 
 
 	/**

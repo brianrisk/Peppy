@@ -17,12 +17,12 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 
 
 ##This could be a directory or a file
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra bad E values
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
@@ -31,7 +31,6 @@ spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem
 scoringMethodName Peppy.Match_IMP
 //scoringMethodName Peppy.Match_TandemFit
 //scoringMethodName Peppy.Match_HMM
-//scoringMethodName Peppy.Match_IMP_MultiMod
 
 //digest only part of a sequence
 useSequenceRegion false
@@ -42,8 +41,8 @@ sequenceRegionStop 35253949
 onlyUsePeptidesInOpenReadingFrames false
 
 //limit returned matches by confidence
-useEValueCutOff true
 eValueCutOff 0.03359587957603186
+//eValueCutOff 0.1 
 
 //a preference for digestion of large DNA windows
 digestionWindowSize 25000000
@@ -73,7 +72,7 @@ useSpliceVariants false
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
 //it will produce (at least) 35 matches per spectrum
 //the final number of results also varies depending on the digestionWindowSize
-maximumNumberOfMatchesForASpectrum 1
+maximumNumberOfMatchesForASpectrum 3
 
 //where we store our reports
 reportDirectory reports

@@ -267,16 +267,14 @@ public class Protein implements Comparable<Protein>{
 			
 			//if we are at a break, 
 			if (isBreak(aminoAcid)) {
-				if (isBreak(aminoAcid)) {
-					//remove those which have exceeded the max break count
-					int size = peptidesUnderConstruction.size();
-					for (int pucIndex = 0; pucIndex < size; pucIndex++) {
-						PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
-						if (puc.getBreakCount() > maxCleavages) {
-							peptidesUnderConstruction.remove(pucIndex);
-							pucIndex--;
-							size--;
-						}
+				//remove those which have exceeded the max break count
+				int size = peptidesUnderConstruction.size();
+				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
+					PeptideUnderConstruction puc = peptidesUnderConstruction.get(pucIndex);
+					if (puc.getBreakCount() > maxCleavages) {
+						peptidesUnderConstruction.remove(pucIndex);
+						pucIndex--;
+						size--;
 					}
 				}
 				
@@ -378,6 +376,7 @@ public class Protein implements Comparable<Protein>{
 		int peptideIntronStartIndex;
 		int peptideIntronStopIndex;
 		Peptide peptide;
+		String sequenceString = puc.getSequence();
 		
 		//splice related
 		isSpliced =  (puc.getStartIndex() < intronStartIndex && acidIndex > intronStopIndex);
@@ -390,7 +389,7 @@ public class Protein implements Comparable<Protein>{
 		}
 		
 		//might not be considering very long peptides
-		if (puc.getSequence().length() <= Properties.peptideMaximumLength) {
+		if (sequenceString.length() <= Properties.peptideMaximumLength) {
 			//If this is coming from DNA or RNA, there is a different peptide constructor
 			int stopIndex = acidIndex;
 			int intronStop = peptideIntronStopIndex;
@@ -404,7 +403,7 @@ public class Protein implements Comparable<Protein>{
 				intronStop -= 4;
 			}
 			peptide = new Peptide(
-					puc.getSequence(),
+					sequenceString,
 					puc.getStartIndex(),
 					stopIndex,
 					peptideIntronStartIndex,

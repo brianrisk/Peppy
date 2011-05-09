@@ -21,7 +21,7 @@ import Utilities.U;
 public class Sequence_Protein extends Sequence {
 	
 	//private final int maxProteinSize = 277882;
-	private final int maxProteinSize = 150000;
+	private final int maxProteinSize = 10000;
 	BufferedReader reader = null;
 	ArrayList<Protein> proteins = null;
 	

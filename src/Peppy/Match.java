@@ -25,7 +25,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public int repeatCount = 0; 
 	public int rank = Integer.MAX_VALUE;
 	
-	private double eValue;
+	protected double eValue;
 	protected double impValue = -1;
 	
 	private static int sortTracker = 0;
@@ -46,26 +46,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	
 	public abstract void calculateScore();
 	public abstract String getScoringMethodName();
-	
-//	public abstract Match createMatch(Spectrum spectrum, Peptide peptide);
-	
-//	public static Match createMatch(Spectrum spectrum, Peptide peptide) {
-//		if (Properties.defaultScore == Properties.DEFAULT_SCORE_IMP) {
-//			return new Match_IMP(spectrum, peptide);
-//		} else {
-//			if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
-//				return new Match_TandemFit(spectrum, peptide);
-//			} else {
-//				if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
-//					return new Match_HMM(spectrum, peptide);
-//				} else {
-//					U.p("ERROR: undefined scoring method");
-//					System.exit(1);
-//				}
-//			}
-//		}
-//		return null;
-//	}
 	
 	
 	public double calculateIMP() {
