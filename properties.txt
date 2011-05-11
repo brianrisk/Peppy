@@ -1,11 +1,11 @@
 ##FASTA files can be either DNA or amino acid sequences
-isSequenceFileDNA true
+isSequenceFileDNA false
 sequenceFilesContainMultipleSequences false
 useOnlyForwardsFrames false
 useIsotopeLabeling false
 
 ##This could be a directory or a file
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr1.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
@@ -14,10 +14,11 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
 
 
 ##This could be a directory or a file
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra bad E values
@@ -26,6 +27,7 @@ spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
 
 //Scoring Method
 scoringMethodName Peppy.Match_IMP

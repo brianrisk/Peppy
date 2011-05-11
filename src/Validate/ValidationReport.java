@@ -90,19 +90,19 @@ public class ValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
-//		Properties.scoringMethodName = "Peppy.Match_IMP";
+		Properties.scoringMethodName = "Peppy.Match_IMP";
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
-//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
 		//uncomment to use HMM score
-		Properties.scoringMethodName = "Peppy.Match_HMM";
-		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-		HMMScore.HMMClass.HmmSetUp();
-		Properties.highIntensityCleaning = true;
+//		Properties.scoringMethodName = "Peppy.Match_HMM";
+//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+//		HMMScore.HMMClass.HmmSetUp();
+//		Properties.highIntensityCleaning = true;
 //		Properties.peakDifferenceThreshold = 0.5;
 
-//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
-		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
+		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
 		Properties.spectrumToPeptideMassError = 2.0;
 		Properties.peakDifferenceThreshold = 0.3;
 		

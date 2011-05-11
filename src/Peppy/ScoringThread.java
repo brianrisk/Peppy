@@ -62,8 +62,13 @@ public class ScoringThread implements Runnable {
 			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(matchesForOneSpectrum);
 			ArrayList<Match> topMatches = new ArrayList<Match>();
-			int max = Properties.maximumNumberOfMatchesForASpectrum;
-			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
+			int max;
+			if (Properties.isSequenceFileDNA) {
+				max = Properties.maximumNumberOfMatchesForASpectrum;
+				if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
+			} else {
+				max = matchesForOneSpectrum.size();
+			}
 			for (int i = 0; i < max; i++) {
 				topMatches.add(matchesForOneSpectrum.get(i));
 			}

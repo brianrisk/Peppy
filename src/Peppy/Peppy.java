@@ -206,8 +206,6 @@ public class Peppy {
 						evaluateMatches(newMatches, segmentMatches);
 						peptides.clear();
 						System.gc();
-						
-						removeDuplicateMatches(segmentMatches);
 					}
 					sequence.reset();
 				}
@@ -218,8 +216,6 @@ public class Peppy {
 				evaluateMatches(newMatches, segmentMatches);
 				peptides.clear();
 				System.gc();
-				removeDuplicateMatches(segmentMatches);
-
 			} else {
 				for (Sequence sequence: sequences) {
 					U.p("working on sequence: " +sequence.getSequenceFile().getName());
@@ -240,11 +236,10 @@ public class Peppy {
 						peptides = sequence.extractMorePeptides(isReverse);
 					}
 					sequence.reset();
-					removeDuplicateMatches(segmentMatches);
 				}
 			}
 			
-			
+			removeDuplicateMatches(segmentMatches);
 			assignConfidenceValuesToMatches(segmentMatches);
 			evaluateMatches(segmentMatches, matches);
 			
@@ -283,9 +278,7 @@ public class Peppy {
 		//Add only matches with a decent e value
 		evaluateMatches(newMatches, matches);
 		
-		if (Properties.isSequenceFileDNA) {
-			removeDuplicateMatches(matches);
-		}
+		removeDuplicateMatches(matches);
 		assignRankToMatches(matches);
 		assignRepeatedPeptideCount(matches);
 		assignConfidenceValuesToMatches(matches);
@@ -365,9 +358,19 @@ public class Peppy {
 		}
 	}
 	
+	/**
+	 * NOTE:  this should only be used for DNA/RNA based searches
+	 * It removes hits to peptides which are redundant.  For example, a spectrum
+	 * has two matches where the peptide is the exact same: same sequence, same start, same direction.
+	 * These redundant matches can occasionally come up due to the way large sequences are digested
+	 * @param matches
+	 */
 	public static void removeDuplicateMatches(ArrayList<Match> matches) {
 		//first error check
 		if (matches.size() == 0) return;
+		
+		//second error check
+		if (!Properties.isSequenceFileDNA) return;
 		
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
 		Collections.sort(matches);
@@ -376,28 +379,15 @@ public class Peppy {
 		Match previousMatch = matches.get(0);
 		int spectrumID;
 		int previousSpectrumID = previousMatch.getSpectrum().getId();
-		boolean areEqual;
 		for (int i = 1; i < numberOfMatches; i++) {
 			match = matches.get(i);
 			spectrumID = match.getSpectrum().getId();
-			areEqual = false;
-			if (match.getPeptide().isForward() && previousMatch.getPeptide().isForward()) {
-				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
-					areEqual = true;
-					matches.remove(i);
-					i--;
-					numberOfMatches--;
-				}
-			}
-			if (!match.getPeptide().isForward() && !previousMatch.getPeptide().isForward()) {
-				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
-					areEqual = true;
-					matches.remove(i);
-					i--;
-					numberOfMatches--;
-				}
-			}
-			if (!areEqual) {
+
+			if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
+				matches.remove(i);
+				i--;
+				numberOfMatches--;
+			} else {
 				previousMatch = match;
 				previousSpectrumID = spectrumID;
 			}
