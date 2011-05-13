@@ -1,10 +1,10 @@
 package Peppy;
 import java.util.ArrayList;
 
-public class DNA_DigestionThread implements Runnable {
+public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-	DNA_Sequence nucleotideSequence;
+	Nucleotides nucleotideSequence;
 	byte frame;
 	boolean forwardsStrand;
 	int startIndex;
@@ -26,7 +26,7 @@ public class DNA_DigestionThread implements Runnable {
 	 * @param frame
 	 * @param forwardsStrand
 	 */
-	public DNA_DigestionThread(DNA_Sequence nucleotideSequence,
+	public DigestionThread_DNA(Nucleotides nucleotideSequence,
 			byte frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
 		if (startIndex < 0) startIndex = 0;
 		this.nucleotideSequence = nucleotideSequence;

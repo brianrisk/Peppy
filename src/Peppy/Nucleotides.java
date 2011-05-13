@@ -5,7 +5,7 @@ package Peppy;
  * @author Brian Risk
  *
  */
-public class DNA_Sequence {
+public class Nucleotides {
 	
 	private String sequenceDescription;
 	private String sequence;
@@ -13,7 +13,7 @@ public class DNA_Sequence {
 	
 
 	
-	public DNA_Sequence(String sequenceDescription, String sequence, Sequence_DNA parentSequence) {
+	public Nucleotides(String sequenceDescription, String sequence, Sequence_DNA parentSequence) {
 		this.sequenceDescription = sequenceDescription;
 		this.sequence = sequence;
 		this.parentSequence = parentSequence;

@@ -4,7 +4,7 @@ import Utilities.U;
 
 public class RNA_Sequence {
 	
-	DNA_Sequence DNA;
+	Nucleotides DNA;
 	byte [] RNA_5to3 = null;
 	byte [] RNA_3to5 = null;
 	int start;
@@ -75,7 +75,7 @@ public class RNA_Sequence {
 	 * @param start
 	 * @param stop
 	 */
-	public RNA_Sequence (DNA_Sequence dna, int start, int stop) {
+	public RNA_Sequence (Nucleotides dna, int start, int stop) {
 		DNA = dna;
 		this.start = start;
 		this.stop = stop;

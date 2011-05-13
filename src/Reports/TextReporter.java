@@ -119,56 +119,54 @@ public class TextReporter {
 			pw.println(sb);		
 			
 			//print rows
-			for (Match match: matches) {;
-				if (match.getEValue() <= Properties.eValueCutOff) {
-					sb = new StringBuffer();
-					sb.append(match.getSpectrum().getId());
+			for (Match match: matches) {
+				sb = new StringBuffer();
+				sb.append(match.getSpectrum().getId());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getMD5());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getFile().getName());
+				sb.append('\t');
+				sb.append(match.getScore());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getPrecursorMZ());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getMass());
+				sb.append('\t');
+				sb.append(match.getEValue());
+				sb.append('\t');
+				sb.append(match.getPeptide().getAcidSequenceString());
+				sb.append('\t');
+				if (Peppy.Properties.isSequenceFileDNA) {
+					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
 					sb.append('\t');
-					sb.append(match.getSpectrum().getMD5());
+					sb.append(match.getPeptide().getProtein().getName());
 					sb.append('\t');
-					sb.append(match.getSpectrum().getFile().getName());
+					sb.append(match.getPeptide().getStartIndex());
 					sb.append('\t');
-					sb.append(match.getScore());
+					sb.append(match.getPeptide().getStopIndex());
 					sb.append('\t');
-					sb.append(match.getSpectrum().getPrecursorMZ());
+					sb.append(match.getPeptide().getIntronStartIndex());
 					sb.append('\t');
-					sb.append(match.getSpectrum().getMass());
+					sb.append(match.getPeptide().getIntronStopIndex());
 					sb.append('\t');
-					sb.append(match.getEValue());
+					sb.append(match.getPeptide().isForward() ? "+" : "-");
 					sb.append('\t');
-					sb.append(match.getPeptide().getAcidSequenceString());
-					sb.append('\t');
-					if (Peppy.Properties.isSequenceFileDNA) {
-						sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
-						sb.append('\t');
-						sb.append(match.getPeptide().getProtein().getName());
-						sb.append('\t');
-						sb.append(match.getPeptide().getStartIndex());
-						sb.append('\t');
-						sb.append(match.getPeptide().getStopIndex());
-						sb.append('\t');
-						sb.append(match.getPeptide().getIntronStartIndex());
-						sb.append('\t');
-						sb.append(match.getPeptide().getIntronStopIndex());
-						sb.append('\t');
-						sb.append(match.getPeptide().isForward() ? "+" : "-");
-						sb.append('\t');
-						sb.append(match.getPeptide().isSpliced());
-					} else {
-						sb.append(match.getPeptide().getProtein().getName());
-					}
-					sb.append('\t');
-					sb.append(match.rank);
-					sb.append('\t');
-					sb.append(match.repeatCount);
-					sb.append('\t');
-					sb.append(match.getIonMatchTally());
-					sb.append('\t');
-					sb.append(match.isIsotopeLabeled());
-					sb.append('\t');
-					sb.append(match.getPeptide().getCleavageAcidCount());
-					pw.println(sb);
+					sb.append(match.getPeptide().isSpliced());
+				} else {
+					sb.append(match.getPeptide().getProtein().getName());
 				}
+				sb.append('\t');
+				sb.append(match.rank);
+				sb.append('\t');
+				sb.append(match.repeatCount);
+				sb.append('\t');
+				sb.append(match.getIonMatchTally());
+				sb.append('\t');
+				sb.append(match.isIsotopeLabeled());
+				sb.append('\t');
+				sb.append(match.getPeptide().getCleavageAcidCount());
+				pw.println(sb);
 			}
 			
 

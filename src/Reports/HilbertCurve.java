@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import Peppy.DNA_DigestionThread;
-import Peppy.DNA_Sequence;
+import Peppy.DigestionThread_DNA;
+import Peppy.Nucleotides;
 import Peppy.Definitions;
 import Peppy.Properties;
 import Peppy.Sequence;
@@ -68,7 +68,7 @@ public class HilbertCurve {
 		//get our sequence
 		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		Sequence_DNA sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
-		DNA_Sequence dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
+		Nucleotides dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
 		String dna = dnaSequence.getSequence();		
 		int sequenceIndexStart = 0;
 		int sequenceIndexStop = dna.length();
@@ -117,7 +117,7 @@ public class HilbertCurve {
 				mod = (index - start) % 3;
 				codon[mod] = dna.charAt(index);
 				if (mod == 2) {
-					aminoAcid = Definitions.aminoAcidList[DNA_DigestionThread.indexForCodonArray(codon, forwards)];
+					aminoAcid = Definitions.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, forwards)];
 					if (aminoAcid == 'M') {
 						inORF = true;
 					}
