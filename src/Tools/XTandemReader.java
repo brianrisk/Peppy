@@ -24,29 +24,32 @@ import Validate.ValidationReport;
 public class XTandemReader {
 	
 	//Where our report files are located
-	static String reportLocation = "reports/X!Tandem reports/EColi";
+//	static String reportLocation = "reports/X!Tandem reports/EColi";
 //	static String reportLocation = "reports/X!Tandem reports/Kapp";
-//	static String reportLocation = "reports/X!Tandem reports/Aurum";
+	static String reportLocation = "reports/X!Tandem reports/Aurum";
 	
-	//the suffix that the files have
-	static String suffix = ".xml";
+//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/";
+//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/";
+	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/";
 	
 	//test name (from ValidationReport)
-	static String testName = "ecoli";
+//	static String testName = "ecoli";
 //	static String testName = "human";
-//	static String testName = "aurum";
+	static String testName = "aurum";
 	
-	static Color color = Color.red;
-//	static Color color = Color.green;
+//	static Color color = Color.red;
 //	static Color color = Color.blue;
+	static Color color = Color.green;
+	
 	
 	//test spectra location
 	static String testLocation = "/Users/risk2/PeppyOverflow/tests/";
 	
+	//the suffix that the files have
+	static String suffix = ".xml";
+	
 	//what surrounds the spectrum file name
-	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/";
-//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/";
-//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/";
+
 	static String spectrumStop = "'\">";
 	static String eStart = "expect=\"";
 	static String seqStart = "seq=\"";

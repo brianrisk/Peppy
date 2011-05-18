@@ -11,10 +11,10 @@ public class RNA_Sequence {
 	int stop;
 	int length;
 	
-	public static byte BASE_A = 1;
-	public static byte BASE_U = 2;
-	public static byte BASE_G = 3;
-	public static byte BASE_C = 4;
+	public final static byte BASE_A = 0;
+	public final static byte BASE_U = 1;
+	public final static byte BASE_G = 2;
+	public final static byte BASE_C = 3;
 	
 	//splice related
 	private boolean [] forwardsStartLocations = null;
@@ -50,7 +50,7 @@ public class RNA_Sequence {
 	 */
 	public static char getRNAChar(byte rna) {
 		if (rna == BASE_A) return 'A';
-		if (rna == BASE_U) return 'T'; //TODO change back to U
+		if (rna == BASE_U) return 'U';
 		if (rna == BASE_G) return 'G';
 		return 'C';
 	}

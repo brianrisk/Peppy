@@ -28,17 +28,18 @@ public class MascotReader {
 
 	//Where our report files are located
 //	static String reportLocation = "reports/Mascot/ecoli.txt";
-//	static String reportLocation = "reports/Mascot/kapp.txt";
-	static String reportLocation = "reports/Mascot/aurum.txt";
+	static String reportLocation = "reports/Mascot/kapp.txt";
+//	static String reportLocation = "reports/Mascot/aurum.txt";
 	
 	//test name (from ValidationReport)
 //	static String testName = "ecoli";
-//	static String testName = "human";
-	static String testName = "aurum";
+	static String testName = "human";
+//	static String testName = "aurum";
 	
 //	static Color color = Color.red;
-//	static Color color = Color.green;
 	static Color color = Color.blue;
+//	static Color color = Color.green;
+	
 	
 	//test spectra location
 	static String testLocation = "/Users/risk2/PeppyOverflow/tests/";

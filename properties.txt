@@ -7,14 +7,14 @@ useIsotopeLabeling false
 ##This could be a directory or a file
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr1.fa
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
 
 
 ##This could be a directory or a file
@@ -27,7 +27,8 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode/DTA_FILES/122409_GO_SDSPAGE_mem_2_091225003916/122409_GO_SDSPAGE_mem_2_091225003916.2243.2243.2.dta
 
 //Scoring Method
 scoringMethodName Peppy.Match_IMP
@@ -43,8 +44,8 @@ sequenceRegionStop 35253949
 onlyUsePeptidesInOpenReadingFrames false
 
 //limit returned matches by confidence
-eValueCutOff 0.03359587957603186
-//eValueCutOff 0.1 
+//eValueCutOff 0.03359587957603186
+eValueCutOff 0.1 
 
 //a preference for digestion of large DNA windows
 digestionWindowSize 25000000

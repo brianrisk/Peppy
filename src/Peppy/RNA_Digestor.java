@@ -246,15 +246,16 @@ public class RNA_Digestor {
 		return peptides;
 	}
 	
+	
 	//does both normal and spliced digestion
 	private void fullDigest() {
 		//normal digestion
-		peptides.addAll(digest(0,length, true, rna.getRNA_5to3()));
-		peptides.addAll(digest(1,length, true, rna.getRNA_5to3()));
-		peptides.addAll(digest(2,length, true, rna.getRNA_5to3()));
-		peptides.addAll(digest(0,length, true, rna.getRNA_3to5()));
-		peptides.addAll(digest(1,length, true, rna.getRNA_3to5()));
-		peptides.addAll(digest(2,length, true, rna.getRNA_3to5()));
+//		peptides.addAll(digest(0,length, true, rna.getRNA_5to3()));
+//		peptides.addAll(digest(1,length, true, rna.getRNA_5to3()));
+//		peptides.addAll(digest(2,length, true, rna.getRNA_5to3()));
+//		peptides.addAll(digest(0,length, true, rna.getRNA_3to5()));
+//		peptides.addAll(digest(1,length, true, rna.getRNA_3to5()));
+//		peptides.addAll(digest(2,length, true, rna.getRNA_3to5()));
 		
 		//finding splices
 		digestSplices(rna.getRNA_5to3(), true, rna.getForwardsStartLocations(), rna.getForwardsStopLocations());	
@@ -298,22 +299,7 @@ public class RNA_Digestor {
 			}
 		}
 	}
-	/*
-	 * 
-	 * @param startIndex
-	 * @param stopIndex
-	 * @param isForward
-	 * @param codeChunk
-	 * @param spliceLocation -1 if not a spliced sequence
-	 * @param beginLocus
-	 * @param intronLength
-	 * @return
-	 */
 	
-	
-	
-	
-
 
 	/*
 	 * TODO this method needs to make sure that if any unknown characters are found then 

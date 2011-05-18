@@ -92,8 +92,6 @@ public class DigestionThread_DNA implements Runnable {
 		if (buildingProtein.length() > 3) {
 			proteins.add(new Protein(name, index, buildingProtein.toString(), false, -1, -1, forwardsStrand, sequence_DNA));
 		}
-			
-	
 		return proteins;
 	}
 
