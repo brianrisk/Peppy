@@ -462,7 +462,7 @@ public class Protein implements Comparable<Protein>{
 		return start;
 	}
 	
-	private boolean isBreak(char aminoAcid) {
+	public static boolean isBreak(char aminoAcid) {
 		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
 	}
 	

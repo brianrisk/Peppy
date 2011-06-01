@@ -24,7 +24,7 @@ public class Properties {
 	
 	//Define our scoring method
 	public static String scoringMethodName = "Peppy.Match_IMP";
-	public static MatchConstructor matchConstructor;
+	public static MatchConstructor matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 	
 	//TODO need to set up modification possibilities
 	public static ModificationPossibilities modificationPossibilities = new ModificationPossibilities();
@@ -32,6 +32,9 @@ public class Properties {
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
+	
+	//ignore spectra with large charges
+	public static boolean ignoreSpectraWithChargeGreaterThanTwo = false;
 	
 	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
@@ -186,6 +189,10 @@ public class Properties {
 		//spectrum cleaning
 		if (propertyName.equals("highIntensityCleaning"))
 			highIntensityCleaning = Boolean.valueOf(propertyValue);
+		
+		if (propertyName.equals("ignoreSpectraWithChargeGreaterThanTwo"))
+			ignoreSpectraWithChargeGreaterThanTwo = Boolean.valueOf(propertyValue);
+		
 		
 		
 		if (propertyName.equals("maximumNumberOfMatchesForASpectrum"))

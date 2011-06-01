@@ -1,6 +1,7 @@
 package Reports;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -73,16 +74,6 @@ public class SpectrumHTMLPage extends HTMLPage {
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
 		
-		//histogram
-//		printH2("E value histogram for spectrum " + spectrum.getId());
-//		File histogramFile = new File(destinationFile.getParent(), spectrum.getId() + "-hist.jpg");
-//		try {
-//			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		printP("<img src=\"" + histogramFile.getName() + "\">");
-		
 		//spectrum
 		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
@@ -102,6 +93,16 @@ public class SpectrumHTMLPage extends HTMLPage {
 			printTableRow(match);
 		}
 		print("</table>");
+		
+		//histogram
+		printH2("E value histogram for spectrum " + spectrum.getId());
+		File histogramFile = new File(destinationFile.getParent(), spectrum.getId() + "-hist.jpg");
+		try {
+			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		printP("<img src=\"" + histogramFile.getName() + "\">");
 
 		printFooter();
 	}

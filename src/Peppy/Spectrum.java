@@ -387,7 +387,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	 * scoring mechanisms like tandemFit.  For example, if a very strong peak
 	 * is at 1000 Da and another, weaker peak is at 1000.1 Da with nothing close after it
 	 * then it will never be used as it will always be overshadowed.  This method
-	 * removes those vestigal peaks.
+	 * removes those vestigial peaks.
 	 */
 	private void cleanWithWindow() {
 		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
@@ -512,7 +512,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 						fileOpen = false;
 //						spectrum.sortByMass();
 						spectrum.cleanPeaks();
-						spectra.add(spectrum);
+						if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
+							spectra.add(spectrum);
+						} else {
+							spectra.add(spectrum);
+						}
 					}
 				} else {
 					if (fileOpen) {
@@ -530,7 +534,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			if (fileOpen) {
 //				spectrum.sortByMass();
 				spectrum.cleanPeaks();
-				spectra.add(spectrum);
+				if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
+					spectra.add(spectrum);
+				} else {
+					spectra.add(spectrum);
+				}
 			}
 			inBR.close();
 		}

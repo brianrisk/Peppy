@@ -54,7 +54,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 8");
+			pw.println("format version 9");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -115,6 +115,8 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Labeled");	
 			sb.append('\t');
+			sb.append("Charge");	
+			sb.append('\t');
 			sb.append("CleavageAcidCount");
 			pw.println(sb);		
 			
@@ -164,6 +166,8 @@ public class TextReporter {
 				sb.append(match.getIonMatchTally());
 				sb.append('\t');
 				sb.append(match.isIsotopeLabeled());
+				sb.append('\t');
+				sb.append(match.getSpectrum().getCharge());
 				sb.append('\t');
 				sb.append(match.getPeptide().getCleavageAcidCount());
 				pw.println(sb);

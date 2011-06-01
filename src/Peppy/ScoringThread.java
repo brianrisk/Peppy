@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Math.MathFunctions;
+import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -45,7 +46,6 @@ public class ScoringThread implements Runnable {
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
 			lastPeptideIndex += 8;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
-			
 			
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
