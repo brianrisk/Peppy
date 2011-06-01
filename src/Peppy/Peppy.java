@@ -10,10 +10,9 @@ import Utilities.U;
 
 /**
  * Peppy
- * A very stripped down Java version of the MS/MS to genome mapping of Morgan Gidding's GFS.
  * Designed with the following goals:
  * 1) More simple code to promote open source development
- * 2) Takes advantage of Java's popularity over Objective-C
+ * 2) Easy proteogenomic mapping
  * 3) better multi-threading
  * @author Brian Risk
  *
@@ -187,12 +186,18 @@ public class Peppy {
 			
 			if (Properties.sequenceFilesContainMultipleSequences) {
 				U.p("Processing all sequences at once");
+				
+				//setting up variables
 				ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 				Sequence sequence;
 				double percentComplete;
 				NumberFormat nfPercent = NumberFormat.getPercentInstance();
 				nfPercent.setMaximumFractionDigits(2);
+				
+				//loop through all of the sequences
 				for (int i = 0; i < sequences.size(); i++) {
+					
+					//get the peptides of the sequence we're looking at
 					sequence = sequences.get(i);
 					peptides.addAll(sequence.extractAllPeptides(isReverse));
 					
@@ -226,10 +231,8 @@ public class Peppy {
 					//continually extract peptides from the sequence until there aren't anymore
 					while (peptides != null) {
 						peptideTally += peptides.size();
-						//This is where the bulk of the processing in long jobs takes
-						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-						//Possible to add only matches with a decent e value
-						evaluateMatches(newMatches, segmentMatches);
+						segmentMatches.addAll((new ScoringThreadServer(peptides, spectraSegment)).getMatches());
+						
 						//free up the memory of the old peptide arraylist
 						peptides.clear();
 						System.gc();
@@ -254,6 +257,8 @@ public class Peppy {
 			if (spectraStop > spectra.size()) spectraStop = spectra.size();
 			
 		}
+		
+		
 		assignRankToMatches(matches);
 		removeMatchesWithLowRank(matches);
 		assignRepeatedPeptideCount(matches);	
@@ -425,6 +430,7 @@ public class Peppy {
 			//The match E value should be less than our cutoff
 			if (match.getEValue() <= Properties.eValueCutOff) {
 				//the match IMP value should always be less than its E value
+				matches.add(match);
 				if (match.calculateIMP() < match.getEValue()) {
 					matches.add(match);
 				}
