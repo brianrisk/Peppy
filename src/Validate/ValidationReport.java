@@ -21,6 +21,7 @@ import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
+import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
 import Reports.ReportStrings;
 import Utilities.U;
@@ -77,12 +78,8 @@ public class ValidationReport {
 			e.printStackTrace();
 		}
 		
-
-		
-//		Properties.peakDifferenceThreshold = 0.3;
-		
 		//how many missed cleavages when we digest
-		Properties.numberOfMissedCleavages = 2;
+		Properties.numberOfMissedCleavages = 1;
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
@@ -90,6 +87,7 @@ public class ValidationReport {
 		Properties.reduceDuplicateMatches = true;
 		
 		//What scoring mechanism?
+//		Properties.scoringMethodName = "Peppy.Match_Fake";
 		Properties.scoringMethodName = "Peppy.Match_IMP";
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
@@ -103,7 +101,7 @@ public class ValidationReport {
 
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
-		Properties.spectrumToPeptideMassError = 2.0;
+		Properties.spectrumToPeptideMassError = 0.01;
 		Properties.peakDifferenceThreshold = 0.3;
 		
 	}
@@ -113,11 +111,11 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 //		String testDirectoryName = "tests/";
 		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 //		tests.add(new TestSet(testDirectoryName, "USP", Color.DARK_GRAY));
-//		tests.add(new TestSet(testDirectoryName, "USP-0.06 precursor tolerance"));
+		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 //		Properties.isSequenceFileDNA = true;
 //		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
 //		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
@@ -132,6 +130,7 @@ public class ValidationReport {
 	public static void forwards() {
 
 		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
+//		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta"));	
 		
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
 		forwardsDatabaseSize += peptides.size();
@@ -167,8 +166,9 @@ public class ValidationReport {
 		//We only want one match per spectrum
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		Sequence_Protein proteinSequence = new Sequence_Protein(databaseFile);
-		ArrayList<Peptide> peptides = proteinSequence.extractAllPeptides(false);
+		Sequence_Protein peptideDatabase = new Sequence_Protein(databaseFile);
+//		Sequence_DNA peptideDatabase = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta"));	
+		ArrayList<Peptide> peptides = peptideDatabase.extractAllPeptides(true);
 		reverseDatabaseSize = peptides.size();
 		
 		for (TestSet test: tests) {
@@ -176,6 +176,8 @@ public class ValidationReport {
 			test.findFalsePositiveMatches(peptides);
 		}		
 	}
+	
+	
 	
 	public static void createReport() {
 		U.p("Data collected, now generating the report...");

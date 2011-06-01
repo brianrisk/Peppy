@@ -1,5 +1,6 @@
 package Utilities;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
@@ -256,6 +257,13 @@ public class U {
 	
 	public static String reverseString(String in) {
 		return new StringBuffer(in).reverse().toString();
+	}
+	
+	public static String getRGBStringFromPercent(double percent) {
+		Color hsb = Color.getHSBColor((float) percent, 1.0f, 1.0f);
+		String rgb = Integer.toHexString(hsb.getRGB());
+		rgb = rgb.substring(2, rgb.length());
+		return rgb;
 	}
 
 }

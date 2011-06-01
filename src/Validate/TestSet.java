@@ -123,6 +123,17 @@ public class TestSet {
 		Peppy.Peppy.removeMatchesWithLowRank(positiveMatches);	
 	}
 	
+	public void resetTest() {
+		positiveMatches = new ArrayList<Match>();
+		topRankTrueTally = 0;
+		topRankFalseTally = 0;
+		totalTrueTally = 0;
+		trueTallyAtFivePercentError = 0;
+		percentAtFivePercentError = 0;
+		eValueAtFivePercentError = 0;
+		areaUnderPRCurve = 0;
+	}
+	
 	/**
 	 * This should be called only after our set of matches has been found
 	 */

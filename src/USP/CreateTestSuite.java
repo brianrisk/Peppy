@@ -10,9 +10,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import Peppy.Match;
+import Peppy.MatchConstructor;
 import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
+import Peppy.ScoringThreadServer;
 import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
 import Utilities.U;
@@ -21,7 +23,7 @@ public class CreateTestSuite {
 
 	/**
 	 * This uses the USP data to create a test suite similar to that of the
-	 * Kapp data set.  This method is not perfect, but it may be good enough
+	 * Aurum data set.  This method is not perfect, but it may be good enough
 	 * for initial testing and optimization.
 	 * 
 	 * The process is this:  We sue the small database of peptides gleaned from
@@ -29,7 +31,7 @@ public class CreateTestSuite {
 	 * MSMSFit.  The idea is that since the database is comparatively small that
 	 * the top match will be the correct match as the odds of a false positive
 	 * in such a small database are slim.  The peptide sequences are then stored
-	 * in a way similar to the way the Kapp set -- each peptide sequence has
+	 * in a way similar to the way the Aurum set -- each peptide sequence has
 	 * its own text file which is named the same as the spectrum it is paired
 	 * with.
 	 * @param args
@@ -38,8 +40,8 @@ public class CreateTestSuite {
 		//Opening message
 		U.p("Creating the necessary files for our USP test suite");
 //		createSuiteFromUSPDatabase();
-//		createSuiteFromTopX(10);
-		createSuiteWithClosePrecursors();
+		createSuiteFromTopX(10);
+//		createSuiteWithClosePrecursors();
 		
 		U.p("Done!");
 	}
@@ -49,32 +51,35 @@ public class CreateTestSuite {
 	 * of these matches have peptides from the USP 50 database.  Those go into our
 	 * test set.
 	 */
-	public static void createSuiteFromTopX(int x) {
-		//set our properties
-		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
-		
-		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-
+	public static void createSuiteFromTopX(int numberToKeepPerSpectrum) {
 		//load the peptides from the database
-		Sequence_Protein sequence = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
-		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
-		
+		Properties.numberOfMissedCleavages = 1;
 		//load the correct peptide set
 		Sequence_Protein sequenceCorrect = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
 		ArrayList<Peptide> correctPeptides = sequenceCorrect.extractAllPeptides(false);
 		
+		//load full database
+		Sequence_Protein sequence = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta"));
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
+		
+		//Load our spectra
+		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+		U.p("loaded " +spectra.size() + " spectra.");
+
 		//restrict the precursors since they should be pretty accurate
-		Properties.spectrumToPeptideMassError = 0.01;
+		Properties.spectrumToPeptideMassError = 0.7;
 		
 		//Get the  matches
-		ArrayList<Match> matches  = Peppy.getMatchesWithPeptides(peptides, spectra);
+		Properties.maximumNumberOfMatchesForASpectrum = numberToKeepPerSpectrum;
+		Properties.scoringMethodName = "Peppy.Match_IMP";
+		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
 		//save to appropriate files
-		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/");
+		File peptideDir = new File("/Users/risk2/PeppyOverflow/tests/USP top " + numberToKeepPerSpectrum + "/peptides/");
 		peptideDir.mkdirs();
-		File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
+		File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP top " + numberToKeepPerSpectrum + "/spectra/");
 		spectraFolder.mkdirs();
 		for (Match match: matches) {
 			try {
@@ -93,43 +98,6 @@ public class CreateTestSuite {
 						U.copyfile(match.getSpectrum().getFile(), spectraFile);
 					}
 				}					
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public static void createSuiteFromUSPDatabase() {
-		//set our properties
-		Properties.spectraDirectoryOrFile = new File("/Users/risk2/PeppyOverflow/spectra USP");
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		
-		//Load our spectra
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
-		U.p("loaded " +spectra.size() + " spectra.");
-
-		//load the peptides from the database
-		Sequence_Protein sequence = new Sequence_Protein(new File("/Users/risk2/PeppyOverflow/USP/extracted-proteins.txt"));
-		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
-		
-		//Get the matches
-		ArrayList<Match> matches  = Peppy.getMatchesWithPeptides(peptides, spectra);
-		
-		//save to appropriate files
-		for (Match match: matches) {
-			try {
-				File peptideFile = new File("/Users/risk2/PeppyOverflow/tests/USP/peptides/" + match.getSpectrum().getFile().getName());
-				PrintWriter pw;
-				pw = new PrintWriter(new BufferedWriter(new FileWriter(peptideFile)));
-				pw.println(match.getPeptide().getAcidSequenceString());
-				pw.flush();
-				pw.close();
-				
-				//copy the spectrum file
-				File spectraFolder =  new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/");
-				File spectraFile = new File(spectraFolder, match.getSpectrum().getFile().getName());
-				spectraFolder.mkdirs();
-				U.copyfile(match.getSpectrum().getFile(), spectraFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
