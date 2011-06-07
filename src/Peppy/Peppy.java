@@ -244,6 +244,8 @@ public class Peppy {
 			
 			removeDuplicateMatches(segmentMatches);
 			assignConfidenceValuesToMatches(segmentMatches);
+			assignRankToMatches(segmentMatches);
+			removeMatchesWithLowRank(segmentMatches);
 			evaluateMatches(segmentMatches, matches);
 			
 			//clear out memory
@@ -258,9 +260,6 @@ public class Peppy {
 			
 		}
 		
-		
-		assignRankToMatches(matches);
-		removeMatchesWithLowRank(matches);
 		assignRepeatedPeptideCount(matches);	
 		
 		return matches;
@@ -430,7 +429,7 @@ public class Peppy {
 			//The match E value should be less than our cutoff
 			if (match.getEValue() <= Properties.eValueCutOff) {
 				//the match IMP value should always be less than its E value
-				matches.add(match);
+//				matches.add(match);
 				if (match.calculateIMP() < match.getEValue()) {
 					matches.add(match);
 				}
