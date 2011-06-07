@@ -101,7 +101,8 @@ public class ValidationReport {
 
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 //		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
-		Properties.spectrumToPeptideMassError = 0.01;
+//		Properties.spectrumToPeptideMassError = 0.01;
+		Properties.spectrumToPeptideMassError = 2;
 		Properties.peakDifferenceThreshold = 0.3;
 		
 	}
@@ -111,9 +112,9 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 //		String testDirectoryName = "tests/";
 		tests = new ArrayList<TestSet>();
-//		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 //		tests.add(new TestSet(testDirectoryName, "USP", Color.DARK_GRAY));
 		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 //		Properties.isSequenceFileDNA = true;
