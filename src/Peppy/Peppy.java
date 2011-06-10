@@ -168,10 +168,9 @@ public class Peppy {
 	 */
 	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
 		//TODO: turn these into preferences
-		int numberOfSpectraPerSegment = 40000;
 		
 		int spectraStart = 0;
-		int spectraStop = numberOfSpectraPerSegment;
+		int spectraStop = Properties.numberOfSpectraPerSegment;
 		if (spectraStop > spectra.size()) spectraStop = spectra.size();
 		ArrayList<Match> matches = new ArrayList<Match>();
 		while (true) {
@@ -255,7 +254,7 @@ public class Peppy {
 			//increment our spectrum segment markers
 			if (spectraStop == spectra.size()) break;
 			spectraStart = spectraStop;
-			spectraStop += numberOfSpectraPerSegment;
+			spectraStop += Properties.numberOfSpectraPerSegment;
 			if (spectraStop > spectra.size()) spectraStop = spectra.size();
 			
 		}

@@ -32,6 +32,7 @@ public class Properties {
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
+	public static int minimumNumberOfPeaksForAValidSpectrum = 4;
 	
 	//ignore spectra with large charges
 	public static boolean ignoreSpectraWithChargeGreaterThanTwo = false;
@@ -47,8 +48,12 @@ public class Properties {
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
 	public static int peptideMaximumLength = 80;
-	public static int digestionWindowSize = 25000000;
 	public static boolean useSequenceRegion = false;
+	
+	//Segmenting up job for memory management
+	public static int numberOfSpectraPerSegment = 40000;
+	public static int digestionWindowSize = 25000000;
+	public static int maxNumberOfProteinsToLoadAtOnce = 10000;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;
@@ -169,8 +174,6 @@ public class Properties {
 			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("peptideMassThreshold")) 
 			peptideMassThreshold = Double.valueOf(propertyValue);
-		if (propertyName.equals("digestionWindowSize")) 
-			digestionWindowSize =Integer.valueOf(propertyValue);
 		if (propertyName.equals("useSequenceRegion"))
 			useSequenceRegion = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStart")) 
@@ -179,6 +182,15 @@ public class Properties {
 			sequenceRegionStop =Integer.valueOf(propertyValue);
 		if (propertyName.equals("useIsotopeLabeling"))
 			useIsotopeLabeling = Boolean.valueOf(propertyValue);
+		
+		//job parsing for memory management
+		if (propertyName.equals("numberOfSpectraPerSegment")) 
+			numberOfSpectraPerSegment =Integer.valueOf(propertyValue);
+		if (propertyName.equals("digestionWindowSize")) 
+			digestionWindowSize =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maxNumberOfProteinsToLoadAtOnce")) 
+			maxNumberOfProteinsToLoadAtOnce =Integer.valueOf(propertyValue);
+		
 		
 		//splicing
 		if (propertyName.equals("useSpliceVariants"))
@@ -192,6 +204,9 @@ public class Properties {
 		
 		if (propertyName.equals("ignoreSpectraWithChargeGreaterThanTwo"))
 			ignoreSpectraWithChargeGreaterThanTwo = Boolean.valueOf(propertyValue);
+		
+		if (propertyName.equals("minimumNumberOfPeaksForAValidSpectrum")) 
+			minimumNumberOfPeaksForAValidSpectrum =Integer.valueOf(propertyValue);
 		
 		
 		

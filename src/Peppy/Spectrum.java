@@ -86,7 +86,12 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public void addPrecursorFromString(String s) {
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
+		try {
 		precursorMZ = Double.parseDouble(chunks[0]);
+		} catch (NumberFormatException nfe) {
+			U.p("bad file: " + file.getPath());
+			System.exit(1);
+		}
 		mass = precursorMZ - Definitions.HYDROGEN_MONO;
 		if (file.getName().endsWith(".dta")) {
 			charge = Integer.parseInt(chunks[1]);
@@ -280,7 +285,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		if (Properties.highIntensityCleaning) {
 			cleanPeaksKeepingHighIntensity();
 		} else {
-			cleanWithWindow();
+			//cleanWithWindow();
+			keepStrongestPeakInRegions();
 		}
 		
 //		markTwinPeaks();
@@ -477,6 +483,19 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		} else {
 			loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra );
 		}
+		
+		/* remove spectra with small amount of peaks */
+		int removeTally = 0;
+		for (int i = 0; i < spectra.size(); i++) {
+			if (spectra.get(i).getPeakCount() < Properties.minimumNumberOfPeaksForAValidSpectrum) {
+				spectra.remove(i);
+				i--;
+				removeTally++;
+			}
+		}
+		U.p("removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks");
+		
+		/* set spectra id */
 		for (int i = 0; i < spectra.size(); i++) {
 			spectra.get(i).setId(i);
 		}

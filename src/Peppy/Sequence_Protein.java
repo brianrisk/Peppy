@@ -20,8 +20,6 @@ import Utilities.U;
  */
 public class Sequence_Protein extends Sequence {
 	
-	//private final int maxProteinSize = 277882;
-	private final int maxProteinSize = 10000;
 	BufferedReader reader = null;
 	ArrayList<Protein> proteins = null;
 	
@@ -122,7 +120,7 @@ public class Sequence_Protein extends Sequence {
 					buffy.append(line);
 				}
 				if (limitAmount) {
-					if (proteins.size() > maxProteinSize) return proteins;
+					if (proteins.size() > Properties.maxNumberOfProteinsToLoadAtOnce) return proteins;
 				}
 				line = reader.readLine();
 			}
@@ -177,7 +175,7 @@ public class Sequence_Protein extends Sequence {
 					proteins.add(new Protein(proteinName, buffy.toString()));
 				}
 				if (limitAmount) {
-					if (proteins.size() > maxProteinSize) return proteins;
+					if (proteins.size() > Properties.maxNumberOfProteinsToLoadAtOnce) return proteins;
 				}
 				//read a new line
 				line = reader.readLine();

@@ -143,8 +143,8 @@ public class TestSet {
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
 
 		//sorting by confidence
-		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
 //		Match.setSortParameter(Match.SORT_BY_P_VALUE);
