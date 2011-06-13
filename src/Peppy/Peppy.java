@@ -230,7 +230,10 @@ public class Peppy {
 					//continually extract peptides from the sequence until there aren't anymore
 					while (peptides != null) {
 						peptideTally += peptides.size();
-						segmentMatches.addAll((new ScoringThreadServer(peptides, spectraSegment)).getMatches());
+						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+						//Possible to add only matches with a decent e value
+						evaluateMatches(newMatches, segmentMatches);
+//						segmentMatches.addAll((new ScoringThreadServer(peptides, spectraSegment)).getMatches());
 						
 						//free up the memory of the old peptide arraylist
 						peptides.clear();
