@@ -90,26 +90,55 @@ public class Sequence_Protein extends Sequence {
 		return peptides;
 	}
 	
+	public static void main(String [] args) {
+		String test = "piowenrweoiren*sflkwnreoin*powiernewoinr*oin";
+		String [] chunks = test.split("\\*");
+		for (int i = 0; i < chunks.length; i++) {
+			U.p(chunks[i]);
+		}
+	}
+	
 	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
 		proteins = new ArrayList<Protein>();
 		try {
 			String line = reader.readLine();
+			
+			/*since proteins occur on multiple lines, this buffer is where they are all put together */
 			StringBuffer buffy = new StringBuffer();
+
+			/* sometimes there are "*" in protein strings to represent chunks.  
+			 * this is where we store those chunks
+			 */
+			String [] proteinChunks;
+			
+			/* the accession number */
 			String proteinName = "";
 			while (line != null) {
-				//this symbol means we've reached the beginning of a new protein and
-				//the one we've been working on has ended
+				
+				/* this symbol means we've reached the beginning of a new protein and
+				the one we've been working on has ended */
 				if (line.startsWith(">")) {
-					//make a new protein if we've been building one
+					
+					/* make a new protein if we've been building one */
 					if (buffy.length() > 0) {
+						
+						/* reverse the string if we are making a null database */
 						if (isReverse) buffy.reverse();
-						proteins.add(new Protein(proteinName, buffy.toString()));
+
+						/* again, this addresses the "*" in some FASTA files */
+						proteinChunks = buffy.toString().split("\\*");
+						
+						/* go through each of our chunks and add them as proteins */
+						for (int i = 0; i < proteinChunks.length; i++) {
+							proteins.add(new Protein(proteinName, buffy.toString()));
+						}
+						
 					}
 
-					//this is the name of the next protein
+					/* this is the name of the next protein */
 					proteinName = line.substring(1).trim();
 					
-					//try to get the accession number from UniProt databases
+					/* try to get the accession number from UniProt databases */
 					if (proteinName.startsWith("sp|") || proteinName.startsWith("tr|")) {
 						String [] proteinWords = proteinName.split("\\|");
 						proteinName = proteinWords[1];

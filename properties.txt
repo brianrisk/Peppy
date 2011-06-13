@@ -50,7 +50,7 @@ minimumNumberOfPeaksForAValidSpectrum 4
 eValueCutOff 0.1 
 
 //Parses jobs with a lot of spectra up in to chunks with this max size
-numberOfSpectraPerSegment 40000
+numberOfSpectraPerSegment 10000
 digestionWindowSize 25000000
 maxNumberOfProteinsToLoadAtOnce 10000
 
