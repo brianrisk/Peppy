@@ -1,6 +1,9 @@
 package Validate;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -207,6 +210,7 @@ public class TestSet {
 			g.setColor(Color.white);
 			g.fillRect(0,0,width,height);
 			
+			
 			//setting the line color
 			g.setColor(color);
 			
@@ -268,8 +272,35 @@ public class TestSet {
 	//		g.setStroke(new BasicStroke(2.0f));
 			g.drawLine(x2, y1, x2, height);
 			
+			//create axis
+			int indent = 40;
+			int axisSpace = 5;
+			BufferedImage axisImage = new BufferedImage(width + indent, height + indent, BufferedImage.TYPE_INT_RGB);
+			Graphics2D axisGraphics = axisImage.createGraphics();
+			axisGraphics.setFont(new Font("Monospaced", Font.PLAIN, 36));
+			FontMetrics fm = axisGraphics.getFontMetrics();
+			axisGraphics.setColor(Color.white);
+			axisGraphics.fillRect(0, 0, width + indent, height + indent);
+			axisGraphics.drawImage(bufferedImage, indent, 0, width, height, null);
+			
+			//draw axis
+			axisGraphics.setColor(Color.black);
+			axisGraphics.setStroke(new BasicStroke(3.0f));
+			axisGraphics.drawLine(indent, 0, indent, height);
+			axisGraphics.drawLine(indent, height, width + indent, height);
+			
+			//draw axis caps
+			int capRadius = 15;
+			axisGraphics.drawLine(indent - capRadius, 0, indent + capRadius, 0);
+			axisGraphics.drawLine(indent + width, height - capRadius, indent + width, height + capRadius);
+			
+			//draw labels
+			axisGraphics.drawString("0", indent - fm.stringWidth("0") - axisSpace, height + fm.getHeight());
+			axisGraphics.drawString("1", indent - fm.stringWidth("1") - axisSpace, fm.getHeight() + axisSpace);
+			axisGraphics.drawString("1", width + indent - fm.stringWidth("1") - axisSpace, height + fm.getHeight());
+			
 			areaUnderPRCurve = area;
-			return bufferedImage;
+			return axisImage;
 			
 		}
 
