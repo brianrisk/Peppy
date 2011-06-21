@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Peptide;
-import Peppy.ProteinDigestion;
+import Peppy.Sequence_Protein;
 import Utilities.U;
 
 /**
@@ -25,7 +25,8 @@ public class SavePeptidesToFile {
 	 */
 	public static void main(String[] args) {
 		U.p("Saving peptides to file");
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(new File("USP/extracted-proteins.txt"));
+		Sequence_Protein sequence = new Sequence_Protein(new File("USP/extracted-proteins.txt"));
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		Collections.sort(peptides);
 		try {
 			//printing full peptide list

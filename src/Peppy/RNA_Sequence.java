@@ -4,17 +4,17 @@ import Utilities.U;
 
 public class RNA_Sequence {
 	
-	DNA_Sequence DNA;
+	Nucleotides DNA;
 	byte [] RNA_5to3 = null;
 	byte [] RNA_3to5 = null;
 	int start;
 	int stop;
 	int length;
 	
-	public static byte BASE_A = 1;
-	public static byte BASE_U = 2;
-	public static byte BASE_G = 3;
-	public static byte BASE_C = 4;
+	public final static byte BASE_A = 0;
+	public final static byte BASE_U = 1;
+	public final static byte BASE_G = 2;
+	public final static byte BASE_C = 3;
 	
 	//splice related
 	private boolean [] forwardsStartLocations = null;
@@ -50,7 +50,7 @@ public class RNA_Sequence {
 	 */
 	public static char getRNAChar(byte rna) {
 		if (rna == BASE_A) return 'A';
-		if (rna == BASE_U) return 'T'; //TODO change back to U
+		if (rna == BASE_U) return 'U';
 		if (rna == BASE_G) return 'G';
 		return 'C';
 	}
@@ -75,7 +75,7 @@ public class RNA_Sequence {
 	 * @param start
 	 * @param stop
 	 */
-	public RNA_Sequence (DNA_Sequence dna, int start, int stop) {
+	public RNA_Sequence (Nucleotides dna, int start, int stop) {
 		DNA = dna;
 		this.start = start;
 		this.stop = stop;
@@ -88,6 +88,7 @@ public class RNA_Sequence {
 		for (int i = start; i < stop; i++) {
 			RNA_5to3[i - start] = DNAtoRNA(DNAsequence.charAt(i));
 		}
+
 		//convert the RNA to the compliment
 		for (int i = 0; i < length; i++) {
 			//note that I'm putting it in reverse order
@@ -212,7 +213,6 @@ public class RNA_Sequence {
 				if (probability < beliveableStartProbability) continue;
 				
 				startSites[i] = true;
-				
 			}
 		}
 		

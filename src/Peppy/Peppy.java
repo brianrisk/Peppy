@@ -1,9 +1,6 @@
 package Peppy;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,15 +8,11 @@ import Reports.HTMLReporter;
 import Reports.TextReporter;
 import Utilities.U;
 
-
-
-
 /**
  * Peppy
- * A very stripped down Java version of the MS/MS to genome mapping of Morgan Gidding's GFS.
  * Designed with the following goals:
  * 1) More simple code to promote open source development
- * 2) Takes advantage of Java's popularity over Objective-C
+ * 2) Easy proteogenomic mapping
  * 3) better multi-threading
  * @author Brian Risk
  *
@@ -30,17 +23,23 @@ public class Peppy {
 	static int peptideTally = 0;
 	
 	public static void main(String [] args) {
+		printGreeting();
 		init(args);
 		runJobs(args);
-//		new Peppy(args);
-//		exportPeptideList();
 		U.p("done");
 	}
 	
-	public Peppy(String [] args) {
+
+	
+	public static void runPeppy(String [] args) {
 		U.startStopwatch();
-		printGreeting();
 		peptideTally = 0;
+		
+		//create new report directory
+		File reportDir = new File(Properties.reportDirectory, Properties.spectraDirectoryOrFile.getName() + "_" + System.currentTimeMillis());
+		
+		//save our properties
+		Properties.generatePropertiesFile(reportDir);
 		
 		//Load our spectra
 		U.p("loading spectra...");
@@ -48,46 +47,59 @@ public class Peppy {
 		U.p("loaded " +spectra.size() + " spectra.");
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//initialize our ArrayList of matches
-		ArrayList<Match> matches = new ArrayList<Match>();
+		ArrayList<Match> matches = null;
 		
 		if (Properties.useSpliceVariants) {
 			//gets the first nucleotide sequence in the first sequence file
-			Sequence sequenceFile = sequences.get(0);
+			Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
 			RNA_Sequence rna = new RNA_Sequence(sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
 			
 			U.p("digesting...");
 			RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
 			ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
-			U.p("peptide tally: " + peptides.size());
 			
 			U.p("getting matches...");
 			//TODO get rid of this getMatches function when this is overhauled
-			matches = getMatches(peptides, spectra, sequenceFile);
+			matches = getMatchesWithPeptides(peptides, spectra);
 			
 		} else {	
-			matches.addAll(getMatches(sequences, spectra));
-			U.p("peptide tally: " + peptideTally);
+			if (Properties.useSequenceRegion) {
+				U.p("digesting on part of sequence");
+				ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
+				oneSequenceList.add(sequences.get(0));
+				sequences = oneSequenceList;
+			}
+			matches = getMatches(sequences, spectra);
 		}
 		
-		//create new report directory
-		File reportDir = new File(Properties.reportDirectory, Properties.reportDirectoryTitle + " " + System.currentTimeMillis());
-		if (Properties.isSequenceFileDNA && Properties.createHTMLReport) {
-			U.p("creating HTML reports");
-			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
-			report.generateFullReport();
-		}
+		
 		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
-		textReport.generatePropertiesFile();
 		
-		U.p();
+		
+		
+		if (Properties.createHTMLReport) {
+			U.p("creating HTML reports");
+			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
+			report.generateFullReport();
+		}	
+		
+		//clear out memory
+		matches.clear();
+		spectra.clear();
+		sequences.clear();
+		System.gc();
+		
+		
 		U.stopStopwatch();
+		U.p();
 	}
+	
 	
 	public static void runJobs(String [] args) {
 		File jobsDir = new File("jobs");
@@ -102,38 +114,38 @@ public class Peppy {
 		}
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
-			new Peppy(null);
+			runPeppy(null);
 		} else {
 			U.p("running " + jobFiles.size() + " jobs");
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
 				init(args);
-				Properties.loadProperties(jobFiles.get(i));
-				new Peppy(null);
+				init(jobFiles.get(i).getAbsolutePath());
+				runPeppy(null);
 			}
 		}
 	}
 
 
 	public static void init(String propertiesFile) {
+		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties(propertiesFile);
-		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) {
-			HMMScore.HMMClass.HmmSetUp();
-		}
+		AminoAcids.init();
 	}
 	
 	
 	public static void init(String [] args) {
 		if (args.length == 0) {
-			init();
+			init("properties.txt");
 		} else {
 			init(args[0]);
 			U.p("Initializing with properties file: " + args[0]);
 		}
 	}
 	
-	public static void init() {
-		init("properties.txt");
+	
+	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		return getMatches(sequences, spectra, true);
 	}
 	
 	
@@ -146,53 +158,139 @@ public class Peppy {
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
 		return getMatches(sequences, spectra, false);
 	}
-	
-	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
-		return getMatches(sequences, spectra, true);
-	}
-	
-	
+
 	/**
+	 * This is the heart of Peppy where the grand symphony takes place.
 	 * 
 	 * @param sequences our list of sequences where we will be getting our peptides
 	 * @param spectra our list of spectra
-	 * @param reverse if we are doing a normal, forwards search or if this is a null, reverse search
+	 * @param isReverse if we are doing a normal, forwards search or if this is a null, reverse search
 	 * @return
 	 */
-	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean reverse) {
-		ArrayList<Match> matches = new ArrayList<Match>() ;
-		for (Sequence sequence: sequences) {
-			U.p("working on sequence: " +sequence.getSequenceFile().getName());
+	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
+		
+		int spectraStart = 0;
+		int spectraStop = Properties.numberOfSpectraPerSegment;
+		if (spectraStop > spectra.size()) spectraStop = spectra.size();
+		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		/* This loop breaks when we have run our last chunk of spectra */
+		while (true) {
+			U.p("working on spectra " + spectraStart + " to " + spectraStop);
+			ArrayList<Match> segmentMatches = new ArrayList<Match>();
 			
-			ArrayList<Peptide> peptides;
-			if (Properties.isSequenceFileDNA) {
-				peptides = sequence.extractMorePeptides(reverse);
-				//continually extract peptides from the sequence until there aren't anymore
-				while (peptides != null) {
-					peptideTally += peptides.size();
-					//This is where the bulk of the processing in long jobs takes
-					ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
-					//Possible to add only matches with a decent e value
-					evaluateMatches(newMatches, matches);
-					//free up the memory of the old peptide arraylist
-					peptides.clear();
+			/* get a manageable segment of spectra */
+			ArrayList<Spectrum> spectraSegment = new ArrayList<Spectrum>();
+			for (int i = spectraStart; i < spectraStop; i++) {
+				spectraSegment.add(spectra.get(i));
+			}
+			
+			/* track which sequence we are examining */
+			int sequenceIndex = 0;
+			
+				
+			/* loops until we have gone through all of our sequences */
+			while (true) {
+				
+				/* Extract a decent size of peptides.  Sequences may be short, so this
+				 * goes through each sequence and extracts peptides until a desired
+				 * threshold has been been reached.
+				 */
+				
+				/*  Initialize our list of peptides */
+				ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+				
+				/* This is where we get a chunk of peptides */
+				ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
+				
+				while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
+					
+					/* clear previous chunk of peptides and reclaim memory */
+					peptideSegment.clear();
 					System.gc();
-					peptides = sequence.extractMorePeptides(reverse);
+					
+					/* collect peptides */
+					peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
+					
+					/* advance to the next sequence if we don't have any more peptides in this sequence */
+					if (peptideSegment.size() == 0) {
+						sequences.get(sequenceIndex).reset();
+						sequenceIndex++;
+					
+					/* add peptides to the main list if we have some to add */
+					} else {
+						peptides.addAll(peptideSegment);
+					}
+					
+					/* if we have advanced past the last sequence, then exit this loop */
+					if (sequenceIndex == sequences.size()) {
+						break;
+					}
 				}
-				sequence.clearNucleotideData();
-				removeDuplicateMatches(matches);
-			} else {
-				peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile(), reverse);
+				
+				/* sort our peptide list by mass */
+				Collections.sort(peptides);
+				
+				/* report */
+				U.p("we are processing a chunk of peptides this size: " + peptides.size());
+				
+				/* Where we store our matches for this batch of peptides */
+				ArrayList<Match> newMatches;
+				
+					
+				/* keep a count of all peptides */
 				peptideTally += peptides.size();
-				//This is where the bulk of the processing in long jobs takes
-				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
-				//Add only matches with a decent e value
-				evaluateMatches(newMatches, matches);
-			}		
+				
+				/* run the scoring threads to get the matches from our set of peptides and spectra */
+				newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+				
+				/* add the new matches with tolerable IMP values to the segment matches */
+				for (Match match: newMatches) {
+					if (match.getIMP() <= Properties.maxIMP) segmentMatches.add(match);
+				}
+				
+				/* free up memory */
+				newMatches.clear();
+				peptides.clear();
+				System.gc();
+					
+				
+				if (sequenceIndex == sequences.size()) {
+					break;
+				}
+			}
+			
+			int count = 0;
+			for (Match match: segmentMatches) {
+				if (match.getPeptide().getParentSequence().getSequenceFile().getName().equals("ecoli.fasta")) count++;
+			}
+			U.p("we found this many from ecoli 1: " + count);
+
+			
+			/* Here we do some basic processing and cleaning of the matches */
+			removeDuplicateMatches(segmentMatches);
+			assignConfidenceValuesToMatches(segmentMatches);
+			assignRankToMatches(segmentMatches);
+			removePoorMatches(segmentMatches);
+			
+			
+			/* add segment matches to the full list of matches */
+			matches.addAll(segmentMatches);
+			
+			/* clear out memory */
+			segmentMatches.clear();
+			System.gc();
+			
+			/* increment our spectrum segment markers */
+			if (spectraStop == spectra.size()) break;
+			spectraStart = spectraStop;
+			spectraStop += Properties.numberOfSpectraPerSegment;
+			if (spectraStop > spectra.size()) spectraStop = spectra.size();
+			
 		}
-		assignRankToMatches(matches);
-		assignRepeatedPeptideCount(matches);	
-		assignConfidenceValuesToMatches(matches);
+		
+		assignRepeatedPeptideCount(matches);
+				
 		return matches;
 	}
 	
@@ -200,50 +298,49 @@ public class Peppy {
 	 * Gets matches where a list of peptides is already derived
 	 * @param peptides
 	 * @param spectra
-	 * @param sequence
+	 * @param sequence_DNA
 	 * @return
 	 */
-	public static ArrayList<Match> getMatches(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
-		ArrayList<Match> matches = new ArrayList<Match>() ;
+	public static ArrayList<Match> getMatchesWithPeptides(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
 		peptideTally += peptides.size();
 		
 		//This is where the bulk of the processing in long jobs takes
-		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra, sequence)).getMatches();
+		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
-		//Add only matches with a decent e value
-		evaluateMatches(newMatches, matches);
-		
-		if (Properties.isSequenceFileDNA) {
-			removeDuplicateMatches(matches);
-		}
+		//Add only matches with a decent e value		
+		removeDuplicateMatches(matches);
 		assignRankToMatches(matches);
 		assignRepeatedPeptideCount(matches);
 		assignConfidenceValuesToMatches(matches);
+		removePoorMatches(matches);
 		
 		return matches;
 	}
 	
 		
 	public static void assignRankToMatches(ArrayList<Match> matches) {
-		//first error check
+		/* first make sure we have matches */
 		if (matches.size() == 0) return;
+		
+		/* sort by spectrum ID, then score */
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
 		Match match = matches.get(0);
 		Match previousMatch = matches.get(0);
 		//set for the first
-		match.setRank(1);
+		match.rank = 1;
 		int rank = 1;
 		for (int i = 1; i < matches.size(); i++) {
 			//see if these are matches for a different spectrum
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				rank = 1;
+			} else {
+				if (match.getScore() == previousMatch.getScore()) {
+					rank = previousMatch.rank;
+				}
 			}
-			if (match.getScore() == previousMatch.getScore()) {
-				rank = previousMatch.getRank();
-			}
-			match.setRank(rank);
+			match.rank = rank;
 			rank++;
 			previousMatch = match;
 		}
@@ -252,7 +349,7 @@ public class Peppy {
 		double previousScore = match.getScore();
 		for (; i >= 0; i--) {
 			match = matches.get(i);
-			if (match.getRank() == 1) {
+			if (match.rank == 1) {
 				match.setScoreRatio(match.getScore() / previousScore);
 			} else {
 				previousScore = match.getScore();
@@ -277,7 +374,7 @@ public class Peppy {
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				for (int j = i - rankCount; j < i; j++) {
-					matches.get(j).setRepeatCount(rankCount);
+					matches.get(j).repeatCount = rankCount;
 				}
 				rankCount = 1;
 			} else {
@@ -285,7 +382,7 @@ public class Peppy {
 					rankCount++;
 				} else {
 					for (int j = i - rankCount; j < i; j++) {
-						matches.get(j).setRepeatCount(rankCount);
+						matches.get(j).repeatCount = rankCount;
 					}
 					rankCount = 1;
 				}
@@ -294,9 +391,19 @@ public class Peppy {
 		}
 	}
 	
+	/**
+	 * NOTE:  this should only be used for DNA/RNA based searches
+	 * It removes hits to peptides which are redundant.  For example, a spectrum
+	 * has two matches where the peptide is the exact same: same sequence, same start, same direction.
+	 * These redundant matches can occasionally come up due to the way large sequences are digested
+	 * @param matches
+	 */
 	public static void removeDuplicateMatches(ArrayList<Match> matches) {
 		//first error check
 		if (matches.size() == 0) return;
+		
+		//second error check
+		if (!Properties.isSequenceFileDNA) return;
 		
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
 		Collections.sort(matches);
@@ -305,34 +412,22 @@ public class Peppy {
 		Match previousMatch = matches.get(0);
 		int spectrumID;
 		int previousSpectrumID = previousMatch.getSpectrum().getId();
-		boolean areEqual;
 		for (int i = 1; i < numberOfMatches; i++) {
 			match = matches.get(i);
 			spectrumID = match.getSpectrum().getId();
-			areEqual = false;
-			if (match.getPeptide().isForward() && previousMatch.getPeptide().isForward()) {
-				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
-					areEqual = true;
-					matches.remove(i);
-					i--;
-					numberOfMatches--;
-				}
-			}
-			if (!match.getPeptide().isForward() && !previousMatch.getPeptide().isForward()) {
-				if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
-					areEqual = true;
-					matches.remove(i);
-					i--;
-					numberOfMatches--;
-				}
-			}
-			if (!areEqual) {
+
+			if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
+				matches.remove(i);
+				i--;
+				numberOfMatches--;
+			} else {
 				previousMatch = match;
 				previousSpectrumID = spectrumID;
 			}
 		}
 	}
 	
+
 	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches) {
 		for (Match match: matches) {
 			if (match.calculateEValue() < match.calculateIMP()) {
@@ -342,72 +437,56 @@ public class Peppy {
 	}
 	
 	/**
-	 * Evaluates newMatches, adds appropriate ones to matches
+	 * Removes matches with poor E values, rank, etc.
 	 * @param newMatches
 	 * @param matches
 	 */
-	public static void evaluateMatches(ArrayList<Match> newMatches, ArrayList<Match> matches) {	
-		if (Properties.useEValueCutOff) {
-			for (Match match: newMatches) {
-				//The match E value should be less than our cutoff
-				if (match.getEValue() <= Properties.eValueCutOff) {
-					//the match IMP value should always be less than its E value
-					if (match.calculateIMP() < match.getEValue()) {
-						matches.add(match);
-					}
-				}
-			}
-		} else {
-			matches.addAll(newMatches);
-		}
-	}
+	public static void removePoorMatches(ArrayList<Match> matches) {	
 
-	/**
-	 * saves a file of peptide information
-	 * @param peptides
-	 */
-	@SuppressWarnings("unused")
-	private static void exportPeptideList() {
-		U.p("exporting peptide list");
-		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		
-		try {
-			//loop through each sequence in the sequences ArrayList
-			File peptidesFolder = new File ("peptides");
-			peptidesFolder.mkdir();
-			for (Sequence sequence: sequences) {
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder, sequence.getSequenceFile().getName()))));
-				
-				ArrayList<Peptide> peptides = null;
-				if (Properties.isSequenceFileDNA) {
-					peptides = sequence.extractAllPeptides(false);
-				} else {
-					peptides = ProteinDigestion.getPeptidesFromDatabase(sequence.getSequenceFile());
-				}
-				
-				U.p("number of peptides: " + peptides.size());
-
-				for (Peptide peptide: peptides) {
-					pw.println(peptide);
-				}
-				
-				peptides = null;
-				System.gc();
-				pw.flush();
-				pw.close();
-				U.p(sequence.getSequenceFile().getName() + " digested.");
+		Match match;
+		boolean remove;
+		for (int i = 1; i < matches.size(); i++) {
+			
+			/* get our match */
+			match = matches.get(i);
+			
+			/* the remove flag initially set to false */
+			remove = false;
+			
+			/* flagging matches with low rank */
+			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+				remove = true;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			
+			/* flagging matches with high E values */
+			if (match.getEValue() > Properties.maxEValue) {
+				remove = true;
+			}
+			
+			/* flagging matches with weirdly low E values */
+			if (match.getIMP() > match.getEValue()) {
+				remove = true;
+			}
+			
+			/* removing the match if it was flagged */
+			if (remove) {
+				matches.remove(i);
+				i--;
+			}
+			
 		}
 	}
 	
-	private static void printGreeting() {
+	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
 		U.p("Proteogenomic mapping software.");
 		U.p("Developed 2010 by the Giddings Lab");
 		U.p();
+		
+
+//		U.p("Peppy Copyright (C) 2011 Brian Risk");
+//		U.p("This program comes with ABSOLUTELY NO WARRANTY;");
+
 	}
 	
 

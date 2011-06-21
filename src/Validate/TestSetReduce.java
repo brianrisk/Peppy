@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.ProteinDigestion;
+import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -30,12 +30,13 @@ public class TestSetReduce {
 		U.p("loading database");
 		Properties.numberOfMissedCleavages = 2;
 		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
-		ArrayList<Peptide> peptides = ProteinDigestion.getPeptidesFromDatabase(databaseFile);
+		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 		//specify test set
-		String testName = "USP";
+		String testName;
 //		String [] testNames = {"ecoli", "human", "aurum", "USP"};
-		String [] testNames = {"ecoli"};
+		String [] testNames = {"human"};
 		for (int testIndex = 0; testIndex < testNames.length; testIndex++) {
 			testName = testNames[testIndex];
 			U.p("doing: " + testName);
@@ -112,10 +113,16 @@ public class TestSetReduce {
 				if (peptide.getMass() < Properties.peptideMassThreshold) continue;
 				
 				//see that the difference between the predicted mass and the precursor mass is within tolerance
-				if (Math.abs(peptide.getMass() - spectrum.getPrecursorMass()) > Properties.spectrumToPeptideMassError) continue;
+				if (Math.abs(peptide.getMass() - spectrum.getMass()) > Properties.spectrumToPeptideMassError) {
+//					U.p("Peptided outside of mass error range: " + peptide.getAcidSequenceString());
+					continue;
+				}
 				
 				//see that the peptide is in the database
-				if (GenerateValidationReport.isPeptidePresentInList( peptide, peptides) < 0) continue;
+				if (ValidationReport.isPeptidePresentInList( peptide, peptides) < 0) {
+//					U.p("Peptided not in database: " + peptide.getAcidSequenceString());
+					continue;
+				}
 				
 				//if all these steps have passed, it must be good.  save files
 				File newSpectrumFile = new File(newSpectraFolder, spectrumFile.getName());

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Peppy.Definitions;
+import Peppy.AminoAcids;
 import Peppy.Match;
 import Peppy.Peak;
 import Peppy.Peptide;
@@ -69,7 +69,7 @@ public class TestSetCharacteristics {
 			String peptideString = peptide.getAcidSequenceString();
 			
 			//If precursor difference is too much, exit
-			double difference = spectrum.getPrecursorMass() - peptide.getMass();
+			double difference = spectrum.getMass() - peptide.getMass();
 			if (Math.abs(difference) > 2) continue;
 	
 			int i;
@@ -94,7 +94,7 @@ public class TestSetCharacteristics {
 			/* y-ion  */
 			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
-				theoreticalPeakMass -= Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+				theoreticalPeakMass -= AminoAcids.getWeightMono(peptideString.charAt(i));
 				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 				maxIntensity = -1;
@@ -117,7 +117,7 @@ public class TestSetCharacteristics {
 			/* b-ion  */
 			theoreticalPeakMass = Properties.leftIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
-				theoreticalPeakMass += Definitions.getAminoAcidWeightMono(peptideString.charAt(i));
+				theoreticalPeakMass += AminoAcids.getWeightMono(peptideString.charAt(i));
 				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
 				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
 				maxIntensity = -1;
@@ -149,20 +149,24 @@ public class TestSetCharacteristics {
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE);
 		Collections.sort(correctMatches);
 		for(Match match: correctMatches) {
-			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
-			U.p(match.getSpectrum().getFile().getName() + ", " + match.getSpectrum().getPrecursorMass() + ": " + difference);
+			double difference = match.getSpectrum().getMass() - match.getPeptide().getMass();
+			U.p(match.getSpectrum().getFile().getName() + ", " + match.getSpectrum().getMass() + ": " + difference);
 		}
 	}
 	
 	public int countBadPrecursors() {
 		int total = 0;
 		for(Match match: correctMatches) {
-			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
+			double difference = match.getSpectrum().getMass() - match.getPeptide().getMass();
 			if (Math.abs(difference) > 2.0) total++;
 		}
 		return total;
 	}
 	
+	public String getTestName() {
+		return testName;
+	}
+
 	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
@@ -199,7 +203,7 @@ public class TestSetCharacteristics {
 			}
 			//adding to the array list
 			if (validPeptideFile) {
-				correctMatches.add(new Match(spectrum, new Peptide(correctAcidSequence), null));
+				correctMatches.add(Properties.matchConstructor.createMatch(spectrum, new Peptide(correctAcidSequence)));	
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {

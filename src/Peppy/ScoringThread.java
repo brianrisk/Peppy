@@ -2,24 +2,26 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Math.MathFunctions;
+import Utilities.U;
+
 
 public class ScoringThread implements Runnable {
 	
 	ArrayList<Peptide> peptides;
 	Spectrum spectrum;
 	ScoringThreadServer scoringThreadServer;
-	Sequence sequence;
 	
 	/**
 	 * @param peptides
 	 * @param spectrum
 	 */
-	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer, Sequence sequence) {
+	public ScoringThread(Spectrum spectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer) {
 		this.spectrum = spectrum;
 		this.peptides = peptides;
 		this.scoringThreadServer = scoringThreadServer;
-		this.sequence = sequence;
 	}
+	
 
 	public void run() {
 		
@@ -28,29 +30,41 @@ public class ScoringThread implements Runnable {
 			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-			double lowestPeptideMassToConsider = spectrum.getPrecursorMass() - Properties.spectrumToPeptideMassError;
-			int firstPeptideIndex = findFirstIndexWithGreaterMass(peptides, lowestPeptideMassToConsider);
+			int firstPeptideIndex;
+			if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
+				firstPeptideIndex = 0;
+			} else {
+				double lowestPeptideMassToConsider = spectrum.getMass() - Properties.spectrumToPeptideMassError;
+				firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
+				firstPeptideIndex -= 8;
+				if (firstPeptideIndex < 0) firstPeptideIndex = 0;
+			}
 			
-			//find the first index of the peptide with mass greater than highestPeptideMassToConsider
-			double highestPeptideMassToConsider = spectrum.getPrecursorMass() + Properties.spectrumToPeptideMassError;
-			int lastPeptideIndex = findFirstIndexWithGreaterMass(peptides, highestPeptideMassToConsider);
+			
+			//find the last index, compensate for rounding error
+			double highestPeptideMassToConsider = spectrum.getMass() + Properties.spectrumToPeptideMassError;
+			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
+			lastPeptideIndex += 8;
+			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
 			
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
-				Match match = new Match(spectrum, peptide, sequence);
-				if (match.getScore() == 0.0) {
-					continue;
-				}
+				
+				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
+
+				if (match.getScore() == 0.0) continue;
+				
 				matchesForOneSpectrum.add(match);
 			}
 			
 			//collect the top maximumNumberOfMatchesForASpectrum
 			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(matchesForOneSpectrum);
-			ArrayList<Match> topMatches = new ArrayList<Match>();
+			
 			int max = Properties.maximumNumberOfMatchesForASpectrum;
 			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
+			ArrayList<Match> topMatches = new ArrayList<Match>(max);
 			for (int i = 0; i < max; i++) {
 				topMatches.add(matchesForOneSpectrum.get(i));
 			}
@@ -81,24 +95,6 @@ public class ScoringThread implements Runnable {
 	}
 
 	
-	/**
-	 * Boolean search to locate the first peptide in the SORTED list of peptides that has
-	 * a mass greater than the "mass" parameter.
-	 * @param peptides
-	 * @param mass
-	 * @return
-	 */
-	public static int findFirstIndexWithGreaterMass(ArrayList<Peptide> peptides, double mass) {
-		Peptide peptide;
-		int index = peptides.size() / 2;
-		int increment = index / 2;
-		while (increment > 0) {
-			peptide = peptides.get(index);
-			if (peptide.getMass() > mass) {index -= increment;}
-			else {index += increment;}
-			increment /= 2;
-		}
-		return index;
-	}
+	
 
 }

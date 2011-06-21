@@ -1,5 +1,8 @@
 package Peppy;
 
+import java.io.File;
+import java.util.ArrayList;
+
 /**
  * A class where we store all of our constants. All variables
  * should be declared "final".  All methods should be static
@@ -24,6 +27,9 @@ public class Definitions {
 	public final static int [] NoCleavageBefore = {20, 23, 22, 21}; 
 	public final static int [] Cleavages = {8, 10, 24, 25, 26, 0, 2}; 
 	
+	//protein modifications
+	public static ArrayList<Modification> modifications = Modification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
+	
 	//HMM state constant
 	public final static int NUMBER_OF_IONS =12;
 	public final static int B_ION =0;
@@ -39,53 +45,5 @@ public class Definitions {
 	public final static int INTERNAL17 = 10;
 	public final static int INTERNAL18 =11;
 	
-	public static double getAminoAcidWeightMono(char c) {
-		if (c =='.') return 0.0;
-		if (c =='A') return 71.03711;
-		if (c =='C') return 103.00919;
-		if (c =='D') return 115.02694;
-		if (c =='E') return 129.04259;
-		if (c =='F') return 147.06841;
-		if (c =='G') return 57.02146;
-		if (c =='H') return 137.05891;
-		if (c =='I') return 113.08406;
-		if (c =='K') return 128.09496;
-		if (c =='L') return 113.08406;
-		if (c =='M') return 131.04049;
-		if (c =='N') return 114.04293;
-		if (c =='P') return 97.05276;
-		if (c =='Q') return 128.05858;
-		if (c =='R') return 156.10111;
-		if (c =='S') return 87.03203;
-		if (c =='T') return 101.04768;
-		if (c =='V') return 99.06841;
-		if (c =='W') return 186.07931;
-		if (c =='Y') return 163.06333;
-		return -1;
-	}
 	
-	public static double getAminoAcidWeightAverage(char c) {
-		if (c =='.') return 0.0; 
-		if (c =='A') return 71.0788; 
-		if (c =='C') return 103.1448; 
-		if (c =='D') return 115.0886; 
-		if (c =='E') return 129.1155; 
-		if (c =='F') return 147.1766; 
-		if (c =='G') return 57.052; 
-		if (c =='H') return 137.1412; 
-		if (c =='I') return 113.1595; 
-		if (c =='K') return 128.1742; 
-		if (c =='L') return 113.1595; 
-		if (c =='M') return 131.1986; 
-		if (c =='N') return 114.1039; 
-		if (c =='P') return 97.1167; 
-		if (c =='Q') return 128.1308; 
-		if (c =='R') return 156.1876; 
-		if (c =='S') return 87.0782; 
-		if (c =='T') return 101.1051; 
-		if (c =='V') return 99.1326; 
-		if (c =='W') return 186.2133; 
-		if (c =='Y') return 163.176; 
-		return -1;
-	}
 }

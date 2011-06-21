@@ -1,0 +1,664 @@
+765		Met-loss	Removal of initiator methionine from protein N-terminus	-131.040485	-131.1961	H(-9) C(-5) N(-1) O(-1) S(-1)
+676		Trp->Gly	Trp->Gly substitution	-129.057849	-129.1586	H(-7) C(-9) N(-1)
+313	Lys-loss	-K	Loss of C-terminal K from Heavy Chain of MAb	-128.094963	-128.1723	H(-12) C(-6) N(-2) O(-1)
+646		Arg->Gly	Arg->Gly substitution	-99.079647	-99.1344	H(-9) C(-4) N(-3)
+673		Trp->Ser	Trp->Ser substitution	-99.047285	-99.1326	H(-5) C(-8) N(-1) O
+400	Tyr->Dha	DehydroalaY	Dehydroalanine (from Tyrosine)	-94.041865	-94.1112	H(-6) C(-6) O(-1)
+766		Met-loss+Acetyl	Removal of initiator methionine from protein N-terminus, then acetylation of the new N-terminus	-89.029920	-89.1594	H(-7) C(-3) N(-1) S(-1)
+674		Trp->Cys	Trp->Cys substitution	-83.070128	-83.0670	H(-5) C(-8) N(-1) S
+679		Tyr->Ser	Tyr->Ser substitution	-76.031300	-76.0960	H(-4) C(-6)
+677		Trp->Leu	Trp->Leu substitution	-72.995249	-73.0523	H C(-5) N(-1)
+564		Glu->Gly	Glu->Gly substitution	-72.021129	-72.0627	H(-4) C(-3) O(-2)
+636		Arg->Ser	Arg->Ser substitution	-69.069083	-69.1084	H(-7) C(-3) N(-3) O
+683		Tyr->Cys	Tyr->Cys substitution	-60.054144	-60.0304	H(-4) C(-6) O(-1) S
+566		Phe->Ser	Phe->Ser substitution	-60.036386	-60.0966	H(-4) C(-6) O
+639		Arg->Pro	Arg->Pro substitution	-59.048347	-59.0705	H(-5) C(-1) N(-3)
+556		Asp->Gly	Asp->Gly substitution	-58.005479	-58.0361	H(-2) C(-2) O(-2)
+560		Glu->Ala	Glu->Ala substitution	-58.005479	-58.0361	H(-2) C(-2) O(-2)
+822		Gly-loss+Amide	Enzymatic glycine removal leaving an amidated C-terminus	-58.005479	-58.0361	H(-2) C(-2) O(-2)
+638		Arg->Thr	Arg->Thr substitution	-55.053433	-55.0818	H(-5) C(-2) N(-3) O
+644		Arg->Cys	Arg->Cys substitution	-53.091927	-53.0428	H(-7) C(-3) N(-3) S
+680		Tyr->Asn	Tyr->Asn substitution	-49.020401	-49.0706	H(-3) C(-5) N
+682		Tyr->Asp	Tyr->Asp substitution	-48.036386	-48.0859	H(-4) C(-5) O
+11	Met->Hsl	Hse_lact	Homoserine lactone	-48.003371	-48.1075	H(-4) C(-1) S(-1)
+526	Dethiomethyl	Dethiomethyl	Prompt loss of side chain from oxidised Met	-48.003371	-48.1075	H(-4) C(-1) S(-1)
+570		Phe->Val	Phe->Val substitution	-48.000000	-48.0428	C(-4)
+140	a-type-ion	a-type_Ion	ISD a-series (C-Term)	-46.005479	-46.0254	H(-2) C(-1) O(-2)
+552		Cys->Gly	Cys->Gly substitution	-45.987721	-46.0916	H(-2) C(-1) S(-1)
+567		Phe->Cys	Phe->Cys substitution	-44.059229	-44.0310	H(-4) C(-6) S
+553		Asp->Ala	Asp->Ala substitution	-43.989829	-44.0095	C(-1) O(-2)
+344	Arg->GluSA	Argglutamicsealde	Arginine oxidation to glutamic semialdehyde	-43.053433	-43.0711	H(-5) C(-1) N(-3) O
+645		Arg->Ile	Arg->Ile or Arg->Leu substitution	-43.017047	-43.0280	H(-1) N(-3)
+672		Val->Gly	Val->Gly substitution	-42.046950	-42.0797	H(-6) C(-3)
+372	Arg->Orn	Arg2Orn	Ornithine from Arginine	-42.021798	-42.0400	H(-2) C(-1) N(-2)
+580		His->Pro	His->Pro substitution	-40.006148	-40.0241	C(-1) N(-2)
+368	Cys->Dha	DehydroalaC	Dehydroalanine (from Cysteine)	-33.987721	-34.0809	H(-2) S(-1)
+568		Phe->Ile	Phe->Ile or Phe->Leu substitution	-33.984350	-34.0162	H(2) C(-3)
+382	Cys->PyruvicAcid	pyruvicC	pyruvic acid from N-term cys	-33.003705	-33.0961	H(-3) N(-1) O S(-1)
+615		Met->Val	Met->Val substitution	-31.972071	-32.0650	S(-1)
+630		Gln->Pro	Gln->Pro substitution	-31.005814	-31.0140	H(-1) N(-1) O(-1)
+360	Pro->Pyrrolidinone	Pyrrolidinone	Proline oxidation to pyrrolidinone	-30.010565	-30.0260	H(-2) C(-1) O(-1)
+657		Ser->Gly	Ser->Gly substitution	-30.010565	-30.0260	H(-2) C(-1) O(-1)
+659		Thr->Ala	Thr->Ala substitution	-30.010565	-30.0260	H(-2) C(-1) O(-1)
+10	Met->Hse	HSe	Homoserine	-29.992806	-30.0922	H(-2) C(-1) O S(-1)
+610		Met->Thr	Met->Thr substitution	-29.992806	-30.0922	H(-2) C(-1) O S(-1)
+675		Trp->Arg	Trp->Arg substitution	-29.978202	-30.0242	H(2) C(-5) N(2)
+565		Glu->Val	Glu->Val substitution	-29.974179	-29.9829	H(2) O(-2)
+642		Arg->Gln	Arg->Gln substitution	-28.042534	-28.0565	H(-4) C(-1) N(-2) O
+667		Val->Ala	Val->Ala substitution	-28.031300	-28.0532	H(-4) C(-2)
+640		Arg->Lys	Arg->Lys substitution	-28.006148	-28.0134	N(-2)
+369	Pro->Pyrrolidone	OxPro	Pyrrolidone from Proline	-27.994915	-28.0101	C(-1) O(-1)
+594		Lys->Thr	Lys->Thr substitution	-27.047285	-27.0684	H(-5) C(-2) N(-1) O
+616		Asn->Ser	Asn->Ser substitution	-27.010899	-27.0253	H(-1) C(-1) N(-1)
+587		Ile->Ser	Ile->Ser substitution	-26.052036	-26.0803	H(-6) C(-3) O
+601		Leu->Ser	Leu->Ser substitution	-26.052036	-26.0803	H(-6) C(-3) O
+624		Pro->Ala	Pro->Ala substitution	-26.015650	-26.0373	H(-2) C(-2)
+681		Tyr->His	Tyr->His substitution	-26.004417	-26.0340	H(-2) C(-3) N(2) O(-1)
+643		Arg->Met	Arg->Met substitution	-25.060626	-24.9896	H(-3) C(-1) N(-3) S
+585		His->Leu	His->Leu substitution	-23.974848	-23.9816	H(4) N(-2)
+348	His->Asn	His2Asn	histidine oxidation to aspargine	-23.015984	-23.0366	H(-1) C(-2) N(-1) O
+349	His->Asp	His2Asp	histidine oxidation to aspartic acid	-22.031969	-22.0519	H(-2) C(-2) N(-2) O(2)
+899		Met->Hpg	methionine replacement by homopropargylglycine	-21.987721	-22.0702	H(-2) C S(-1)
+641		Arg->His	Arg->His substitution	-19.042199	-19.0464	H(-5) N(-1)
+23	Dehydrated	Phospho+PL	Dehydration	-18.010565	-18.0153	H(-2) O(-1)
+27	Glu->pyro-Glu	Pyro_glu	Pyro-glu from E	-18.010565	-18.0153	H(-2) O(-1)
+402	Cys->Oxoalanine	oxoalanine	oxoalanine	-17.992806	-18.0815	H(-2) O S(-1)
+612		Met->Ile	Met->Ile substitution	-17.956421	-18.0384	H(2) C S(-1)
+614		Met->Leu	Met->Leu substitution	-17.956421	-18.0384	H(2) C S(-1)
+28	Gln->pyro-Glu	Pyro-glu	Pyro-glu from Q	-17.026549	-17.0305	H(-3) N(-1)
+385	Ammonia-loss	N-oxobutanoic	Loss of ammonia	-17.026549	-17.0305	H(-3) N(-1)
+604		Leu->Pro	Leu->Pro substitution	-16.031300	-16.0425	H(-4) C(-1)
+447	Deoxy	semialdehyde	reduction	-15.994915	-15.9994	O(-1)
+648		Ser->Ala	Ser->Ala substitution	-15.994915	-15.9994	O(-1)
+678		Tyr->Phe	Tyr->Phe substitution	-15.994915	-15.9994	O(-1)
+548		Cys->Ser	Cys->Ser substitution	-15.977156	-16.0656	O S(-1)
+559		Asp->Val	Asp->Val substitution	-15.958529	-15.9563	H(4) C O(-2)
+403	Ser->LacticAcid	lactic	lactic acid from N-term Ser	-15.010899	-15.0146	H(-1) N(-1)
+600		Lys->Ile	Lys->Ile substitution	-15.010899	-15.0146	H(-1) N(-1)
+991		ISD_z+2_ion	ISD (z+2)-series	-15.010899	-15.0146	H(-1) N(-1)
+635		Gln->Leu	Gln->Leu substitution	-14.974514	-14.9716	H(3) C N(-1) O(-1)
+595		Lys->Asn	Lys->Asn substitution	-14.052036	-14.0696	H(-6) C(-2) O
+544		Ala->Gly	Ala->Gly substitution	-14.015650	-14.0266	H(-2) C(-1)
+562		Glu->Asp	Glu->Asp substitution	-14.015650	-14.0266	H(-2) C(-1)
+591		Ile->Val	Ile->Val substitution	-14.015650	-14.0266	H(-2) C(-1)
+605		Leu->Val	Leu->Val substitution	-14.015650	-14.0266	H(-2) C(-1)
+658		Thr->Ser	Thr->Ser substitution	-14.015650	-14.0266	H(-2) C(-1)
+617		Asn->Thr	Asn->Thr substitution	-12.995249	-12.9988	H N(-1)
+588		Ile->Thr	Ile->Thr substitution	-12.036386	-12.0538	H(-4) C(-2) O
+623		Pro->Ser	Pro->Ser substitution	-10.020735	-10.0379	H(-2) C(-2) O
+582		His->Gln	His->Gln substitution	-9.000334	-9.0101	H C(-1) N(-1) O
+896		Met->Aha	Methionine replacement by azido homoalanine	-4.986324	-5.0794	H(-3) C(-1) N(3) S(-1)
+662		Thr->Pro	Thr->Pro substitution	-3.994915	-3.9887	C O(-1)
+613		Met->Lys	Met->Lys substitution	-2.945522	-3.0238	H(3) C N S(-1)
+939		Cys->methylaminoAla	carbamidomethylated Cys that undergoes beta-elimination and Michael addition of methylamine	-2.945522	-3.0238	H(3) C N S(-1)
+401	Didehydro	didehydro	2-amino-3-oxo-butanoic_acid	-2.015650	-2.0159	H(-2)
+352	Lys->Allysine	Lysaminoadipicsealde	Lysine oxidation to aminoadipic semialdehyde	-1.031634	-1.0311	H(-3) N(-1) O
+374	Dehydro	Cystine	Half of a disulfide bridge	-1.007825	-1.0079	H(-1)
+2	Amidated	Amide	Amidation	-0.984016	-0.9848	H N O(-1)
+555		Asp->Asn	Asp->Asn substitution	-0.984016	-0.9848	H N O(-1)
+561		Glu->Gln	Glu->Gln substitution	-0.984016	-0.9848	H N O(-1)
+622		Asn->Ile	Asn->Ile substitution	-0.958863	-0.9450	H(5) C(2) N(-1) O(-1)
+563		Glu->Lys	Glu->Lys substitution	-0.947630	-0.9417	H(5) C N O(-2)
+597		Lys->Gln	Lys->Gln substitution	-0.036386	-0.0431	H(-4) C(-1) O
+631		Gln->Lys	Gln->Lys substitution	0.036386	0.0431	H(4) C O(-1)
+596		Lys->Glu	Lys->Glu substitution	0.947630	0.9417	H(-5) C(-1) N(-1) O(2)
+589		Ile->Asn	Ile->Asn substitution	0.958863	0.9450	H(-5) C(-2) N O
+7	Deamidated	Deamidation	Deamidation	0.984016	0.9848	H(-1) N(-1) O
+621		Asn->Asp	Asn->Asp substitution	0.984016	0.9848	H(-1) N(-1) O
+632		Gln->Glu	Gln->Glu substitution	0.984016	0.9848	H(-1) N(-1) O
+994		Label:15N(1)	SILAS 15N(1)	0.997035	0.9934	N(-1) 15N
+995		Label:15N(2)	SILAS 15N(2)	1.994070	1.9868	N(-2) 15N(2)
+258	Label:18O(1)	O18_STY	O18 Labeling	2.004246	1.9998	O(-1) 18O
+598		Lys->Met	Lys->Met substitution	2.945522	3.0238	H(-3) C(-1) N(-1) S
+170	Delta:H(1)O(-1)18O(1)	GN18Olabeling	glycosylated asparagine 18O labeling	2.988261	2.9845	H(-1) N(-1) 18O
+366	Deamidated:18O(1)	Deamidation_O18	Deamidation in presence of O18	2.988261	2.9845	H(-1) N(-1) 18O
+996		Label:15N(3)	SILAS 15N(3)	2.991105	2.9802	N(-3) 15N(3)
+262	Label:2H(3)	D3_Label	Trideuteration	3.018830	3.0185	H(-3) 2H(3)
+897		Label:15N(4)	SILAC 15N(4)	3.988140	3.9736	N(-4) 15N(4)
+351	Trp->Kynurenin	kynurenin	tryptophan oxidation to kynurenin	3.994915	3.9887	C(-1) O
+627		Pro->Thr	Pro->Thr substitution	3.994915	3.9887	C(-1) O
+193	Label:18O(2)	double_O18	O18 label at both C-terminal oxygens	4.008491	3.9995	O(-2) 18O(2)
+862		Label:13C(1)2H(3)	SILAC	4.022185	4.0111	H(-3) 2H(3) C(-1) 13C
+481	Label:2H(4)	Lys4	4,4,5,5-D4 Lysine	4.025107	4.0246	H(-4) 2H(4)
+772	Label:13C(5)	13C5	13C(5) Silac label	5.016774	4.9633	C(-5) 13C(5)
+950		Cation:Li	Replacement of proton by lithium	6.008178	5.9331	H(-1) Li
+268	Label:13C(5)15N(1)	13C5-15N1	13C(5) 15N(1) Silac label	6.013809	5.9567	C(-5) 13C(5) N(-1) 15N
+188	Label:13C(6)	13C6	13C(6) Silac label	6.020129	5.9559	C(-6) 13C(6)
+695	Label:13C(6)15N(1)	Label:13C(6)15N(1)	13C(6) 15N(1) Silac label	7.017164	6.9493	C(-6) 13C(6) N(-1) 15N
+259	Label:13C(6)15N(2)	13C6-15N2	13C(6) 15N(2) Silac label	8.014199	7.9427	C(-6) 13C(6) N(-2) 15N(2)
+633		Gln->His	Gln->His substitution	9.000334	9.0101	H(-1) C N O(-1)
+184	Label:13C(9)	13C9	13C(9) Silac label	9.030193	8.9339	C(-9) 13C(9)
+267	Label:13C(6)15N(4)	13C6-15N4	13C(6) 15N(4) Silac label	10.008269	9.9296	C(-6) 13C(6) N(-4) 15N(4)
+652		Ser->Pro	Ser->Pro substitution	10.020735	10.0379	H(2) C(2) O(-1)
+854		Label:13C(8)15N(2)	13C(8) 15N(2) Silac label	10.020909	9.9281	C(-8) 13C(8) N(-2) 15N(2)
+269	Label:13C(9)15N(1)	13C9-15N1	13C(9) 15N(1) Silac label	10.027228	9.9273	C(-9) 13C(9) N(-1) 15N
+944		Label:15N(2)2H(9)	SILAC label	11.050561	11.0423	H(-9) 2H(9) N(-2) 15N(2)
+940		Cys->ethylaminoAla	Carbamidomethylated Cys that undergoes beta-elimination and Michael addition of ethylamine	11.070128	11.0028	H(5) C(2) N S(-1)
+1009		Thiazolidine	Addition of Carbon to cysteine	12.000000	12.0107	C
+664		Thr->Ile	Thr->Ile substitution	12.036386	12.0538	H(4) C(2) O(-1)
+904		Phe->CamCys	Phe->Cys substitution and carbamidomethylation	12.962234	13.0204	H(-1) C(-4) N O S
+660		Thr->Asn	Thr->Asn substitution	12.995249	12.9988	H(-1) N
+337	Methylamine	MethylamineST	Michael addition with methylamine	13.031634	13.0418	H(3) C N O(-1)
+359	Pro->pyro-Glu	Pyroglutamic	proline oxidation to pyroglutamic acid	13.979265	13.9835	H(-2) O
+288	Trp->Oxolactone	oxolactone	Tryptophan oxidation to oxolactone	13.979265	13.9835	H(-2) O
+34	Methyl	Methyl	Methylation	14.015650	14.0266	H(2) C
+558		Asp->Glu	Asp->Glu substitution	14.015650	14.0266	H(2) C
+571		Gly->Ala	Gly->Ala substitution	14.015650	14.0266	H(2) C
+650		Ser->Thr	Ser->Thr substitution	14.015650	14.0266	H(2) C
+671		Val->Ile	Val->Ile or Val->Leu substitution	14.015650	14.0266	H(2) C
+618		Asn->Lys	Asn->Lys substitution	14.052036	14.0696	H(6) C(2) O(-1)
+381	Lys->AminoadipicAcid	aminoadipic	alpha-amino adipic acid	14.963280	14.9683	H(-3) N(-1) O(2)
+607		Leu->Gln	Leu->Gln substitution	14.974514	14.9716	H(-3) C(-1) N O
+528	Methyl+Deamidated	Methyl+Deamidated	Deamidation followed by a methylation	14.999666	15.0113	H C N(-1) O
+342	Amino	aminotyrosine	Tyrosine oxidation to 2-aminotyrosine	15.010899	15.0146	H N
+590		Ile->Lys	Ile->Lys substitution	15.010899	15.0146	H N
+670		Val->Asp	Val->Asp substitution	15.958529	15.9563	H(-4) C(-1) O(2)
+420	Carboxy->Thiocarboxy	thiocarboxy	thiocarboxylic acid	15.977156	16.0656	O(-1) S
+654		Ser->Cys	Ser->Cys substitution	15.977156	16.0656	O(-1) S
+35	Oxidation	Hydroxylation	Oxidation or Hydroxylation	15.994915	15.9994	O
+540		Ala->Ser	Ala->Ser substitution	15.994915	15.9994	O
+569		Phe->Tyr	Phe->Tyr substitution	15.994915	15.9994	O
+284	Methyl:2H(2)	DeMet	Deuterium Methylation of Lysine	16.028204	16.0389	2H(2) C
+629		Pro->Leu	Pro->Leu substitution	16.031300	16.0425	H(4) C
+989		Ammonium	replacement of proton with ammonium ion	17.026549	17.0305	H(3) N
+298	Methyl:2H(3)	D3-Me-ester	deuterated methyl ester	17.034480	17.0451	H(-1) 2H(3) C
+696	Label:2H(9)13C(6)15N(2)	13C6-15N2-D9	13C(6) 15N(2) (D)9 SILAC label	17.070690	16.9982	H(-9) 2H(9) C(-6) 13C(6) N(-2) 15N(2)
+592		Ile->Met	Ile->Met substitution	17.956421	18.0384	H(-2) C(-1) S
+608		Leu->Met	Leu->Met substitution	17.956421	18.0384	H(-2) C(-1) S
+127	Fluoro	Fphe	fluorophenylalanine replacement of phenylalanine	17.990578	17.9905	H(-1) F
+329	Methyl:2H(3)13C(1)	Methyl-Heavy	monomethylated arginine	18.037835	18.0377	H(-1) 2H(3) 13C
+906		Lys->MetOx	Lys->Met substitution and sulfoxidation	18.940436	19.0232	H(-3) C(-1) N(-1) O S
+584		His->Arg	His->Arg substitution	19.042199	19.0464	H(5) N
+350	Trp->Hydroxykynurenin	hydroxykynurenin	tryptophan oxidation to hydroxykynurenin	19.989829	19.9881	C(-1) O(2)
+885		Label:13C(1)2H(3)+Oxidation	Oxidised methionine 13C(1)2H(3) SILAC label	20.017100	20.0105	H(-3) 2H(3) C(-1) 13C O
+956		Cation:Mg[II]	Replacement of 2 protons by magnesium	21.969392	22.2891	H(-2) Mg
+30	Cation:Na	Sodiated	Sodium adduct	21.981943	21.9818	H(-1) Na
+554		Asp->His	Asp->His substitution	22.031969	22.0519	H(2) C(2) N(2) O(-2)
+620		Asn->His	Asn->His substitution	23.015984	23.0366	H C(2) N O(-1)
+606		Leu->His	Leu->His substitution	23.974848	23.9816	H(-4) N(2)
+1004		Label:13C(6)15N(4)+Methyl	Monomethylated Arg13C(6) 15N(4)	24.023919	23.9561	H(2) C(-5) 13C(6) N(-4) 15N(4)
+438	Cyano	cyano	cyano	24.995249	25.0095	H(-1) C N
+611		Met->Arg	Met->Arg substitution	25.060626	24.9896	H(3) C N(3) S(-1)
+581		His->Tyr	His->Tyr substitution	26.004417	26.0340	H(2) C(3) N(-2) O
+254	Delta:H(2)C(2)	Acetald+26	Acetaldehyde +26	26.015650	26.0373	H(2) C(2)
+543		Ala->Pro	Ala->Pro substitution	26.015650	26.0373	H(2) C(2)
+656		Ser->Ile	Ser->Ile or Ser->Leu substitution	26.052036	26.0803	H(6) C(3) O(-1)
+651		Ser->Asn	Ser->Asn substitution	27.010899	27.0253	H C N
+661		Thr->Lys	Thr->Lys substitution	27.047285	27.0684	H(5) C(2) N O(-1)
+926		ethylamino	ethyl amino	27.047285	27.0684	H(5) C(2) N O(-1)
+122	Formyl	Formyl	Formylation	27.994915	28.0101	C O
+599		Lys->Arg	Lys->Arg substitution	28.006148	28.0134	N(2)
+36	Dimethyl	di-Methylation	di-Methylation	28.031300	28.0532	H(4) C(2)
+255	Delta:H(4)C(2)	Acetald+28	Acetaldehyde +28	28.031300	28.0532	H(4) C(2)
+280	Ethyl	Ethyl	Ethylation	28.031300	28.0532	H(4) C(2)
+546		Ala->Val	Ala->Val substitution	28.031300	28.0532	H(4) C(2)
+634		Gln->Arg	Gln->Arg substitution	28.042534	28.0565	H(4) C N(2) O(-1)
+1006		Label:13C(6)15N(4)+Methyl:2H(3)13C(1)	2H(3) 13C(1) monomethylated Arg13C(6) 15N(4)	28.046104	27.9673	H(-1) 2H(3) C(-6) 13C(7) N(-4) 15N(4)
+275	Nitrosyl	SNO	S-nitrosylation	28.990164	28.9982	H(-1) N O
+529	Delta:H(5)C(2)	Delta:H(5)C(2)	Dimethylation of proline residue	29.039125	29.0611	H(5) C(2)
+931		EthylAmide	solvolysis of amide group on Asn or Gln by ethanol	29.039125	29.0611	H(5) C(2)
+392	Quinone	quinone	quinone	29.974179	29.9829	H(-2) O(2)
+668		Val->Glu	Val->Glu substitution	29.974179	29.9829	H(-2) O(2)
+637		Arg->Trp	Arg->Trp substitution	29.978202	30.0242	H(-2) C(5) N(-2)
+663		Thr->Met	Thr->Met substitution	29.992806	30.0922	H(2) C O(-1) S
+414	Hydroxymethyl	hydroxymethyl	hydroxymethyl	30.010565	30.0260	H(2) C O
+541		Ala->Thr	Ala->Thr substitution	30.010565	30.0260	H(2) C O
+572		Gly->Ser	Gly->Ser substitution	30.010565	30.0260	H(2) C O
+626		Pro->Gln	Pro->Gln substitution	31.005814	31.0140	H N O
+903		Lys->CamCys	Lys->Cys substitution and carbamidomethylation	31.935685	32.0219	H(-4) C(-1) O S
+421	Sulfide	persulfide	persulfide	31.972071	32.0650	S
+669		Val->Met	Val->Met substitution	31.972071	32.0650	S
+425	Dioxidation	dihydroxy	dihydroxy	31.989829	31.9988	O(2)
+199	Dimethyl:2H(4)	CHD2	DiMethyl-CHD2	32.056407	32.0778	2H(4) C(2)
+905		Leu->MetOx	Leu->Met substitution and sulfoxidation	33.951335	34.0378	H(-2) C(-1) O S
+586		Ile->Phe	Ile->Phe substitution	33.984350	34.0162	H(-2) C(3)
+602		Leu->Phe	Leu->Phe substitution	33.984350	34.0162	H(-2) C(3)
+986		Label:13C(6)+Dimethyl	Dimethyl 13C(6) Silac label	34.051429	34.0091	H(4) C(-4) 13C(6)
+510	Dimethyl:2H(4)13C(2)	C13HD2	DiMethyl-C13HD2	34.063117	34.0631	2H(4) 13C(2)
+936		Chlorination	Chlorination of tyrosine residues	34.968853	35.4530	Cl
+987		Label:13C(6)15N(2)+Dimethyl	Dimethyl 13C(6)15N(2) Silac label	36.045499	35.9959	H(4) C(-4) 13C(6) N(-2) 15N(2)
+330	Dimethyl:2H(6)13C(2)	Dimethyl-Heavy	dimethylated arginine	36.075670	36.0754	H(-2) 2H(6) 13C(2)
+958		Propargylamine	propargylamine	37.031634	37.0632	H(3) C(3) N O(-1)
+951		Cation:Ca[II]	Replacement of 2 protons by calcium	37.946941	38.0621	H(-2) Ca
+530	Cation:K	Cation:K	Replacement of proton by potassium	37.955882	38.0904	H(-1) K
+207	Delta:H(2)C(3)	Acrolein38	Acrolein addition +38	38.015650	38.0480	H(2) C(3)
+1005		Label:13C(6)15N(4)+Dimethyl	Dimethylated Arg13C(6) 15N(4)	38.039569	37.9827	H(4) C(-4) 13C(6) N(-4) 15N(4)
+26	Pyro-carbamidomethyl	Pyro-cmC	S-carbamoylmethylcysteine cyclization (N-terminus)	39.994915	40.0208	C(2) O
+860		G-H1	Glyoxal-derived hydroimiadazolone	39.994915	40.0208	C(2) O
+625		Pro->His	Pro->His substitution	40.006148	40.0241	C N(2)
+256	Delta:H(4)C(3)	Propionald+40	Propionaldehyde +40	40.031300	40.0639	H(4) C(3)
+141	Amidine	amidine	amidination of lysines or N-terminal amines with methyl acetimidate	41.026549	41.0519	H(3) C(2) N
+1	Acetyl	Acetyl	Acetylation	42.010565	42.0367	H(2) C(2) O
+52	Guanidinyl	Guanidination	Guanidination	42.021798	42.0400	H(2) C N(2)
+440	Amidino	amidino	amidino	42.021798	42.0400	H(2) C N(2)
+37	Trimethyl	tri-Methylation	tri-Methylation	42.046950	42.0797	H(6) C(3)
+575		Gly->Val	Gly->Val substitution	42.046950	42.0797	H(6) C(3)
+5	Carbamyl	Carbamyl	Carbamylation	43.005814	43.0247	H C N O
+593		Ile->Arg	Ile->Arg substitution	43.017047	43.0280	H N(3)
+609		Leu->Arg	Leu->Arg substitution	43.017047	43.0280	H N(3)
+734		Ethanolamine	Carboxyl modification with ethanolamine	43.042199	43.0678	H(5) C(2) N
+299	Carboxy	carboxyl	Carboxylation	43.989829	44.0095	C O(2)
+542		Ala->Asp	Ala->Asp substitution	43.989829	44.0095	C O(2)
+327	Delta:H(4)C(2)O(-1)S(1)	S-Eth	S-Ethylcystine from Serine	44.008456	44.1188	H(4) C(2) O(-1) S
+278	Ethanolyl	EtOH	Ethanolation	44.026215	44.0526	H(4) C(2) O
+547		Cys->Phe	Cys->Phe substitution	44.059229	44.0310	H(4) C(6) S(-1)
+354	Nitro	Nitro	Oxidation to nitro	44.985078	44.9976	H(-1) N O(2)
+56	Acetyl:2H(3)	Acetyl_heavy	Acetate labeling reagent (N-term & K) (heavy form, +3amu)	45.029395	45.0552	H(-1) 2H(3) C(2) O
+39	Methylthio	b-methylthiol	Beta-methylthiolation	45.987721	46.0916	H(2) C S
+577		Gly->Cys	Gly->Cys substitution	45.987721	46.0916	H(2) C S
+834		Label:2H(4)+Acetyl	Acetyl 4,4,5,5-D4 Lysine	46.035672	46.0613	H(-2) 2H(4) C(2) O
+1007		Label:13C(6)15N(4)+Dimethyl:2H(6)13C(2)	2H(6) 13C(2) Dimethylated Arg13C(6) 15N(4)	46.083939	46.0050	H(-2) 2H(6) C(-6) 13C(8) N(-4) 15N(4)
+162	Delta:S(-1)Se(1)	SeMet	Selenium replaces sulphur	47.944449	46.8950	S(-1) Se
+345	Trioxidation	Cysteic_acid	cysteine oxidation to cysteic acid	47.984744	47.9982	O(3)
+666		Val->Phe	Val->Phe substitution	48.000000	48.0428	C(4)
+835		Label:13C(6)+Acetyl	Acetyl 13C(6) Silac label	48.030694	47.9926	H(2) C(-4) 13C(6) O
+557		Asp->Tyr	Asp->Tyr substitution	48.036386	48.0859	H(4) C(5) O(-1)
+619		Asn->Tyr	Asn->Tyr substitution	49.020401	49.0706	H(3) C(5) N(-1)
+836		Label:13C(6)15N(2)+Acetyl	Acetyl_13C(6) 15N(2) Silac label	50.024764	49.9794	H(2) C(-4) 13C(6) N(-2) 15N(2) O
+551		Cys->Arg	Cys->Arg substitution	53.091927	53.0428	H(7) C(3) N(3) S(-1)
+952		Cation:Fe[II]	Replacement of 2 protons by iron	53.919289	53.8291	H(-2) Fe
+750		trifluoro	trifluoroleucine replacement of leucine	53.971735	53.9714	H(-3) F(3)
+319	Delta:H(2)C(3)O(1)	MDA54	MDA adduct +54	54.010565	54.0474	H(2) C(3) O
+859		MG-H1	Methylglyoxal-derived hydroimidazolone	54.010565	54.0474	H(2) C(3) O
+665		Thr->Arg	Thr->Arg substitution	55.053433	55.0818	H(5) C(2) N(3) O(-1)
+953		Cation:Ni[II]	Replacement of 2 protons by nickel	55.919696	56.6775	H(-2) Ni
+58	Propionyl	Propionyl_light	Propionate labeling reagent light form (N-term & K)	56.026215	56.0633	H(4) C(3) O
+206	Delta:H(4)C(3)O(1)	Acrolein56	Acrolein addition +56	56.026215	56.0633	H(4) C(3) O
+518	Diethyl	Diethylation	Diethylation, analogous to Dimethylation	56.062600	56.1063	H(8) C(4)
+4	Carbamidomethyl	Carbamidomethyl	Iodoacetamide derivative	57.021464	57.0513	H(3) C(2) N O
+6	Carboxymethyl	Carboxymethyl	Iodoacetic acid derivative	58.005479	58.0361	H(2) C(2) O(2)
+545		Ala->Glu	Ala->Glu substitution	58.005479	58.0361	H(2) C(2) O(2)
+576		Gly->Asp	Gly->Asp substitution	58.005479	58.0361	H(2) C(2) O(2)
+977		Carbofuran	2,3-dihydro-2,2-dimethyl-7-benzofuranol N-methyl carbamate	58.029289	58.0593	H(4) C(2) N O
+472	AEC-MAEC	AEC-MAEC	aminoethylcysteine	59.019355	59.1334	H(5) C(2) N O(-1) S
+59	Propionyl:13C(3)	Propionyl_heavy	Propionate labeling reagent heavy form (+3amu), N-term & K	59.036279	59.0412	H(4) 13C(3) O
+768		Methyl+Acetyl:2H(3)	Mono-methylated lysine labelled with Acetyl_heavy	59.045045	59.0817	H 2H(3) C(3) O
+628		Pro->Arg	Pro->Arg substitution	59.048347	59.0705	H(5) C N(3)
+445	Hydroxytrimethyl	trimethyl-OH	5-hydroxy-N6,N6,N6-trimethyl	59.049690	59.0871	H(7) C(3) O
+928		MercaptoEthanol	2-OH-ethyl thio-Ser	60.003371	60.1182	H(4) C(2) S
+775		Carboxymethyl:13C(2)	Iodoacetic acid derivative w/ 13C label	60.012189	60.0214	H(2) 13C(2) O(2)
+647		Ser->Phe	Ser->Phe substitution	60.036386	60.0966	H(4) C(6) O(-1)
+550		Cys->Tyr	Cys->Tyr substitution	60.054144	60.0304	H(4) C(6) O S(-1)
+954		Cation:Zn[II]	Replacement of 2 protons by zinc	61.913495	63.3931	H(-2) Zn
+531	Cation:Cu[I]	Cation:Cu	Replacement of proton by copper	61.921774	62.5381	H(-1) Cu
+318	Delta:H(2)C(5)	MDA62	MDA adduct +62	62.015650	62.0694	H(2) C(5)
+792		AEC-MAEC:2H(4)	deuterium cysteamine modification to S or T	63.044462	63.1580	H 2H(4) C(2) N O(-1) S
+94	IMID	IMID_light	IMID d0	68.037448	68.0773	H(4) C(3) N(2)
+520	Piperidine	Piperidination	Piperidination	68.062600	68.1170	H(8) C(5)
+655		Ser->Arg	Ser->Arg substitution	69.069083	69.1084	H(7) C(3) N(3) O(-1)
+937		dichlorination	Dichlorination of tyrosine residues	69.937705	70.9060	Cl(2)
+422	PyruvicAcidIminyl	pyruv-iminyl	N-pyruvic acid 2-iminyl	70.005479	70.0468	H(2) C(3) O(2)
+253	Crotonaldehyde	Croton	Crotonaldehyde	70.041865	70.0898	H(6) C(4) O
+24	Propionamide	Propionamide	Acrylamide adduct	71.037114	71.0779	H(5) C(3) N O
+378	Carboxyethyl	carboxyethyl	carboxyethyl	72.021129	72.0627	H(4) C(3) O(2)
+574		Gly->Glu	Gly->Glu substitution	72.021129	72.0627	H(4) C(3) O(2)
+830		Dihydroxyimidazolidine	Dihydroxy methylglyoxal adduct	72.021129	72.0627	H(4) C(3) O(2)
+95	IMID:2H(4)	IMID_heavy	IMID d4	72.062555	72.1019	2H(4) C(3) N(2)
+603		Leu->Trp	Leu->Trp substitution	72.995249	73.0523	H(-1) C(5) N
+915		Ethoxyformyl	Ethoxyformylation	73.028954	73.0706	H(5) C(3) O(2)
+97	Propionamide:2H(3)	Acrylamide_heavy	Acrylamide d3	74.055944	74.0964	H(2) 2H(3) C(3) N O
+200	Ethanedithiol	EDT	EDT	75.980527	76.1838	H(4) C(2) O(-1) S(2)
+303	DeStreak	DeStreak	Cysteine mercaptoethanol	75.998285	76.1176	H(4) C(2) O S
+208	Delta:H(4)C(6)	Acrolein76	Acrolein addition +76	76.031300	76.0960	H(4) C(6)
+653		Ser->Tyr	Ser->Tyr substitution	76.031300	76.0960	H(4) C(6)
+340	Bromo	bromo	bromination	77.910511	78.8961	H(-1) Br
+728		Methylphosphonate	Methylphosphonylation	77.987066	78.0071	H(3) C O(2) P
+316	DimethylpyrroleAdduct	pyrrole	2,5-dimethypyrrole	78.046950	78.1118	H(6) C(6)
+423	Delta:Se(1)	selenyl	selenyl	79.916520	78.9600	Se
+40	Sulfo	Sulfation	O-Sulfonation	79.956815	80.0632	O(3) S
+21	Phospho	Phospho	Phosphorylation	79.966331	79.9799	H O(3) P
+837		Arg->Npo	Arginine replacement by Nitropyrimidyl ornithine	80.985078	81.0297	H(-1) C(3) N O(2)
+549		Cys->Trp	Cys->Trp substitution	83.070128	83.0670	H(5) C(8) N S(-1)
+211	NEIAA	NEIAA-d0	N-ethyl iodoacetamide-d0	85.052764	85.1045	H(7) C(4) N O
+801		Pentylamine	Labeling transglutaminase substrate on glutamine side chain	85.089149	85.1475	H(11) C(5) N
+747		Malonyl	Malonylation of C and S residues	86.000394	86.0462	H(2) C(3) O(3)
+371	HMVK	HMVK86	Michael addition of hydroxymethylvinyl ketone to cysteine	86.036779	86.0892	H(6) C(4) O(2)
+324	DTBP	DTBP	dimethyl 3,3\'-dithiobispropionimidate	87.014270	87.1435	H(5) C(3) N S
+1014		glycidamide	glycidamide adduct	87.032028	87.0773	H(5) C(3) N O(2)
+178	DAET	ser_thr_DAET	phosphorylation to amine thiol	87.050655	87.1866	H(9) C(4) N O(-1) S
+379	Hypusine	hypusine	hypusine	87.068414	87.1204	H(9) C(4) N O
+126	Thioacyl	DSP	3-sulfanylpropanoyl	87.998285	88.1283	H(4) C(3) O S
+185	Label:13C(9)+Phospho	13C9_Phospho_Tyr	C13 label (Phosphotyrosine)	88.996524	88.9138	H C(-9) 13C(9) O(3) P
+212	NEIAA:2H(5)	NEIAA-d5	N-ethyl iodoacetamide-d5	90.084148	90.1353	H(2) 2H(5) C(4) N O
+724		O-Methylphosphate	O-Methylphosphorylation	93.981981	94.0065	H(3) C O(3) P
+205	Delta:H(6)C(6)O(1)	Acrolein94	Acrolein addition +94	94.041865	94.1112	H(6) C(6) O
+997		sulfo+amino	aminotyrosine with sulfation	94.967714	95.0778	H N O(3) S
+260	Thiophospho	Thio-phospho	Thiophosphorylation	95.943487	96.0455	H O(2) P S
+773		maleimide	maleimide	97.016378	97.0721	H(3) C(4) N O(2)
+649		Ser->Trp	Ser->Trp substitution	99.047285	99.1326	H(5) C(8) N O(-1)
+17	NIPCAM	NIPCAM	N-isopropylcarboxamidomethyl	99.068414	99.1311	H(9) C(5) N O
+578		Gly->Arg	Gly->Arg substitution	99.079647	99.1344	H(9) C(4) N(3)
+64	Succinyl	Suc_anh_light	Succinic anhydride labeling reagent light form (N-term & K)	100.016044	100.0728	H(4) C(4) O(3)
+914		Methylmalonylation	Methylmalonylation on Serine	100.016044	100.0728	H(4) C(4) O(3)
+902		DimethylArsino	Reaction with dimethylarsinous (AsIII) acid	103.960719	103.9827	H(5) C(2) As
+136	Benzoyl	benzoyl	labeling reagent light form (N-term & K)	104.026215	104.1061	H(4) C(7) O
+66	Succinyl:13C(4)	Suc_anh+4C13	Succinic anhydride labeling reagent, heavy form (+4amu, 4C13), N-term & K	104.029463	104.0434	H(4) 13C(4) O(3)
+65	Succinyl:2H(4)	Suc_anh+4H2	Succinic anhydride labeling reagent, heavy form (+4amu, 4H2), N-term & K	104.041151	104.0974	2H(4) C(4) O(3)
+1008		SecCarbamidomethyl	Sec Iodoacetamide derivative	104.965913	103.9463	H(3) C(2) N O S(-1) Se
+365	ICPL	ICPL_light	Bruker Daltonics SERVA-ICPL(TM) quantification chemistry, light form	105.021464	105.0941	H(3) C(6) N O
+697		NIC	Nicotinic Acid	105.021464	105.0941	H(3) C(6) N O
+31	Pyridylethyl	S-pyridylethyl	S-pyridylethylation	105.057849	105.1372	H(7) C(7) N
+955		Cation:Ag	Replacement of proton by silver	105.897267	106.8603	H(-1) Ag
+1000		AHA-Alkyne	Azidohomoalanine (AHA) bound to propargylglycine-NH2 (alkyne)	107.077339	107.0504	H(5) C(4) N(5) O S(-1)
+723		O-Dimethylphosphate	O-Dimethylphosphorylation	107.997631	108.0331	H(5) C(2) O(3) P
+726		O-Ethylphosphate	O-Ethylphosphorylation	107.997631	108.0331	H(5) C(2) O(3) P
+886		HydroxymethylOP	2-ammonio-6-[4-(hydroxymethyl)-3-oxidopyridinium-1-yl]- hexanoate	108.021129	108.0948	H(4) C(6) O(2)
+687	ICPL:2H(4)	ICPL_medium	Bruker Daltonics SERVA-ICPL(TM) quantification chemistry, medium form	109.046571	109.1188	H(-1) 2H(4) C(6) N O
+698		dNIC	deuterated Nicotinic Acid	109.048119	109.1205	H 2H(3) C(6) N O
+435	Methylpyrroline	me-pyrroline	4-methyl-delta-1-pyrroline-5-carboxyl	109.052764	109.1259	H(7) C(6) N O
+314	Nmethylmaleimide	NMM	Nmethylmaleimide	111.032028	111.0987	H(5) C(5) N O(2)
+364	ICPL:13C(6)	ICPL_heavy	Bruker Daltonics SERVA-ICPL(TM) quantification chemistry, heavy form	111.041593	111.0500	H(3) 13C(6) N O
+1017		DMPO	DMPO spin-trap nitrone adduct	111.068414	111.1418	H(9) C(6) N O
+209	Delta:H(8)C(6)O(2)	Acrolein112	Acrolein addition +112	112.052430	112.1265	H(8) C(6) O(2)
+121	GlyGly	GlyGly	ubiquitinylation residue	114.042927	114.1026	H(6) C(4) N(2) O(2)
+866		ICPL:13C(6)2H(4)	Bruker Daltonics SERVA-ICPL(TM) quantification chemistry, +10 Da form	115.066700	115.0747	H(-1) 2H(4) 13C(6) N O
+957		2-succinyl	S-(2-succinyl) cysteine	116.010959	116.0722	H(4) C(4) O(4)
+959		Phosphopropargyl	phospho-propargylamine	116.997965	117.0431	H(4) C(3) N O(2) P
+488	DHP	DHP	Dehydropyrrolizidine alkaloid (dehydroretronecine) on cysteines	118.065674	118.1558	H(8) C(8) N
+853		Label:2H(4)+GlyGly	Ubiquitination 2H4 lysine	118.068034	118.1273	H(2) 2H(4) C(4) N(2) O(2)
+312	Cysteinyl	Cysteinyl	Cysteinylation	119.004099	119.1423	H(5) C(3) N O(2) S
+25	Pyridylacetyl	pyridylacetyl	pyridylacetyl	119.037114	119.1207	H(5) C(7) N O
+411	Phenylisocyanate	PIC	phenyl isocyanate	119.037114	119.1207	H(5) C(7) N O
+736		DTT_C	Dithiothreitol (DTT) on Cys	120.024500	120.1701	H(8) C(4) O(2) S
+729		O-Isopropylmethylphosphonate	O-Isopropylmethylphosphonylation	120.034017	120.0868	H(9) C(4) O(2) P
+923		Label:13C(4)15N(2)+GlyGly	13C(4) 15N(2) Lysine glygly	120.050417	120.0601	H(6) 13C(4) 15N(2) O(2)
+799		Label:13C(6)+GlyGly	13C6 labeled ubiquitinylation residue	120.063056	120.0586	H(6) C(-2) 13C(6) N(2) O(2)
+264	PET	PET	phosphorylation to pyridyl thiol	121.035005	121.2028	H(7) C(7) N O(-1) S
+363	Isopropylphospho	O-Isopropylphosphate	O-Isopropylphosphorylation	122.013281	122.0596	H(7) C(3) O(3) P
+864		Label:13C(6)15N(2)+GlyGly	13C(6) 15N(2) Lysine glygly	122.057126	122.0454	H(6) C(-2) 13C(6) 15N(2) O(2)
+456	Xlink:DMP	DMP	Both ends of crosslink attached to same peptide	122.084398	122.1677	H(10) C(7) N(2)
+394	GPIanchor	GPI-anchor	glycosylphosphatidylinositol	123.008530	123.0477	H(6) C(2) N O(3) P
+412	Phenylisocyanate:2H(5)	d5-PIC	d5-phenyl isocyanate	124.068498	124.1515	2H(5) C(7) N O
+108	Nethylmaleimide	NEM	N-ethylmaleimide on cysteines	125.047679	125.1253	H(7) C(6) N O(2)
+129	Iodo	Iodination	Iodination	125.896648	125.8965	H(-1) I
+764		DTT_C:2H(6)	Isotopically labeled Dithiothreitol (DTT) modification of cysteines	126.062161	126.2071	H(2) 2H(6) C(4) O(2) S
+426	Octanoyl	octanoyl	octanoyl	126.104465	126.1962	H(14) C(8) O
+29	SMA	SMA	N-Succinimidyl-2-morpholine acetate	127.063329	127.1412	H(9) C(6) N O(2)
+60	GIST-Quat	Quat_0	Quaternary amine labeling reagent light form (N-term & K)	127.099714	127.1842	H(13) C(7) N O
+476	TMAB	TMAB-d0	4-trimethyllammoniumbutyryl-	128.107539	128.1922	H(14) C(7) N O
+450	Glu	-Glu-	monoglutamyl	129.042593	129.1140	H(7) C(5) N O(3)
+500	Nmethylmaleimide+water	NMMhyd	Nmethylmaleimidehydrolysis	129.042593	129.1140	H(7) C(5) N O(3)
+573		Gly->Trp	Gly->Trp substitution	129.057849	129.1586	H(7) C(9) N
+776		NEM:2H(5)	D5 N-ethylmaleimide on cysteines	130.079062	130.1561	H(2) 2H(5) C(6) N O(2)
+61	GIST-Quat:2H(3)	Quat_3	Quaternary amine labeling reagent heavy (+3amu) form, N-term & K	130.118544	130.2027	H(10) 2H(3) C(7) N O
+186	HPG	Arg1HPG	Hydroxyphenylglyoxal arginine	132.021129	132.1162	H(4) C(8) O(2)
+62	GIST-Quat:2H(6)	Quat_6	Quaternary amine labeling reagent heavy form (+6amu), N-term & K	133.137375	133.2212	H(7) 2H(6) C(7) N O
+501	PyMIC	PyMIC	3-methyl-2-pyridyl isocyanate	134.048013	134.1353	H(6) C(7) N(2) O
+272	CAF	CAF	sulfonation of N-terminus	135.983029	136.1265	H(4) C(3) O(4) S
+735		DTT_ST	Dithiothreitol (DTT)	136.001656	136.2357	H(8) C(4) O S(2)
+725		O-Diethylphosphate	O-Diethylphosphorylation	136.028931	136.0862	H(9) C(4) O(3) P
+743		4-ONE+Delta:H(-2)O(-1)	Dehydrated 4-Oxononenal Michael adduct	136.088815	136.1910	H(12) C(9) O
+63	GIST-Quat:2H(9)	Quat_9	Quaternary amine labeling reagent heavy form (+9amu), N-term & K	136.156205	136.2397	H(4) 2H(9) C(7) N O
+477	TMAB:2H(9)	TMAB-d9	d9-4-trimethyllammoniumbutyryl-	137.164030	137.2476	H(5) 2H(9) C(7) N O
+720		HNE-Delta:H(2)O	Dehydrated 4-hydroxynonenal	138.104465	138.2069	H(14) C(9) O
+524		CLIP_TRAQ_1	CLIP_TRAQ_1	140.094963	140.1830	H(12) C(7) N(2) O
+888		mTRAQ	mTRAQ light	140.094963	140.1830	H(12) C(7) N(2) O
+525		CLIP_TRAQ_2	CLIP_TRAQ_2	141.098318	141.1756	H(12) C(6) 13C N(2) O
+763		DTT_ST:2H(6)	Isotopically labeled Dithiothreitol (DTT) modification of serines or threonines	142.039317	142.2727	H(2) 2H(6) C(4) O S(2)
+320	Nethylmaleimide+water	NEMhyd	Nethylmaleimidehydrolysis	143.058243	143.1406	H(9) C(6) N O(3)
+375	Diphthamide	Diphthamide	Diphthamide	143.118438	143.2068	H(15) C(7) N(2) O
+949		3-deoxyglucosone	Condensation product of 3-deoxyglucosone	144.042259	144.1253	H(8) C(6) O(4)
+533	iTRAQ4plex115	iTRAQ115	Accurate mass for 115	144.099599	144.1688	H(12) C(6) 13C N 15N 18O
+214	iTRAQ4plex	iTRAQ	Representative mass and accurate mass for 116 & 117	144.102063	144.1544	H(12) C(4) 13C(3) N 15N O
+889		mTRAQ:13C(3)15N(1)	mTRAQ heavy	144.102063	144.1544	H(12) C(4) 13C(3) N 15N O
+532	iTRAQ4plex114	iTRAQ114	Accurate mass for 114	144.105918	144.1680	H(12) C(5) 13C(2) N(2) 18O
+293	CAMthiopropanoyl	CAMthiopropanoyl	3-(carbamidomethylthio)propanoyl	145.019749	145.1796	H(7) C(5) N O(2) S
+407	Hydroxycinnamyl	hydroxycinnamyl	hydroxycinnamyl	146.036779	146.1427	H(6) C(9) O(2)
+295	dHex	Fuc	Fucose	146.057909	146.1412	dHex
+408	Glycosyl	glycosyl	glycosyl-L-hydroxyproline	148.037173	148.1140	H(8) C(5) O(5)
+978		BITC	Benzyl isothiocyanate	149.029920	149.2129	H(7) C(8) N S
+851		cGMP+RMP-loss	S-guanylation-2	150.041585	150.1182	H(4) C(5) N(5) O
+172	NBS	NBS-12C	Shimadzu NBS-12C	152.988449	153.1585	H(3) C(6) N O(2) S
+975		Chlorpyrifos	O,O-diethyl o-3,5,6-trichloro-2-pyridyl phosphorothioate	153.013912	153.1598	H(10) C(4) O(2) P S
+419	Glycerophospho	glycerophospho	glycerophospho	154.003110	154.0584	H(7) C(3) O(5) P
+721		4-ONE	4-Oxononenal (ONE)	154.099380	154.2063	H(14) C(9) O(2)
+455	Xlink:DMP-s	DMP-s	One end of crosslink attached, one end free	154.110613	154.2096	H(14) C(8) N(2) O
+449	Decanoyl	decanoyl	lipid	154.135765	154.2493	H(18) C(10) O
+285	SulfanilicAcid	SA_light	Light Sulfanilic Acid (SA) C12	155.004099	155.1744	H(5) C(6) N O(2) S
+534	Dibromo	Dibromo	Dibromo	155.821022	157.7921	H(-2) Br(2)
+53	HNE	HNE	4-hydroxynonenal (HNE)	156.115030	156.2221	H(16) C(9) O(2)
+335	HNE+Delta:H(2)	redHNE	reduced 4-Hydroxynonenal	158.130680	158.2380	H(18) C(9) O(2)
+171	NBS:13C(6)	NBS-13C	Shimadzu NBS-13C	159.008578	159.1144	H(3) 13C(6) N O(2) S
+107	FormylMet	+N-formyl-met	Addition of N-formyl met	159.035399	159.2062	H(9) C(6) N O(2) S
+967		thioacylPA	membrane protein extraction	159.035399	159.2062	H(9) C(6) N O(2) S
+898		pyrophospho	pyrophosphorylation of Ser/Thr	159.932662	159.9598	H(2) O(6) P(2)
+981		glucosone	Condensation product of glucosone	160.037173	160.1247	H(8) C(6) O(5)
+286	SulfanilicAcid:13C(6)	SA_heavy	Heavy Sulfanilic Acid (SA) C13	161.024228	161.1303	H(5) 13C(6) N O(2) S
+454	HexN	HexN	Hexosamine	161.068808	161.1558	H(11) C(6) N O(4)
+41	Hex	Hex	Hexose	162.052824	162.1406	Hex
+727		O-pinacolylmethylphosphonate	O-pinacolylmethylphosphonylation	162.080967	162.1666	H(15) C(7) O(2) P
+979		PEITC	Phenethyl isothiocyanate	163.045570	163.2395	H(9) C(9) N S
+362	Diisopropylphosphate	O-Diisopropylphosphate	O-Diisopropylphosphorylation	164.060231	164.1394	H(13) C(6) O(3) P
+302	Menadione	Menadione-Q	Menadione quinone derivative	170.036779	170.1641	H(6) C(11) O(2)
+194	AccQTag	AccQTag	6-aminoquinolyl-N-hydroxysuccinimidyl carbamate	170.048013	170.1674	H(6) C(10) N(2) O
+195	QAT	QAT	APTA-d0	171.149738	171.2600	H(19) C(9) N(2) O
+767		Menadione-HQ	Menadione hydroquinone derivative	172.052430	172.1800	H(8) C(11) O(2)
+196	QAT:2H(3)	QATd3	APTA d3	174.168569	174.2784	H(16) 2H(3) C(9) N(2) O
+457	NDA	NDA	naphthalene-2,3-dicarboxaldehyde	175.042199	175.1855	H(5) C(13) N
+54	Glucuronyl	N-glucuronyl	N-glucuronylation	176.032088	176.1241	H(8) C(6) O(6)
+907		Galactosyl	Galactosyl hydroxylysine	178.047738	178.1400	O Hex
+276	AEBS	AEBS	Aminoethylbenzenesulfonylation	183.035399	183.2276	H(9) C(8) N O(2) S
+748		3sulfo	derivatization by N-term modification using 3-Sulfobenzoic succinimidyl ester	183.983029	184.1693	H(4) C(7) O(4) S
+911		MTSL	Cys modification by (1-oxyl-2,2,5,5-tetramethyl-3-pyrroline-3-methyl)methanesulfonate (MTSL)	184.079610	184.2786	H(14) C(9) N O S
+197	EQAT	EQAT	EAPTA d0	184.157563	184.2786	H(20) C(10) N(2) O
+42	Lipoyl	Lipoyl	Lipoyl	188.032956	188.3103	H(12) C(8) O S(2)
+198	EQAT:2H(5)	EQATd5	EAPTA d5	189.188947	189.3094	H(15) 2H(5) C(10) N(2) O
+301	Bromobimane	Bromobimane	Monobromobimane derivative	190.074228	190.1986	H(10) C(10) N(2) O(2)
+490	Hep	Hep	Heptose	192.063388	192.1666	Hep
+396	GlycerylPE	glycerylPE	glycerylphosphorylethanolamine	197.045310	197.1262	H(12) C(5) N O(5) P
+941		DNPS	2,4-Dinitrobenzenesulfenyl	198.981352	199.1640	H(3) C(6) N(2) O(4) S
+343		Argbiotinhydrazide	oxidized Arginine biotinylated with biotin hydrazide	199.066699	199.2700	H(13) C(9) N O(2) S
+291	Delta:Hg(1)	Hg	Mercury Mercaptan	201.970617	200.5900	Hg
+43	HexNAc	HexNAc	N-Acetylhexosamine	203.079373	203.1925	HexNAc
+825		DFDNB	Addition of DFDNB crosslinker	203.998263	204.0879	H(2) C(6) N(2) O(4) F(2)
+44	Farnesyl	Farnesylation	Farnesylation	204.187801	204.3511	H(24) C(15)
+135	Myristoyl+Delta:H(-4)	myristoyl-4H	(cis,cis-delta 5, delta 8)-tetradecadienoyl	206.167065	206.3239	H(22) C(14) O
+134	Myristoleyl	myristoleylation	(cis-delta 5)-tetradecaenoyl	208.182715	208.3398	H(24) C(14) O
+893		CarbamidomethylDTT	Carbamidomethylated DTT modification of cysteine	209.018035	209.2864	H(11) C(6) N O(3) S(2)
+894		CarboxymethylDTT	Carboxymethylated DTT modification of cysteine	210.002050	210.2712	H(10) C(6) O(4) S(2)
+45	Myristoyl	Myristoylation	Myristoylation	210.198366	210.3556	H(26) C(14) O
+751		TNBS	tri nitro benzene	210.986535	211.0886	H C(6) N(3) O(6)
+261	SPITC	SPITC	4-sulfophenyl isothiocyanate	214.971084	215.2495	H(5) C(7) N O(3) S(2)
+762		IDEnT	Isotope Distribution Encoded Tag	214.990469	216.0640	H(7) C(9) N O Cl(2)
+176	BHT	BHT	Michael addition of BHT quinone methide to Cysteine and Lysine	218.167065	218.3346	H(22) C(15) O
+824		BMOE	Addition of BMOE crosslinker	220.048407	220.1815	H(8) C(10) N(2) O(4)
+376	Hydroxyfarnesyl	hydroxyfarnesyl	hydroxyfarnesyl	220.182715	220.3505	H(24) C(15) O
+464	SPITC:13C(6)	SPITC_Heavy	4-sulfophenyl isothiocyanate (Heavy C13)	220.991213	221.2054	H(5) C 13C(6) N O(3) S(2)
+739		TMT	Native Tandem Mass Tag®	224.152478	224.2994	H(20) C(12) N(2) O(2)
+89	Iminobiotin	Im_biotin	Iminobiotinylation	225.093583	225.3106	H(15) C(10) N(3) O S
+738		TMT2plex	Duplex Tandem Mass Tag®	225.155833	225.2921	H(20) C(11) 13C N(2) O(2)
+3	Biotin	Biotin	Biotinylation	226.077598	226.2954	H(14) C(10) N(2) O(2) S
+105	ICAT-C	ICAT_light	Applied Biosystems cleavable ICAT(TM) light	227.126991	227.2603	H(17) C(10) N(3) O(3)
+513	C8-QAT	C8-QAT	[3-(2,5)-Dioxopyrrolidin-1-yloxycarbonyl)-propyl]dimethyloctylammonium	227.224915	227.3862	H(29) C(14) N O
+910		Bacillosamine	2,4-diacetamido-2,4,6-trideoxyglucopyranose	228.111007	228.2450	H(16) C(10) N(2) O(4)
+46	PyridoxalPhosphate	Pyridoxal-phos	Pyridoxal phosphate	229.014009	229.1266	H(8) C(8) N O(5) P
+737		TMT6plex	Sixplex Tandem Mass Tag®	229.162932	229.2634	H(20) C(8) 13C(4) N 15N O(2)
+514	PropylNAGthiazoline	propyl-NAG-thiazoline	propyl-1,2-dideoxy-2\'-methyl-alpha-D-glucopyranoso-[2,1-d]-Delta2\'-thiazoline	232.064354	232.2768	H(14) C(9) N O(4) S
+139	Dansyl	dansyl	5-dimethylaminonaphthalene-1-sulfonyl	233.051049	233.2862	H(11) C(12) N O(2) S
+498	BHTOH	BHTOH	Michael addition of t-butyl hydroxylated BHT (BHTOH) to C, H or K	234.161980	234.3340	H(22) C(15) O(2)
+106	ICAT-C:13C(9)	ICAT_heavy	Applied Biosystems cleavable ICAT(TM) heavy	236.157185	236.1942	H(17) C 13C(9) N(3) O(3)
+431	Palmitoleyl	palmitoleyl	palmitoleyl	236.214016	236.3929	H(28) C(16) O
+47	Palmitoyl	Palmitoylation	Palmitoylation	238.229666	238.4088	H(30) C(16) O
+361		Thrbiotinhydrazide	oxidized Threonine biotinylated with biotin hydrazide	240.104482	240.3252	H(16) C(10) N(4) O S
+771		lapachenole	lapachenole photochemically added to cysteine	240.115030	240.2970	H(16) C(16) O(2)
+353		Lysbiotinhydrazide	oxidized Lysine biotinylated with biotin hydrazide	241.088497	241.3100	H(15) C(10) N(3) O(2) S
+429	PhosphoHex	p-Man	phosphoglycosyl-D-mannose-1-phosphoryl	242.019154	242.1205	H O(3) P Hex
+537		CLIP_TRAQ_4	CLIP_TRAQ_4	244.101452	244.2292	H(15) C(9) 13C N(2) O(5)
+1016		4MT	Cys modification by 4-maleimido TEMPO	251.139568	251.3016	H(19) C(13) N(2) O(3)
+130	Diiodo	di-Iodination	di-Iodination	251.793296	251.7931	H(-2) I(2)
+744		NO_SMX_SEMD	Nitroso Sulfamethoxazole Sulphenamide thiol adduct	252.044287	252.2697	H(10) C(10) N(3) O(3) S
+684		BDMAPP	Mass Defect Tag on lysine e-amino	253.010225	254.1231	H(12) C(11) N O Br
+273	Xlink:SSD	SSD_K	covalent modification of lysine by cross-linking reagent	253.095023	253.2512	H(15) C(12) N O(5)
+451	GluGlu	-Glu-Glu-	diglutamyl	258.085186	258.2280	H(14) C(10) N(2) O(6)
+357		probiotinhydrazide	oxidized proline biotinylated with biotin hydrazide	258.115047	258.3405	H(18) C(10) N(4) O(2) S
+433	Didehydroretinylidene	didehydroretinyl	3,4-didehydroretinylidene	264.187801	264.4046	H(24) C(20)
+848		Arg2PG	Adduct of phenylglyoxal with Arg	266.057909	266.2482	H(10) C(16) O(4)
+380	Retinylidene	retinal	retinal	266.203451	266.4204	H(26) C(20)
+746		NO_SMX_SIMD	Nitroso Sulfamethoxazole Sulfinamide thiol adduct	267.031377	267.2612	H(9) C(10) N(3) O(4) S
+943		DimethylamineGMBS	Modified GMBS X linker for proteins	267.158292	267.3241	H(21) C(13) N(3) O(3)
+745		NO_SMX_SMCT	Nitroso Sulfamethoxazole semimercaptal thiol adduct	268.039202	268.2691	H(10) C(10) N(3) O(4) S
+536		CLIP_TRAQ_3	CLIP_TRAQ_3	271.148736	271.2976	H(20) C(11) 13C N(3) O(4)
+48	GeranylGeranyl	Geranyl-geranyl	Geranyl-geranyl	272.250401	272.4681	H(32) C(20)
+187	2HPG	Arg2HPG	bis(hydroxphenylglyoxal) arginine	282.052824	282.2476	H(10) C(16) O(5)
+428	PhosphoHexNAc	p-GlcNAc	N-acetylglucosamine-1-phosphoryl	283.045704	283.1724	H O(3) P HexNAc
+1003		EGCG2	(-)-dehydroepigallocatechin	287.055563	287.2442	H(11) C(15) O(6)
+505		LG-lactam-R	Levuglandinyl - arginine lactam adduct	290.176961	290.3939	H(26) C(19) N(-2) O(4)
+434	CHDH	LTP1-lipid	cis-14-hydroxy-10,13-dioxo-7-heptadecenoic ester	294.183109	294.3859	H(26) C(17) O(4)
+243	IGBP	IGBP	Light IDBEST tag for quantitation	296.016039	297.1478	H(13) C(12) N(2) O(2) Br
+499	IGBP:13C(2)	IGBP:13C(2)	Heavy IDBEST tag for quantitation	298.022748	299.1331	H(13) C(10) 13C(2) N(2) O(2) Br
+948		LG-anhyropyrrole	Levuglandinyl-lysine anhyropyrrole adduct	298.193280	298.4192	H(26) C(20) O(2)
+984		cysTMT	Native cysteine-reactive Tandem Mass Tag®	299.166748	299.4322	H(25) C(14) N(3) O(2) S
+985		cysTMT6plex	cysteine-reactive Sixplex Tandem Mass Tag®	304.177202	304.3962	H(25) C(10) 13C(4) N(2) 15N O(2) S
+731		iTRAQ8plex:13C(6)15N(2)	Accurate mass for 115, 118, 119 & 121	304.199040	304.3081	H(24) C(8) 13C(6) N(2) 15N(2) O(3)
+730		iTRAQ8plex	Representative mass and accurate mass for 113, 114, 116 & 117	304.205360	304.3074	H(24) C(7) 13C(7) N(3) 15N O(3)
+55	Glutathione	Glutathione	glutathione disulfide	305.068156	305.3076	H(15) C(10) N(3) O(6) S
+417	PhosphoUridine	p-uridine	uridine phosphodiester	306.025302	306.1660	H(11) C(9) N(2) O(8) P
+506		LG-Hlactam-R	Levuglandinyl - arginine hydroxylactam adduct	306.171876	306.3933	H(26) C(19) N(-2) O(5)
+1015		Ahx2+Hsl	C-terminal homoserine lactone and two aminohexanoic acids	309.205242	309.4039	H(27) C(16) N(3) O(3)
+116		OxArgBiotin	Oxidized arginine biotinylated with biotin-LC-hydrazide	310.135113	310.4118	H(22) C(15) N(2) O(3) S
+800		Biotin:Thermo-21345	was PentylamineBiotin	311.166748	311.4429	H(25) C(15) N(3) O(2) S
+117		OxArgBiotinRed	Oxidized arginine biotinylated with biotin-LC-hydrazide, reduced	312.150763	312.4277	H(24) C(15) N(2) O(3) S
+946		LG-anhydrolactam	Levuglandinyl-lysine anhydrolactam adduct	314.188195	314.4186	H(26) C(20) O(3)
+119	IBTP	IBTP	Thio Ether Formation - BTP Adduct	316.138088	316.3759	H(21) C(22) P
+947		LG-pyrrole	Levuglandinyl-lysine pyrrole adduct	316.203845	316.4345	H(28) C(20) O(3)
+908		SMCC-maleimide	Modified SMCC maleimide with 3-(dimethylamino)-1-propylamine	321.205242	321.4146	H(27) C(17) N(3) O(3)
+292	IodoU-AMP	IodoU-AMP	Cross-link of (Iodo)-uracil MP with W,F,Y	322.020217	322.1654	H(11) C(9) N(2) O(9) P
+512	Hex(2)	Gal-Glu	Lactosylation	324.105647	324.2812	Hex(2)
+685		NA-LNO2	Nitroalkylation by Nitro Linoleic Acid	325.225309	325.4430	H(31) C(18) N O(4)
+294	IED-Biotin	ied-biotin	biotinoyl-iodoacetyl-ethylenediamine	326.141261	326.4145	H(22) C(14) N(4) O(3) S
+686		NA-OA-NO2	Nitroalkylation by Nitro Oleic Acid	327.240959	327.4589	H(33) C(18) N O(4)
+405	Phosphoadenosine	p-adenosine	AMP binding site	329.052520	329.2059	H(12) C(10) N(5) O(6) P
+503		LG-lactam-K	Levuglandinyl - lysine lactam adduct	332.198760	332.4339	H(28) C(20) O(4)
+90	ESP	ESP-Tag_light	ESP-Tag light d0	338.177647	338.4682	H(26) C(16) N(4) O(2) S
+92	NHS-LC-Biotin	Biot_LC	NHS-LC-Biotin	339.161662	339.4530	H(25) C(16) N(3) O(3) S
+998		BHAc	N-biotinyl-6-aminohexanoyl	339.161662	339.4530	H(25) C(16) N(3) O(3) S
+49	Phosphopantetheine	p-pantetheine	Phosphopantetheine	340.085794	340.3330	H(21) C(11) N(2) O(6) P S
+393	Glucosylgalactosyl	glucosylgalactosyl	glucosylgalactosyl hydroxylysine	340.100562	340.2806	O Hex(2)
+493	BADGE	BADGE	Bisphenol A diglycidyl ether derivative	340.167459	340.4129	H(24) C(21) O(4)
+439	Diironsubcluster	Fe-cluster	hydrogenase diiron subcluster	342.786916	342.8760	H(-1) C(5) N(2) O(5) S(2) Fe(2)
+849		cGMP	S-guanylation	344.039610	344.1974	H(11) C(10) N(5) O(7) P
+413	Phosphoguanosine	p-guanosine	phospho-guanosine	345.047435	345.2053	H(12) C(10) N(5) O(7) P
+123	ICAT-H	Harbury_ICAT_C12	N-iodoacetyl, p-chlorobenzyl-12C6-glucamine	345.097915	345.7754	H(20) C(15) N O(6) Cl
+504		LG-Hlactam-K	Levuglandinyl - lysine hydroxylactam adduct	348.193674	348.4333	H(28) C(20) O(5)
+91	ESP:2H(10)	ESP-Tag_heavy	ESP-Tag heavy d10	348.240414	348.5299	H(16) 2H(10) C(16) N(4) O(2) S
+142	HexNAc(1)dHex(1)	HexNAc1dHex1	HexNAc1dHex1	349.137281	349.3337	dHex HexNAc
+124	ICAT-H:13C(6)	Harbury_ICAT_C13	N-iodoacetyl, p-chlorobenzyl-13C6-glucamine	351.118044	351.7313	H(20) C(9) 13C(6) N O(6) Cl
+113		OxLysBiotin	Oxidized lysine biotinylated with biotin-LC-hydrazide	352.156911	352.4518	H(24) C(16) N(4) O(3) S
+112		OxLysBiotinRed	Oxidized lysine biotinylated with biotin-LC-hydrazide, reduced	354.172562	354.4676	H(26) C(16) N(4) O(3) S
+289	Biotin-PEO-Amine	BiotinPEO-amine	Biotin polyethyleneoxide amine	356.188212	356.4835	H(28) C(16) N(4) O(3) S
+270	Cytopiloyne	cytopiloyne	nucleophilic addtion to cytopiloyne	362.136553	362.3738	H(22) C(19) O(7)
+793		Hex1HexNAc1	Hex1HexNAc1	365.132196	365.3331	Hex HexNAc
+432	Cholesterol	C-cholesterol	cholesterol ester	368.344302	368.6383	H(44) C(27)
+115		OxProBiotin	Oxidized Proline biotinylated with biotin-LC-hydrazide	369.183461	369.4823	H(27) C(16) N(5) O(3) S
+114		OxProBiotinRed	Oxidized proline biotinylated with biotin-LC-hydrazide, reduced	371.199111	371.4982	H(29) C(16) N(5) O(3) S
+901		4AcAllylGal	2,3,4,6-tetra-O-Acetyl-1-allyl-α-D-galactopyranoside modification of cysteine	372.142033	372.3671	H(24) C(17) O(9)
+131	Triiodo	tri-Iodination	tri-Iodination	377.689944	377.6896	H(-3) I(3)
+271	Cytopiloyne+water	cytopiloyne+H2O	nucleophilic addition to cytopiloyne+H2O	380.147118	380.3891	H(24) C(19) O(8)
+887		MDCC	covalent linkage of maleimidyl coumarin probe (Molecular Probes D-10253)	383.148121	383.3978	H(21) C(20) N(3) O(5)
+535	LeuArgGlyGly	LeuArgGlyGly	Ubiquitination	383.228103	383.4460	H(29) C(16) N(7) O(4)
+437	MicrocinC7	C-Asn-deriv	(3-aminopropyl)(L-aspartyl-1-amino)phosphoryl-5-adenosine	386.110369	386.3003	H(19) C(13) N(6) O(6) P
+452	GluGluGlu	-Glu-Glu-Glu-	triglutamyl	387.127779	387.3419	H(21) C(15) N(3) O(9)
+128	Fluorescein	Fluorescein	5-Iodoacetamidofluorescein (Molecular Probe, Eugene, OR)	388.082112	388.3497	H(14) C(22) N O(6)
+143	HexNAc(2)	HexNAc2	HexNAc2	406.158745	406.3850	HexNAc(2)
+878		Bodipy	Bodipy modifications onto cysteine	414.167478	414.2135	H(21) B C(20) N(4) O(3) F(2)
+20	PEO-Iodoacetyl-LC-Biotin	PEO-Biotin	Biotinyl-iodoacetamidyl-3,6-dioxaoctanediamine	414.193691	414.5196	H(30) C(18) N(4) O(5) S
+416	Dipyrrolylmethanemethyl	dipyrrole	dipyrrolylmethanemethyl	418.137616	418.3973	H(22) C(20) N(2) O(8)
+478	FTC	FTC	fluorescein-5-thiosemicarbazide	421.073241	421.4259	H(15) C(21) N(3) O(5) S
+515	FNEM	F-NEM	fluorescein-5-maleimide	427.069202	427.3625	H(13) C(24) N O(7)
+290	Biotin-HPDP	Biotin:Thermo-21341	Pierce EZ-Link Biotin-HPDP	428.191582	428.6124	H(32) C(19) N(4) O(3) S(2)
+442	FMN	FMN2	O3-(riboflavin phosphoryl)	438.094051	438.3285	H(19) C(17) N(4) O(8) P
+13	ICAT-D	AB_old_ICATd0	Applied Biosystems original ICAT(TM) d0	442.224991	442.5728	H(34) C(20) N(4) O(5) S
+333	Can-FP-biotin	Biotin:TRC-B394885	6-N-biotinylaminohexyl isopropyl phosphate	447.195679	447.5291	H(34) C(19) N(3) O(5) P S
+993		Biotin:Sigma-B1267	was Biotin-maleimide	449.173290	449.5239	H(27) C(20) N(5) O(5) S
+12	ICAT-D:2H(8)	AB_old_ICATd8	Applied Biosystems original ICAT(TM) d8	450.275205	450.6221	H(26) 2H(8) C(20) N(4) O(5) S
+523	Sulfo-NHS-LC-LC-Biotin	Biotin:Thermo-21338	Biot_LC_LC	452.245726	452.6106	H(36) C(22) N(4) O(4) S
+973		Puromycin	Puromycin	453.212452	453.4943	H(27) C(22) N(7) O(4)
+409	FMNH	FMN	flavin mononucleotide	454.088965	454.3279	H(19) C(17) N(4) O(9) P
+1002		EGCG1	(-)-epigallocatechin-3-gallate	456.069261	456.3558	H(16) C(22) O(11)
+443	FMNC	FMN3	S-(4a-FMN)	456.104615	456.3438	H(21) C(17) N(4) O(9) P
+942		SulfoGMBS	High molecular absorption label for proteins	458.162391	458.5306	H(26) C(22) N(4) O(5) S
+397	Triiodothyronine	triiodo	triiodo	469.716159	469.7850	H C(6) O I(3)
+935		Atto495Maleimide	High molecular absorption maleimide label for proteins	474.250515	474.5747	H(32) C(27) N(5) O(3)
+846		EQIGG	Sumo mutant Smt3-WT tail following trypsin digestion	484.228162	484.5035	H(32) C(20) N(6) O(8)
+144	Hex(3)	Hex3	Hex3	486.158471	486.4218	Hex(3)
+8	ICAT-G	Gygi_ICATd0	Gygi ICAT(TM) d0	486.251206	486.6253	H(38) C(22) N(4) O(6) S
+811		Biotin:Thermo-21360	was Biotin-PEO4-hydrazide	487.246455	487.6134	H(37) C(21) N(5) O(6) S
+118	EDT-iodoacetyl-PEO-biotin	EDT-i-biotin	EDT-iodo-PEO-biotin	490.174218	490.7034	H(34) C(20) N(4) O(4) S(3)
+9	ICAT-G:2H(8)	Gygi_ICATd8	Gygi ICAT(TM) d8	494.301420	494.6746	H(30) 2H(8) C(22) N(4) O(6) S
+145	HexNAc(1)dHex(2)	HexNAc1dHex2	HexNAc1dHex2	495.195190	495.4749	dHex(2) HexNAc
+934		AMTzHexNAc2	Photocleavable Biotin + GalNAz on O-GlcNAc	502.202341	502.4757	H(30) C(19) N(6) O(10)
+146	Hex(1)HexNAc(1)dHex(1)	Hex1HexNAc1dHex1	Hex1HexNAc1dHex1	511.190105	511.4743	dHex Hex HexNAc
+912		HNE-BAHAH	4-hydroxy-2-nonenal and biotinamidohexanoic acid hydrazide, reduced	511.319226	511.7209	H(45) C(25) N(5) O(4) S
+453	GluGluGluGlu	-Glu-Glu-Glu-Glu-	tetraglutamyl	516.170373	516.4559	H(28) C(20) N(4) O(12)
+391	Molybdopterin	molybdopterin	molybdopterin	521.884073	520.2668	H(11) C(10) N(5) O(8) P S(2) Mo
+1012		Biotin:Invitrogen-M1602	Nalpha-(3-maleimidylpropionyl)biocytin	523.210069	523.6024	H(33) C(23) N(5) O(7) S
+332	Thiophos-S-S-biotin	Thiophos-S-S-biotin	thiophosphate labeled with biotin-HPDP	525.142894	525.6658	H(34) C(19) N(4) O(5) P S(3)
+522	Maleimide-PEO2-Biotin	Biotin:Thermo-21901	Maleimide-Biotin	525.225719	525.6183	H(35) C(23) N(5) O(7) S
+213	ADP-Ribosyl	ADP-Ribose	ADP Ribose addition	541.061110	541.3005	H(21) C(15) N(5) O(13) P(2)
+147	HexNAc(2)dHex(1)	HexNAc2dHex1	HexNAc2dHex1	552.216654	552.5262	dHex HexNAc(2)
+148	Hex(1)HexNAc(2)	Hex1HexNAc2	Hex1HexNAc2	568.211569	568.5256	Hex HexNAc(2)
+827		TMPP-Ac	tris(2,4,6-trimethoxyphenyl)phosphonium acetic acid N-hydroxysuccinimide ester derivative	572.181134	572.5401	H(33) C(29) O(10) P
+325	FP-Biotin	FP-Biotin	10-ethoxyphosphinyl-N-(biotinamidopentyl)decanamide	572.316129	572.7405	H(49) C(27) N(4) O(5) P S
+377	Diacylglycerol	diacylglycerol	diacylglycerol	576.511761	576.9334	H(68) C(37) O(4)
+895		Biotin-PEG-PRA	Biotin polyethyleneoxide (n=3) alkyne	578.317646	578.6611	H(42) C(26) N(8) O(7)
+389	Phytochromobilin	phytochromobilin	phytochromobilin	584.263485	584.6621	H(36) C(33) N(4) O(6)
+387	Phycocyanobilin	phycocyanobilin	phycocyanobilin	586.279135	586.6780	H(38) C(33) N(4) O(6)
+388	Phycoerythrobilin	phycoerythrobilin	phycoerythrobilin	588.294785	588.6939	H(40) C(33) N(4) O(6)
+519	BisANS	BisANS	4,4\'-dianilino-1,1\'-binaphthyl-5,5\'-disulfonic acid	592.076278	592.6410	H(20) C(32) N(2) O(6) S(2)
+398	Thyroxine	tetraiodo	tetraiodo	595.612807	595.6815	C(6) O I(4)
+877		QQQTGG	SUMOylation by SUMO-2/3	599.266339	599.5942	H(37) C(23) N(9) O(10)
+876		QEQTGG	SUMOylation by SUMO-1	600.250354	600.5789	H(36) C(23) N(8) O(11)
+93	EDT-maleimide-PEO-biotin	EDT-m-biotin	EDT-maleimide-PEO-biotin	601.206246	601.8021	H(39) C(25) N(5) O(6) S(3)
+436	Hydroxyheme	hydroxyheme	hydroxyheme	614.161645	614.4714	H(30) C(34) N(4) O(4) Fe
+390	Heme	heme	heme	616.177295	616.4873	H(32) C(34) N(4) O(4) Fe
+774		Biotin-phenacyl	Alkylation by biotinylated form of phenacyl bromide	626.263502	626.7270	H(38) C(29) N(8) O(6) S
+538		Biotin:Cayman-10141	was 15dB-biotin	626.386577	626.8927	H(54) C(35) N(4) O(4) S
+410	Archaeol	S-archaeol	S-diphytanylglycerol diether	634.662782	635.1417	H(86) C(43) O(2)
+149	Hex(1)HexNAc(1)NeuAc(1)	Hex1HexNAc1NeuAc1	Hex1HexNAc1NeuAc1	656.227613	656.5877	Hex HexNAc NeuAc
+539		Biotin:Cayman-10013	was PGA1-biotin	660.428442	660.9504	H(60) C(36) N(4) O(5) S
+494	CyDye-Cy3	CyDye-Cy3	Cy3 CyDye DIGE Fluor saturation dye	672.298156	672.8335	H(44) C(37) N(4) O(6) S
+495	CyDye-Cy5	CyDye-Cy5	Cy5 CyDye DIGE Fluor saturation dye	684.298156	684.8442	H(44) C(38) N(4) O(6) S
+1001		AHA-Alkyne-KDDDD	Azidohomoalanine (AHA) bound to DDDDK-propargylglycine-NH2 (alkyne)	695.280074	695.5723	H(37) C(26) N(11) O(14) S(-1)
+884		Biotin:Thermo-21325	was ChromoBiotin	695.310118	695.8288	H(45) C(34) N(7) O(7) S
+150	HexNAc(2)dHex(2)	HexNAc2dHex2	HexNAc2dHex2	698.274563	698.6674	dHex(2) HexNAc(2)
+151	Hex(1)HexNAc(2)Pent(1)	Hex1HexNAc2Pent1	Hex1HexNAc2Pent1	700.253828	700.6403	Pent Hex HexNAc(2)
+891		Methyl-PEO12-Maleimide	Methyl-PEO12-Maleimide	710.383719	710.8073	H(58) C(32) N(2) O(15)
+323	Xlink:B10621	bNis	bis-N-I-sulfonerahodamine	713.093079	713.5626	H(30) C(31) N(4) O(6) S I
+152	Hex(1)HexNAc(2)dHex(1)	Hex1HexNAc2dHex1	Hex1HexNAc2dHex1	714.269478	714.6668	dHex Hex HexNAc(2)
+153	Hex(2)HexNAc(2)	Hex2HexNAc2	Hex2HexNAc2	730.264392	730.6662	Hex(2) HexNAc(2)
+861		ZGB	NHS ester linked Green Fluorescent Bodipy Dye	758.380841	758.7261	H(53) B C(37) N(6) O(6) F(2) S
+281	CoenzymeA	CysCoA	Cysteine modified Coenzyme A	765.099560	765.5182	H(34) C(21) N(7) O(16) P(3) S
+50	FAD	FAD	Flavin adenine dinucleotide	783.141486	783.5339	H(31) C(27) N(9) O(15) P(2)
+51	Tripalmitate	Tripalmitate	N-acyl diglyceride cysteine	788.725777	789.3049	H(96) C(51) O(5)
+821		Cy3b-maleimide	fluorescent dye that labels cysteines	796.238984	796.8086	H(39) C(39) N(4) O(9) F(3) S
+938		AROD	Cysteine modifier	820.336015	820.9790	H(52) C(35) N(10) O(9) S(2)
+154	Hex(3)HexNAc(1)Pent(1)	Hex3HexNAc1Pent1	Hex3HexNAc1Pent1	821.280102	821.7289	Pent Hex(3) HexNAc
+448	Microcin	microcin	microcin E492 siderophore ester from serine	831.197041	831.6871	H(37) C(36) N(3) O(20)
+932		VFQQQTGG	SUMOylation by SUMO-2/3 (formic acid cleavage)	845.403166	845.8991	H(55) C(37) N(11) O(12)
+155	Hex(1)HexNAc(2)dHex(1)Pent(1)	Hex1HexNAc2dHex1Pent1	Hex1HexNAc2dHex1Pent1	846.311736	846.7815	Pent dHex Hex HexNAc(2)
+156	Hex(1)HexNAc(2)dHex(2)	Hex1HexNAc2dHex2	Hex1HexNAc2dHex2	860.327386	860.8080	dHex(2) Hex HexNAc(2)
+157	Hex(2)HexNAc(2)Pent(1)	Hex2HexNAc2Pent1	Hex2HexNAc2Pent1	862.306651	862.7809	Pent Hex(2) HexNAc(2)
+158	Hex(2)HexNAc(2)dHex(1)	Hex2HexNAc2dHex1	Hex2HexNAc2dHex1	876.322301	876.8074	dHex Hex(2) HexNAc(2)
+395	PhosphoribosyldephosphoCoA	pRibodePcoA	phosphoribosyl dephospho-coenzyme A	881.146904	881.6335	H(42) C(26) N(7) O(19) P(3) S
+159	Hex(3)HexNAc(2)	Hex3HexNAc2	Hex3HexNAc2	892.317216	892.8068	Hex(3) HexNAc(2)
+444	CuSMo	CuSMo	copper sulfido molybdopterin cytosine dinuncleotide	922.834855	922.0670	H(24) C(19) N(8) O(15) P(2) S(3) Cu Mo
+161	Hex(3)HexNAc(2)P(1)	Hex3HexNAc2P1	Hex3HexNAc2P1	923.290978	923.7806	P Hex(3) HexNAc(2)
+890		DyLight-maleimide	Thiol-reactive dye for fluorescence labelling of proteins	940.199900	941.0762	H(48) C(39) N(4) O(15) S(4)
+160	Hex(1)HexNAc(1)NeuAc(2)	Hex1HexNAc1NeuAc2	Hex1HexNAc1NeuAc2	947.323029	947.8423	Hex HexNAc NeuAc(2)
+971		maleimide3	maleimide-3-saccharide	969.366232	969.8975	H(59) C(37) N(7) O(23)
+740		ExacTagThiol	ExacTag Thiol label mass for 2-4-7-10 plex	972.365219	972.7268	H(50) C(23) 13C(12) N(8) 15N(6) O(18)
+741		ExacTagAmine	ExacTag Amine label mass for 2-4-7-10 plex	1046.347854	1046.8285	H(52) C(25) 13C(12) N(8) 15N(6) O(19) S
+933		VIEVYQEQTGG	SUMOylation by SUMO-1 (formic acid cleavage)	1203.577168	1204.2859	H(81) C(53) N(13) O(19)
+137	Hex(5)HexNAc(2)	N-glycan	N-linked glycan core	1216.422863	1217.0880	Hex(5) HexNAc(2)
+972		maleimide5	maleimide-5-saccharide	1293.471879	1294.1787	H(79) C(49) N(7) O(33)
+309	Hex(3)HexNAc(4)	G0-Fuc	Biantennary (-2 galactose)	1298.475961	1299.1919	Hex(3) HexNAc(4)
+305	dHex(1)Hex(3)HexNAc(4)	G0	Fucosylated biantennary (-2 galactose)	1444.533870	1445.3331	dHex Hex(3) HexNAc(4)
+310	Hex(4)HexNAc(4)	G1-Fuc	Biantennary (-1 galactose)	1460.528784	1461.3325	Hex(4) HexNAc(4)
+424	MolybdopterinGD	molybdopterin-gd	molybdenum bis(molybdopterin guanine dinucleotide)	1572.985775	1572.0146	H(47) C(40) N(20) O(26) P(4) S(4) Mo
+307	dHex(1)Hex(4)HexNAc(4)	G1	Fucosylated biantennary (-1 galactose)	1606.586693	1607.4737	dHex Hex(4) HexNAc(4)
+415	MolybdopterinGD+Delta:S(-1)Se(1)	molybdopterin-se	L-selenocysteinyl molybdenum bis(molybdopterin guanine dinucleotide)	1620.930224	1618.9096	H(47) C(40) N(20) O(26) P(4) S(3) Se Mo
+311	Hex(5)HexNAc(4)	G2-Fuc	Biantennary	1622.581608	1623.4731	Hex(5) HexNAc(4)
+308	dHex(1)Hex(5)HexNAc(4)	G2	Fucosylated biantennary	1768.639517	1769.6143	dHex Hex(5) HexNAc(4)
+1010		DEDGFLYMVYASQETFG	Addition of DEDGFLYMVYASQETFG	1970.824411	1972.0880	H(122) C(89) N(18) O(31) S
+960		SUMO2135	SUMOylation by SUMO-1 after tryptic cleavage	2135.920496	2137.2343	H(137) C(90) N(21) O(37) S
+961		SUMO3549	SUMOylation by SUMO-2/3 after tryptic cleavage	3549.536568	3551.6672	H(224) C(150) N(38) O(60) S

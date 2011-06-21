@@ -1,51 +1,62 @@
 ##FASTA files can be either DNA or amino acid sequences
 isSequenceFileDNA true
+sequenceFilesContainMultipleSequences false
+useOnlyForwardsFrames false
+useIsotopeLabeling false
 
 ##This could be a directory or a file
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences encode
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr11.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences HG19/chr1.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
+//sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences s cerevisiae
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
 
 
-
-//This could be a directory or a file
+##This could be a directory or a file
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra ecoli579
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra bad E values
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/GO_mem_FASP_dta20100628
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode/DTA_FILES/122409_GO_SDSPAGE_mem_2_091225003916/122409_GO_SDSPAGE_mem_2_091225003916.2243.2243.2.dta
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
 
-//where we store our reports
-reportDirectory reports
+//Scoring Method
+//scoringMethodName Peppy.Match_Fake
+scoringMethodName Peppy.Match_IMP
+//scoringMethodName Peppy.Match_TandemFit
+//scoringMethodName Peppy.Match_HMM
 
-//can be "HMM_Score" or "TandemFit"
-defaultScore TandemFit
+//digest only part of a sequence
+useSequenceRegion false
+sequenceRegionStart 35160417
+sequenceRegionStop 35253949
 
-//digest only inside ORFs?
-onlyUsePeptidesInOpenReadingFrames false
-
-//spectrum cleaning
-localMaximaCleaning false
-highIntensityCleaning true
-
-//how to calculate our ion masses
-leftIonDifference 1.0
-rightIonDifference 1.0
+minimumNumberOfPeaksForAValidSpectrum 4
 
 //limit returned matches by confidence
-eValueCutOff 0.01
-useEValueCutOff true
+//eValueCutOff 0.03359587957603186
+eValueCutOff 0.1 
 
-//a preference for digestion of large DNA windows
-digestionWindowSize 25000000
+//Parses jobs with a lot of spectra up in to chunks with this max size
+numberOfSpectraPerSegment 10000
+digestionWindowSize 10000000
+maxNumberOfProteinsToLoadAtOnce 10000
 
 //how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 2.0
+spectrumToPeptideMassError 0.2
+//spectrumToPeptideMassError 2.0
 
 //TandemFit property
 peakDifferenceThreshold 0.3
@@ -54,11 +65,7 @@ peakDifferenceThreshold 0.3
 createHTMLReport true
 generateNeighborhoodReport false
 generateSequenceReport false
-generateSpectrumReport false
-
-
-//how many processors does your computer have?  This number should be that number.
-numberOfThreads 16
+generateSpectrumReport true
 
 //no fragments that weigh less than this will be admitted into the fragment list
 //units are daltons.
@@ -66,8 +73,16 @@ peptideMassThreshold 500.0
 
 numberOfMissedCleavages 2
 
+//splicing
+useSpliceVariants false
+
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
-//it will produce (at most) 35 matches per spectrum
-maximumNumberOfMatchesForASpectrum 2
+//it will produce (at least) 35 matches per spectrum
+//the final number of results also varies depending on the digestionWindowSize
+maximumNumberOfMatchesForASpectrum 3
+
+//where we store our reports
+reportDirectory reports
+reportDirectoryTitle report
 
 

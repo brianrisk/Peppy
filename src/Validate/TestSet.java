@@ -1,6 +1,9 @@
 package Validate;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -23,14 +26,15 @@ import Utilities.U;
 public class TestSet {
 	
 	private String testName;
+	private Color color;
 	private ArrayList<Spectrum> spectra;
 	private ArrayList<MatchContainer> topForwardsTestedMatches = null;
 	private ArrayList<Match> topForwardsMatches = null;
-	private ArrayList<Match> positiveMatches = null;
+	private ArrayList<Match> positiveMatches = new ArrayList<Match>();
 	private ArrayList<Match> topReverseMatches = null;
-	private ArrayList<Match> correctMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
 	private int setSize = -1;
+	private double averageNumberOfPeaksPerSpectrum;
 	
 	//statistics
 	private int topRankTrueTally = 0;
@@ -43,104 +47,49 @@ public class TestSet {
 	//PR curve
 	private double areaUnderPRCurve = 0;
 	
-	long timeElapsed;
-	String timeToComplete = "";
+	long timeElapsed = 0;
 	double milisecondsPerSpectrum;
 	
+	public TestSet(String testDirectoryName, String testName, ArrayList<Match> matches, Color color) {
+		this(testDirectoryName, testName, color);
+		positiveMatches = matches;
+		cleanMatches();
+	}
+	
 
-	public TestSet(String testDirectoryName, String testName, ArrayList<Peptide> peptides) {
+	public TestSet(String testDirectoryName, String testName, Color color) {
 		this.testName = testName;
+		this.color = color;
 		
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
 		
-
-//		//load "correct" matches as defined by the test set
-		correctMatches = loadCorrectMatches();
+		setSize = spectra.size();	
 		
-		//load our spectra from our correct matches as not all matches may be valid
-		//and the correct 
-		//remove spectra that don't have a proper match in our database
-		//first remove spectra which do not represent peptides in our given database
-		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
-		for (Match match: correctMatches) {
-			Peptide peptide = match.getPeptide();
-			if (GenerateValidationReport.isPeptidePresentInList(peptide, peptides) != -1) {
-				reducedSpectra.add(match.getSpectrum());
-			}
+		averageNumberOfPeaksPerSpectrum = 0;
+		for (Spectrum spectrum: spectra) {
+			averageNumberOfPeaksPerSpectrum += spectrum.getPeakCount();
 		}
-		spectra = reducedSpectra;
-		setSize = spectra.size();
-		
-		
-//		
-//		//use only spectra that don't have a big difference between precursor and the predicted protein mass
-//		ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>();
-//		for (Match match: correctMatches) {
-//			double difference = match.getSpectrum().getPrecursorMass() - match.getPeptide().getMass();
-//			if (Math.abs(difference) < Properties.peptideMassThreshold) {
-//				reducedSpectra.add(match.getSpectrum());
-//			}
-//		}
-//		spectra = reducedSpectra;
-//		setSize = spectra.size();
-//		
-//		//add all the correct peptides to the peptide database
-//		peptides.addAll(loadCorrectPeptides());
-//		Collections.sort(peptides);		
+		averageNumberOfPeaksPerSpectrum /= spectra.size();
 	}
 	
-	public void findPositiveMatches(ArrayList<Peptide> peptides) {
-		
-		
-		
-		//get the matches
-		long startTimeMilliseconds = System.currentTimeMillis();
-		positiveMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
-		long stopTimeMilliseconds = System.currentTimeMillis();
-		timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
-		timeToComplete = U.millisecondsToString(timeElapsed);
-		milisecondsPerSpectrum = (double) timeElapsed / setSize;
-		
-		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
-		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
-//		Match.setSortParameter(Match.SORT_BY_P_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
-//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
-//		Match.setSortParameter(Match.SORT_BY_SCORE);
-		Collections.sort(positiveMatches);
-		
-		//See which of the positive matches are true
-		testedMatches = new ArrayList<MatchContainer>();
-		for (Match match: positiveMatches) {
-			if (match == null) U.p("null match?  What?");
-			testedMatches.add(new MatchContainer(match));
-		}
-		//Sort MatchContainer by e value (default)	
-		Collections.sort(testedMatches);
-		
-		//find the #1 ranked match for each spectrum
-		topForwardsMatches = new ArrayList<Match>();
-		topForwardsTestedMatches = new ArrayList<MatchContainer>();
-		for (Match match: positiveMatches) {
-			if (match.getRank() == 1) {
-				topForwardsMatches.add(match);
-				topForwardsTestedMatches.add(new MatchContainer(match));
-			}
-		}
-		//should already be ordered, but what the hell, right?
-		Collections.sort(topForwardsMatches);
-		Collections.sort(topForwardsTestedMatches);
-			
-		
-		
-		calculateStastics();
+	public double getAverageNumberOfPeaksPerSpectrum() {
+		return averageNumberOfPeaksPerSpectrum;
 	}
 
+	public void findPositiveMatches(ArrayList<Peptide> peptides) {
+		/* get the matches and how long it takes */
+		long startTimeMilliseconds = System.currentTimeMillis();
+		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		long stopTimeMilliseconds = System.currentTimeMillis();
+		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
+		
+		/* add the matches to the full list */
+		if (matches != null) positiveMatches.addAll(matches);
+		
+		/* clean the full list */
+		cleanMatches();
+	}
 
 	/**
 	 * Here the peptide list is probably from a reverse database.
@@ -156,7 +105,7 @@ public class TestSet {
 			spectrum.clearEValues();
 		}
 		//get the matches
-		topReverseMatches = (new ScoringThreadServer(peptides, spectra, null)).getMatches();
+		topReverseMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
 		//Sort matches by e value	
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -175,14 +124,88 @@ public class TestSet {
 		
 	}
 	
+	public void cleanMatches() {
+		/* Do a little house cleaning */
+		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
+		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+		
+		/*removing matches with low rank */
+		Match match;
+		int size = positiveMatches.size();
+		for (int i = 0; i < size; i++) {
+			
+			
+			/* get our match */
+			match = positiveMatches.get(i);
+			
+			/* remove matches with low rank */
+			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+				positiveMatches.remove(i);
+				size--;
+				i--;
+			}
+			
+		}
+	}
+	
+	public void resetTest() {
+		positiveMatches = new ArrayList<Match>();
+		topRankTrueTally = 0;
+		topRankFalseTally = 0;
+		totalTrueTally = 0;
+		trueTallyAtFivePercentError = 0;
+		percentAtFivePercentError = 0;
+		eValueAtFivePercentError = 0;
+		areaUnderPRCurve = 0;
+	}
+	
 	/**
 	 * This should be called only after our set of matches has been found
 	 */
-	private void calculateStastics() {
-		//stats for tested matches
+	public void calculateStastics() {
+		
+		//track r time
+		milisecondsPerSpectrum = (double) timeElapsed / setSize;
+
+		//sorting by confidence
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
+//		Match.setSortParameter(Match.SORT_BY_P_VALUE);
+//		Match.setSortParameter(Match.SORT_BY_RANK_THEN_SCORE);
+//		Match.setSortParameter(Match.SORT_BY_SCORE);
+		Collections.sort(positiveMatches);
+		
+		
+		//See which of the positive matches are true
+		testedMatches = new ArrayList<MatchContainer>();
+		for (Match match: positiveMatches) {
+			if (match == null) U.p("null match?  What?");
+			testedMatches.add(new MatchContainer(match));
+		}
+		//Sort MatchContainer by e value (default)	
+		Collections.sort(testedMatches);
+		
+		//find the #1 ranked match for each spectrum
+		topForwardsMatches = new ArrayList<Match>();
+		topForwardsTestedMatches = new ArrayList<MatchContainer>();
+		for (Match match: positiveMatches) {
+			if (match.rank == 1) {
+				topForwardsMatches.add(match);
+				topForwardsTestedMatches.add(new MatchContainer(match));
+			}
+		}
+		//should already be ordered, but what the hell, right?
+		Collections.sort(topForwardsMatches);
+		Collections.sort(topForwardsTestedMatches);
+			
+		double highestIMP = 0;
 		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
 				topRankTrueTally++;
+				if (match.getMatch().getIMP() > highestIMP) highestIMP = match.getMatch().getIMP();
 			} else {
 				topRankFalseTally++;
 			}
@@ -192,6 +215,7 @@ public class TestSet {
 				eValueAtFivePercentError = match.getEValue();
 			}
 		}
+		U.p("highestIMP for true found in " + testName + ": " + highestIMP);
 		//count total true
 		for (MatchContainer match: testedMatches) {
 			if (match.isTrue()) totalTrueTally++;
@@ -211,8 +235,9 @@ public class TestSet {
 			g.setColor(Color.white);
 			g.fillRect(0,0,width,height);
 			
+			
 			//setting the line color
-			g.setColor(Color.red);
+			g.setColor(color);
 			
 			int x1 = 0;
 			int x2 = 0;
@@ -233,8 +258,8 @@ public class TestSet {
 				
 				precision = (double) trueCount / (i + 1);
 				recallPrevious = recall;
-//				recall = (double) trueCount / getSetSize();	
-				recall = (double) trueCount / totalTrueTally;	
+				recall = (double) trueCount / getSetSize();	
+//				recall = (double) trueCount / totalTrueTally;	
 				
 				area += (recall - recallPrevious) * precision;
 				
@@ -249,7 +274,7 @@ public class TestSet {
 					x1 = x2_old;
 					
 	//				U.p(trueCount + ", " + precision);
-					g.setColor(Color.red);
+					g.setColor(color);
 	//				g.setStroke(new BasicStroke(2.0f));
 					g.drawLine(x1, y1, x2, y2);
 					//let's fill in the area under the line, yes?
@@ -258,7 +283,7 @@ public class TestSet {
 					polygon.addPoint(x2, y2);
 					polygon.addPoint(x2, height);
 					polygon.addPoint(x1, height);
-					g.setColor(new Color(255,0,0,128));
+					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue() ,128));
 					g.fillPolygon(polygon);
 					
 					//updating variables
@@ -268,15 +293,43 @@ public class TestSet {
 				
 			}
 			//draw final line straight down (just for looks)
-			g.setColor(Color.red);
+			g.setColor(color);
 	//		g.setStroke(new BasicStroke(2.0f));
 			g.drawLine(x2, y1, x2, height);
 			
+			//create axis
+			int indent = 40;
+			int axisSpace = 5;
+			BufferedImage axisImage = new BufferedImage(width + indent, height + indent, BufferedImage.TYPE_INT_RGB);
+			Graphics2D axisGraphics = axisImage.createGraphics();
+			axisGraphics.setFont(new Font("Monospaced", Font.PLAIN, 36));
+			FontMetrics fm = axisGraphics.getFontMetrics();
+			axisGraphics.setColor(Color.white);
+			axisGraphics.fillRect(0, 0, width + indent, height + indent);
+			axisGraphics.drawImage(bufferedImage, indent, 0, width, height, null);
+			
+			//draw axis
+			axisGraphics.setColor(Color.black);
+			axisGraphics.setStroke(new BasicStroke(3.0f));
+			axisGraphics.drawLine(indent, 0, indent, height);
+			axisGraphics.drawLine(indent, height, width + indent, height);
+			
+			//draw axis caps
+			int capRadius = 15;
+			axisGraphics.drawLine(indent - capRadius, 0, indent + capRadius, 0);
+			axisGraphics.drawLine(indent + width, height - capRadius, indent + width, height + capRadius);
+			
+			//draw labels
+			axisGraphics.drawString("0", indent - fm.stringWidth("0") - axisSpace, height + fm.getHeight());
+			axisGraphics.drawString("1", indent - fm.stringWidth("1") - axisSpace, fm.getHeight() + axisSpace);
+			axisGraphics.drawString("1", width + indent - fm.stringWidth("1") - axisSpace, height + fm.getHeight());
+			
 			areaUnderPRCurve = area;
-			return bufferedImage;
+			return axisImage;
 			
 		}
 
+	@SuppressWarnings("unused")
 	private ArrayList<Peptide> loadCorrectPeptides() {
 		ArrayList<Peptide> correctPeptides = new ArrayList<Peptide>();
 		for(Spectrum spectrum: spectra) {
@@ -319,6 +372,7 @@ public class TestSet {
 		return correctPeptides;
 	}
 	
+	@SuppressWarnings("unused")
 	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
@@ -349,7 +403,7 @@ public class TestSet {
 			if (correctAcidSequence == null) {
 				validPeptideFile = false;
 			}
-			correctAcidSequence = correctAcidSequence.trim();
+			correctAcidSequence = correctAcidSequence.trim().toUpperCase();
 			if (correctAcidSequence.equals("")) {
 				validPeptideFile = false;
 			}
@@ -365,7 +419,7 @@ public class TestSet {
 			}
 			//adding to the array list
 			if (validPeptideFile && validPeptide) {
-				correctMatches.add(new Match(spectrum, peptide, null));
+				correctMatches.add(Properties.matchConstructor.createMatch(spectrum, peptide));
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
@@ -410,10 +464,6 @@ public class TestSet {
 
 	public long getTimeElapsed() {
 		return timeElapsed;
-	}
-
-	public String getTimeToComplete() {
-		return timeToComplete;
 	}
 
 	public int getSetSize() {

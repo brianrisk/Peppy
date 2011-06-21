@@ -23,8 +23,7 @@ public class PeptideUnderConstruction {
 	
 	public void addAminoAcid(char acid) {
 		buffer.append(acid);
-		if (acid == 'K') breakCount++;
-		if (acid == 'R') breakCount++;
+		if (Protein.isBreak(acid)) breakCount++;
 	}
 	
 	public int getBreakCount() {

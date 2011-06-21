@@ -1,6 +1,7 @@
 package Utilities;
 
-import java.awt.Point;
+import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * A basic utility class.
@@ -130,6 +130,8 @@ public class U {
 	public static void p(char o) {System.out.println(o);}
 	public static void p() {System.out.println();}
 	
+	public static void beep() {Toolkit.getDefaultToolkit().beep();}
+	
 	public static void copyfile(File sourceFile, File destinationFile){
 	    try{
 	      InputStream in = new FileInputStream(sourceFile);
@@ -151,25 +153,6 @@ public class U {
 	      System.out.println(e.getMessage());      
 	    }
 	  }
-	
-	
-	public static void appendFile(PrintWriter pw, File file) {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line = br.readLine();
-			while (line != null) {
-				pw.println(line);
-				line = br.readLine();
-			}
-			br.close();
-		} catch (FileNotFoundException e) {
-			U.p("could not append file: " + file.getName());
-			e.printStackTrace();
-		} catch (IOException e) {
-			U.p("could not read file: " + file.getName());
-			e.printStackTrace();
-		}
-	}
 	
 	public static double log(double base, double of) {
 		return Math.log(of) / Math.log(base);
@@ -274,6 +257,13 @@ public class U {
 	
 	public static String reverseString(String in) {
 		return new StringBuffer(in).reverse().toString();
+	}
+	
+	public static String getRGBStringFromPercent(double percent) {
+		Color hsb = Color.getHSBColor((float) percent, 1.0f, 1.0f);
+		String rgb = Integer.toHexString(hsb.getRGB());
+		rgb = rgb.substring(2, rgb.length());
+		return rgb;
 	}
 
 }

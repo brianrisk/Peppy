@@ -9,12 +9,14 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Random;
 
 import Peppy.Match;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -31,12 +33,11 @@ public class FPR {
 		nfPercent.setMaximumFractionDigits(2);
 		
 		//What scoring mechanism?
-		String scoreName = "TandemFit";
-		if (Properties.defaultScore == Properties.DEFAULT_SCORE_HMM) scoreName = "HMM_Score";
+		String scoreName = Properties.scoringMethodName;
 		U.p("running report for " + scoreName);
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		ArrayList<Sequence> sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//Loading a subset of our spectra
 		U.p("loading spectral files...");
@@ -67,7 +68,7 @@ public class FPR {
 		Collections.sort(forwardsMatches);
 		
 		//need to initialize things now that we have found matches
-		sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
+		sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		for (Spectrum spectrum: spectra) {
 			spectrum.clearEValues();
 		}
@@ -107,26 +108,53 @@ public class FPR {
 		double fpr05 = getFPR(points, 0.05);
 		
 		//Find the percent of total spectra found at 1%
+		int total01 = 0;
 		double percent01 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
 			if (forwardsMatches.get(i).getEValue() <= fpr01) {
-				percent01 =  i;
+				total01++;
 			} else {
 				break;
 			}
 		}
-		percent01 /= setSize;
+		percent01 = (double) total01 / setSize;
 		
 		//Find the percent of total spectra found at 5%
+		int total05 = 0;
 		double percent05 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
 			if (forwardsMatches.get(i).getEValue() <= fpr05) {
-				percent05 =  i;
+				total05++;
 			} else {
 				break;
 			}
 		}
-		percent05 /= setSize;
+		percent05 = (double) total05/ setSize;
+		
+		//find peptide spectrum mass differences
+		double averageAbsMassDifference = 0;
+		double lowestMassDifference = Double.MAX_VALUE;
+		double highestMassDifference = Double.MIN_VALUE;
+		double massDifference;
+		for (int i = 0; i < total01; i++) {
+			massDifference = forwardsMatches.get(i).getSpectrum().getMass() - forwardsMatches.get(i).getPeptide().getMass();
+			averageAbsMassDifference += Math.abs(massDifference);
+			if (lowestMassDifference > massDifference) lowestMassDifference = massDifference;
+			if (highestMassDifference < massDifference) highestMassDifference = massDifference;
+		}
+		averageAbsMassDifference /= total01;
+		
+		//find number of spectra with matches in this range
+		Hashtable<Integer, Integer> uniqueSpectrumIDsOnePercent = new Hashtable<Integer, Integer>();
+		for (int i = 0; i < total01; i++) {
+			Integer ID = new Integer(forwardsMatches.get(i).getSpectrum().getId());
+			uniqueSpectrumIDsOnePercent.put(ID, ID);
+		}
+		Hashtable<Integer, Integer> uniqueSpectrumIDsFivePercent = new Hashtable<Integer, Integer>();
+		for (int i = 0; i < total05; i++) {
+			Integer ID = new Integer(forwardsMatches.get(i).getSpectrum().getId());
+			uniqueSpectrumIDsFivePercent.put(ID, ID);
+		}
 			
 		File fprFile = new File("FPR-" + scoreName + ".txt");
 		try {
@@ -143,9 +171,21 @@ public class FPR {
 			pw.println("database: " + Properties.sequenceDirectoryOrFile.getName());
 			pw.println("1% FPR: " + fpr01);
 			pw.println("percent found at 1% FPR: " + nfPercent.format(percent01));
+			pw.println("number of unique spectra at 1%: " + uniqueSpectrumIDsOnePercent.size());
+			pw.println();
 			pw.println("5% FPR: " + fpr05);
 			pw.println("percent found at 5% FPR: " + nfPercent.format(percent05));
+			pw.println("number of unique spectra at 5%: " + uniqueSpectrumIDsFivePercent.size());
 			pw.println();
+			
+			//print peptide/spectrum mass differences
+			pw.println("mass stats at 1%:");
+			pw.println("average absolute value of mass difference: " + averageAbsMassDifference);
+			pw.println("lowest mass difference: " + lowestMassDifference);
+			pw.println("higest mass difference: " + highestMassDifference);
+			pw.println();
+			
+			
 
 			pw.flush();
 			pw.close();

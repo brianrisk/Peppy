@@ -15,7 +15,6 @@ import Utilities.U;
 public class ScoringThreadServer {
 	
 	ArrayList<Spectrum> spectra;
-	Sequence sequence;
 	/*
 	 * Having a ArrayList of ArrayLists may look overly complicated, but I am doing this for a reason.
 	 * The easier way is to just have a ArrayList of SpectrumPeptideMatch objects and each time 
@@ -38,9 +37,8 @@ public class ScoringThreadServer {
 	 * @param spectra
 	 * @param matches the ArrayList where we store the best matches
 	 */
-	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra, Sequence sequence) {
+	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
 		this.spectra = spectra;	
-		this.sequence = sequence;
 		matches = new ArrayList<ArrayList<Match>>(spectra.size());
 		
 		//here we make sure we don't use more threads than we have spectra
@@ -49,7 +47,7 @@ public class ScoringThreadServer {
 		
 		//spawn new threads as needed
 		for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
-			ScoringThread scorer = new ScoringThread(getNextSpectrum(), peptides, this, sequence);
+			ScoringThread scorer = new ScoringThread(getNextSpectrum(), peptides, this);
 			Thread thread = new Thread(scorer);
 			thread.start();
 			threads.add(thread);	

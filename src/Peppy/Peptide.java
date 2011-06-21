@@ -1,5 +1,7 @@
 package Peppy;
 
+import Math.HasValue;
+
 
 /**
  * Is a data class that stores:
@@ -11,7 +13,7 @@ package Peppy;
  * @author Brian Risk
  *
  */
-public class Peptide implements Comparable<Peptide> {
+public class Peptide implements Comparable<Peptide>, HasValue {
 	
 //	private String acidSequence;
 	private byte [] acidSequence;
@@ -21,10 +23,12 @@ public class Peptide implements Comparable<Peptide> {
 	private int intronStartIndex;
 	private int intronStopIndex;
 	private boolean forward;
-	private Sequence parentSequence;
+	private Sequence_DNA parentSequence;
 	private Protein protein;
 	private boolean isSpliced;
 	private boolean isMatched = false;
+	private int lengthMinusOne;
+	private int cleavageAcidCount;
 	
 	
 	public boolean isMatched() {
@@ -40,51 +44,14 @@ public class Peptide implements Comparable<Peptide> {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this.acidSequence = AminoAcids.getByteArrayForString(sequence);
-		this.mass = calculateMass();
-		this.startIndex = 0;
-		this.forward = true;
-		this.parentSequence = null;
-		this.isSpliced = false;
+		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false);
 	}
 	
-	/**
-	 * A version of the constructor which calculates the mass from the given sequence.
-	 * @param acidSequence
-	 * @param startIndex
-	 * @param forward
-	 */
-	public Peptide(String acidSequence, int startIndex, boolean forward, Sequence parentSequence) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
-		this.startIndex = startIndex;
-		if (forward) {
-			this.stopIndex = startIndex + (acidSequence.length() * 3);
-		} else {
-			this.stopIndex = startIndex - (acidSequence.length() * 3);
-		}
-		this.forward = forward;
-		this.parentSequence = parentSequence;
-		this.isSpliced = false;
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, boolean isSpliced) {
+		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced);
 	}
 	
-	/**
-	 * For spliced peptides
-	 * @param acidSequence
-	 * @param startIndex
-	 * @param forward
-	 */
-	public Peptide(String acidSequence, int startIndex, int stopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
-		this.startIndex = startIndex;
-		this.stopIndex = stopIndex;
-		this.forward = forward;
-		this.parentSequence = parentSequence;
-		this.isSpliced = isSpliced;
-	}
-	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -93,33 +60,34 @@ public class Peptide implements Comparable<Peptide> {
 		this.intronStopIndex = intronStopIndex;
 		this.forward = forward;
 		this.parentSequence = parentSequence;
-		this.isSpliced = isSpliced;
-	}
-	
-	/**
-	 * A constructor for if our peptide comes from a protein database, not from digested DNA
-	 * @param acidSequence
-	 * @param proteinName
-	 */
-	public Peptide(String acidSequence, Protein protein) {
-		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
-		this.mass = calculateMass();
 		this.protein = protein;
+		this.isSpliced = isSpliced;
+		this.lengthMinusOne = this.acidSequence.length - 1;
+		
+		cleavageAcidCount = 0;
+		for (int i = 0; i < this.acidSequence.length; i++) {
+			if (this.acidSequence[i] == AminoAcids.K || this.acidSequence[i] == AminoAcids.R) {
+				cleavageAcidCount++;
+			}
+		}
 	}
-	
 
+
+	public int getLengthMinusOne() {
+		return lengthMinusOne;
+	}
 
 	@Override
 	public String toString() {
 //		return mass + "\t" + getAcidSequenceString() + "\t" + startIndex + "\t" + proteinName;
-		return  getAcidSequenceString() + "\t" + startIndex + "\t" + forward + "\t" + (startIndex % 3);
+		return  getAcidSequenceString() + "\t" + getMass() + "\t" + getStartIndex() + "\t" +  getStopIndex()  + "\t" + forward;
 //		return  getAcidSequenceString();
 	}
 
 
-	public int compareTo(Peptide o) {
-		if (mass > o.getMass()) return 1;
-		if (mass < o.getMass()) return -1;
+	public int compareTo(Peptide other) {
+		if (mass > other.getMass()) return  1;
+		if (mass < other.getMass()) return -1;
 		return 0;
 	}
 	
@@ -186,6 +154,10 @@ public class Peptide implements Comparable<Peptide> {
 	public String getAcidSequenceString() {
 		return AminoAcids.getStringForByteArray(acidSequence);
 	}
+	
+	public int getLength() {
+		return acidSequence.length;
+	}
 
 
 	/**
@@ -236,25 +208,9 @@ public class Peptide implements Comparable<Peptide> {
 	}
 
 
-//	/**
-//	 * This returns the start position.  For reporting purposes.  Conforms to standards.
-//	 * @return
-//	 */
-//	public int getSTART() {
-//		if (forward) {
-//			return startIndex;
-//		} else {
-//			return startIndex + 1 - (acidSequence.length() * 3);
-//		}
-//	}
-//	
-//	public int getSTOP() {
-//		if (forward) {
-//			return startIndex + (acidSequence.length() * 3);
-//		} else {
-//			return startIndex + 1;
-//		}
-//	}
+	public int getCleavageAcidCount() {
+		return cleavageAcidCount;
+	}
 
 
 	/**
@@ -272,7 +228,7 @@ public class Peptide implements Comparable<Peptide> {
 	/**
 	 * @return the parentSequence
 	 */
-	public Sequence getParentSequence() {
+	public Sequence_DNA getParentSequence() {
 		return parentSequence;
 	}
 	
@@ -281,7 +237,7 @@ public class Peptide implements Comparable<Peptide> {
 	 * in your Properties object.
 	 * @return
 	 */
-	public double calculateMass() {
+	private double calculateMass() {
 		double mass = 0.0;
 		if (Properties.useMonoMass) {
 			for (int i = 0; i < acidSequence.length; i++) {
@@ -305,6 +261,10 @@ public class Peptide implements Comparable<Peptide> {
 			mass += Definitions.WATER_AVERAGE;
 		}
 		return mass;
+	}
+
+	public double getValue() {
+		return getMass();
 	}
 	
 

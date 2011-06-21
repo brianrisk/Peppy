@@ -11,7 +11,7 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
-import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Utilities.U;
 
@@ -28,19 +28,19 @@ public class BEDReporter {
 	
 	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
-	ArrayList<Sequence> sequences;
+	ArrayList<Sequence_DNA> sequence_DNAs;
 	
 	
 	/**
 	 * @param matches
 	 * @param spectra
-	 * @param sequences
+	 * @param sequence_DNAs
 	 */
 	public BEDReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
+			ArrayList<Spectrum> spectra, ArrayList<Sequence_DNA> sequence_DNAs) {
 		this.matches = matches;
 		this.spectra = spectra;
-		this.sequences = sequences;
+		this.sequence_DNAs = sequence_DNAs;
 	}
 
 
@@ -70,7 +70,7 @@ public class BEDReporter {
 			int score;
 			for (Match match: matches) {
 				//chrom
-				chromFileName = match.getSequence().getSequenceFile().getName();
+				chromFileName = match.getPeptide().getParentSequence().getSequenceFile().getName();
 				chrom = chromFileName.substring(0, chromFileName.indexOf('.'));
 				
 				//chromStart

@@ -1,8 +1,8 @@
 package HMMScore;
-import Peppy.Properties;
-
 import java.util.Hashtable;
 import java.util.Vector;
+
+import Peppy.Properties;
 
 public class CleavageProb {
 

@@ -1,5 +1,4 @@
 package Peppy;
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,8 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import Math.EValueCalculator;
+import Math.HasValue;
 import Reports.HistogramVisualizer;
-import Statistics.EValueCalculator;
 import Utilities.U;
 
 /**
@@ -22,11 +22,11 @@ import Utilities.U;
  * @author Brian Risk
  *
  */
-public class Spectrum implements Comparable<Spectrum>{
+public class Spectrum implements Comparable<Spectrum>, HasValue {
 
 	private ArrayList<Peak> peaks;
 	private double maxMass;
-	private double precursorMass;
+	private double mass;
 	private double precursorMZ;
 	private int id;
 	private int charge = 0;
@@ -46,6 +46,10 @@ public class Spectrum implements Comparable<Spectrum>{
 	private double minimumIntensity = -1; 
 	private double coverage = -1;
 	
+	//for Multi PTMS
+	private double massPlusMargin;
+	private double massMinusMargin;
+	
 	public Spectrum() {
 		peaks = new ArrayList<Peak>();
 	}
@@ -55,16 +59,13 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 	public Spectrum(File file) {
-		this(file, false);
-	}
-	
-	public Spectrum(File file, boolean normalizePeaks) {
 		this();
 		this.file = file;
 		Spectrum spectrum = loadSpectra(file).get(0); 
 		peaks = spectrum.getPeaks();
-		precursorMass = spectrum.getPrecursorMass();
-		if (normalizePeaks) normalizePeaks();
+		mass = spectrum.getMass();
+		massPlusMargin = mass + Properties.multiModPrecursorMargin;
+		massMinusMargin = mass - Properties.multiModPrecursorMargin;
 	}
 	
 	public Spectrum(String line, File file) {
@@ -76,8 +77,8 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void addPeakFromString(String s) {
 		try {
 			Peak p = new Peak(s);
-			if (p.getMass() <= precursorMass) peaks.add(new Peak(s));
-		} catch (MalformedPeakException mpe) {
+			if (p.getMass() <= mass) peaks.add(new Peak(s));
+		} catch (Exception e) {
 			//don't add it if it's bad!
 		}	
 	}
@@ -85,16 +86,24 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void addPrecursorFromString(String s) {
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
+		try {
 		precursorMZ = Double.parseDouble(chunks[0]);
-		precursorMass = precursorMZ - Definitions.HYDROGEN_MONO;
+		} catch (NumberFormatException nfe) {
+			U.p("bad file: " + file.getPath());
+			System.exit(1);
+		}
+		mass = precursorMZ - Definitions.HYDROGEN_MONO;
 		if (file.getName().endsWith(".dta")) {
 			charge = Integer.parseInt(chunks[1]);
 		}
 		//assumes txt files are really pkl
 		if (file.getName().endsWith(".pkl") || file.getName().endsWith(".txt")) {
 			charge = Integer.parseInt(chunks[2]);
-			precursorMass *= charge;
+			mass *= charge;
 		}
+		//for our multi modification search homies
+		massPlusMargin = mass + Properties.multiModPrecursorMargin;
+		massMinusMargin = mass - Properties.multiModPrecursorMargin;
 	}
 	
 	/* returns a double, but we're really interested in setting the max */
@@ -108,7 +117,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 	
-	public void sortByIntensity() {
+	public void sortPeaksByIntensity() {
 		Peak p;
 		for (int i = 0; i < peaks.size(); i++) {
 			p = (Peak) peaks.get(i);
@@ -117,7 +126,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		Collections.sort(peaks);
 	}
 	
-	public void sortByMass() {
+	public void sortPeaksByMass() {
 		Peak p;
 		for (int i = 0; i < peaks.size(); i++) {
 			p = (Peak) peaks.get(i);
@@ -195,12 +204,12 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 	private void calculateDistributions(){
-		sortByIntensity();
+		sortPeaksByIntensity();
 		medianIntensity = getPeak(peaks.size() / 2).getIntensity();
 		intensity25Percent = getPeak((int) (peaks.size() * .75)).getIntensity();
 		intensity12Percent = getPeak((int) (peaks.size() * .875)).getIntensity();
 		intensity06Percent = getPeak((int) (peaks.size() * .9375)).getIntensity();
-		sortByMass();
+		sortPeaksByMass();
 	}
 	
 	/**
@@ -215,7 +224,7 @@ public class Spectrum implements Comparable<Spectrum>{
 			double upperBound, lowerBound, lastUpperBound = 0;
 			double windowSize = 2 * Properties.peakDifferenceThreshold;
 			for (Peak peak: peaks) {
-				if (peak.getMass() < precursorMass) {
+				if (peak.getMass() < mass) {
 					upperBound = peak.getMass() + Properties.peakDifferenceThreshold;
 					lowerBound = peak.getMass() - Properties.peakDifferenceThreshold;
 					if (lowerBound < lastUpperBound) {
@@ -226,20 +235,32 @@ public class Spectrum implements Comparable<Spectrum>{
 					lastUpperBound = upperBound;
 				}
 			}
-			coverage = covered / precursorMass;
+			coverage = covered / mass;
 		}
 		return coverage;
+	}
+	
+	public double getMassPlusMargin() {
+		return massPlusMargin;
+	}
+	
+	public double getMassMinusMargin() {
+		return massMinusMargin;
 	}
 
 	public Peak getPeak(int i) {return (Peak) peaks.get(i);}
 	
 	public ArrayList<Peak> getPeaks() {return peaks;}
 	
-	public double getPrecursorMass() {return precursorMass;}
+	public double getMass() {return mass;}
 	public double getPrecursorMZ() {return precursorMZ;}
 	
 	public int getPeakCount() {return peaks.size();}
 
+
+	public int getCharge() {
+		return charge;
+	}
 
 	public int getId() {
 		return id;
@@ -257,18 +278,21 @@ public class Spectrum implements Comparable<Spectrum>{
 		return eValueCalculator;
 	}
 
-	public void setAllPeaksToColor(Color c) {
-		for (int i = 0; i < getPeakCount(); i++) {getPeak(i).setColor(c);}
-	}
-
-	public void cleanPeaks() {
+	private void cleanPeaks() {
 		//before we mess with the peak data, let's make sure we have the MD5
 		MD5 = getMD5();
 		
-		cleanWithWindow();
-		
-		if (Properties.highIntensityCleaning) 
+		if (Properties.highIntensityCleaning) {
 			cleanPeaksKeepingHighIntensity();
+		} else {
+			//cleanWithWindow();
+			keepStrongestPeakInRegions();
+		}
+		
+//		markTwinPeaks();
+//		markPeaksWithHighestIntensity();
+		
+//		keepOnlyUsedPeaks();
 		
 		//take exponent of peak intensities
 //		if (Properties.defaultScore == Properties.DEFAULT_SCORE_TANDEM_FIT) {
@@ -279,11 +303,97 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 	/**
+	 * This method is employed after other method mark
+	 * peaks as "used".
+	 */
+	private void keepOnlyUsedPeaks() {
+		for (int i = 0; i < peaks.size(); i++) {
+			if (!peaks.get(i).used) {
+				peaks.remove(i);
+				i--;
+			}
+		}
+	}
+	
+	/**
+	 * The owls are not what they seem.
+	 * Or, in this case, we pretend every peak is
+	 * a b ion and look at all other peaks for
+	 * a probable y ion.  If they exist, then both
+	 * are kept.
+	 */
+	private void markTwinPeaks() {
+		int stop = peaks.size();
+		double massLowerBound, massUpperBound, perfectY;
+		boolean found;
+		Peak peakB, peakY;
+		for (int b = 0; b < stop - 1; b++) {
+			peakB = peaks.get(b);
+			if (peakB.used) continue;
+			
+			//found starts as false because we haven't found a match yet
+			found = false;
+			
+			//Determining the y ion
+			//Start with the precursor mass
+			perfectY = getMass();
+			//subtract the mass of the b ion
+			perfectY -= peakB.getMass();
+			//since b ion is the sum of the amino acids + left ion difference,
+			//that means we just subtracted the left ion difference. add that back.
+			//this should now be the raw summation of the amino acids of the y ion
+			perfectY += Properties.leftIonDifference;
+			//add the right ion difference to get the y ion mass
+			perfectY += Properties.rightIonDifference;
+			massLowerBound = perfectY - Properties.peakDifferenceThreshold;
+			massUpperBound = perfectY + Properties.peakDifferenceThreshold;
+			for (int y = b + 1; y < stop; y++) {
+				peakY = peaks.get(y);
+				if (peakY.used) continue;
+				if (peakY.getMass() > massLowerBound && peakY.getMass() < massUpperBound) {
+					peakY.used = true;
+					found = true;
+					break;
+				}
+			}
+			
+			//handle if we found a Y match
+			if (found == true) {
+				peakB.used = true;
+				continue;
+			}
+		}
+	}
+	
+	private void keepStrongestPeakInRegions() {
+		sortPeaksByIntensity();
+		int start = peaks.size() - 1;
+		int stop = 0;
+		double lowerBound, upperBound;
+		
+		//note: > stop as we save final one for inside loop
+		for (int i = start; i > stop; i--) {
+			lowerBound = peaks.get(i).getMass() - Properties.peakDifferenceThreshold;
+			upperBound = peaks.get(i).getMass() + Properties.peakDifferenceThreshold;
+			for (int j = i - 1; j >= stop; j--) {
+				if (peaks.get(j).getMass() > lowerBound) {
+					if (peaks.get(j).getMass() < upperBound) {
+						peaks.remove(j);
+						i--;
+						j--;
+					}
+				}
+			}
+		}
+		sortPeaksByMass();
+	}
+	
+	/**
 	 * There may be some peaks that don't ever get considered with
 	 * scoring mechanisms like tandemFit.  For example, if a very strong peak
 	 * is at 1000 Da and another, weaker peak is at 1000.1 Da with nothing close after it
 	 * then it will never be used as it will always be overshadowed.  This method
-	 * removes those vestigal peaks.
+	 * removes those vestigial peaks.
 	 */
 	private void cleanWithWindow() {
 		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
@@ -324,17 +434,27 @@ public class Spectrum implements Comparable<Spectrum>{
 		peaks = retPeaks;
 	}
 	
-	//keep the 100 most intense peaks.  Intense!
+	//mark the 100 most intense peaks.  Intense!
 	private void cleanPeaksKeepingHighIntensity() {
 		if (peaks.size() <= Properties.numberOfHighIntensityPeaksToRetain) return;
-		sortByIntensity();
+		sortPeaksByIntensity();
 		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
 		for (int i = peaks.size() - 1; i >= peaks.size() - Properties.numberOfHighIntensityPeaksToRetain; i--) {
 			retPeaks.add(peaks.get(i));
 		}
 		
 		peaks = retPeaks;	
-		sortByMass();
+		sortPeaksByMass();
+	}
+	
+	//keep the 100 most intense peaks.  Intense!
+	private void markPeaksWithHighestIntensity() {
+		if (peaks.size() <= Properties.numberOfHighIntensityPeaksToRetain) return;
+		sortPeaksByIntensity();
+		for (int i = peaks.size() - 1; i >= peaks.size() - Properties.numberOfHighIntensityPeaksToRetain; i--) {
+			peaks.get(i).used = true;
+		}
+		sortPeaksByMass();
 	}
 	
 	/**
@@ -344,7 +464,7 @@ public class Spectrum implements Comparable<Spectrum>{
 	public void normalizePeaks() {
 		double maxIntensity = getMaxIntensity();
 		for (Peak peak: peaks) {
-			peak.setIntensity(peak.getIntensity() * 100.0 / maxIntensity);
+			peak.setIntensity((float) (peak.getIntensity() * 100.0 / maxIntensity));
 		}
 	}
 	
@@ -363,6 +483,21 @@ public class Spectrum implements Comparable<Spectrum>{
 		} else {
 			loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra );
 		}
+		
+		/* remove spectra with small amount of peaks */
+		int removeTally = 0;
+		for (int i = 0; i < spectra.size(); i++) {
+			if (spectra.get(i).getPeakCount() < Properties.minimumNumberOfPeaksForAValidSpectrum) {
+				spectra.remove(i);
+				i--;
+				removeTally++;
+			}
+		}
+		if (removeTally > 0) {
+			U.p("removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks");
+		}
+		
+		/* set spectra id */
 		for (int i = 0; i < spectra.size(); i++) {
 			spectra.get(i).setId(i);
 		}
@@ -398,7 +533,11 @@ public class Spectrum implements Comparable<Spectrum>{
 						fileOpen = false;
 //						spectrum.sortByMass();
 						spectrum.cleanPeaks();
-						spectra.add(spectrum);
+						if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
+							spectra.add(spectrum);
+						} else {
+							spectra.add(spectrum);
+						}
 					}
 				} else {
 					if (fileOpen) {
@@ -416,7 +555,11 @@ public class Spectrum implements Comparable<Spectrum>{
 			if (fileOpen) {
 //				spectrum.sortByMass();
 				spectrum.cleanPeaks();
-				spectra.add(spectrum);
+				if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
+					spectra.add(spectrum);
+				} else {
+					spectra.add(spectrum);
+				}
 			}
 			inBR.close();
 		}
@@ -442,12 +585,12 @@ public class Spectrum implements Comparable<Spectrum>{
 //				}
 //				if (intensityTotal > maxValueForCombination[ionMatchTally]) maxValueForCombination[ionMatchTally] = intensityTotal;
 //			}
-			sortByIntensity();
+			sortPeaksByIntensity();
 			for (int i = peaks.size() - ionMatchTally; i < peaks.size(); i++) {
 				if (i < 0) continue;
 				maxValueForCombination[ionMatchTally] += peaks.get(i).getIntensity();
 			}
-			sortByMass();
+			sortPeaksByMass();
 		}
 		return maxValueForCombination[ionMatchTally];
 	}
@@ -464,7 +607,7 @@ public class Spectrum implements Comparable<Spectrum>{
 		Random random = new Random();
 		for (int spectrumCount = 0; spectrumCount < 20; spectrumCount++) {
 			Spectrum spectrum = spectra.get(spectrumCount);
-			spectrum.sortByIntensity();
+			spectrum.sortPeaksByIntensity();
 			double [] histogram = new double[numberOfHistogramBars];
 			ArrayList<Peak> peaks = spectrum.getPeaks();
 			double min = ionMatchTally * peaks.get(0).getIntensity();
@@ -597,9 +740,9 @@ public class Spectrum implements Comparable<Spectrum>{
 	}
 	
 
-	public int compareTo(Spectrum spectrum) {
-		if (precursorMass < spectrum.getPrecursorMass()) return -1;
-		if (precursorMass > spectrum.getPrecursorMass())  return 1;
+	public int compareTo(Spectrum other) {
+		if (mass > other.getMass()) return  1;
+		if (mass < other.getMass()) return -1;
 		return  0;
 	}
 	
@@ -662,6 +805,10 @@ public class Spectrum implements Comparable<Spectrum>{
 			out.append("\r");
 		}
 		return out.toString();
+	}
+
+	public double getValue() {
+		return getMass();
 	}
 	
 	

@@ -1,9 +1,13 @@
 package Peppy;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Hashtable;
 
 import Utilities.U;
 
@@ -16,49 +20,61 @@ import Utilities.U;
  */
 public class Properties {
 	
-	//how many processors does your computer have?  This number should be that number.
-	public static int numberOfThreads = 16;
+	private static Hashtable<String, Property> allProperties = new Hashtable<String, Property>();
 	
-	//which scoring mechanism to use?
-	public final static int DEFAULT_SCORE_TANDEM_FIT = 0;
-	public final static int DEFAULT_SCORE_HMM = 1;
-	public static int defaultScore = DEFAULT_SCORE_TANDEM_FIT;
+	//how many processors does your computer have?  This number should be that number.
+	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	
+	//Define our scoring method
+	public static String scoringMethodName = "Peppy.Match_IMP";
+	public static MatchConstructor matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+	
+	//TODO need to set up modification possibilities
+	public static ModificationPossibilities modificationPossibilities = new ModificationPossibilities();
 
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
+	public static int minimumNumberOfPeaksForAValidSpectrum = 4;
+	
+	//ignore spectra with large charges
+	public static boolean ignoreSpectraWithChargeGreaterThanTwo = false;
 	
 	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
+	
+	//in some experiments we will have a heavy R and K
+	public static boolean useIsotopeLabeling = false;
 	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
-	public static int digestionWindowSize = 25000000;
+	public static int minPeptideLength = 5;
+	public static int maxPeptideLength = 80;
+	public static boolean useSequenceRegion = false;
+	
+	//Segmenting up job for memory management
+	public static int numberOfSpectraPerSegment = 50000;
+	public static int digestionWindowSize = 10000000;
+	public static int maxNumberOfProteinsToLoadAtOnce = 10000;
+	public static int desiredPeptideDatabaseSize = 20000000;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;
-	public static boolean useSequenceRegion = false;
 	public static int sequenceRegionStart = 0;
 	public static int sequenceRegionStop = 0;
 	
-	//when comparing a spectrum to a peptide, the mass may difference by as much as this amount
-	//units are daltons.
+	//mass error tolerances
 	public static double spectrumToPeptideMassError = 2.0;
+	public static double peakDifferenceThreshold = 0.3;
 	
 	//TandemFit
-	public static double peakDifferenceThreshold = 0.5;
-//	public static double peakIntensityExponent = 0.33333333;
-	public static double peakIntensityExponent = 0.30;
+	public static double peakIntensityExponent = 0.33333333;
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
-//	public static double YBtrue = 1.1;
-//	public static double YBfalse = 1.2;
-//	public static double BYtrue = 1.3;
-//	public static double BYfalse = 0.9;
-	public static double YBtrue = 1.17;
-	public static double YBfalse = 1.43;
+	public static double YBtrue = 1.1;
+	public static double YBfalse = 0.9;
 	public static double BYtrue = 1.1;
 	public static double BYfalse = 0.9;
 	
@@ -66,9 +82,9 @@ public class Properties {
 	//matches per spectrum
 	public static int maximumNumberOfMatchesForASpectrum = 5;
 	
-	//e value cut off
-	public static double eValueCutOff = 0.03359587957603186;
-	public static boolean useEValueCutOff = true;
+	//cut offs.  sexy, sexy cutoffs.
+	public static double maxEValue = 0.1;
+	public static double maxIMP = 0.00001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -79,12 +95,16 @@ public class Properties {
 	//FASTA files can be either DNA or amino acid sequences
 	public static boolean isSequenceFileDNA = true;
 	
+	//do the sequence files contain many sequences?
+	
+	//Is the sequence file supposed to be read only in the first frame?
+	public static boolean useOnlyForwardsFrames = false;
+	
 	//HMM Score parameter file folder
 	public static File HMMScoreParametersFile = new File("resources/HMMScore/ParamFiles");
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
-	public static String reportDirectoryTitle = "report";
 	
 	//where we put our validation report
 	public static File validationDirectory = new File("validation");
@@ -106,6 +126,9 @@ public class Properties {
 	//the number of nucleotides away from a specific location on a chromosome for it to be
 	//considered part of the "neighborhood"
 	public static int locusNeighborhood = 3000;
+	
+	//Multiple Modifications
+	public static double multiModPrecursorMargin = 0.1;
 	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
@@ -136,17 +159,26 @@ public class Properties {
 		
 	}
 	
+	public static void setAllProperties() {
+		numberOfThreads = allProperties.get("numberOfThreads").getInt();
+	}
+	
 	private static void setPropertyFromString(String line) {
 		line = line.trim();
+		
+		/* ignore blank lines */
 		if (line.equals("")) return;
+		
+		/* ignore comments */
 		if (line.startsWith("//")) return;
 		if (line.startsWith("#")) return;
+		
+		/* ignore lines that do not have a space in them */
 		if (line.indexOf(" ") == -1) return;
+		
+		/* getting the property name and the propert value */
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
-		if (propertyName.equals("numberOfThreads")) {
-			numberOfThreads = Integer.valueOf(propertyValue);
-		}
 		
 		//sequence digestion
 		if (propertyName.equals("numberOfMissedCleavages")) 
@@ -155,23 +187,44 @@ public class Properties {
 			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("peptideMassThreshold")) 
 			peptideMassThreshold = Double.valueOf(propertyValue);
-		if (propertyName.equals("digestionWindowSize")) 
-			digestionWindowSize =Integer.valueOf(propertyValue);
-		
-		//splicing
-		if (propertyName.equals("useSpliceVariants"))
-			useSpliceVariants = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("useSequenceRegion"))
 			useSequenceRegion = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStart")) 
 			sequenceRegionStart =Integer.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStop")) 
 			sequenceRegionStop =Integer.valueOf(propertyValue);
+		if (propertyName.equals("useIsotopeLabeling"))
+			useIsotopeLabeling = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("minPeptideLength")) 
+			minPeptideLength =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maxPeptideLength")) 
+			maxPeptideLength =Integer.valueOf(propertyValue);
+		
+		//job parsing for memory management
+		if (propertyName.equals("numberOfSpectraPerSegment")) 
+			numberOfSpectraPerSegment =Integer.valueOf(propertyValue);
+		if (propertyName.equals("digestionWindowSize")) 
+			digestionWindowSize =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maxNumberOfProteinsToLoadAtOnce")) 
+			maxNumberOfProteinsToLoadAtOnce =Integer.valueOf(propertyValue);
+		
+		
+		//splicing
+		if (propertyName.equals("useSpliceVariants"))
+			useSpliceVariants = Boolean.valueOf(propertyValue);
+		
 		
 		
 		//spectrum cleaning
 		if (propertyName.equals("highIntensityCleaning"))
 			highIntensityCleaning = Boolean.valueOf(propertyValue);
+		
+		if (propertyName.equals("ignoreSpectraWithChargeGreaterThanTwo"))
+			ignoreSpectraWithChargeGreaterThanTwo = Boolean.valueOf(propertyValue);
+		
+		if (propertyName.equals("minimumNumberOfPeaksForAValidSpectrum")) 
+			minimumNumberOfPeaksForAValidSpectrum =Integer.valueOf(propertyValue);
+		
 		
 		
 		if (propertyName.equals("maximumNumberOfMatchesForASpectrum"))
@@ -183,13 +236,17 @@ public class Properties {
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
+		if (propertyName.equals("useOnlyForwardsFrames")) {
+			useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
+		}
 		
-		if (propertyName.equals("defaultScore")) {
-			//Default to tandemFit:
-			defaultScore = DEFAULT_SCORE_TANDEM_FIT;
-			if (propertyValue.equals("HMM_Score")) {
-				defaultScore = DEFAULT_SCORE_HMM;
-			}
+		
+		
+		
+		//Scoring method
+		if (propertyName.equals("scoringMethodName")) {
+			scoringMethodName = propertyValue;
+			matchConstructor = new MatchConstructor(scoringMethodName);
 		}
 		
 		if (propertyName.equals("leftIonDifference"))
@@ -199,19 +256,19 @@ public class Properties {
 		
 		//e value
 		if (propertyName.equals("eValueCutOff")) 
-			eValueCutOff = Double.valueOf(propertyValue);
-		if (propertyName.equals("useEValueCutOff")) 
-			useEValueCutOff = Boolean.valueOf(propertyValue);
-		
+			maxEValue = Double.valueOf(propertyValue);
+
 		//matches
 		if (propertyName.equals("spectrumToPeptideMassError")) 
 			spectrumToPeptideMassError = Double.valueOf(propertyValue);
 		if (propertyName.equals("peakDifferenceThreshold")) 
 			peakDifferenceThreshold = Double.valueOf(propertyValue);
+		if (propertyName.equals("precursorTolerance")) 
+			spectrumToPeptideMassError = Double.valueOf(propertyValue);
+		if (propertyName.equals("fragmentTolerance")) 
+			peakDifferenceThreshold = Double.valueOf(propertyValue);
 		
 		//reports
-		if (propertyName.equals("reportDirectoryTitle")) 
-			reportDirectoryTitle =propertyValue;
 		if (propertyName.equals("reportDirectory")) 
 			reportDirectory = new File(propertyValue);
 		if (propertyName.equals("createHTMLReport")) 
@@ -223,7 +280,90 @@ public class Properties {
 		if (propertyName.equals("generateSpectrumReport")) 
 			generateSpectrumReport = Boolean.valueOf(propertyValue);
 		
+		//Multi PTMS
+		if (propertyName.equals("multiModPrecursorMargin")) 
+			multiModPrecursorMargin = Double.valueOf(propertyValue);
 		
+		
+	}
+
+
+	public static void generatePropertiesFile(File reportDir) {	
+		reportDir.mkdirs();
+		//set up our main index file
+		File ppropertiesFile = new File(reportDir, reportDir.getName() + "_properties.txt");
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
+			
+			pw.println("##FASTA files can be either DNA or amino acid sequences ");
+			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
+			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
+			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
+			pw.println();
+			pw.println("##This could be a directory or a file ");
+			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
+			pw.println();
+			pw.println("//Scoring Method ");
+			pw.println("scoringMethodName " + Properties.scoringMethodName);
+			pw.println();
+			pw.println("//retain 100 most intense peaks");
+			pw.println("highIntensityCleaning " + Properties.highIntensityCleaning);
+			pw.println();
+			pw.println("//digest only part of a sequence ");
+			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
+			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
+			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
+			pw.println();
+			pw.println("//digest only inside ORFs? ");
+			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
+			pw.println();
+			pw.println("//limit returned matches by confidence ");
+			pw.println("eValueCutOff " + Properties.maxEValue);
+			pw.println();
+			pw.println("//a preference for digestion of large DNA windows ");
+			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
+			pw.println();
+			pw.println("//how much precursor mass / theoretical mass difference should we tolerate? ");
+			pw.println("spectrumToPeptideMassError " + Properties.spectrumToPeptideMassError);
+			pw.println("//spectrumToPeptideMassError ");
+			pw.println();
+			pw.println("//TandemFit property ");
+			pw.println("peakDifferenceThreshold " + Properties.peakDifferenceThreshold);
+			pw.println();
+			pw.println("//Report variables ");
+			pw.println("createHTMLReport " + Properties.createHTMLReport);
+			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
+			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
+			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
+			pw.println();
+			pw.println("//no fragments that weigh less than this will be admitted into the fragment list ");
+			pw.println("//units are daltons. ");
+			pw.println("peptideMassThreshold " + Properties.peptideMassThreshold);
+			pw.println();
+			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
+			pw.println();
+			pw.println("//splicing ");
+			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
+			pw.println();
+			pw.println("//This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
+			pw.println("//it will produce (at least) 35 matches per spectrum ");
+			pw.println("//the final number of results also varies depending on the digestionWindowSize ");
+			pw.println("maximumNumberOfMatchesForASpectrum " + Properties.maximumNumberOfMatchesForASpectrum);
+			pw.println();
+			pw.println("//where we store our reports ");
+			pw.println("reportDirectory " + Properties.reportDirectory);
+			pw.println();
+			pw.println();
+	
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 	
 

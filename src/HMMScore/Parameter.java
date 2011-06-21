@@ -1,8 +1,7 @@
 package HMMScore;
+import java.util.Vector;
+
 import Peppy.Properties;
-import java.io.*;
-import java.util.*;
-import java.lang.Math.*;
 
 public class Parameter {
 

@@ -9,11 +9,12 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import Peppy.DNA_DigestionThread;
-import Peppy.DNA_Sequence;
+import Peppy.DigestionThread_DNA;
+import Peppy.Nucleotides;
 import Peppy.Definitions;
 import Peppy.Properties;
 import Peppy.Sequence;
+import Peppy.Sequence_DNA;
 import Utilities.U;
 
 public class HilbertCurve {
@@ -65,9 +66,9 @@ public class HilbertCurve {
 	 */
 	public HilbertCurve() {
 		//get our sequence
-		ArrayList<Sequence> sequences = Sequence.loadSequences(Properties.sequenceDirectoryOrFile);
-		Sequence sequence = sequences.get(0);
-		DNA_Sequence dnaSequence = sequence.getNucleotideSequences().get(0);
+		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		Sequence_DNA sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
+		Nucleotides dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
 		String dna = dnaSequence.getSequence();		
 		int sequenceIndexStart = 0;
 		int sequenceIndexStop = dna.length();
@@ -96,7 +97,6 @@ public class HilbertCurve {
 
 		//initialize our image
 		int whiteRGB = Color.white.getRGB();
-		int blackRGB = Color.blue.getRGB(); //Color.black.getRGB();
 		curveImage = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_RGB);
 		for (int x = 0; x < sideLength; x++) {
 			for (int y = 0; y < sideLength; y++) {
@@ -111,14 +111,13 @@ public class HilbertCurve {
 		boolean forwards = true;
 		Point point;
 		boolean inORF = false;
-		int [] colors = {Color.red.getRGB(), Color.green.getRGB(), Color.blue.getRGB()};
 		Color color;
 		for (int start = 0; start < 3; start++) {
 			for (int index = start; index < dna.length(); index++) {
 				mod = (index - start) % 3;
 				codon[mod] = dna.charAt(index);
 				if (mod == 2) {
-					aminoAcid = Definitions.aminoAcidList[DNA_DigestionThread.indexForCodonArray(codon, forwards)];
+					aminoAcid = Definitions.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, forwards)];
 					if (aminoAcid == 'M') {
 						inORF = true;
 					}
