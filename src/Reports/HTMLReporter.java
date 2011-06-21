@@ -75,7 +75,7 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-					if (match.getEValue() < Peppy.Properties.eValueCutOff) {
+					if (match.getEValue() < Peppy.Properties.maxEValue) {
 						bestMatches.add(match);
 					}
 				} else {
@@ -91,7 +91,7 @@ public class HTMLReporter {
 			
 			//sort our best matches by score ratio
 //			Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
-			Match.setSortParameter(Match.SORT_BY_SCORE);
+			Match.setSortParameter(Match.SORT_BY_E_VALUE);
 			Collections.sort(bestMatches);
 			
 			//set up our main index file
@@ -140,27 +140,25 @@ public class HTMLReporter {
 				
 				sb.append("<td>");
 				if (match.getPeptide().getParentSequence() != null) {
-					sb.append("<nobr>");
 					if (sequences != null) {
-						sb.append("<a href=\"sequences/");
-						sb.append(match.getPeptide().getParentSequence().getId());
-						sb.append(Properties.reportWebSuffix);
-						sb.append("\">");
+//						sb.append("<a href=\"sequences/");
+//						sb.append(match.getPeptide().getParentSequence().getId());
+//						sb.append(Properties.reportWebSuffix);
+//						sb.append("\">");
 						sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
-						sb.append("</a> ");
+//						sb.append("</a> ");
 					}
-					sb.append("</nobr>");
 				}
 				sb.append("</td>");
 				
 				sb.append("<td>");
-				sb.append("<a href=\"neighborhoods/");
-				sb.append(i);
-				sb.append(Properties.reportWebSuffix);
-				sb.append("\">");
+//				sb.append("<a href=\"neighborhoods/");
+//				sb.append(i);
+//				sb.append(Properties.reportWebSuffix);
+//				sb.append("\">");
 				sb.append(match.getPeptide().getStartIndex());
 				sb.append(" (" + match.getPeptide().getStartIndex() % 3 + ")");
-				sb.append("</a>");
+//				sb.append("</a>");
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -272,81 +270,6 @@ public class HTMLReporter {
 		}
 	}
 	
-	
-	
-	/**
-	 * Give this method a print writer and some other necessary ingredients and it will put the report in there
-	 * 
-	 * 
-	 * @param theseMatches
-	 * @param sequenceReportDirectory
-	 * @param pw
-	 * @param sequence
-	 * @throws IOException 
-	 */
-//	private void insertSequenceRegionReport(ArrayList<Match> theseMatches, File sequenceReportDirectory, PrintWriter pw, Sequence sequence) throws IOException {
-//		//initialize our variables
-//		int numberOfTopRegions = 10;
-//		int regionSize = 3000;
-//		int histogramHeight = 200;
-//		int sequenceLength = sequence.getSequenceLength();
-//		int numberOfRegions = (int) Math.ceil(sequenceLength / regionSize) + 1;
-//		ArrayList<SequenceRegion> regions = new ArrayList<SequenceRegion>(numberOfRegions);
-//		for (int i = 0 ; i < numberOfRegions; i++) {
-//			regions.add(new SequenceRegion(regionSize * i, regionSize));
-//		}
-//		int matchIndex;
-//		SequenceRegion targetRegion;
-//		
-//		//fill our regions with matches
-//		for (Match match: theseMatches) {
-//			matchIndex = match.getPeptide().getIndex();
-//			targetRegion = regions.get(matchIndex / regionSize);
-//			targetRegion.addHit(match);
-//		}
-//		Collections.sort(regions);
-//		int maxBar = 0;
-//		SequenceRegion region;
-//		for (int i = 0; i < numberOfTopRegions; i++) {
-//			region = regions.get(i);
-//			if (region.getMaxBar() > maxBar) maxBar = region.getMaxBar();
-//		}
-//		
-//		//create visualizations and report of the top regions
-//		File regionDirectory = new File(sequenceReportDirectory, "regions" + sequence.getId());
-//		regionDirectory.mkdirs();
-//		pw.println("<table border=1>");
-//		for (int i = 0; i < numberOfTopRegions; i++) {
-//			region = regions.get(i);
-//			
-//			pw.println();
-//			pw.print("<tr>");
-//			
-//			pw.print("<td>");
-//			pw.print("<a href=\"" + regionDirectory.getName() + "/" + i + ".html\">");
-//			pw.print(region.getStartIndex());
-//			pw.print("</a>");
-//			pw.print("</td>");
-//			
-//			pw.print("<td>");
-//			pw.print(region.getScore());
-//			pw.print("</td>");
-//			
-//			pw.print("<td>");
-//			pw.print(region.getMaxBar());
-//			pw.print("</td>");
-//			
-//			pw.print("<td>");
-//			pw.print("<img src=\"" + regionDirectory.getName() + "/" + i + ".jpg\">");
-//			pw.print("</td>");
-//			
-//			pw.print("</tr>");
-//			
-//			//create the images and html for this region
-//			HistogramVisualizer.drawShadedHistogram(region.getHistogram(), histogramHeight, maxBar, new File(regionDirectory, i + ".jpg"));
-//		}
-//		pw.println("</table>");
-//	}
 	
 	public void generateSpectrumReport(Spectrum spectrum) {
 		//set up our files and folders

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Match_Blank;
@@ -23,27 +24,6 @@ import Validate.ValidationReport;
  */
 public class XTandemReader {
 	
-	//Where our report files are located
-	static String reportLocation = "reports/X!Tandem reports/EColi";
-//	static String reportLocation = "reports/X!Tandem reports/Kapp";
-//	static String reportLocation = "reports/X!Tandem reports/Aurum";
-	
-	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/";
-//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/";
-//	static String specrumStart = "label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/";
-	
-	//test name (from ValidationReport)
-	static String testName = "ecoli";
-//	static String testName = "human";
-//	static String testName = "aurum";
-	
-	static Color color = Color.red;
-//	static Color color = Color.blue;
-//	static Color color = Color.green;
-	
-	
-	//test spectra location
-	static String testLocation = "/Users/risk2/PeppyOverflow/tests/";
 	
 	//the suffix that the files have
 	static String suffix = ".xml";
@@ -55,19 +35,34 @@ public class XTandemReader {
 	static String seqStart = "seq=\"";
 	
 	public static void main(String args[]) {
-		File reportFolder = new File(reportLocation);
-		File [] reportFiles = reportFolder.listFiles();
-		ArrayList<Match> matches = new ArrayList<Match>();
-		Match match;
-		for (int fileIndex = 0; fileIndex < reportFiles.length; fileIndex++) {
-			if (!reportFiles[fileIndex].getName().toLowerCase().endsWith(suffix)) continue;
-			match = extractHitsFromFile(reportFiles[fileIndex]);
-			if (match != null) matches.add(match);
-		}
-		U.p("found this many matches: " + matches.size());
 		
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
-		testSets.add(new TestSet(testLocation, testName, matches, color));
+		
+		testSets.add(getTestSet(
+			"reports/X!Tandem reports/EColi",
+			"/Users/risk2/PeppyOverflow/tests/",
+			"ecoli",
+			Color.red,
+			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/"
+		));
+		
+		testSets.add(getTestSet(
+			"reports/X!Tandem reports/Kapp",
+			"/Users/risk2/PeppyOverflow/tests/",
+			"human",
+			Color.blue,
+			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/"
+		));
+		
+		testSets.add(getTestSet(
+			"reports/X!Tandem reports/Aurum",
+			"/Users/risk2/PeppyOverflow/tests/",
+			"aurum",
+			Color.green,
+			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/"
+		));
+		
+		
 		
 		for (TestSet test: testSets) {
 			test.calculateStastics();
@@ -78,7 +73,43 @@ public class XTandemReader {
 		U.p("done");
 	}
 	
-	private static Match_Blank extractHitsFromFile(File file) {
+	private static TestSet getTestSet(String reportLocation, String testLocation, String testName, Color color, String spectrumStart) {
+		
+		/* get files from report folder */
+		File reportFolder = new File(reportLocation);
+		File [] reportFiles = reportFolder.listFiles();
+		
+		/* where we hold matches */
+		ArrayList<Match> matches = new ArrayList<Match>();
+		Match match;
+		
+		/* load the spectra from test set so we can get their spectrum IDs */
+		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(testLocation + testName + "/spectra");
+			
+		for (int fileIndex = 0; fileIndex < reportFiles.length; fileIndex++) {
+			if (!reportFiles[fileIndex].getName().toLowerCase().endsWith(suffix)) continue;
+			match = extractHitsFromFile(reportFiles[fileIndex], spectrumStart, testLocation, testName);
+			if (match != null) {
+				
+				/* set the proper spectrum ID */
+				Spectrum matchSpectrum = match.getSpectrum();
+				for (Spectrum spectrum: spectra) {
+					if (spectrum.getFile().getName().equals(matchSpectrum.getFile().getName())) {
+						matchSpectrum.setId(spectrum.getId());
+					}
+				}
+				
+				/* add the match */
+				matches.add(match);
+			}
+		}
+		U.p("found this many matches: " + matches.size());
+		
+		return new TestSet(testLocation, testName, matches, color);
+		
+	}
+	
+	private static Match_Blank extractHitsFromFile(File file, String spectrumStart, String testLocation, String testName) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			Spectrum spectrum = null;
@@ -88,7 +119,7 @@ public class XTandemReader {
 			while (line != null) {
 				//the line which contains the spectrum
 				if (line.startsWith("<bioml")) {
-					subIndexStart = line.indexOf(specrumStart) + specrumStart.length();
+					subIndexStart = line.indexOf(spectrumStart) + spectrumStart.length();
 					subIndexStop = line.indexOf(spectrumStop, subIndexStart);
 					nugget = line.substring(subIndexStart, subIndexStop);
 					spectrum = new Spectrum(testLocation + testName + "/spectra/" + nugget);

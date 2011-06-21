@@ -47,8 +47,10 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
-		getProteinsFromDatabase(isReverse, true);
-		return getPeptidesFromListOfProteins(proteins);	
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		proteins = getProteinsFromDatabase(isReverse, true);
+		peptides = getPeptidesFromListOfProteins(proteins);
+		return peptides;
 	}
 	
 
@@ -81,21 +83,13 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
-		if (proteins.size() == 0) return null;
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		if (proteins.size() == 0) return peptides;
 		for (Protein protein: proteins) {
 			peptides.addAll(protein.digest());
 		}
 		Collections.sort(peptides);
 		return peptides;
-	}
-	
-	public static void main(String [] args) {
-		String test = "piowenrweoiren*sflkwnreoin*powiernewoinr*oin";
-		String [] chunks = test.split("\\*");
-		for (int i = 0; i < chunks.length; i++) {
-			U.p(chunks[i]);
-		}
 	}
 	
 	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
@@ -125,12 +119,13 @@ public class Sequence_Protein extends Sequence {
 						/* reverse the string if we are making a null database */
 						if (isReverse) buffy.reverse();
 
-						/* again, this addresses the "*" in some FASTA files */
+						/* this addresses the "*" in some FASTA files */
 						proteinChunks = buffy.toString().split("\\*");
 						
 						/* go through each of our chunks and add them as proteins */
 						for (int i = 0; i < proteinChunks.length; i++) {
-							proteins.add(new Protein(proteinName, buffy.toString()));
+							if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
+							proteins.add(new Protein(proteinName, proteinChunks[i]));
 						}
 						
 					}
@@ -144,6 +139,7 @@ public class Sequence_Protein extends Sequence {
 						proteinName = proteinWords[1];
 					}
 					
+					/* initialize our string buffer */
 					buffy = new StringBuffer(); 
 				} else {
 					buffy.append(line);

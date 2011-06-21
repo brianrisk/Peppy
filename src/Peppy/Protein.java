@@ -258,11 +258,20 @@ public class Protein implements Comparable<Protein>{
 			}
 			
 			//create new forming peptides if necessary
-			if ( (isStart(aminoAcid)) ||  // start a new peptide at M
-				 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-				 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-			{		
-				peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
+			if (Properties.isSequenceFileDNA) {
+				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
+					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+				{		
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
+				}
+				
+			/* 'M' Does not mean a new peptide should form in proteins */
+			} else {
+				// Create new peptides after a break
+				if (isBreak(previousAminoAcid)) {		
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
+				}
 			}
 			
 			//if we are at a break, 
@@ -389,7 +398,7 @@ public class Protein implements Comparable<Protein>{
 		}
 		
 		//might not be considering very long peptides
-		if (sequenceString.length() <= Properties.peptideMaximumLength) {
+		if (sequenceString.length() <= Properties.maxPeptideLength) {
 			//If this is coming from DNA or RNA, there is a different peptide constructor
 			int stopIndex = acidIndex;
 			int intronStop = peptideIntronStopIndex;
@@ -464,6 +473,7 @@ public class Protein implements Comparable<Protein>{
 	
 	public static boolean isBreak(char aminoAcid) {
 		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
+//		return ( aminoAcid == 'Y' || aminoAcid == 'W' || aminoAcid == 'F' || aminoAcid == 'X');
 	}
 	
 	

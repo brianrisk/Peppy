@@ -80,6 +80,10 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return impValue;
 	}
 	
+	public double getIMP() {
+		return calculateIMP();
+	}
+	
 	public void setSpectrum(Spectrum spectrum) {
 		this.spectrum = spectrum;
 	}

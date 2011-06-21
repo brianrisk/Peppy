@@ -54,7 +54,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 9");
+			pw.println("format version 10");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -87,14 +87,14 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("Peptide Sequence");
 			sb.append('\t');
+			sb.append("START");
+			sb.append('\t');
+			sb.append("STOP");
+			sb.append('\t');
 			if (Peppy.Properties.isSequenceFileDNA) {
 				sb.append("Sequence File");
 				sb.append('\t');
 				sb.append("Sequence Description");
-				sb.append('\t');
-				sb.append("START");
-				sb.append('\t');
-				sb.append("STOP");
 				sb.append('\t');
 				sb.append("INTRON-START");
 				sb.append('\t');

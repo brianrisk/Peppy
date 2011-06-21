@@ -81,6 +81,8 @@ public class ValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 1;
 		
+		Properties.isSequenceFileDNA = false;
+		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
@@ -99,29 +101,25 @@ public class ValidationReport {
 //		Properties.highIntensityCleaning = true;
 //		Properties.peakDifferenceThreshold = 0.5;
 
-		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
-//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
+//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
 //		Properties.spectrumToPeptideMassError = 0.01;
 		Properties.spectrumToPeptideMassError = 2;
 		Properties.peakDifferenceThreshold = 0.3;
+		
+		/* save our properties */
+		Properties.generatePropertiesFile(reportFolder);
 		
 	}
 	
 	private static void addTests() {
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-//		String testDirectoryName = "tests/";
 		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
-//		tests.add(new TestSet(testDirectoryName, "USP", Color.DARK_GRAY));
+//		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
-//		Properties.isSequenceFileDNA = true;
-//		Sequence ecoli = new Sequence("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta");
-//		ArrayList<Peptide> peptides = ecoli.extractAllPeptides(false);
-//		U.p("forwards database size: " + peptides.size());
-//		forwardsDatabaseSize = peptides.size();
 	}
 	
 	
@@ -133,24 +131,23 @@ public class ValidationReport {
 		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
 //		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta"));	
 		
-		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
-		forwardsDatabaseSize += peptides.size();
-
-		while (peptides.size() > 0) {
-			for (TestSet test: tests) {
-				U.p("Getting matches for: " + test.getName());
-				test.findPositiveMatches(peptides);
-			}	
+		/* where we store our peptide chunk */
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		
+		/* repeat extracting peptides until end of sequence has been reached */
+		do {
+			/* get our peptides and report size */
 			peptides.clear();
 			System.gc();
 			peptides = sequence.extractMorePeptides(false);
+			forwardsDatabaseSize += peptides.size();
 			
-			if (peptides == null) {
-				break;
-			} else {
-				forwardsDatabaseSize += peptides.size();
+			/* get matches for each of our sets for each of these peptides */
+			for (TestSet test: tests) {
+				test.findPositiveMatches(peptides);
 			}
-		}
+			
+		} while (peptides.size() > 0);
 		
 		for (TestSet test: tests) {
 			test.cleanMatches();

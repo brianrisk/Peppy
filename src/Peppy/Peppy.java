@@ -160,6 +160,7 @@ public class Peppy {
 	}
 
 	/**
+	 * This is the heart of Peppy where the grand symphony takes place.
 	 * 
 	 * @param sequences our list of sequences where we will be getting our peptides
 	 * @param spectra our list of spectra
@@ -167,94 +168,120 @@ public class Peppy {
 	 * @return
 	 */
 	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
-		//TODO: turn these into preferences
 		
 		int spectraStart = 0;
 		int spectraStop = Properties.numberOfSpectraPerSegment;
 		if (spectraStop > spectra.size()) spectraStop = spectra.size();
 		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		/* This loop breaks when we have run our last chunk of spectra */
 		while (true) {
 			U.p("working on spectra " + spectraStart + " to " + spectraStop);
 			ArrayList<Match> segmentMatches = new ArrayList<Match>();
 			
-			//grab our segment of spectra
+			/* get a manageable segment of spectra */
 			ArrayList<Spectrum> spectraSegment = new ArrayList<Spectrum>();
 			for (int i = spectraStart; i < spectraStop; i++) {
 				spectraSegment.add(spectra.get(i));
 			}
 			
-			if (Properties.sequenceFilesContainMultipleSequences) {
-				U.p("Processing all sequences at once");
+			/* track which sequence we are examining */
+			int sequenceIndex = 0;
+			
 				
-				//setting up variables
+			/* loops until we have gone through all of our sequences */
+			while (true) {
+				
+				/* Extract a decent size of peptides.  Sequences may be short, so this
+				 * goes through each sequence and extracts peptides until a desired
+				 * threshold has been been reached.
+				 */
+				
+				/*  Initialize our list of peptides */
 				ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-				Sequence sequence;
-				double percentComplete;
-				NumberFormat nfPercent = NumberFormat.getPercentInstance();
-				nfPercent.setMaximumFractionDigits(2);
 				
-				//loop through all of the sequences
-				for (int i = 0; i < sequences.size(); i++) {
+				/* This is where we get a chunk of peptides */
+				ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
+				
+				while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
 					
-					//get the peptides of the sequence we're looking at
-					sequence = sequences.get(i);
-					peptides.addAll(sequence.extractAllPeptides(isReverse));
+					/* clear previous chunk of peptides and reclaim memory */
+					peptideSegment.clear();
+					System.gc();
 					
-					//there may be a lot of peptides, so this segments the task
-					if (peptides.size() > 10000000) {
-						percentComplete = (double) i / sequences.size();
-						U.p(nfPercent.format(percentComplete) + " percent complete"); 
-						peptideTally += peptides.size();
-						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-						//Possible to add only matches with a decent e value
-						evaluateMatches(newMatches, segmentMatches);
-						peptides.clear();
-						System.gc();
+					/* collect peptides */
+					peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
+					
+					/* advance to the next sequence if we don't have any more peptides in this sequence */
+					if (peptideSegment.size() == 0) {
+						sequences.get(sequenceIndex).reset();
+						sequenceIndex++;
+					
+					/* add peptides to the main list if we have some to add */
+					} else {
+						peptides.addAll(peptideSegment);
 					}
-					sequence.reset();
+					
+					/* if we have advanced past the last sequence, then exit this loop */
+					if (sequenceIndex == sequences.size()) {
+						break;
+					}
 				}
-				U.p("evaulating for " + peptides.size() + " peptide subset");
+				
+				/* sort our peptide list by mass */
+				Collections.sort(peptides);
+				
+				/* report */
+				U.p("we are processing a chunk of peptides this size: " + peptides.size());
+				
+				/* Where we store our matches for this batch of peptides */
+				ArrayList<Match> newMatches;
+				
+					
+				/* keep a count of all peptides */
 				peptideTally += peptides.size();
-				ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-				//Possible to add only matches with a decent e value
-				evaluateMatches(newMatches, segmentMatches);
+				
+				/* run the scoring threads to get the matches from our set of peptides and spectra */
+				newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
+				
+				/* add the new matches with tolerable IMP values to the segment matches */
+				for (Match match: newMatches) {
+					if (match.getIMP() <= Properties.maxIMP) segmentMatches.add(match);
+				}
+				
+				/* free up memory */
+				newMatches.clear();
 				peptides.clear();
 				System.gc();
-			} else {
-				for (Sequence sequence: sequences) {
-					U.p("working on sequence: " +sequence.getSequenceFile().getName());
 					
-					//extract the first batch of peptides
-					ArrayList<Peptide> peptides = sequence.extractMorePeptides(isReverse);
-					
-					//continually extract peptides from the sequence until there aren't anymore
-					while (peptides != null) {
-						peptideTally += peptides.size();
-						ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectraSegment)).getMatches();
-						//Possible to add only matches with a decent e value
-						evaluateMatches(newMatches, segmentMatches);
-//						segmentMatches.addAll((new ScoringThreadServer(peptides, spectraSegment)).getMatches());
-						
-						//free up the memory of the old peptide arraylist
-						peptides.clear();
-						System.gc();
-						peptides = sequence.extractMorePeptides(isReverse);
-					}
-					sequence.reset();
+				
+				if (sequenceIndex == sequences.size()) {
+					break;
 				}
 			}
 			
+			int count = 0;
+			for (Match match: segmentMatches) {
+				if (match.getPeptide().getParentSequence().getSequenceFile().getName().equals("ecoli.fasta")) count++;
+			}
+			U.p("we found this many from ecoli 1: " + count);
+
+			
+			/* Here we do some basic processing and cleaning of the matches */
 			removeDuplicateMatches(segmentMatches);
 			assignConfidenceValuesToMatches(segmentMatches);
 			assignRankToMatches(segmentMatches);
-			removeMatchesWithLowRank(segmentMatches);
-			evaluateMatches(segmentMatches, matches);
+			removePoorMatches(segmentMatches);
 			
-			//clear out memory
+			
+			/* add segment matches to the full list of matches */
+			matches.addAll(segmentMatches);
+			
+			/* clear out memory */
 			segmentMatches.clear();
 			System.gc();
 			
-			//increment our spectrum segment markers
+			/* increment our spectrum segment markers */
 			if (spectraStop == spectra.size()) break;
 			spectraStart = spectraStop;
 			spectraStop += Properties.numberOfSpectraPerSegment;
@@ -262,8 +289,8 @@ public class Peppy {
 			
 		}
 		
-		assignRepeatedPeptideCount(matches);	
-		
+		assignRepeatedPeptideCount(matches);
+				
 		return matches;
 	}
 	
@@ -275,27 +302,27 @@ public class Peppy {
 	 * @return
 	 */
 	public static ArrayList<Match> getMatchesWithPeptides(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
-		ArrayList<Match> matches = new ArrayList<Match>() ;
 		peptideTally += peptides.size();
 		
 		//This is where the bulk of the processing in long jobs takes
-		ArrayList<Match> newMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
-		//Add only matches with a decent e value
-		evaluateMatches(newMatches, matches);
-		
+		//Add only matches with a decent e value		
 		removeDuplicateMatches(matches);
 		assignRankToMatches(matches);
 		assignRepeatedPeptideCount(matches);
 		assignConfidenceValuesToMatches(matches);
+		removePoorMatches(matches);
 		
 		return matches;
 	}
 	
 		
 	public static void assignRankToMatches(ArrayList<Match> matches) {
-		//first error check
+		/* first make sure we have matches */
 		if (matches.size() == 0) return;
+		
+		/* sort by spectrum ID, then score */
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
 		Match match = matches.get(0);
@@ -400,19 +427,7 @@ public class Peppy {
 		}
 	}
 	
-	public static void removeMatchesWithLowRank(ArrayList<Match> matches) {
-		int numberOfMatches = matches.size();
-		Match match;
-		for (int i = 1; i < numberOfMatches; i++) {
-			match = matches.get(i);
-			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
-				matches.remove(i);
-				i--;
-				numberOfMatches--;
-			}
-		}
-	}
-	
+
 	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches) {
 		for (Match match: matches) {
 			if (match.calculateEValue() < match.calculateIMP()) {
@@ -422,20 +437,43 @@ public class Peppy {
 	}
 	
 	/**
-	 * Evaluates newMatches, adds appropriate ones to matches
+	 * Removes matches with poor E values, rank, etc.
 	 * @param newMatches
 	 * @param matches
 	 */
-	public static void evaluateMatches(ArrayList<Match> newMatches, ArrayList<Match> matches) {	
-		for (Match match: newMatches) {
-			//The match E value should be less than our cutoff
-			if (match.getEValue() <= Properties.eValueCutOff) {
-				//the match IMP value should always be less than its E value
-//				matches.add(match);
-				if (match.calculateIMP() < match.getEValue()) {
-					matches.add(match);
-				}
+	public static void removePoorMatches(ArrayList<Match> matches) {	
+
+		Match match;
+		boolean remove;
+		for (int i = 1; i < matches.size(); i++) {
+			
+			/* get our match */
+			match = matches.get(i);
+			
+			/* the remove flag initially set to false */
+			remove = false;
+			
+			/* flagging matches with low rank */
+			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+				remove = true;
 			}
+			
+			/* flagging matches with high E values */
+			if (match.getEValue() > Properties.maxEValue) {
+				remove = true;
+			}
+			
+			/* flagging matches with weirdly low E values */
+			if (match.getIMP() > match.getEValue()) {
+				remove = true;
+			}
+			
+			/* removing the match if it was flagged */
+			if (remove) {
+				matches.remove(i);
+				i--;
+			}
+			
 		}
 	}
 	

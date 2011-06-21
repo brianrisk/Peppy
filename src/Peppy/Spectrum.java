@@ -493,7 +493,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				removeTally++;
 			}
 		}
-		U.p("removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks");
+		if (removeTally > 0) {
+			U.p("removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks");
+		}
 		
 		/* set spectra id */
 		for (int i = 0; i < spectra.size(); i++) {

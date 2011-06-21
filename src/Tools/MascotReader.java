@@ -13,6 +13,7 @@ import java.util.Collections;
 import Peppy.Match;
 import Peppy.Match_Blank;
 import Peppy.Peptide;
+import Peppy.Properties;
 import Peppy.Spectrum;
 import Utilities.U;
 import Validate.TestSet;
@@ -25,28 +26,42 @@ import Validate.ValidationReport;
  */
 public class MascotReader {
 	
-
-	//Where our report files are located
-//	static String reportLocation = "reports/Mascot/ecoli.txt";
-//	static String reportLocation = "reports/Mascot/kapp.txt";
-	static String reportLocation = "reports/Mascot/aurum.txt";
-	
-	//test name (from ValidationReport)
-//	static String testName = "ecoli";
-//	static String testName = "human";
-	static String testName = "aurum";
-	
-//	static Color color = Color.red;
-//	static Color color = Color.blue;
-	static Color color = Color.green;
-	
-	
-	//test spectra location
-	static String testLocation = "/Users/risk2/PeppyOverflow/tests/";
-	
 	
 	public static void main(String args[]) {
-
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		
+		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
+		testSets.add(getTestSet(
+				"reports/Mascot/ecoli.txt",
+				"/Users/risk2/PeppyOverflow/tests/",
+				"ecoli",
+				Color.red
+		));
+		
+		testSets.add(getTestSet(
+				"reports/Mascot/kapp.txt",
+				"/Users/risk2/PeppyOverflow/tests/",
+				"human",
+				Color.blue
+		));
+		
+		testSets.add(getTestSet(
+				"reports/Mascot/aurum.txt",
+				"/Users/risk2/PeppyOverflow/tests/",
+				"aurum",
+				Color.green
+		));
+		
+		for (TestSet test: testSets) {
+			test.calculateStastics();
+		}
+		
+		ValidationReport vr = new ValidationReport(testSets);
+		vr.createReport();
+		U.p("done");
+	}
+	
+	private static TestSet getTestSet(String reportLocation, String testLocation, String testName, Color color) {
 		//where our matches are
 		File matchesFile = new File(reportLocation);
 		
@@ -62,18 +77,7 @@ public class MascotReader {
 		//get the matches that correspond with the spectra
 		ArrayList<Match> matches = extractMatchesFromFile(matchesFile, spectra);
 		
-		U.p("found this many matches: " + matches.size());
-		
-		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
-		testSets.add(new TestSet(testLocation, testName, matches, color));
-		
-		for (TestSet test: testSets) {
-			test.calculateStastics();
-		}
-		
-		ValidationReport vr = new ValidationReport(testSets);
-		vr.createReport();
-		U.p("done");
+		return new TestSet(testLocation, testName, matches, color);
 	}
 	
 	private static ArrayList<Match> extractMatchesFromFile(File file, ArrayList<Spectrum> spectra) {
@@ -101,8 +105,9 @@ public class MascotReader {
 						if (matches.get(i).getEValue() < eValue) {
 							addMatch = false;
 						} else {
-							matches.remove(i);
-							break;
+							if (matches.get(i).getEValue() > eValue) {
+								matches.remove(i);
+							}
 						}
 					}
 				}

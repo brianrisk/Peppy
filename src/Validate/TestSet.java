@@ -53,6 +53,7 @@ public class TestSet {
 	public TestSet(String testDirectoryName, String testName, ArrayList<Match> matches, Color color) {
 		this(testDirectoryName, testName, color);
 		positiveMatches = matches;
+		cleanMatches();
 	}
 	
 
@@ -77,12 +78,17 @@ public class TestSet {
 	}
 
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
-		//get the matches
+		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
 		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
-		if (matches != null) positiveMatches.addAll(matches);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
+		
+		/* add the matches to the full list */
+		if (matches != null) positiveMatches.addAll(matches);
+		
+		/* clean the full list */
+		cleanMatches();
 	}
 
 	/**
@@ -119,11 +125,28 @@ public class TestSet {
 	}
 	
 	public void cleanMatches() {
-		//Do a little house cleaning first
+		/* Do a little house cleaning */
 		Peppy.Peppy.assignRankToMatches(positiveMatches);
 		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
 		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
-		Peppy.Peppy.removeMatchesWithLowRank(positiveMatches);	
+		
+		/*removing matches with low rank */
+		Match match;
+		int size = positiveMatches.size();
+		for (int i = 0; i < size; i++) {
+			
+			
+			/* get our match */
+			match = positiveMatches.get(i);
+			
+			/* remove matches with low rank */
+			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+				positiveMatches.remove(i);
+				size--;
+				i--;
+			}
+			
+		}
 	}
 	
 	public void resetTest() {
@@ -178,10 +201,11 @@ public class TestSet {
 		Collections.sort(topForwardsMatches);
 		Collections.sort(topForwardsTestedMatches);
 			
-		
+		double highestIMP = 0;
 		for (MatchContainer match: topForwardsTestedMatches) {
 			if (match.isTrue()) {
 				topRankTrueTally++;
+				if (match.getMatch().getIMP() > highestIMP) highestIMP = match.getMatch().getIMP();
 			} else {
 				topRankFalseTally++;
 			}
@@ -191,6 +215,7 @@ public class TestSet {
 				eValueAtFivePercentError = match.getEValue();
 			}
 		}
+		U.p("highestIMP for true found in " + testName + ": " + highestIMP);
 		//count total true
 		for (MatchContainer match: testedMatches) {
 			if (match.isTrue()) totalTrueTally++;

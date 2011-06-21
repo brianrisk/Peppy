@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Hashtable;
 
 import Utilities.U;
 
@@ -18,6 +19,8 @@ import Utilities.U;
  *
  */
 public class Properties {
+	
+	private static Hashtable<String, Property> allProperties = new Hashtable<String, Property>();
 	
 	//how many processors does your computer have?  This number should be that number.
 	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
@@ -47,13 +50,15 @@ public class Properties {
 	public static int numberOfMissedCleavages = 2;
 	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
-	public static int peptideMaximumLength = 80;
+	public static int minPeptideLength = 5;
+	public static int maxPeptideLength = 80;
 	public static boolean useSequenceRegion = false;
 	
 	//Segmenting up job for memory management
-	public static int numberOfSpectraPerSegment = 40000;
-	public static int digestionWindowSize = 25000000;
+	public static int numberOfSpectraPerSegment = 50000;
+	public static int digestionWindowSize = 10000000;
 	public static int maxNumberOfProteinsToLoadAtOnce = 10000;
+	public static int desiredPeptideDatabaseSize = 20000000;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;
@@ -68,12 +73,8 @@ public class Properties {
 	public static double peakIntensityExponent = 0.33333333;
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
-//	public static double YBtrue = 1.1;
-//	public static double YBfalse = 1.2;
-//	public static double BYtrue = 1.3;
-//	public static double BYfalse = 0.9;
-	public static double YBtrue = 1.17;
-	public static double YBfalse = 1.43;
+	public static double YBtrue = 1.1;
+	public static double YBfalse = 0.9;
 	public static double BYtrue = 1.1;
 	public static double BYfalse = 0.9;
 	
@@ -81,8 +82,9 @@ public class Properties {
 	//matches per spectrum
 	public static int maximumNumberOfMatchesForASpectrum = 5;
 	
-	//e value cut off
-	public static double eValueCutOff = 0.1;
+	//cut offs.  sexy, sexy cutoffs.
+	public static double maxEValue = 0.1;
+	public static double maxIMP = 0.00001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -94,7 +96,6 @@ public class Properties {
 	public static boolean isSequenceFileDNA = true;
 	
 	//do the sequence files contain many sequences?
-	public static boolean sequenceFilesContainMultipleSequences = false;
 	
 	//Is the sequence file supposed to be read only in the first frame?
 	public static boolean useOnlyForwardsFrames = false;
@@ -158,12 +159,24 @@ public class Properties {
 		
 	}
 	
+	public static void setAllProperties() {
+		numberOfThreads = allProperties.get("numberOfThreads").getInt();
+	}
+	
 	private static void setPropertyFromString(String line) {
 		line = line.trim();
+		
+		/* ignore blank lines */
 		if (line.equals("")) return;
+		
+		/* ignore comments */
 		if (line.startsWith("//")) return;
 		if (line.startsWith("#")) return;
+		
+		/* ignore lines that do not have a space in them */
 		if (line.indexOf(" ") == -1) return;
+		
+		/* getting the property name and the propert value */
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
 		
@@ -182,6 +195,10 @@ public class Properties {
 			sequenceRegionStop =Integer.valueOf(propertyValue);
 		if (propertyName.equals("useIsotopeLabeling"))
 			useIsotopeLabeling = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("minPeptideLength")) 
+			minPeptideLength =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maxPeptideLength")) 
+			maxPeptideLength =Integer.valueOf(propertyValue);
 		
 		//job parsing for memory management
 		if (propertyName.equals("numberOfSpectraPerSegment")) 
@@ -219,9 +236,6 @@ public class Properties {
 		if (propertyName.equals("isSequenceFileDNA")) {
 			isSequenceFileDNA = Boolean.valueOf(propertyValue);
 		}
-		if (propertyName.equals("sequenceFilesContainMultipleSequences")) {
-			sequenceFilesContainMultipleSequences = Boolean.valueOf(propertyValue);
-		}
 		if (propertyName.equals("useOnlyForwardsFrames")) {
 			useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
 		}
@@ -242,12 +256,16 @@ public class Properties {
 		
 		//e value
 		if (propertyName.equals("eValueCutOff")) 
-			eValueCutOff = Double.valueOf(propertyValue);
+			maxEValue = Double.valueOf(propertyValue);
 
 		//matches
 		if (propertyName.equals("spectrumToPeptideMassError")) 
 			spectrumToPeptideMassError = Double.valueOf(propertyValue);
 		if (propertyName.equals("peakDifferenceThreshold")) 
+			peakDifferenceThreshold = Double.valueOf(propertyValue);
+		if (propertyName.equals("precursorTolerance")) 
+			spectrumToPeptideMassError = Double.valueOf(propertyValue);
+		if (propertyName.equals("fragmentTolerance")) 
 			peakDifferenceThreshold = Double.valueOf(propertyValue);
 		
 		//reports
@@ -280,7 +298,6 @@ public class Properties {
 			
 			pw.println("##FASTA files can be either DNA or amino acid sequences ");
 			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
-			pw.println("sequenceFilesContainMultipleSequences " + Properties.sequenceFilesContainMultipleSequences);
 			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
 			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
 			pw.println();
@@ -305,7 +322,7 @@ public class Properties {
 			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
 			pw.println();
 			pw.println("//limit returned matches by confidence ");
-			pw.println("eValueCutOff " + Properties.eValueCutOff);
+			pw.println("eValueCutOff " + Properties.maxEValue);
 			pw.println();
 			pw.println("//a preference for digestion of large DNA windows ");
 			pw.println("digestionWindowSize " + Properties.digestionWindowSize);

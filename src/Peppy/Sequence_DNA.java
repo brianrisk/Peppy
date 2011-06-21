@@ -51,6 +51,9 @@ public class Sequence_DNA extends Sequence{
 		//one sequence in nucleotideSequences, but sometimes more
 		Nucleotides nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 		
+		/* initialize where we will hold the peptides */
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		
 		//if this is the first time we've tried to extract peptides
 		if (!Properties.useSequenceRegion) {
 			if (stopIndex == 0) {
@@ -63,8 +66,7 @@ public class Sequence_DNA extends Sequence{
 					stopIndex = Properties.digestionWindowSize;
 					nucleotideSequenceIndex++;
 					if (nucleotideSequenceIndex >= nucleotideSequences.size()) {
-						//returning null as signal that we have reached the end
-						return null;
+						return peptides;
 					} else {
 						nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 					}
@@ -81,15 +83,14 @@ public class Sequence_DNA extends Sequence{
 			//if we've already extracted the region
 			if (stopIndex == Properties.sequenceRegionStop) {
 				//signal that we've finished
-				return null;
+				return peptides;
 			} else {
 				startIndex = Properties.sequenceRegionStart;
 				stopIndex = Properties.sequenceRegionStop;
 			}
 		}
 		
-		
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
 		
 		//Create our SequenceDigestionThread ArrayList
 		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
@@ -156,13 +157,15 @@ public class Sequence_DNA extends Sequence{
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(sequenceFile));
 				String line = br.readLine();
-				//lines beginning with ">" name the sequence
+
 				String sequenceDescription = null;
 				StringBuffer sequence = new StringBuffer();
 				while (line != null) {
-					//lines that begin with ">" are comments which name the sequence
+					
+					/* lines that begin with ">" are comments which name the sequence */
 					if (line.startsWith(">")) {
-						//if sequenceDescription has not been defined, that means it is the first in the file
+						
+						/* if sequenceDescription has not been defined, that means it is the first in the file */
 						if (sequenceDescription != null) {
 							nucleotideSequences.add(new Nucleotides(sequenceDescription, sequence.toString().toUpperCase(), this));
 							sequence = new StringBuffer();
@@ -171,7 +174,8 @@ public class Sequence_DNA extends Sequence{
 						line = br.readLine(); 
 						continue;	
 					}
-					//lines that begin with ";" are comments which should be ignored
+					
+					/* lines that begin with ";" are comments which should be ignored */
 					if (line.startsWith(";")) {
 						line = br.readLine(); 
 						continue;	
