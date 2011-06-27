@@ -161,13 +161,7 @@ public class RNA_Digestor {
 							}
 							if (peptide != null) {
 								if (peptide.getMass() >= Properties.peptideMassThreshold) {
-									if (Properties.onlyUsePeptidesInOpenReadingFrames) {
-										if (inORF) {
-											peptides.add(peptide);
-										}
-									} else {
-										peptides.add(peptide);
-									}
+									peptides.add(peptide);
 								}
 							}
 						}
@@ -232,13 +226,7 @@ public class RNA_Digestor {
 			}
 			if (peptide != null) {
 				if (peptide.getMass() >= Properties.peptideMassThreshold) {
-					if (Properties.onlyUsePeptidesInOpenReadingFrames) {
-						if (inORF) {
-							peptides.add(peptide);
-						}
-					} else {
-						peptides.add(peptide);
-					}
+					peptides.add(peptide);
 				}
 			}
 		}

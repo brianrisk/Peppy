@@ -92,7 +92,7 @@ public class Sequence_DNA extends Sequence{
 		
 		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
 		
-		//Create our SequenceDigestionThread ArrayList
+		/* Create our SequenceDigestionThread ArrayList */
 		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
 		for (byte frame = 0; frame < 3; frame++) {
 			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, reverse));
@@ -101,7 +101,7 @@ public class Sequence_DNA extends Sequence{
 			}
 		}
 		
-		//create the threads and start them engines!
+		/* create the threads and start them engines! */
 		ArrayList<Thread> threads = new ArrayList<Thread>(); 
 		for (DigestionThread_DNA digestor: digestors) {
 			Thread thread = new Thread(digestor);
@@ -109,7 +109,7 @@ public class Sequence_DNA extends Sequence{
 			threads.add(thread);
 		}
 		
-		//Wait for them all to finish
+		/* Wait for them all to finish */
 		for (Thread thread: threads) {
 			try {
 				thread.join();
@@ -119,7 +119,7 @@ public class Sequence_DNA extends Sequence{
 			}
 		}
 		
-		//harvest all digested peptides
+		/* harvest all digested peptides */
 		for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
 			DigestionThread_DNA digestor = digestors.get(digestorIndex);
 			peptides.addAll(digestor.getPeptides());

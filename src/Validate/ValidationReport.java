@@ -116,9 +116,9 @@ public class ValidationReport {
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
-//		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	

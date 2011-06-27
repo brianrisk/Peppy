@@ -48,7 +48,6 @@ public class Properties {
 	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
-	public static boolean onlyUsePeptidesInOpenReadingFrames = true;
 	public static double peptideMassThreshold = 500.0;
 	public static int minPeptideLength = 5;
 	public static int maxPeptideLength = 80;
@@ -183,8 +182,6 @@ public class Properties {
 		//sequence digestion
 		if (propertyName.equals("numberOfMissedCleavages")) 
 			numberOfMissedCleavages =Integer.valueOf(propertyValue);
-		if (propertyName.equals("onlyUsePeptidesInOpenReadingFrames")) 
-			onlyUsePeptidesInOpenReadingFrames = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("peptideMassThreshold")) 
 			peptideMassThreshold = Double.valueOf(propertyValue);
 		if (propertyName.equals("useSequenceRegion"))
@@ -317,9 +314,6 @@ public class Properties {
 			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
 			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
 			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
-			pw.println();
-			pw.println("//digest only inside ORFs? ");
-			pw.println("onlyUsePeptidesInOpenReadingFrames " + Properties.onlyUsePeptidesInOpenReadingFrames);
 			pw.println();
 			pw.println("//limit returned matches by confidence ");
 			pw.println("eValueCutOff " + Properties.maxEValue);

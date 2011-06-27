@@ -82,7 +82,7 @@ public class SpectrumHTMLPage extends HTMLPage {
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
 		printTH("peptide");
-		printTH("database");
+		printTH("sequence");
 		printTH("indicies");
 		printTH("F");
 		printTH("S");
@@ -120,9 +120,7 @@ public class SpectrumHTMLPage extends HTMLPage {
 		printTD(peptideLine.toString());
 		
 		//sequence name
-		if (match.getPeptide().getParentSequence() != null) {
-			printTD(match.getPeptide().getParentSequence().getSequenceFile().getName());
-		}
+		printTD(match.getPeptide().getProtein().getName());
 		
 		//start / stop
 		printTD( match.getPeptide().getStartIndex() + ", " + match.getPeptide().getStopIndex());

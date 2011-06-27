@@ -1,21 +1,26 @@
 package Peppy;
 import java.util.ArrayList;
 
+import Utilities.U;
+
 public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 	Nucleotides nucleotideSequence;
 	byte frame;
-	boolean forwardsStrand;
+	boolean isForwardsStrand;
 	int startIndex;
 	int stopIndex;
 	boolean reverseDatabase;
 
 	public void run() {
 		//go through each character in the line, skipping ahead "frame" characters
-		if (forwardsStrand) {
+		if (isForwardsStrand) {
 			digest(startIndex + frame, stopIndex);
 		} else {
+			/* the "startIndex -1" is because we go while our 
+			 * index does not equal to that number.  Therefore it goes
+			 * right up to startIndex  */
 			digest(stopIndex - frame - 1, startIndex - 1);	
 		}
 	}
@@ -28,10 +33,14 @@ public class DigestionThread_DNA implements Runnable {
 	 */
 	public DigestionThread_DNA(Nucleotides nucleotideSequence,
 			byte frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
+		
+		/* because of the digestion window overlap, sometimes this will be < 0 */
 		if (startIndex < 0) startIndex = 0;
+		
+		/* set our variables */
 		this.nucleotideSequence = nucleotideSequence;
 		this.frame = frame;
-		this.forwardsStrand = forwardsStrand;
+		this.isForwardsStrand = forwardsStrand;
 		this.startIndex = startIndex;
 		this.stopIndex = stopIndex;
 		this.reverseDatabase = reverseDatabase;
@@ -43,8 +52,8 @@ public class DigestionThread_DNA implements Runnable {
 	}
 	
 	
-	public ArrayList<Peptide> digest(int startIndex, int stopIndex) {
-		ArrayList<Protein> proteins = translateToProteins(startIndex, stopIndex);
+	public ArrayList<Peptide> digest(int startPosition, int stopPosition) {
+		ArrayList<Protein> proteins = translateToProteins(startPosition, stopPosition);
 		peptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins);
 		return peptides;
 	}
@@ -65,24 +74,24 @@ public class DigestionThread_DNA implements Runnable {
 		Sequence_DNA sequence_DNA = nucleotideSequence.getParentSequence();
 		String name = nucleotideSequence.getSequenceDescription();
 		int increment = 1;
-		if (!forwardsStrand) increment = -1;
+		if (!isForwardsStrand) increment = -1;
 		int index;
 		int proteinStart = startPosition;
 		for (index = startPosition; index != stopPosition; index += increment) {
 			codon[mod] = nucleotideSequence.getSequence().charAt(index);
 			if (mod == 2) {
-				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, forwardsStrand)];
+				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, isForwardsStrand)];
 				buildingProtein.append(aminoAcid);
 				if (aminoAcid == '.') {
 					if (buildingProtein.length() > 3) {
 						if (reverseDatabase) buildingProtein.reverse();
-						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, forwardsStrand, sequence_DNA));
+						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA));
 					}
 					buildingProtein = new StringBuffer();
-					proteinStart = index + 1;
+					proteinStart = index + increment;
 				}
-			}
-			if (mod == 2) {
+				
+				/* reset mod */
 				mod = 0;
 			} else {
 				mod++;
@@ -90,7 +99,7 @@ public class DigestionThread_DNA implements Runnable {
 		}
 		
 		if (buildingProtein.length() > 3) {
-			proteins.add(new Protein(name, index, buildingProtein.toString(), false, -1, -1, forwardsStrand, sequence_DNA));
+			proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA));
 		}
 		return proteins;
 	}

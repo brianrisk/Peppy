@@ -32,7 +32,7 @@ public class ReportStrings {
 		sb.append("    	<tr>");
 		sb.append("            <th scope=\"col\">ID</th>");
 		sb.append("            <th scope=\"col\">Peptide</th>");
-		sb.append("            <th scope=\"col\">Chromosome</th>");
+		sb.append("            <th scope=\"col\">Sequence</th>");
 		sb.append("            <th scope=\"col\">Start</th>");
 		sb.append("            <th scope=\"col\">Stop</th>");
 		sb.append("            <th scope=\"col\">F</th>");
@@ -42,7 +42,7 @@ public class ReportStrings {
 		sb.append("            <th scope=\"col\">Score</th>");
 		sb.append("            <th scope=\"col\">ions</th>");
 		sb.append("            <th scope=\"col\">ions/length</th>");
-		sb.append("            <th scope=\"col\">score ratio</th>");
+//		sb.append("            <th scope=\"col\">score ratio</th>");
 		sb.append("            <th scope=\"col\">E value</th>");
 		sb.append("        </tr>");
 		sb.append("    </thead>");

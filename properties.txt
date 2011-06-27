@@ -1,6 +1,5 @@
 ##FASTA files can be either DNA or amino acid sequences
 isSequenceFileDNA true
-sequenceFilesContainMultipleSequences false
 useOnlyForwardsFrames false
 useIsotopeLabeling false
 
@@ -15,7 +14,8 @@ useIsotopeLabeling false
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/sequences/
 
 
 ##This could be a directory or a file
@@ -30,7 +30,8 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode/DTA_FILES/122409_GO_SDSPAGE_mem_2_091225003916/122409_GO_SDSPAGE_mem_2_091225003916.2243.2243.2.dta
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/spectra/
 
 //Scoring Method
 //scoringMethodName Peppy.Match_Fake
@@ -54,12 +55,9 @@ numberOfSpectraPerSegment 10000
 digestionWindowSize 10000000
 maxNumberOfProteinsToLoadAtOnce 10000
 
-//how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 0.2
-//spectrumToPeptideMassError 2.0
-
-//TandemFit property
-peakDifferenceThreshold 0.3
+//error tolerance
+spectrumToPeptideMassError 0.1
+peakDifferenceThreshold 0.1
 
 //Report variables
 createHTMLReport true

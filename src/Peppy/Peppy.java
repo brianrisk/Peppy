@@ -1,6 +1,8 @@
 package Peppy;
 import java.io.File;
-import java.text.NumberFormat;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -19,17 +21,27 @@ import Utilities.U;
  */
 public class Peppy {
 	
-	//So that we may report the total amount of peptides found
+	/* So that we may report the total amount of peptides found */
 	static int peptideTally = 0;
 	
-	public static void main(String [] args) {
-		printGreeting();
-		init(args);
-		runJobs(args);
-		U.p("done");
-	}
+	/* track how much memory we have used */
+	static MemoryUsage memoryUsage;
+	static long maxMemoryUsed = 0;
 	
-
+	
+	public static void main(String [] args) {
+		/* set up initial state */
+		init(args);
+		
+		/*  hello! */
+		printGreeting();
+		
+		/* do the work */
+		runJobs(args);
+		
+		/* i'm finished! */
+		printFarewell();
+	}
 	
 	public static void runPeppy(String [] args) {
 		U.startStopwatch();
@@ -97,7 +109,6 @@ public class Peppy {
 		
 		
 		U.stopStopwatch();
-		U.p();
 	}
 	
 	
@@ -131,6 +142,10 @@ public class Peppy {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties(propertiesFile);
 		AminoAcids.init();
+		
+		/* track memory */
+		MemoryMXBean mbean = ManagementFactory.getMemoryMXBean();
+		memoryUsage = mbean.getHeapMemoryUsage();
 	}
 	
 	
@@ -191,6 +206,10 @@ public class Peppy {
 				
 			/* loops until we have gone through all of our sequences */
 			while (true) {
+				/* check our memory situation */
+				if (maxMemoryUsed < memoryUsage.getCommitted()) {
+					maxMemoryUsed = memoryUsage.getCommitted();
+				}
 				
 				/* Extract a decent size of peptides.  Sequences may be short, so this
 				 * goes through each sequence and extracts peptides until a desired
@@ -259,12 +278,6 @@ public class Peppy {
 					break;
 				}
 			}
-			
-			int count = 0;
-			for (Match match: segmentMatches) {
-				if (match.getPeptide().getParentSequence().getSequenceFile().getName().equals("ecoli.fasta")) count++;
-			}
-			U.p("we found this many from ecoli 1: " + count);
 
 			
 			/* Here we do some basic processing and cleaning of the matches */
@@ -344,7 +357,8 @@ public class Peppy {
 			rank++;
 			previousMatch = match;
 		}
-		//Setting Score ratios for those with rank 1
+		/* Setting Score ratios for those with rank 1 
+		 * Works backwards through the list */
 		int i = matches.size() - 1;
 		double previousScore = match.getScore();
 		for (; i >= 0; i--) {
@@ -480,14 +494,22 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
 		U.p("Proteogenomic mapping software.");
-		U.p("Developed 2010 by the Giddings Lab");
+		U.p("Developed 2011 by the Giddings Lab");
 		U.p();
 		
-
+		U.p("max available memory: " + (double) memoryUsage.getMax() / (1024 * 1024 * 1024) + " gigabytes");
+		U.p();
+		
 //		U.p("Peppy Copyright (C) 2011 Brian Risk");
 //		U.p("This program comes with ABSOLUTELY NO WARRANTY;");
 
 	}
+	
+	protected static void printFarewell() {
+		U.p("max memory used: " + (double) maxMemoryUsed / (1024 * 1024 * 1024) + " gigabytes");
+		U.p("done");
+	}
+	
 	
 
 }

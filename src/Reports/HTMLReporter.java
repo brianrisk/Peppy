@@ -91,7 +91,7 @@ public class HTMLReporter {
 			
 			//sort our best matches by score ratio
 //			Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
+			Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 			Collections.sort(bestMatches);
 			
 			//set up our main index file
@@ -139,16 +139,7 @@ public class HTMLReporter {
 				
 				
 				sb.append("<td>");
-				if (match.getPeptide().getParentSequence() != null) {
-					if (sequences != null) {
-//						sb.append("<a href=\"sequences/");
-//						sb.append(match.getPeptide().getParentSequence().getId());
-//						sb.append(Properties.reportWebSuffix);
-//						sb.append("\">");
-						sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
-//						sb.append("</a> ");
-					}
-				}
+				sb.append(match.getPeptide().getProtein().getName());
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -195,9 +186,9 @@ public class HTMLReporter {
 				sb.append(nfPercent.format(matchPercent));
 				sb.append("</td>");
 				
-				sb.append("<td>");
-				sb.append(nfDecimal.format(match.getScoreRatio()));
-				sb.append("</td>");
+//				sb.append("<td>");
+//				sb.append(nfDecimal.format(match.getScoreRatio()));
+//				sb.append("</td>");
 				
 				sb.append("<td>");
 				sb.append(match.getEValue());
