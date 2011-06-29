@@ -73,7 +73,7 @@ public class ProteinHTMLPage extends HTMLPage{
 				
 				printTD("<a href=\"" + match.getPeptide().getAcidSequenceString() + ".html\">" + match.getPeptide().getAcidSequenceString() + "</a>");
 				printTD("" + match.getPeptide().getStartIndex());
-				printTD("" + match.getImpValue());
+				printTD("" + match.getIMP());
 				printTD("" + match.getScore());
 				printTD("" + match.hasModification());
 				

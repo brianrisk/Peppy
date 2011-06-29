@@ -1,8 +1,6 @@
 package Peppy;
 import java.util.ArrayList;
 
-import Utilities.U;
-
 public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();

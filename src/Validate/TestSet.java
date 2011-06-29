@@ -373,7 +373,7 @@ public class TestSet {
 	}
 	
 	@SuppressWarnings("unused")
-	private ArrayList<Match> loadCorrectMatches() {
+	public ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
 			//find the file for the correct peptide

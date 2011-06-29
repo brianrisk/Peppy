@@ -59,7 +59,7 @@ public class PeptidesWithModificaitonsHTMLPage extends HTMLPage {
 			printTD("" + i);
 			printTD("<a href=\"proteins/" + match.getPeptide().getProtein().getName() + "/" + match.getPeptide().getAcidSequenceString() + ".html\">" + match.getPeptide().getAcidSequenceString() + "</a>");
 			printTD("" + match.getPeptide().getProtein().getName());
-			printTD("" + match.getImpValue());
+			printTD("" + match.getIMP());
 		}
 		print("</tbody>");
 		print("</table>");

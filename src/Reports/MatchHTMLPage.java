@@ -142,7 +142,7 @@ public class MatchHTMLPage extends HTMLPage {
 				
 				//building the link
 				StringBuffer modificationLink = new StringBuffer();
-				if (indexIMP != match.getImpValue()) {
+				if (indexIMP != match.getIMP()) {
 					modificationLink.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"javascript:if (!lock) {modificationIndex='");
 				} else {
 					modificationLink.append("<a href=\"\" class=\"spectrumTrigger bestTrigger\" onClick=\"javascript:lock=!lock;return false;\" onMouseOver=\"if (!lock) {javascript:modificationIndex='");
