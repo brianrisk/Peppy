@@ -54,7 +54,11 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
+<<<<<<< Updated upstream
 			pw.println("format version 10");
+=======
+			pw.println("format version 12");
+>>>>>>> Stashed changes
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -143,10 +147,6 @@ public class TextReporter {
 					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
 					sb.append('\t');
 					sb.append(match.getPeptide().getProtein().getName());
-					sb.append('\t');
-					sb.append(match.getPeptide().getStartIndex());
-					sb.append('\t');
-					sb.append(match.getPeptide().getStopIndex());
 					sb.append('\t');
 					sb.append(match.getPeptide().getIntronStartIndex());
 					sb.append('\t');

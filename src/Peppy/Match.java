@@ -81,7 +81,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	}
 	
 	public double getIMP() {
-		return calculateIMP();
+		return impValue;
 	}
 	
 	public void setSpectrum(Spectrum spectrum) {
@@ -333,8 +333,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				return 0;
 			} else
 			if (sortParameter == SORT_BY_IMP_VALUE) {
-				if (impValue < match.getImpValue()) return -1;
-				if (impValue > match.getImpValue()) return  1;
+				if (impValue < match.getIMP()) return -1;
+				if (impValue > match.getIMP()) return  1;
 				return 0;
 			} else
 			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_SCORE) {
@@ -350,8 +350,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
 				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
 				//then by start location
-				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
-				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
+//				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+//				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
 				//then by alphabetical order of peptides
 				int shortLength = peptide.getAcidSequence().length;
 				if (match.getPeptide().getAcidSequence().length < shortLength) shortLength = match.getPeptide().getAcidSequence().length;
@@ -392,13 +392,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			}
 		}
 
-	public double getImpValue() {
-		return impValue;
-	}
-
 	public boolean equals(Match match) {
 		if (getScore() == match.getScore()) {
-			if (peptide.equals(match.getPeptide())) return true;
+			if (peptide.equals(match.getPeptide())) 
+				if (spectrum.equals(match.getSpectrum()))
+					return true;
 		}
 		return false;
 	}
@@ -457,7 +455,56 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	}
 
 	public String toString() {
-		return spectrum.getId() + "\t" + peptide.getAcidSequenceString()  + "\t" + getScore() + "\t" + getEValue() + "\t" + getImpValue();
+		StringBuffer sb = new StringBuffer();
+		sb.append(getSpectrum().getId());
+		sb.append('\t');
+		sb.append(getSpectrum().getMD5());
+		sb.append('\t');
+		sb.append(getSpectrum().getFile().getName());
+		sb.append('\t');
+		sb.append(getScore());
+		sb.append('\t');
+		sb.append(getSpectrum().getPrecursorMZ());
+		sb.append('\t');
+		sb.append(getSpectrum().getMass());
+		sb.append('\t');
+		sb.append(getEValue());
+		sb.append('\t');
+		sb.append(getPeptide().getAcidSequenceString());
+		sb.append('\t');
+		sb.append(getPeptide().getStartIndex());
+		sb.append('\t');
+		sb.append(getPeptide().getStopIndex());
+		sb.append('\t');
+		if (Properties.isSequenceFileDNA) {
+			sb.append(getPeptide().getParentSequence().getSequenceFile().getName());
+			sb.append('\t');
+			sb.append(getPeptide().getProtein().getName());
+			sb.append('\t');
+			sb.append(getPeptide().getIntronStartIndex());
+			sb.append('\t');
+			sb.append(getPeptide().getIntronStopIndex());
+			sb.append('\t');
+			sb.append(getPeptide().isForward() ? "+" : "-");
+			sb.append('\t');
+			sb.append(getPeptide().isSpliced());
+		} else {
+			sb.append(getPeptide().getProtein().getName());
+		}
+		sb.append('\t');
+		sb.append(rank);
+		sb.append('\t');
+		sb.append(repeatCount);
+		sb.append('\t');
+		sb.append(getIonMatchTally());
+		sb.append('\t');
+		sb.append(isIsotopeLabeled());
+		sb.append('\t');
+		sb.append(getSpectrum().getCharge());
+		sb.append('\t');
+		sb.append(getPeptide().getCleavageAcidCount());
+
+		return sb.toString();
 	}
 	
 	public double calculateEValue() {

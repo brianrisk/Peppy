@@ -33,14 +33,11 @@ public class EValueCalculator {
 	public int getNumberOfMatches() {
 		return numberOfMatches;
 	}
-
-	public EValueCalculator(ArrayList<? extends HasEValue> values, ArrayList<? extends HasEValue> topValues) {
-		addScores(values, topValues);
+	
+	public EValueCalculator() {
+		//nothing
 	}
 	
-	public EValueCalculator(int [] histogram) {
-		this.histogram = histogram;
-	}
 	
 	/**
 	 * find expected value (a.k.a. "e value") for top matches
@@ -50,11 +47,18 @@ public class EValueCalculator {
 	 * @param matchesForOneSpectrum
 	 * @param topMatches
 	 */
-	public void addScores(ArrayList<? extends HasEValue> values, ArrayList<? extends HasEValue> topValues) {
+	public void addScores(ArrayList<? extends HasEValue> values) {
 		//Set these values if this is our first time calculating e value
 		if (highScore < 0) {
-			//setting up the histogram parameters
-			highScore = topValues.get(0).getScore();
+			
+			/* Find best score */
+			highScore = 0;
+			for (HasEValue value: values) {
+				if (value.getScore() > highScore) {
+					highScore = value.getScore();
+				}
+			}
+			
 			//multiplying high score by 2 as there may be higher scores in other chromosomes
 			highScore *= 2;
 			barWidth = (highScore - lowScore) / numberOfHistogramBars;
@@ -80,6 +84,9 @@ public class EValueCalculator {
 			}
 		}
 		
+	}
+	
+	public void calculateHistogramProperties() {
 //		smoothedHistogram = smoothHistogram(histogram, 2);
 		smoothedHistogram = histogram;
 		
@@ -122,12 +129,6 @@ public class EValueCalculator {
 		m = U.calculateM(xValues, survivability, smoothedHistogram, chopIndex, topIndex);
 		b = U.calculateB(xValues, survivability, smoothedHistogram, chopIndex, topIndex, m);
 		
-		//using our m and b to derive e values for all top matches
-		double eValue;
-		for (HasEValue value: topValues) {
-			eValue = getEValue(value.getScore());
-			value.setEValue(eValue);
-		}
 	}
 
 	/**
@@ -136,7 +137,7 @@ public class EValueCalculator {
 	 * @param score
 	 * @return
 	 */
-	public double getEValue(double score) {
+	public double calculateEValueOfScore(double score) {
 		double eValue = m * score + b;
 		eValue = Math.exp(eValue);
 		eValue *= numberOfMatches;

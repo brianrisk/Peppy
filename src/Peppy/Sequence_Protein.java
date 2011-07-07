@@ -99,12 +99,7 @@ public class Sequence_Protein extends Sequence {
 			
 			/*since proteins occur on multiple lines, this buffer is where they are all put together */
 			StringBuffer buffy = new StringBuffer();
-
-			/* sometimes there are "*" in protein strings to represent chunks.  
-			 * this is where we store those chunks
-			 */
-			String [] proteinChunks;
-			
+	
 			/* the accession number */
 			String proteinName = "";
 			while (line != null) {
@@ -114,21 +109,7 @@ public class Sequence_Protein extends Sequence {
 				if (line.startsWith(">")) {
 					
 					/* make a new protein if we've been building one */
-					if (buffy.length() > 0) {
-						
-						/* reverse the string if we are making a null database */
-						if (isReverse) buffy.reverse();
-
-						/* this addresses the "*" in some FASTA files */
-						proteinChunks = buffy.toString().split("\\*");
-						
-						/* go through each of our chunks and add them as proteins */
-						for (int i = 0; i < proteinChunks.length; i++) {
-							if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
-							proteins.add(new Protein(proteinName, proteinChunks[i]));
-						}
-						
-					}
+					addProtein(buffy, proteinName, isReverse);	
 
 					/* this is the name of the next protein */
 					proteinName = line.substring(1).trim();
@@ -149,10 +130,42 @@ public class Sequence_Protein extends Sequence {
 				}
 				line = reader.readLine();
 			}
+			
+			/* Add the final line */
+			addProtein(buffy, proteinName, isReverse);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return proteins;
+	}
+	
+	/**
+	 * Takes a string buffer and adds it to our list of proteins with the appropriate name
+	 * @param buffy
+	 * @param proteinName
+	 * @param isReverse
+	 */
+	private void addProtein(StringBuffer buffy, String proteinName, boolean isReverse) {
+		if (buffy.length() > 0) {
+			
+			/* sometimes there are "*" in protein strings to represent chunks.  
+			 * this is where we store those chunks
+			 */
+			String [] proteinChunks;
+			
+			/* reverse the string if we are making a null database */
+			if (isReverse) buffy.reverse();
+	
+			/* this addresses the "*" in some FASTA files */
+			proteinChunks = buffy.toString().split("\\*");
+			
+			/* go through each of our chunks and add them as proteins */
+			for (int i = 0; i < proteinChunks.length; i++) {
+				if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
+				proteins.add(new Protein(proteinName, proteinChunks[i]));
+			}
+		}
 	}
 	
 	/**

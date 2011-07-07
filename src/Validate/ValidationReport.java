@@ -85,6 +85,8 @@ public class ValidationReport {
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
+		Properties.maxEValue = 1;
+		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
 		
@@ -94,12 +96,6 @@ public class ValidationReport {
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
-		//uncomment to use HMM score
-//		Properties.scoringMethodName = "Peppy.Match_HMM";
-//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-//		HMMScore.HMMClass.HmmSetUp();
-//		Properties.highIntensityCleaning = true;
-//		Properties.peakDifferenceThreshold = 0.5;
 
 //		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
@@ -116,10 +112,17 @@ public class ValidationReport {
 		//set up which tests we will perform
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
+<<<<<<< Updated upstream
 //		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
 //		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
 //		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+=======
+		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
+//			tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//			tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//			tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+>>>>>>> Stashed changes
 	}
 	
 	
@@ -152,6 +155,32 @@ public class ValidationReport {
 		for (TestSet test: tests) {
 			test.cleanMatches();
 			test.calculateStastics();
+		}
+		
+		/* write all matches for potential hand verification */
+		for (TestSet testSet: tests) {
+
+			/* set up our file to write to */
+			File matchFile = new File(reportFolder, testSet.getName() + " matches.txt");
+			
+			try {
+				PrintWriter pw = new PrintWriter(new BufferedWriter (new FileWriter(matchFile)));
+				
+				ArrayList<Match> positiveMatches = testSet.getPositiveMatches();
+				
+				/* write all the matches for the test set */
+				for (Match match: positiveMatches) {
+					pw.println(match);
+				}
+				
+				/* close it out */
+				pw.flush();
+				pw.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 		
 	}

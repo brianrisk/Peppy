@@ -80,15 +80,17 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
-		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+//		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectra);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
 		
 		/* add the matches to the full list */
-		if (matches != null) positiveMatches.addAll(matches);
+		if (matches != null) {
+			positiveMatches.addAll(matches);
+		}
 		
-		/* clean the full list */
-		cleanMatches();
+		U.p ("match size: " + positiveMatches.size());
 	}
 
 	/**
@@ -124,10 +126,13 @@ public class TestSet {
 		
 	}
 	
+	/**
+	 * This method is for special use with hits from other search engines like X!Tandem and Mascot
+	 */
 	public void cleanMatches() {
 		/* Do a little house cleaning */
 		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
 		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
 		
 		/*removing matches with low rank */
@@ -149,6 +154,12 @@ public class TestSet {
 		}
 	}
 	
+	
+	public ArrayList<Match> getPositiveMatches() {
+		return positiveMatches;
+	}
+
+
 	public void resetTest() {
 		positiveMatches = new ArrayList<Match>();
 		topRankTrueTally = 0;
@@ -164,6 +175,45 @@ public class TestSet {
 	 * This should be called only after our set of matches has been found
 	 */
 	public void calculateStastics() {
+		/* clean the match set due to the multiple sectioning of the sequence file */
+		Peppy.Peppy.assignRankToMatches(positiveMatches);
+		Peppy.Peppy.assignRepeatedPeptideCount(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
+		Peppy.Peppy.removePoorMatches(positiveMatches);
+		
+		
+		
+		//remove duplicate matches
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+		Collections.sort(positiveMatches);
+		int numberOfMatches = positiveMatches.size();
+		Match theMatch;
+		Match previousMatch = positiveMatches.get(0);
+		int spectrumID;
+		int previousSpectrumID = previousMatch.getSpectrum().getId();
+		for (int i = 1; i < numberOfMatches; i++) {
+//			theMatch = positiveMatches.get(i);
+//			spectrumID = theMatch.getSpectrum().getId();
+//			
+//			if (theMatch.getPeptide().equals(previousMatch.getPeptide()) && spectrumID == previousSpectrumID) {
+//				positiveMatches.remove(i);
+//				i--;
+//				numberOfMatches--;
+//			} else {
+//				previousMatch = theMatch;
+//				previousSpectrumID = spectrumID;
+//			}
+
+//			if (theMatch.equals(previousMatch) && theMatch.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
+//				positiveMatches.remove(i);
+//				i--;
+//				numberOfMatches--;
+//			} else {
+//				previousMatch = theMatch;
+//				previousSpectrumID = spectrumID;
+//			}
+		}
+		U.p ("final match size: " + positiveMatches.size());
 		
 		//track r time
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
