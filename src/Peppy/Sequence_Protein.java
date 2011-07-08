@@ -16,7 +16,6 @@ import java.util.Collections;
 public class Sequence_Protein extends Sequence {
 	
 	BufferedReader reader = null;
-	ArrayList<Protein> proteins = null;
 	
 	public Sequence_Protein(File proteinFile) {
 		this.sequenceFile = proteinFile;
@@ -28,7 +27,6 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public void reset() {
-		proteins = null;
 		try {
 			reader = new BufferedReader(new FileReader(sequenceFile));
 		} catch (FileNotFoundException e) {
@@ -37,13 +35,13 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public  ArrayList<Peptide> extractAllPeptides(boolean isReverse) {
-		getProteinsFromDatabase(isReverse, false);
+		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, false);
 		return getPeptidesFromListOfProteins(proteins);	
 	}
 	
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-		proteins = getProteinsFromDatabase(isReverse, true);
+		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, true);
 		peptides = getPeptidesFromListOfProteins(proteins);
 		return peptides;
 	}
@@ -58,7 +56,7 @@ public class Sequence_Protein extends Sequence {
 	 * @return
 	 */
 	public  ArrayList<Peptide> getAllPeptidesFromReverseDatabase(File proteinFile) {
-		getProteinsFromDatabase(true, false);
+		ArrayList<Protein> proteins = getProteinsFromDatabase(true, false);
 		return getPeptidesFromListOfProteins(proteins);	
 	}
 	
@@ -88,7 +86,7 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
-		proteins = new ArrayList<Protein>();
+		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		try {
 			String line = reader.readLine();
 			
@@ -156,7 +154,7 @@ public class Sequence_Protein extends Sequence {
 	 * @return
 	 */
 	private ArrayList<Protein> getProteinsFromUniprotDAT(boolean reverse, boolean limitAmount) {
-		proteins = new ArrayList<Protein>();
+		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		try {
 			String line;
 			line = reader.readLine();
