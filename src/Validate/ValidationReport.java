@@ -117,9 +117,9 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
-		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	
 	
@@ -129,7 +129,7 @@ public class ValidationReport {
 	public static void forwards() {
 
 		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
-//		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta"));	
+//		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();

@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * The contract here is that all lists of peptides must be returned
@@ -77,11 +76,10 @@ public class Sequence_Protein extends Sequence {
 	
 	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-		if (proteins.size() == 0) return peptides;
-		for (Protein protein: proteins) {
-			peptides.addAll(protein.digest());
+		if (proteins.size() != 0) {
+			ProteinDigestionServer pds = new ProteinDigestionServer(proteins);
+			peptides = pds.getPeptides();
 		}
-		Collections.sort(peptides);
 		return peptides;
 	}
 	

@@ -186,7 +186,7 @@ public class Protein implements Comparable<Protein>{
 		return 0;
 	}
 	
-	public ArrayList<Peptide> digest() {
+	private ArrayList<Peptide> digest() {
 		peptides = new ArrayList<Peptide>();
 		
 		//if our peptide has only 3 acids, return an empty list
