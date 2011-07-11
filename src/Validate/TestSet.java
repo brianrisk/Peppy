@@ -88,7 +88,7 @@ public class TestSet {
 		if (matches != null) positiveMatches.addAll(matches);
 		
 		/* clean the full list */
-		cleanMatches();
+//		cleanMatches();
 	}
 
 	/**
@@ -223,6 +223,11 @@ public class TestSet {
 		
 		generatePrecisionRecallCurve();
 	}
+
+	public ArrayList<Match> getPositiveMatches() {
+		return positiveMatches;
+	}
+
 
 	public BufferedImage generatePrecisionRecallCurve() {
 			int width = 500;

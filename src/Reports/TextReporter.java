@@ -148,10 +148,6 @@ public class TextReporter {
 					sb.append('\t');
 					sb.append(match.getPeptide().getProtein().getName());
 					sb.append('\t');
-					sb.append(match.getPeptide().getStartIndex());
-					sb.append('\t');
-					sb.append(match.getPeptide().getStopIndex());
-					sb.append('\t');
 					sb.append(match.getPeptide().getIntronStartIndex());
 					sb.append('\t');
 					sb.append(match.getPeptide().getIntronStopIndex());

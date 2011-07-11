@@ -54,10 +54,10 @@ public class Properties {
 	public static boolean useSequenceRegion = false;
 	
 	//Segmenting up job for memory management
-	public static int numberOfSpectraPerSegment = 50000;
+	public static int numberOfSpectraPerSegment = 10000;
 	public static int digestionWindowSize = 10000000;
-	public static int maxNumberOfProteinsToLoadAtOnce = 50000;
 	public static int desiredPeptideDatabaseSize = 20000000;
+	public static int maxNumberOfProteinsToLoadAtOnce = 50000;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;

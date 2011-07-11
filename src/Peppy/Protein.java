@@ -399,18 +399,24 @@ public class Protein implements Comparable<Protein>{
 		
 		//might not be considering very long peptides
 		if (sequenceString.length() <= Properties.maxPeptideLength) {
-			//If this is coming from DNA or RNA, there is a different peptide constructor
+			
 			int stopIndex = acidIndex;
 			int intronStop = peptideIntronStopIndex;
-			if (isForward) {
-				//2, not 3, because index already at 1
-				stopIndex += 2;
-				intronStop += 2;
-			} else {
-				//4 because we're already at the 1 index of the next peptide
-				stopIndex -= 4;
-				intronStop -= 4;
+			
+			/* Adjust indicies for DNA and RNA */
+			if (Properties.isSequenceFileDNA) {
+				if (isForward) {
+					//2, not 3, because index already at 1
+					stopIndex += 2;
+					intronStop += 2;
+				} else {
+					//4 because we're already at the 1 index of the next peptide
+					stopIndex -= 4;
+					intronStop -= 4;
+				}
 			}
+			
+			/* create the peptide */
 			peptide = new Peptide(
 					sequenceString,
 					puc.getStartIndex(),

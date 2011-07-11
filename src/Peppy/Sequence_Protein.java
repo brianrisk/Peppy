@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Utilities.U;
+
 /**
  * The contract here is that all lists of peptides must be returned
  * sorted by mass, from least to greatest.
@@ -39,9 +41,8 @@ public class Sequence_Protein extends Sequence {
 	}
 	
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, true);
-		peptides = getPeptidesFromListOfProteins(proteins);
+		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins);
 		return peptides;
 	}
 	
@@ -85,6 +86,7 @@ public class Sequence_Protein extends Sequence {
 	
 	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
 		ArrayList<Protein> proteins = new ArrayList<Protein>();
+		int combinedLength = 0;
 		try {
 			String line = reader.readLine();
 			
@@ -116,6 +118,7 @@ public class Sequence_Protein extends Sequence {
 						/* go through each of our chunks and add them as proteins */
 						for (int i = 0; i < proteinChunks.length; i++) {
 							if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
+							combinedLength += proteinChunks[i].length();
 							proteins.add(new Protein(proteinName, proteinChunks[i]));
 						}
 						
@@ -136,7 +139,7 @@ public class Sequence_Protein extends Sequence {
 					buffy.append(line);
 				}
 				if (limitAmount) {
-					if (proteins.size() > Properties.maxNumberOfProteinsToLoadAtOnce) return proteins;
+					if (combinedLength > 100 * 500000) return proteins;
 				}
 				line = reader.readLine();
 			}

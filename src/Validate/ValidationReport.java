@@ -117,9 +117,9 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
-//		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	
 	
@@ -132,14 +132,11 @@ public class ValidationReport {
 //		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
 		
 		/* where we store our peptide chunk */
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
 		
 		/* repeat extracting peptides until end of sequence has been reached */
-		do {
-			/* get our peptides and report size */
-			peptides.clear();
-			System.gc();
-			peptides = sequence.extractMorePeptides(false);
+		while (peptides.size() > 0) {
+			/* track database size */
 			forwardsDatabaseSize += peptides.size();
 			
 			/* get matches for each of our sets for each of these peptides */
@@ -147,7 +144,11 @@ public class ValidationReport {
 				test.findPositiveMatches(peptides);
 			}
 			
-		} while (peptides.size() > 0);
+			/* get our peptides and report size */
+			peptides.clear();
+			System.gc();
+			peptides = sequence.extractMorePeptides(false);
+		}
 		
 		for (TestSet test: tests) {
 			test.cleanMatches();
@@ -181,6 +182,21 @@ public class ValidationReport {
 		U.p("Data collected, now generating the report...");
 
 		try {
+			/* save raw matches */
+			for (TestSet testSet: tests) {
+				File testDirectory = new File(reportFolder, testSet.getName());
+				testDirectory.mkdirs();
+				File matchesFile = new File(testDirectory, "/matches.txt");
+				PrintWriter matchPW = new PrintWriter(new BufferedWriter(new FileWriter(matchesFile)));
+				ArrayList<Match> matches = testSet.getPositiveMatches();
+				Collections.sort(matches);
+				for (Match match: matches) {
+					matchPW.println(match);
+				}
+				matchPW.flush();
+				matchPW.close();
+			}
+			
 			File indexFile = new File(reportFolder, "index.html");
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
 			NumberFormat nfPercent = NumberFormat.getPercentInstance();

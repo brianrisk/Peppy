@@ -81,7 +81,10 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	}
 	
 	public double getIMP() {
-		return calculateIMP();
+		if (impValue < 0) {
+			calculateIMP();
+		}
+		return impValue;
 	}
 	
 	public void setSpectrum(Spectrum spectrum) {
@@ -457,7 +460,59 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	}
 
 	public String toString() {
-		return spectrum.getId() + "\t" + peptide.getAcidSequenceString()  + "\t" + getScore() + "\t" + getEValue() + "\t" + getImpValue();
+		StringBuffer sb = new StringBuffer();
+		sb.append(getSpectrum().getId());
+		sb.append('\t');
+		sb.append(getSpectrum().getMD5());
+		sb.append('\t');
+		sb.append(getSpectrum().getFile().getName());
+		sb.append('\t');
+		sb.append(getScore());
+		sb.append('\t');
+		sb.append(getSpectrum().getPrecursorMZ());
+		sb.append('\t');
+		sb.append(getSpectrum().getMass());
+		sb.append('\t');
+		sb.append(getEValue());
+		sb.append('\t');
+		sb.append(getPeptide().getAcidSequenceString());
+		sb.append('\t');
+		sb.append(getPeptide().getStartIndex());
+		sb.append('\t');
+		sb.append(getPeptide().getStopIndex());
+		sb.append('\t');
+		if (Properties.isSequenceFileDNA) {
+			sb.append(getPeptide().getParentSequence().getSequenceFile().getName());
+			sb.append('\t');
+			sb.append(getPeptide().getProtein().getName());
+			sb.append('\t');
+			sb.append(getPeptide().getStartIndex());
+			sb.append('\t');
+			sb.append(getPeptide().getStopIndex());
+			sb.append('\t');
+			sb.append(getPeptide().getIntronStartIndex());
+			sb.append('\t');
+			sb.append(getPeptide().getIntronStopIndex());
+			sb.append('\t');
+			sb.append(getPeptide().isForward() ? "+" : "-");
+			sb.append('\t');
+			sb.append(getPeptide().isSpliced());
+		} else {
+			sb.append(getPeptide().getProtein().getName());
+		}
+		sb.append('\t');
+		sb.append(rank);
+		sb.append('\t');
+		sb.append(repeatCount);
+		sb.append('\t');
+		sb.append(getIonMatchTally());
+		sb.append('\t');
+		sb.append(isIsotopeLabeled());
+		sb.append('\t');
+		sb.append(getSpectrum().getCharge());
+		sb.append('\t');
+		sb.append(getPeptide().getCleavageAcidCount());
+		return sb.toString();
 	}
 	
 	public double calculateEValue() {
