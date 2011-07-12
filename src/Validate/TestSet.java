@@ -80,15 +80,15 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
-		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+//		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectra);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
 		
 		/* add the matches to the full list */
-		if (matches != null) positiveMatches.addAll(matches);
-		
-		/* clean the full list */
-//		cleanMatches();
+		if (matches != null) {
+			positiveMatches.addAll(matches);
+		}
 	}
 
 	/**
@@ -124,11 +124,30 @@ public class TestSet {
 		
 	}
 	
+
 	public void cleanMatches() {
 		/* Do a little house cleaning */
 		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches);
+		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
 		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+		
+		/* remove duplicate matches */
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+		Collections.sort(positiveMatches);
+		Match theMatch;
+		Match previousMatch = positiveMatches.get(0);
+		for (int i = 1; i < positiveMatches.size(); i++) {
+			theMatch = positiveMatches.get(i);
+			
+			if (theMatch.getPeptide().equals(previousMatch.getPeptide()) ) {
+				if (theMatch.getSpectrum().getId() == previousMatch.getSpectrum().getId()) {
+					positiveMatches.remove(i);
+					i--;
+				}
+			} else {
+				previousMatch = theMatch;
+			}
+		}
 		
 		/*removing matches with low rank */
 		Match match;
@@ -149,6 +168,12 @@ public class TestSet {
 		}
 	}
 	
+	
+	public ArrayList<Match> getPositiveMatches() {
+		return positiveMatches;
+	}
+
+
 	public void resetTest() {
 		positiveMatches = new ArrayList<Match>();
 		topRankTrueTally = 0;
@@ -163,7 +188,10 @@ public class TestSet {
 	/**
 	 * This should be called only after our set of matches has been found
 	 */
-	public void calculateStastics() {
+	public void calculateStastics() {		
+		
+		
+		U.p ("final match size: " + positiveMatches.size());
 		
 		//track r time
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
@@ -222,10 +250,6 @@ public class TestSet {
 		}
 		
 		generatePrecisionRecallCurve();
-	}
-
-	public ArrayList<Match> getPositiveMatches() {
-		return positiveMatches;
 	}
 
 
@@ -378,7 +402,7 @@ public class TestSet {
 	}
 	
 	@SuppressWarnings("unused")
-	public ArrayList<Match> loadCorrectMatches() {
+	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
 		for(Spectrum spectrum: spectra) {
 			//find the file for the correct peptide

@@ -282,7 +282,7 @@ public class Peppy {
 			
 			/* Here we do some basic processing and cleaning of the matches */
 			removeDuplicateMatches(segmentMatches);
-			assignConfidenceValuesToMatches(segmentMatches);
+			assignConfidenceValuesToMatches(segmentMatches, spectra);
 			assignRankToMatches(segmentMatches);
 			removePoorMatches(segmentMatches);
 			
@@ -319,12 +319,12 @@ public class Peppy {
 		
 		//This is where the bulk of the processing in long jobs takes
 		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
-		
+
 		//Add only matches with a decent e value		
 		removeDuplicateMatches(matches);
 		assignRankToMatches(matches);
 		assignRepeatedPeptideCount(matches);
-		assignConfidenceValuesToMatches(matches);
+		assignConfidenceValuesToMatches(matches, spectra);
 		removePoorMatches(matches);
 		
 		return matches;
@@ -406,7 +406,8 @@ public class Peppy {
 	}
 	
 	/**
-	 * NOTE:  this should only be used for DNA/RNA based searches
+	 * NOTE:  this returns early if not DNA search.
+	 * 
 	 * It removes hits to peptides which are redundant.  For example, a spectrum
 	 * has two matches where the peptide is the exact same: same sequence, same start, same direction.
 	 * These redundant matches can occasionally come up due to the way large sequences are digested
@@ -442,8 +443,18 @@ public class Peppy {
 	}
 	
 
-	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches) {
+	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches, ArrayList<Spectrum> spectra) {
+		/* tally histograms for all spectra so E values can be calculated */
+		for (Spectrum spectrum: spectra) {
+			spectrum.getEValueCalculator().calculateHistogramProperties();
+		}
+		
+		/* now calculate e values for all matches */
 		for (Match match: matches) {
+			
+			match.calculateEValue();
+			
+			/* this is a sanity check for overly confident e values */
 			if (match.calculateEValue() < match.calculateIMP()) {
 				match.setEValue(Double.MAX_VALUE);
 			}
@@ -459,7 +470,7 @@ public class Peppy {
 
 		Match match;
 		boolean remove;
-		for (int i = 1; i < matches.size(); i++) {
+		for (int i = 0; i < matches.size(); i++) {
 			
 			/* get our match */
 			match = matches.get(i);
@@ -494,9 +505,11 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
 		U.p("Proteogenomic mapping software.");
-		U.p("Developed 2011 by the Giddings Lab");
+		U.p("Developed 2010 by Brian Risk");
 		U.p();
 		
+		/* print some system statistics */
+		U.p("number of processors available: " + Runtime.getRuntime().availableProcessors());
 		U.p("max available memory: " + (double) memoryUsage.getMax() / (1024 * 1024 * 1024) + " gigabytes");
 		U.p();
 		

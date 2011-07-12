@@ -85,6 +85,8 @@ public class ValidationReport {
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
+		Properties.maxEValue = 1;
+		
 		//we'd prefer not to have duplicate matches -- especially for the correct ones
 		Properties.reduceDuplicateMatches = true;
 		
@@ -94,12 +96,6 @@ public class ValidationReport {
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
-		//uncomment to use HMM score
-//		Properties.scoringMethodName = "Peppy.Match_HMM";
-//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-//		HMMScore.HMMClass.HmmSetUp();
-//		Properties.highIntensityCleaning = true;
-//		Properties.peakDifferenceThreshold = 0.5;
 
 //		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
 		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
@@ -117,9 +113,9 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
-		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	
 	

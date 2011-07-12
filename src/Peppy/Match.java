@@ -336,8 +336,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				return 0;
 			} else
 			if (sortParameter == SORT_BY_IMP_VALUE) {
-				if (impValue < match.getImpValue()) return -1;
-				if (impValue > match.getImpValue()) return  1;
+				if (impValue < match.getIMP()) return -1;
+				if (impValue > match.getIMP()) return  1;
 				return 0;
 			} else
 			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_SCORE) {
@@ -353,8 +353,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
 				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
 				//then by start location
-				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
-				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
+//				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+//				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
 				//then by alphabetical order of peptides
 				int shortLength = peptide.getAcidSequence().length;
 				if (match.getPeptide().getAcidSequence().length < shortLength) shortLength = match.getPeptide().getAcidSequence().length;
@@ -395,13 +395,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			}
 		}
 
-	public double getImpValue() {
-		return impValue;
-	}
-
 	public boolean equals(Match match) {
 		if (getScore() == match.getScore()) {
-			if (peptide.equals(match.getPeptide())) return true;
+			if (peptide.equals(match.getPeptide())) 
+				if (spectrum.equals(match.getSpectrum()))
+					return true;
 		}
 		return false;
 	}
@@ -485,10 +483,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			sb.append(getPeptide().getParentSequence().getSequenceFile().getName());
 			sb.append('\t');
 			sb.append(getPeptide().getProtein().getName());
-			sb.append('\t');
-			sb.append(getPeptide().getStartIndex());
-			sb.append('\t');
-			sb.append(getPeptide().getStopIndex());
 			sb.append('\t');
 			sb.append(getPeptide().getIntronStartIndex());
 			sb.append('\t');

@@ -27,6 +27,7 @@ public class ScoringThread implements Runnable {
 		while (spectrum != null) {
 			
 			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
+			ArrayList<Match> topMatches = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			int firstPeptideIndex;
@@ -51,45 +52,23 @@ public class ScoringThread implements Runnable {
 				Peptide peptide = peptides.get(peptideIndex);
 				
 				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
-
-				if (match.getScore() == 0.0) continue;
 				
+				/* add the match we find */
 				matchesForOneSpectrum.add(match);
-			}
-			
-			//collect the top maximumNumberOfMatchesForASpectrum
-			Match.setSortParameter(Match.SORT_BY_SCORE);
-			Collections.sort(matchesForOneSpectrum);
-			
-			int max = Properties.maximumNumberOfMatchesForASpectrum;
-			if (matchesForOneSpectrum.size() < max) max = matchesForOneSpectrum.size();
-			ArrayList<Match> topMatches = new ArrayList<Match>(max);
-			for (int i = 0; i < max; i++) {
-				topMatches.add(matchesForOneSpectrum.get(i));
-			}
-			
-			//We may want to reduce the number of duplicate matches
-			if (Properties.reduceDuplicateMatches && max > 1) {
-				for (int i = 0; i < topMatches.size(); i++) {
-					Match matchA = topMatches.get(i);
-					for (int j = i + 1; j < topMatches.size(); j++) {
-						Match matchB = topMatches.get(j);
-						if (matchA.equals(matchB)) {
-							topMatches.remove(j);
-							j--;
-						}
-					}
+						
+				/* only add the match if it is decent */
+				if (match.getIMP() <= Properties.maxIMP) {
+					topMatches.add(match);
 				}
+				
 			}
+			
+			/* keep track of scores for e values */
+			spectrum.getEValueCalculator().addScores(matchesForOneSpectrum);
 
-			
-			//assign E values to top Matches:
-			if (matchesForOneSpectrum.size() != 0) {
-				spectrum.calculateEValues(matchesForOneSpectrum, topMatches);
-			}
-			
-			//return results, get new task
+			/* return results, get new task */
 			spectrum = scoringThreadServer.getNextSpectrum(topMatches);
+
 		}
 	}
 

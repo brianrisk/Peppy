@@ -34,7 +34,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private String MD5 = null;
 	
 	//E-Values
-	private EValueCalculator eValueCalculator;
+	private EValueCalculator eValueCalculator = new EValueCalculator();
 	
 	//in reality these values should never be less than a positive number
 	private double averageIntensity = -1; 
@@ -749,17 +749,10 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public void clearEValues() {
 		eValueCalculator = null;
 	}
-	
-	public void calculateEValues(ArrayList<Match> matches, ArrayList<Match> topMatches) {
-		if (eValueCalculator == null) {
-			eValueCalculator = new EValueCalculator(matches, topMatches);
-		} else {
-			eValueCalculator.addScores(matches, topMatches);
-		}
-	}
+
 	
 	public double getEValue(double score) {
-		return eValueCalculator.getEValue(score);
+		return eValueCalculator.calculateEValueOfScore(score);
 	}
 	
 	
