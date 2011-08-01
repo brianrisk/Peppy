@@ -65,20 +65,6 @@ public class ScoringThreadPTM implements Runnable {
 			for (int i = 0; i < max; i++) {
 				topMatches.add(matchesForOneSpectrum.get(i));
 			}
-			
-			//We may want to reduce the number of duplicate matches
-			if (Properties.reduceDuplicateMatches && max > 1) {
-				for (int i = 0; i < topMatches.size(); i++) {
-					Match_IMP_VariMod matchA = topMatches.get(i);
-					for (int j = i + 1; j < topMatches.size(); j++) {
-						Match_IMP_VariMod matchB = topMatches.get(j);
-						if (matchA.equals(matchB)) {
-							topMatches.remove(j);
-							j--;
-						}
-					}
-				}
-			}
 
 			
 			//assign E values to top Matches:

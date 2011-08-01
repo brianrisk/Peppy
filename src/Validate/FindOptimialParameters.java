@@ -41,9 +41,6 @@ public class FindOptimialParameters {
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		//we'd prefer not to have duplicate matches -- especially for the correct ones
-		Properties.reduceDuplicateMatches = true;
-		
 		//What scoring mechanism?
 		Properties.scoringMethodName = "Peppy.Match_IMP";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
@@ -71,9 +68,9 @@ public class FindOptimialParameters {
 				prGrid.println("<tr>");
 				fprGrid.println("<tr>");
 				for (double fragmentTolerance = 0.06; fragmentTolerance < .61; fragmentTolerance += 0.01){
-					Properties.spectrumToPeptideMassError = precursorTolerance;
+					Properties.precursorTolerance = precursorTolerance;
 //					double fragmentTolerance = 0.34;
-					Properties.peakDifferenceThreshold = fragmentTolerance;
+					Properties.fragmentTolerance = fragmentTolerance;
 					test.resetTest();
 					test.findPositiveMatches(peptides);
 					test.cleanMatches();

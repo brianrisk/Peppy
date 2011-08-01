@@ -237,8 +237,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
+			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
 		}
 		
 		peakIndex = spectrum.getPeakCount() - 1;
@@ -283,8 +283,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
+			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
 		}
 		
 		peakIndex = 0;

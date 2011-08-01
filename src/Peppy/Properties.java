@@ -52,6 +52,7 @@ public class Properties {
 	public static int minPeptideLength = 5;
 	public static int maxPeptideLength = 80;
 	public static boolean useSequenceRegion = false;
+	public static boolean useReverseDatabase = false;
 	
 	//Segmenting up job for memory management
 	public static int numberOfSpectraPerSegment = 10000;
@@ -65,8 +66,8 @@ public class Properties {
 	public static int sequenceRegionStop = 0;
 	
 	//mass error tolerances
-	public static double spectrumToPeptideMassError = 2.0;
-	public static double peakDifferenceThreshold = 0.3;
+	public static double precursorTolerance = 2.0;
+	public static double fragmentTolerance = 0.3;
 	
 	//TandemFit
 	public static double peakIntensityExponent = 0.33333333;
@@ -107,8 +108,6 @@ public class Properties {
 	
 	//where we put our validation report
 	public static File validationDirectory = new File("validation");
-	
-	public static boolean reduceDuplicateMatches = false;
 	
 	//Report related
 	public static boolean createHTMLReport = true;
@@ -196,6 +195,8 @@ public class Properties {
 			minPeptideLength =Integer.valueOf(propertyValue);
 		if (propertyName.equals("maxPeptideLength")) 
 			maxPeptideLength =Integer.valueOf(propertyValue);
+		if (propertyName.equals("useReverseDatabase"))
+			useReverseDatabase = Boolean.valueOf(propertyValue);
 		
 		//job parsing for memory management
 		if (propertyName.equals("numberOfSpectraPerSegment")) 
@@ -255,15 +256,18 @@ public class Properties {
 		if (propertyName.equals("eValueCutOff")) 
 			maxEValue = Double.valueOf(propertyValue);
 
-		//matches
-		if (propertyName.equals("spectrumToPeptideMassError")) 
-			spectrumToPeptideMassError = Double.valueOf(propertyValue);
-		if (propertyName.equals("peakDifferenceThreshold")) 
-			peakDifferenceThreshold = Double.valueOf(propertyValue);
+		//Ion and precursor threshold values
 		if (propertyName.equals("precursorTolerance")) 
-			spectrumToPeptideMassError = Double.valueOf(propertyValue);
+			precursorTolerance = Double.valueOf(propertyValue);
 		if (propertyName.equals("fragmentTolerance")) 
-			peakDifferenceThreshold = Double.valueOf(propertyValue);
+			fragmentTolerance = Double.valueOf(propertyValue);
+		
+		//Old ion/precursor value names
+		if (propertyName.equals("spectrumToPeptideMassError")) 
+			precursorTolerance = Double.valueOf(propertyValue);
+		if (propertyName.equals("peakDifferenceThreshold")) 
+			fragmentTolerance = Double.valueOf(propertyValue);
+		
 		
 		//reports
 		if (propertyName.equals("reportDirectory")) 
@@ -293,10 +297,11 @@ public class Properties {
 		try {
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
 			
-			pw.println("##FASTA files can be either DNA or amino acid sequences ");
+			pw.println("##Properties which define how a sequence is digested");
 			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
 			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
 			pw.println("useIsotopeLabeling " + Properties.useIsotopeLabeling);
+			pw.println("useReverseDatabase " + Properties.useReverseDatabase);
 			pw.println();
 			pw.println("##This could be a directory or a file ");
 			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
@@ -304,31 +309,30 @@ public class Properties {
 			pw.println("##This could be a directory or a file ");
 			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
 			pw.println();
-			pw.println("//Scoring Method ");
+			pw.println("##Scoring Method ");
 			pw.println("scoringMethodName " + Properties.scoringMethodName);
 			pw.println();
-			pw.println("//retain 100 most intense peaks");
+			pw.println("##retain 100 most intense peaks");
 			pw.println("highIntensityCleaning " + Properties.highIntensityCleaning);
 			pw.println();
-			pw.println("//digest only part of a sequence ");
+			pw.println("##digest only part of a sequence ");
 			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
 			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
 			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
 			pw.println();
-			pw.println("//limit returned matches by confidence ");
+			pw.println("##limit returned matches by confidence ");
 			pw.println("eValueCutOff " + Properties.maxEValue);
 			pw.println();
-			pw.println("//a preference for digestion of large DNA windows ");
+			pw.println("##a preference for digestion of large DNA windows ");
 			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
 			pw.println();
-			pw.println("//how much precursor mass / theoretical mass difference should we tolerate? ");
-			pw.println("spectrumToPeptideMassError " + Properties.spectrumToPeptideMassError);
-			pw.println("//spectrumToPeptideMassError ");
+			pw.println("##how much precursor mass / theoretical mass difference should we tolerate? ");
+			pw.println("spectrumToPeptideMassError " + Properties.precursorTolerance);
 			pw.println();
-			pw.println("//TandemFit property ");
-			pw.println("peakDifferenceThreshold " + Properties.peakDifferenceThreshold);
+			pw.println("##TandemFit property ");
+			pw.println("peakDifferenceThreshold " + Properties.fragmentTolerance);
 			pw.println();
-			pw.println("//Report variables ");
+			pw.println("##Report variables ");
 			pw.println("createHTMLReport " + Properties.createHTMLReport);
 			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
 			pw.println("generateSequenceReport " + Properties.generateSequenceReport);

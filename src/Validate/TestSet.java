@@ -189,10 +189,6 @@ public class TestSet {
 	 * This should be called only after our set of matches has been found
 	 */
 	public void calculateStastics() {		
-		
-		
-		U.p ("final match size: " + positiveMatches.size());
-		
 		//track r time
 		milisecondsPerSpectrum = (double) timeElapsed / setSize;
 
@@ -358,8 +354,7 @@ public class TestSet {
 			
 		}
 
-	@SuppressWarnings("unused")
-	private ArrayList<Peptide> loadCorrectPeptides() {
+	public ArrayList<Peptide> loadCorrectPeptides() {
 		ArrayList<Peptide> correctPeptides = new ArrayList<Peptide>();
 		for(Spectrum spectrum: spectra) {
 			//find the file for the correct peptide

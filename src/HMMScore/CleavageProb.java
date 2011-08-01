@@ -185,7 +185,7 @@ public class CleavageProb {
 		int massCount = masses.size();
 		for (i = 0; i < massCount; i++) {
 			float massValue = (Float) masses.get(i);
-			if (Math.abs(massValue - bIon) < Properties.peakDifferenceThreshold) {
+			if (Math.abs(massValue - bIon) < Properties.fragmentTolerance) {
 				matched = true;
 				return matched;
 			}

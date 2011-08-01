@@ -222,11 +222,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		if (coverage < 0) {
 			double covered = 0;
 			double upperBound, lowerBound, lastUpperBound = 0;
-			double windowSize = 2 * Properties.peakDifferenceThreshold;
+			double windowSize = 2 * Properties.fragmentTolerance;
 			for (Peak peak: peaks) {
 				if (peak.getMass() < mass) {
-					upperBound = peak.getMass() + Properties.peakDifferenceThreshold;
-					lowerBound = peak.getMass() - Properties.peakDifferenceThreshold;
+					upperBound = peak.getMass() + Properties.fragmentTolerance;
+					lowerBound = peak.getMass() - Properties.fragmentTolerance;
 					if (lowerBound < lastUpperBound) {
 						covered += upperBound - lastUpperBound;
 					} else {
@@ -345,8 +345,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			perfectY += Properties.leftIonDifference;
 			//add the right ion difference to get the y ion mass
 			perfectY += Properties.rightIonDifference;
-			massLowerBound = perfectY - Properties.peakDifferenceThreshold;
-			massUpperBound = perfectY + Properties.peakDifferenceThreshold;
+			massLowerBound = perfectY - Properties.fragmentTolerance;
+			massUpperBound = perfectY + Properties.fragmentTolerance;
 			for (int y = b + 1; y < stop; y++) {
 				peakY = peaks.get(y);
 				if (peakY.used) continue;
@@ -373,8 +373,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		
 		//note: > stop as we save final one for inside loop
 		for (int i = start; i > stop; i--) {
-			lowerBound = peaks.get(i).getMass() - Properties.peakDifferenceThreshold;
-			upperBound = peaks.get(i).getMass() + Properties.peakDifferenceThreshold;
+			lowerBound = peaks.get(i).getMass() - Properties.fragmentTolerance;
+			upperBound = peaks.get(i).getMass() + Properties.fragmentTolerance;
 			for (int j = i - 1; j >= stop; j--) {
 				if (peaks.get(j).getMass() > lowerBound) {
 					if (peaks.get(j).getMass() < upperBound) {
@@ -404,7 +404,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			left = false;
 			right = false;
 			for (int j = i - 1; j >=0; j--) {
-				if (peaks.get(i).getMass() - peaks.get(j).getMass() <= Properties.peakDifferenceThreshold) {
+				if (peaks.get(i).getMass() - peaks.get(j).getMass() <= Properties.fragmentTolerance) {
 					if (peaks.get(i).getIntensity() < peaks.get(j).getIntensity()) {
 						left = true;
 						break;
@@ -415,7 +415,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			}
 			if (left) {
 				for (int j = i + 1; j < peaks.size(); j++) {
-					if ( peaks.get(j).getMass() - peaks.get(i).getMass() <= Properties.peakDifferenceThreshold) {
+					if ( peaks.get(j).getMass() - peaks.get(i).getMass() <= Properties.fragmentTolerance) {
 						if (peaks.get(i).getIntensity() < peaks.get(j).getIntensity()) {
 							right = true;
 							break;

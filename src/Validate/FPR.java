@@ -163,8 +163,8 @@ public class FPR {
 			//print header
 			pw.println("scoring system used: " + scoreName);
 			pw.println("number of spectra in our set: " + spectra.size());
-			pw.println("precursor tolerance: " + Properties.spectrumToPeptideMassError);
-			pw.println("peak tolerance: " + Properties.peakDifferenceThreshold);
+			pw.println("precursor tolerance: " + Properties.precursorTolerance);
+			pw.println("peak tolerance: " + Properties.fragmentTolerance);
 			pw.println();
 			
 			//print results

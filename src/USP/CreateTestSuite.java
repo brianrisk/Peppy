@@ -68,7 +68,7 @@ public class CreateTestSuite {
 		U.p("loaded " +spectra.size() + " spectra.");
 
 		//restrict the precursors since they should be pretty accurate
-		Properties.spectrumToPeptideMassError = 0.7;
+		Properties.precursorTolerance = 0.7;
 		
 		//Get the  matches
 		Properties.maximumNumberOfMatchesForASpectrum = numberToKeepPerSpectrum;

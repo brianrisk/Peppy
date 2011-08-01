@@ -40,10 +40,10 @@ public class Sequence_DNA extends Sequence{
 	 * multiple times, each time it is called it returns another portion of the
 	 * database of peptides.  When there are no more peptides from that sequence
 	 * then null is returned.
-	 * @param reverse This is if we want to reverse our database to get a null database
+	 * @param isReverse This is if we want to reverse our database to get a null database
 	 * @return a sorted ArrayList of amino acid sequence fragments from the given sequence file
 	 */
-	public ArrayList<Peptide> extractMorePeptides(boolean reverse) {
+	public ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
 		//if we have yet to read in all the ATGC data, do that now
 		if (nucleotideSequences == null) getNucleotideSequences();
 		
@@ -95,9 +95,9 @@ public class Sequence_DNA extends Sequence{
 		/* Create our SequenceDigestionThread ArrayList */
 		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
 		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, reverse));
+			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
 			if (!Properties.useOnlyForwardsFrames) {
-				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, reverse));
+				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
 			}
 		}
 		
@@ -120,12 +120,9 @@ public class Sequence_DNA extends Sequence{
 		}
 		
 		/* harvest all digested peptides */
-		for (int digestorIndex = 0; digestorIndex < digestors.size(); digestorIndex++) {
-			DigestionThread_DNA digestor = digestors.get(digestorIndex);
+		for (DigestionThread_DNA digestor: digestors) {
 			peptides.addAll(digestor.getPeptides());
 		}
-			
-		Collections.sort(peptides);
 		return peptides;
 	}
 	

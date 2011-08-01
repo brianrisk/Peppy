@@ -32,7 +32,7 @@ public class Parameter {
 			float massValue = (Float) masses.get(i);
 			for (j = 0; j < bTypeIons.size(); j++) {
 				typeValue = (Double) bTypeIons.get(j); // .valueOf(typeStr)).floatValue();
-				if (Math.abs(massValue - typeValue) < Properties.peakDifferenceThreshold) {
+				if (Math.abs(massValue - typeValue) < Properties.fragmentTolerance) {
 					bIonCount++;
 				}
 			}

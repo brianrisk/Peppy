@@ -101,7 +101,7 @@ public class TheoreticalFragment {
 		boolean isFrag = false;
 		for (i = 0; i < internalFrags.size(); i++) {
 			double currentMass = (Double) internalFrags.get(i);
-			if (Math.abs(currentMass - currentFrag) < Properties.peakDifferenceThreshold) {
+			if (Math.abs(currentMass - currentFrag) < Properties.fragmentTolerance) {
 				isFrag = true;
 				return isFrag;
 			}
@@ -109,7 +109,7 @@ public class TheoreticalFragment {
 
 		for (i = 0; i < bIons.size(); i++) {
 			double currentMass = (Double) bIons.get(i);
-			if (Math.abs(currentMass - currentFrag) < Properties.peakDifferenceThreshold) {
+			if (Math.abs(currentMass - currentFrag) < Properties.fragmentTolerance) {
 				isFrag = true;
 				return isFrag;
 			}

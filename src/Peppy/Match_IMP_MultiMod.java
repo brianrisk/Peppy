@@ -115,8 +115,8 @@ public class Match_IMP_MultiMod extends Match {
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeakMass -= modifications[i].getMonoMass();
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;	
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
+			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;	
 		}
 		
 		peakIndex = spectrum.getPeakCount() - 1;
@@ -150,8 +150,8 @@ public class Match_IMP_MultiMod extends Match {
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			theoreticalPeakMass += modifications[i].getMonoMass();
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
+			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
 		}
 		
 		peakIndex = 0;

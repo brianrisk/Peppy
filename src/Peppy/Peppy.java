@@ -43,6 +43,7 @@ public class Peppy {
 		printFarewell();
 	}
 	
+	
 	public static void runPeppy(String [] args) {
 		U.startStopwatch();
 		peptideTally = 0;
@@ -87,13 +88,9 @@ public class Peppy {
 			matches = getMatches(sequences, spectra);
 		}
 		
-		
-		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
-		
-		
 		
 		if (Properties.createHTMLReport) {
 			U.p("creating HTML reports");
@@ -106,7 +103,6 @@ public class Peppy {
 		spectra.clear();
 		sequences.clear();
 		System.gc();
-		
 		
 		U.stopStopwatch();
 	}
@@ -171,7 +167,7 @@ public class Peppy {
 	 * @return
 	 */
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
-		return getMatches(sequences, spectra, false);
+		return getMatches(sequences, spectra, Properties.useReverseDatabase);
 	}
 
 	/**
@@ -452,10 +448,11 @@ public class Peppy {
 		/* now calculate e values for all matches */
 		for (Match match: matches) {
 			
+			/* determine and set the E value */
 			match.calculateEValue();
 			
 			/* this is a sanity check for overly confident e values */
-			if (match.calculateEValue() < match.calculateIMP()) {
+			if (match.getEValue() < match.getIMP()) {
 				match.setEValue(Double.MAX_VALUE);
 			}
 		}
@@ -484,14 +481,14 @@ public class Peppy {
 			}
 			
 			/* flagging matches with high E values */
-			if (match.getEValue() > Properties.maxEValue) {
-				remove = true;
-			}
+//			if (match.getEValue() > Properties.maxEValue) {
+//				remove = true;
+//			}
 			
 			/* flagging matches with weirdly low E values */
-			if (match.getIMP() > match.getEValue()) {
-				remove = true;
-			}
+//			if (match.getIMP() > match.getEValue()) {
+//				remove = true;
+//			}
 			
 			/* removing the match if it was flagged */
 			if (remove) {

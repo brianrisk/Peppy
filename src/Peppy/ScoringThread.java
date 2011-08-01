@@ -1,6 +1,5 @@
 package Peppy;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import Math.MathFunctions;
 
@@ -34,7 +33,7 @@ public class ScoringThread implements Runnable {
 			if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
 				firstPeptideIndex = 0;
 			} else {
-				double lowestPeptideMassToConsider = spectrum.getMass() - Properties.spectrumToPeptideMassError;
+				double lowestPeptideMassToConsider = spectrum.getMass() - Properties.precursorTolerance;
 				firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
 				firstPeptideIndex -= 8;
 				if (firstPeptideIndex < 0) firstPeptideIndex = 0;
@@ -42,7 +41,7 @@ public class ScoringThread implements Runnable {
 			
 			
 			//find the last index, compensate for rounding error
-			double highestPeptideMassToConsider = spectrum.getMass() + Properties.spectrumToPeptideMassError;
+			double highestPeptideMassToConsider = spectrum.getMass() + Properties.precursorTolerance;
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
 			lastPeptideIndex += 8;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;

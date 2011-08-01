@@ -95,8 +95,8 @@ public class TestSetCharacteristics {
 			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
 				theoreticalPeakMass -= AminoAcids.getWeightMono(peptideString.charAt(i));
-				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+				theoreticalPeakLeft = theoreticalPeakMass - Properties.fragmentTolerance;
+				theoreticalPeakRight = theoreticalPeakMass + Properties.fragmentTolerance;
 				maxIntensity = -1;
 				for(Peak peak: peaks) {
 					peakMass = peak.getMass();
@@ -118,8 +118,8 @@ public class TestSetCharacteristics {
 			theoreticalPeakMass = Properties.leftIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
 				theoreticalPeakMass += AminoAcids.getWeightMono(peptideString.charAt(i));
-				theoreticalPeakLeft = theoreticalPeakMass - Properties.peakDifferenceThreshold;
-				theoreticalPeakRight = theoreticalPeakMass + Properties.peakDifferenceThreshold;
+				theoreticalPeakLeft = theoreticalPeakMass - Properties.fragmentTolerance;
+				theoreticalPeakRight = theoreticalPeakMass + Properties.fragmentTolerance;
 				maxIntensity = -1;
 				for(Peak peak: peaks) {
 					peakMass = peak.getMass();

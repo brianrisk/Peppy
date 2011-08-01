@@ -113,7 +113,7 @@ public class TestSetReduce {
 				if (peptide.getMass() < Properties.peptideMassThreshold) continue;
 				
 				//see that the difference between the predicted mass and the precursor mass is within tolerance
-				if (Math.abs(peptide.getMass() - spectrum.getMass()) > Properties.spectrumToPeptideMassError) {
+				if (Math.abs(peptide.getMass() - spectrum.getMass()) > Properties.precursorTolerance) {
 //					U.p("Peptided outside of mass error range: " + peptide.getAcidSequenceString());
 					continue;
 				}
