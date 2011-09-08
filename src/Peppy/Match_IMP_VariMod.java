@@ -11,6 +11,8 @@ public class Match_IMP_VariMod extends Match {
 	//this is which amino acid we think has the modification
 	boolean [] potentialPlacesForModification;
 	
+	public Match_IMP_VariMod() {}
+	
 	public Match_IMP_VariMod(Spectrum spectrum, Peptide peptide) {
 		setSpectrum(spectrum);
 		setPeptide(peptide);
@@ -60,12 +62,13 @@ public class Match_IMP_VariMod extends Match {
 	}
 	
 
-	
+	@Override
 	public void calculateScore() {
 		modificationMass = spectrum.getMass() - peptide.getMass();
 		score = -Math.log(calculateIMP());
 	}
 	
+	@Override
 	public String getScoringMethodName() {return "IMP VariMod";}
 	
 	public double calculateIMP() {
@@ -202,7 +205,15 @@ public class Match_IMP_VariMod extends Match {
 	}
 
 	public boolean hasModification() {
-		return true;
+		return (modificationMass > Properties.fragmentTolerance);
+	}
+	
+	public int getNumberOfModifications() {
+		if (hasModification()) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
 }

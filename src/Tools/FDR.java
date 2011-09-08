@@ -1,4 +1,4 @@
-package Validate;
+package Tools;
 
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
@@ -20,11 +20,13 @@ import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Utilities.U;
 
-public class FPR {
+public class FDR {
 	
+	public static final int Evalue = 1;
+	public static final int IMP = 2;
 	
 	public static void main(String args[]) {
-		U.p("running FPR report...");
+		U.p("running FDR report...");
 		U.startStopwatch();
 		
 		//grab our properties file, set up.
@@ -38,6 +40,9 @@ public class FPR {
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		
+		//This has to be 1 to properly calculate FDR
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//Loading a subset of our spectra
 		U.p("loading spectral files...");
@@ -64,6 +69,7 @@ public class FPR {
 		//getting forwards matches
 		U.p("finding forwards matches...");
 		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
+		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 		Collections.sort(forwardsMatches);
 		
@@ -76,6 +82,7 @@ public class FPR {
 		//getting reverse matches -- need to reload the sequences
 		U.p("finding reverse matches...");
 		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
+		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 		Collections.sort(reverseMatches);
 		
@@ -86,21 +93,65 @@ public class FPR {
 			
 		
 		//Save FPRs
+		calculateFDR(IMP, forwardsMatches, reverseMatches, setSize);
+		calculateFDR(Evalue, forwardsMatches, reverseMatches, setSize);
+		
+		
+		U.stopStopwatch();
+		U.p("done");
+	}
+	
+	private static double getFPR(ArrayList<Point2D.Double> points, double percent) {
+		double out = -1;
+		for (Point2D.Double point: points) {
+			if (point.getX() < percent) out = point.getY();
+		}
+		return out;
+	}
+	
+	private static void printMatches(ArrayList<Match> matches, String fileName) {
+		File reportFile = new File(fileName);
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
+			
+			int upper = 1000;
+			if (matches.size() < upper) upper = matches.size();
+			for (int i = 0; i < upper; i++) {
+				Match match = matches.get(i);
+				pw.println(match.toString());
+			}
+
+			pw.flush();
+			pw.close();
+			
+		} catch (IOException e) {
+			U.p("ERROR: Could not create file writer for our report");
+			e.printStackTrace();
+		}
+	}
+	
+	private static void calculateFDR(int confidenceMethod, ArrayList<Match> forwardsMatches, ArrayList<Match> reverseMatches, int setSize) {
+		//E value FPRs
+		if (confidenceMethod == Evalue) Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		if (confidenceMethod == IMP) Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Collections.sort(forwardsMatches);
+		Collections.sort(reverseMatches);
 		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
 		int forwardsIndex = 0;
-		Point2D.Double point;
+
 		int forwardsSize = forwardsMatches.size();
 		for (int reverseIndex = 0; reverseIndex < reverseMatches.size(); reverseIndex++) {
 			if (forwardsIndex == forwardsSize) break;
 			if (forwardsIndex < 0) forwardsIndex = 0;
-			while (forwardsMatches.get(forwardsIndex).getEValue() < reverseMatches.get(reverseIndex).getEValue()) {
+			
+			while (getConfidenceScore(forwardsMatches.get(forwardsIndex), confidenceMethod) < getConfidenceScore(reverseMatches.get(reverseIndex), confidenceMethod)) {
 				forwardsIndex++;
 				if (forwardsIndex == forwardsSize) break;
 			}
 			if (forwardsIndex == forwardsSize) break;
 			if (forwardsIndex < 0) break;
 			forwardsIndex--;
-			point = new Point2D.Double(((double) (reverseIndex + 1) / (forwardsIndex + 1)), reverseMatches.get(reverseIndex).getEValue());
+			Point2D.Double point = new Point2D.Double(((double) (reverseIndex + 1) / (forwardsIndex + 1)), getConfidenceScore(reverseMatches.get(reverseIndex), confidenceMethod));
 			points.add(point);
 		}
 		
@@ -111,7 +162,7 @@ public class FPR {
 		int total01 = 0;
 		double percent01 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
-			if (forwardsMatches.get(i).getEValue() <= fpr01) {
+			if (getConfidenceScore(forwardsMatches.get(i), confidenceMethod) <= fpr01) {
 				total01++;
 			} else {
 				break;
@@ -123,7 +174,7 @@ public class FPR {
 		int total05 = 0;
 		double percent05 = 0;
 		for (int i = 0; i < forwardsMatches.size(); i++) {
-			if (forwardsMatches.get(i).getEValue() <= fpr05) {
+			if (getConfidenceScore(forwardsMatches.get(i), confidenceMethod) <= fpr05) {
 				total05++;
 			} else {
 				break;
@@ -156,13 +207,19 @@ public class FPR {
 			uniqueSpectrumIDsFivePercent.put(ID, ID);
 		}
 			
-		File fprFile = new File("FPR-" + scoreName + ".txt");
+		File fprFile = null;
+		if (confidenceMethod == Evalue) fprFile = new File("FPR-E-" + Properties.scoringMethodName + ".txt");
+		if (confidenceMethod == IMP) fprFile = new File("FPR-IMP-" + Properties.scoringMethodName + ".txt");
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(fprFile)));
 			
+			//set up percent formatting
+			NumberFormat nfPercent = NumberFormat.getPercentInstance();
+			nfPercent.setMaximumFractionDigits(2);
+			
 			//print header
-			pw.println("scoring system used: " + scoreName);
-			pw.println("number of spectra in our set: " + spectra.size());
+			pw.println("scoring system used: " + Properties.scoringMethodName);
+			pw.println("number of spectra in our set: " + setSize);
 			pw.println("precursor tolerance: " + Properties.precursorTolerance);
 			pw.println("peak tolerance: " + Properties.fragmentTolerance);
 			pw.println();
@@ -190,41 +247,28 @@ public class FPR {
 			pw.flush();
 			pw.close();
 			
-		} catch (IOException e) {
-			U.p("ERROR: Could not create file writer for our report");
-			e.printStackTrace();
-		}
-		U.stopStopwatch();
-		U.p("done");
-	}
-	
-	private static double getFPR(ArrayList<Point2D.Double> points, double percent) {
-		double out = -1;
-		for (Point2D.Double point: points) {
-			if (point.getX() < percent) out = point.getY();
-		}
-		return out;
-	}
-	
-	private static void printMatches(ArrayList<Match> matches, String fileName) {
-		File reportFile = new File(fileName);
-		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
-			
-			int upper = 1000;
-			if (matches.size() < upper) upper = matches.size();
-			for (int i = 0; i < upper; i++) {
-				Match match = matches.get(i);
-				pw.println(match.toString());
-			}
-
-			pw.flush();
-			pw.close();
+			/* saves a list of the masses along with the ion count */
+//			if (confidenceMethod == Evalue) {
+//				pw = new PrintWriter(new BufferedWriter(new FileWriter("ioncount.txt")));
+//				for (Match match: forwardsMatches) {
+//					if (match.getEValue() < fpr01) {
+//						pw.println(match.getPeptide().getMass() + "," + match.getIonMatchTally());
+//					}
+//				}
+//			}
+//			pw.flush();
+//			pw.close();
 			
 		} catch (IOException e) {
 			U.p("ERROR: Could not create file writer for our report");
 			e.printStackTrace();
 		}
+	}
+	
+	private static double getConfidenceScore(Match match, int confidenceMethod) {
+		if (confidenceMethod == Evalue) return match.getEValue();
+		if (confidenceMethod == IMP) return match.getIMP();
+		return -1;
 	}
 
 }

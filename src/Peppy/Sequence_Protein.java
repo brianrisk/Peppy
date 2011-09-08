@@ -42,6 +42,7 @@ public class Sequence_Protein extends Sequence {
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, true);
 		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins);
+		if (peptides.size() == 0) return null; //TODO fix.  there is the (small) possibility that this may return null and there are still proteins left to digest.
 		return peptides;
 	}
 	

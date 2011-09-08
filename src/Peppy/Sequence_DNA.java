@@ -54,6 +54,9 @@ public class Sequence_DNA extends Sequence{
 		/* initialize where we will hold the peptides */
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		
+		/* this will help us know when to clear our nucleotide data */
+		boolean atLastBit = false;
+		
 		//if this is the first time we've tried to extract peptides
 		if (!Properties.useSequenceRegion) {
 			if (stopIndex == 0) {
@@ -66,7 +69,8 @@ public class Sequence_DNA extends Sequence{
 					stopIndex = Properties.digestionWindowSize;
 					nucleotideSequenceIndex++;
 					if (nucleotideSequenceIndex >= nucleotideSequences.size()) {
-						return peptides;
+						clearNucleotideSequences();
+						return null;
 					} else {
 						nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
 					}
@@ -76,19 +80,26 @@ public class Sequence_DNA extends Sequence{
 				}
 			}
 			//overshoot correction
-			if (stopIndex > nucleotideSequence.getSequence().length()) {
+			if (stopIndex >= nucleotideSequence.getSequence().length()) {
 				stopIndex = nucleotideSequence.getSequence().length();
+				if (nucleotideSequences.size() == nucleotideSequenceIndex - 1) {
+					atLastBit = true;
+				}
 			}
 		} else {
 			//if we've already extracted the region
 			if (stopIndex == Properties.sequenceRegionStop) {
 				//signal that we've finished
-				return peptides;
+				clearNucleotideSequences();
+				return null;
 			} else {
 				startIndex = Properties.sequenceRegionStart;
 				stopIndex = Properties.sequenceRegionStop;
+				atLastBit = true;
 			}
 		}
+		
+
 		
 		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
 		
@@ -123,6 +134,13 @@ public class Sequence_DNA extends Sequence{
 		for (DigestionThread_DNA digestor: digestors) {
 			peptides.addAll(digestor.getPeptides());
 		}
+		
+		/* free up nucleotides */
+		if(atLastBit) {
+			clearNucleotideSequences();
+		}
+		
+		/* return */
 		return peptides;
 	}
 	
@@ -202,13 +220,21 @@ public class Sequence_DNA extends Sequence{
 	//clears nucleotide data
 	//resets index variables
 	public void reset() {
-		if (nucleotideSequences != null) {
-			nucleotideSequences.clear();
-		}
+		clearNucleotideSequences();
 		nucleotideSequences = null;
 		startIndex = 0;
 		stopIndex = 0;
 		nucleotideSequenceIndex = 0;
+	}
+
+	private void clearNucleotideSequences() {
+		if (nucleotideSequences != null) {
+			for (Nucleotides seq: nucleotideSequences) {
+				seq.clearSequenceData();
+			}
+			nucleotideSequences.clear();
+		}
+		System.gc();
 	}
 
 }

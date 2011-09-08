@@ -8,6 +8,7 @@ import java.util.Collections;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
 import Peppy.Peak;
+import Peppy.Properties;
 import Peppy.Spectrum;
 
 public class SpectrumHTMLPage extends HTMLPage {
@@ -120,7 +121,12 @@ public class SpectrumHTMLPage extends HTMLPage {
 		printTD(peptideLine.toString());
 		
 		//sequence name
-		printTD(match.getPeptide().getProtein().getName());
+		if (Properties.useSpliceVariants) {
+			printTD("NULL");
+		} else {
+			printTD(match.getPeptide().getProtein().getName());
+		}
+		
 		
 		//start / stop
 		printTD( match.getPeptide().getStartIndex() + ", " + match.getPeptide().getStopIndex());

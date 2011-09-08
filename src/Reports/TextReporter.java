@@ -146,7 +146,11 @@ public class TextReporter {
 				if (Peppy.Properties.isSequenceFileDNA) {
 					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
 					sb.append('\t');
-					sb.append(match.getPeptide().getProtein().getName());
+					if (Properties.useSpliceVariants) {
+						sb.append("null");
+					} else {
+						sb.append(match.getPeptide().getProtein().getName());
+					}
 					sb.append('\t');
 					sb.append(match.getPeptide().getIntronStartIndex());
 					sb.append('\t');

@@ -127,45 +127,46 @@ public class TestSet {
 
 	public void cleanMatches() {
 		/* Do a little house cleaning */
-		Peppy.Peppy.assignRankToMatches(positiveMatches);
-		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
-		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
+//		Peppy.Peppy.assignRankToMatches(positiveMatches);
+//		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
+//		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
 		
 		/* remove duplicate matches */
-		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
-		Collections.sort(positiveMatches);
-		Match theMatch;
-		Match previousMatch = positiveMatches.get(0);
-		for (int i = 1; i < positiveMatches.size(); i++) {
-			theMatch = positiveMatches.get(i);
-			
-			if (theMatch.getPeptide().equals(previousMatch.getPeptide()) ) {
-				if (theMatch.getSpectrum().getId() == previousMatch.getSpectrum().getId()) {
-					positiveMatches.remove(i);
-					i--;
-				}
-			} else {
-				previousMatch = theMatch;
-			}
-		}
+//		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+//		Collections.sort(positiveMatches);
+//		Match theMatch;
+//		Match previousMatch = positiveMatches.get(0);
+//		for (int i = 1; i < positiveMatches.size(); i++) {
+//			theMatch = positiveMatches.get(i);
+//			
+//			if (theMatch.getPeptide().equals(previousMatch.getPeptide()) ) {
+//				if (theMatch.getSpectrum().getId() == previousMatch.getSpectrum().getId()) {
+//					positiveMatches.remove(i);
+//					i--;
+//				}
+//			} else {
+//				previousMatch = theMatch;
+//			}
+//		}
+		positiveMatches = Peppy.Peppy.reduceMatchesToOnePerSpectrum(positiveMatches);
 		
 		/*removing matches with low rank */
-		Match match;
-		int size = positiveMatches.size();
-		for (int i = 0; i < size; i++) {
-			
-			
-			/* get our match */
-			match = positiveMatches.get(i);
-			
-			/* remove matches with low rank */
-			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
-				positiveMatches.remove(i);
-				size--;
-				i--;
-			}
-			
-		}
+//		Match match;
+//		int size = positiveMatches.size();
+//		for (int i = 0; i < size; i++) {
+//			
+//			
+//			/* get our match */
+//			match = positiveMatches.get(i);
+//			
+//			/* remove matches with low rank */
+//			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
+//				positiveMatches.remove(i);
+//				size--;
+//				i--;
+//			}
+//			
+//		}
 	}
 	
 	
@@ -239,7 +240,7 @@ public class TestSet {
 				eValueAtFivePercentError = match.getEValue();
 			}
 		}
-		U.p("highestIMP for true found in " + testName + ": " + highestIMP);
+//		U.p("highestIMP for true found in " + testName + ": " + highestIMP);
 		//count total true
 		for (MatchContainer match: testedMatches) {
 			if (match.isTrue()) totalTrueTally++;

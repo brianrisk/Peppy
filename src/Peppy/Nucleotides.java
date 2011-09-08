@@ -31,5 +31,9 @@ public class Nucleotides {
 	public Sequence_DNA getParentSequence() {
 		return parentSequence;
 	}
+	
+	public void clearSequenceData() {
+		sequence = null;
+	}
 
 }

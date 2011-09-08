@@ -32,27 +32,28 @@ public class MascotReader {
 		
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		testSets.add(getTestSet(
-				"reports/Mascot/ecoli.txt",
+				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/ecoli.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
 				"ecoli",
 				Color.red
 		));
 		
 		testSets.add(getTestSet(
-				"reports/Mascot/kapp.txt",
+				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/kapp.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
 				"human",
 				Color.blue
 		));
 		
 		testSets.add(getTestSet(
-				"reports/Mascot/aurum.txt",
+				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/aurum.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
 				"aurum",
 				Color.green
 		));
 		
 		for (TestSet test: testSets) {
+			test.cleanMatches();
 			test.calculateStastics();
 		}
 		
@@ -76,6 +77,8 @@ public class MascotReader {
 		
 		//get the matches that correspond with the spectra
 		ArrayList<Match> matches = extractMatchesFromFile(matchesFile, spectra);
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Collections.sort(matches);
 		
 		return new TestSet(testLocation, testName, matches, color);
 	}

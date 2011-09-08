@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import Peppy.AminoAcids;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
@@ -20,13 +21,15 @@ import Utilities.U;
 public class ExportPeptideList {
 	
 	public static void main(String args[]) {
+		init("properties.txt");
+		
 		U.p("exporting peptide list");
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		try {
 			//loop through each sequence in the sequences ArrayList
-			File peptidesFolder = new File ("peptides");
+			File peptidesFolder = new File ("exported peptides");
 			peptidesFolder.mkdir();
 			for (Sequence sequence: sequences) {
 				U.p("working on sequence " + sequence.getSequenceFile().getName());
@@ -49,6 +52,13 @@ public class ExportPeptideList {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public static void init(String propertiesFile) {
+		System.setProperty("java.awt.headless", "true"); 
+		Properties.loadProperties(propertiesFile);
+		AminoAcids.init();
 	}
 
 }

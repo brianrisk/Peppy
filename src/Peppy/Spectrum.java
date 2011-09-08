@@ -50,6 +50,13 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double massPlusMargin;
 	private double massMinusMargin;
 	
+	private static int sortTracker = 0;
+	public final static int SORT_BY_MASS = sortTracker++;
+	public final static int SORT_BY_ID = sortTracker++;
+	
+	//default is that we sort matches by MASS
+	private static int sortParameter = SORT_BY_MASS;
+	
 	public Spectrum() {
 		peaks = new ArrayList<Peak>();
 	}
@@ -741,13 +748,25 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	
 
 	public int compareTo(Spectrum other) {
-		if (mass > other.getMass()) return  1;
-		if (mass < other.getMass()) return -1;
-		return  0;
+		if (sortParameter == SORT_BY_MASS) {
+			if (mass > other.getMass()) return  1;
+			if (mass < other.getMass()) return -1;
+			return  0;
+		}
+		if (sortParameter == SORT_BY_ID) {
+			if (id > other.getId()) return  1;
+			if (id < other.getId()) return -1;
+			return  0;
+		}
+		return 0;
 	}
 	
+	public static void setSortParameter(int sortParameter) {
+		Spectrum.sortParameter = sortParameter;
+	}
+
 	public void clearEValues() {
-		eValueCalculator = null;
+		eValueCalculator = new EValueCalculator();
 	}
 
 	

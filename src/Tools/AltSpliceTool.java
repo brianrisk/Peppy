@@ -99,7 +99,7 @@ public class AltSpliceTool {
 		
 		//performing alternative splicing
 		U.p("digesting " + chrName + " from " + startIndex + " to " + stopIndex + "...");
-		RNA_Sequence rna = new RNA_Sequence(sequence_DNA.getNucleotideSequences().get(0), startIndex, stopIndex);
+		RNA_Sequence rna = new RNA_Sequence(sequence_DNA, sequence_DNA.getNucleotideSequences().get(0), startIndex, stopIndex);
 		rna.printStats();
 		RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
 		ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();

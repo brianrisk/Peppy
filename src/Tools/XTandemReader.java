@@ -39,7 +39,7 @@ public class XTandemReader {
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		
 		testSets.add(getTestSet(
-			"reports/X!Tandem reports/EColi",
+			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/EColi",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"ecoli",
 			Color.red,
@@ -47,7 +47,7 @@ public class XTandemReader {
 		));
 		
 		testSets.add(getTestSet(
-			"reports/X!Tandem reports/Kapp",
+			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Kapp",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"human",
 			Color.blue,
@@ -55,7 +55,7 @@ public class XTandemReader {
 		));
 		
 		testSets.add(getTestSet(
-			"reports/X!Tandem reports/Aurum",
+			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Aurum",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"aurum",
 			Color.green,
@@ -65,6 +65,7 @@ public class XTandemReader {
 		
 		
 		for (TestSet test: testSets) {
+			test.cleanMatches();
 			test.calculateStastics();
 		}
 		

@@ -40,10 +40,10 @@ public class ValidationReport {
 		setUp();
 		addTests();
 		U.startStopwatch();
-		createListOfPeptidesNotFoundInTheDatabase();
-//		if (doForwards) forwards();
+//		createListOfPeptidesNotFoundInTheDatabase();
+		if (doForwards) forwards();
 //		if (doReverse) reverse();
-//		createReport();
+		createReport();
 //		createWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
@@ -81,12 +81,12 @@ public class ValidationReport {
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		Properties.maxEValue = 1;
+		Properties.maxIMP = 0.0001;
 		
 		//What scoring mechanism?
 //		Properties.scoringMethodName = "Peppy.Match_Fake";
-//		Properties.scoringMethodName = "Peppy.Match_IMP";
-		Properties.scoringMethodName = "Peppy.Match_TandemFit";
+		Properties.scoringMethodName = "Peppy.Match_IMP";
+//		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 //		Properties.scoringMethodName = "Peppy.Match_HMM";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
@@ -107,8 +107,8 @@ public class ValidationReport {
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 //		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	
@@ -125,7 +125,7 @@ public class ValidationReport {
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
 			
 		/* repeat extracting peptides until end of sequence has been reached */
-		while (peptides.size() > 0) {
+		while (peptides != null) {
 			/* track database size */
 			forwardsDatabaseSize += peptides.size();
 			

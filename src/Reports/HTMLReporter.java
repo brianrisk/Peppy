@@ -75,13 +75,10 @@ public class HTMLReporter {
 				if (spectrumID != match.getSpectrum().getId()) {
 					spectrumID = match.getSpectrum().getId();
 					matchRank = 1;
-					if (match.getEValue() < Peppy.Properties.maxEValue) {
-						bestMatches.add(match);
-					}
+					bestMatches.add(match);
 				} else {
 					matchRank++;
 				}
-//				match.setRank(matchRank);
 				if (matchRank == 2) {
 					scoreRatio = previousMatch.getScore() / match.getScore();
 					previousMatch.setScoreRatio(scoreRatio);
@@ -89,8 +86,7 @@ public class HTMLReporter {
 				previousMatch = match;
 			}
 			
-			//sort our best matches by score ratio
-//			Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
+			//sort our best matches
 			Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 			Collections.sort(bestMatches);
 			
@@ -139,7 +135,11 @@ public class HTMLReporter {
 				
 				
 				sb.append("<td>");
-				sb.append(match.getPeptide().getProtein().getName());
+				if (Properties.useSpliceVariants) {
+					sb.append("null");
+				} else {
+					sb.append(match.getPeptide().getProtein().getName());
+				}
 				sb.append("</td>");
 				
 				sb.append("<td>");

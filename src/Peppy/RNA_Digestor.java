@@ -155,7 +155,7 @@ public class RNA_Digestor {
 										intronStartIndex,
 										intronStopIndex,
 										isForward,
-										null,
+										rna.getSequenceFile(),
 										(spliceLocation != -1)
 										);
 							}
@@ -220,7 +220,7 @@ public class RNA_Digestor {
 						intronStartIndex,
 						intronStopIndex,
 						isForward,
-						null,
+						rna.getSequenceFile(),
 						(spliceLocation != -1)
 						);
 			}

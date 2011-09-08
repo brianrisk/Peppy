@@ -27,7 +27,8 @@ import Utilities.U;
 public class FindOptimialParameters {
 	
 	public static void main(String[] args) {	
-		findOptimalParameters();
+//		findOptimalParameters();
+		findOptimalTandemFitExponent();
 		U.p("done.");
 	}
 	
@@ -47,7 +48,8 @@ public class FindOptimialParameters {
 		
 		//set up our tests
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-		TestSet test = new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY);
+//		TestSet test = new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY);
+		TestSet test = new TestSet(testDirectoryName, "aurum", Color.DARK_GRAY);
 		
 		//get our peptides
 		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
@@ -58,10 +60,14 @@ public class FindOptimialParameters {
 		NumberFormat numberFormat = NumberFormat.getInstance();
 		numberFormat.setMaximumFractionDigits(2);
 		
+		//where we are saving it
+		File parentDirectory = new File("optimal parameters/" + test.getName());
+		parentDirectory.mkdirs();
+		
 		try {
-			PrintWriter pw = new PrintWriter(new FileWriter(new File ("optimal-parameters-report-005.txt")));
-			PrintWriter prGrid = new PrintWriter(new FileWriter(new File ("PR-grid-00.html5")));
-			PrintWriter fprGrid = new PrintWriter(new FileWriter(new File ("FPR-grid-005.html")));
+			PrintWriter pw = new PrintWriter(new FileWriter(new File (parentDirectory, "optimal-parameters-report-005.txt")));
+			PrintWriter prGrid = new PrintWriter(new FileWriter(new File (parentDirectory, "PR-grid-00.html5")));
+			PrintWriter fprGrid = new PrintWriter(new FileWriter(new File (parentDirectory, "FPR-grid-005.html")));
 			prGrid.println("<html><body><table>");
 			fprGrid.println("<html><body><table>");
 			for (double precursorTolerance = 0.005; precursorTolerance < 0.6; precursorTolerance += 0.005){
@@ -99,6 +105,72 @@ public class FindOptimialParameters {
 			prGrid.close();
 			fprGrid.flush();
 			fprGrid.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+
+		peptides.clear();
+		System.gc();
+		
+	}
+	
+	
+	/**
+	 * When we don't know what the proper value for the fragment tolerance or precursor tolerance
+	 */
+	public static void findOptimalTandemFitExponent() {
+		
+		//how many missed cleavages when we digest
+		Properties.numberOfMissedCleavages = 1;
+		
+		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		
+		//What scoring mechanism?
+		Properties.scoringMethodName = "Peppy.Match_TandemFit";
+		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+		
+		//set up our tests
+		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+		TestSet test = new TestSet(testDirectoryName, "human", Color.DARK_GRAY);
+		
+		//get our peptides
+		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
+		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
+		U.p("peptides created");
+		
+		//report thing
+		NumberFormat numberFormat = NumberFormat.getInstance();
+		numberFormat.setMaximumFractionDigits(5);
+		
+		//where we are saving it
+		File parentDirectory = new File("optimal parameters/" + test.getName());
+		parentDirectory.mkdirs();
+		
+		try {
+			PrintWriter pw = new PrintWriter(new FileWriter(new File (parentDirectory, "aryaScore-exponent-performance.txt")));
+			for (double peakIntensityExponent = 0.00; peakIntensityExponent < 1.0; peakIntensityExponent += 0.01){
+
+
+				Properties.peakIntensityExponent = peakIntensityExponent;
+				test.resetTest();
+				test.findPositiveMatches(peptides);
+				test.cleanMatches();
+				test.calculateStastics();
+				String reportString = 
+					numberFormat.format(peakIntensityExponent) + "," +
+					test.getTrueTally() + "," +
+					test.getPercentAtFivePercentError() + "," +
+					test.getAreaUnderPRCurve();
+				U.p(reportString);
+				pw.println(reportString);
+
+			}
+
+			pw.flush();
+			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -492,7 +492,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			sb.append('\t');
 			sb.append(getPeptide().isSpliced());
 		} else {
-			sb.append(getPeptide().getProtein().getName());
+			if (getPeptide().getProtein() != null) {
+				sb.append(getPeptide().getProtein().getName());
+			} else {
+				sb.append("null");
+			}
 		}
 		sb.append('\t');
 		sb.append(rank);

@@ -4,6 +4,7 @@ import Utilities.U;
 
 public class RNA_Sequence {
 	
+	Sequence_DNA sequenceFile;
 	Nucleotides DNA;
 	byte [] RNA_5to3 = null;
 	byte [] RNA_3to5 = null;
@@ -25,6 +26,56 @@ public class RNA_Sequence {
 	private boolean [] reverseBranchLocations = null;
 	private boolean [] reverseStopLocations = null;
 	
+	/**
+	 * Assumes start < stop
+	 * Assumes stop is an inclusive index
+	 * @param dna
+	 * @param start
+	 * @param stop
+	 */
+	public RNA_Sequence (Sequence_DNA sequenceFile, Nucleotides dna, int start, int stop) {
+		this.sequenceFile = sequenceFile;
+		DNA = dna;
+		this.start = start;
+		this.stop = stop;
+		this.length = stop - start + 1;
+		RNA_5to3 = new byte[length];
+		RNA_3to5 = new byte[length];
+		
+		String DNAsequence = dna.getSequence();
+		//convert the DNA to our forwards RNA strand
+		for (int i = start; i < stop; i++) {
+			RNA_5to3[i - start] = DNAtoRNA(DNAsequence.charAt(i));
+		}
+	
+		//convert the RNA to the compliment
+		for (int i = 0; i < length; i++) {
+			//note that I'm putting it in reverse order
+			RNA_3to5[i] = getRNACompliment(RNA_5to3[length - i - 1]);
+		}
+		
+		//find our splices
+		forwardsStartLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {forwardsStartLocations[i] = false;}
+		forwardsBranchLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {forwardsBranchLocations[i] = false;}
+		forwardsStopLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {forwardsStopLocations[i] = false;}
+		
+		reverseStartLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {reverseStartLocations[i] = false;}
+		reverseBranchLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {reverseBranchLocations[i] = false;}
+		reverseStopLocations = new boolean[length];
+		for (int i = 0; i < length; i++) {reverseStopLocations[i] = false;}
+		
+		findSpliceLocations();
+	}
+
+	public Sequence_DNA getSequenceFile() {
+		return sequenceFile;
+	}
+
 	public static final double beliveableStartProbability = 0.01;
 	public static final double beliveableBranchProbability = 0.00;
 	public static final double beliveableStopProbability = 0.08;
@@ -66,51 +117,6 @@ public class RNA_Sequence {
 		if (rna == BASE_C) return true;
 		if (rna == BASE_U) return true;
 		return false;
-	}
-	
-	/**
-	 * Assumes start < stop
-	 * Assumes stop is an inclusive index
-	 * @param dna
-	 * @param start
-	 * @param stop
-	 */
-	public RNA_Sequence (Nucleotides dna, int start, int stop) {
-		DNA = dna;
-		this.start = start;
-		this.stop = stop;
-		this.length = stop - start + 1;
-		RNA_5to3 = new byte[length];
-		RNA_3to5 = new byte[length];
-		
-		String DNAsequence = dna.getSequence();
-		//convert the DNA to our forwards RNA strand
-		for (int i = start; i < stop; i++) {
-			RNA_5to3[i - start] = DNAtoRNA(DNAsequence.charAt(i));
-		}
-
-		//convert the RNA to the compliment
-		for (int i = 0; i < length; i++) {
-			//note that I'm putting it in reverse order
-			RNA_3to5[i] = getRNACompliment(RNA_5to3[length - i - 1]);
-		}
-		
-		//find our splices
-		forwardsStartLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {forwardsStartLocations[i] = false;}
-		forwardsBranchLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {forwardsBranchLocations[i] = false;}
-		forwardsStopLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {forwardsStopLocations[i] = false;}
-		
-		reverseStartLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {reverseStartLocations[i] = false;}
-		reverseBranchLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {reverseBranchLocations[i] = false;}
-		reverseStopLocations = new boolean[length];
-		for (int i = 0; i < length; i++) {reverseStopLocations[i] = false;}
-		
-		findSpliceLocations();
 	}
 	
 	public void checkCD44Sites() {

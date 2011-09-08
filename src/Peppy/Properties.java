@@ -35,7 +35,7 @@ public class Properties {
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;
 	public static int numberOfHighIntensityPeaksToRetain = 100;
-	public static int minimumNumberOfPeaksForAValidSpectrum = 4;
+	public static int minimumNumberOfPeaksForAValidSpectrum = 20;
 	
 	//ignore spectra with large charges
 	public static boolean ignoreSpectraWithChargeGreaterThanTwo = false;
@@ -55,9 +55,9 @@ public class Properties {
 	public static boolean useReverseDatabase = false;
 	
 	//Segmenting up job for memory management
-	public static int numberOfSpectraPerSegment = 10000;
+	public static int numberOfSpectraPerSegment = 60000;
 	public static int digestionWindowSize = 10000000;
-	public static int desiredPeptideDatabaseSize = 20000000;
+	public static int desiredPeptideDatabaseSize = 10000000;
 	public static int maxNumberOfProteinsToLoadAtOnce = 50000;
 	
 	//Splicing?
@@ -84,7 +84,7 @@ public class Properties {
 	
 	//cut offs.  sexy, sexy cutoffs.
 	public static double maxEValue = 0.1;
-	public static double maxIMP = 0.00001;
+	public static double maxIMP = 0.0000000001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");

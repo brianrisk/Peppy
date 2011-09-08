@@ -68,11 +68,12 @@ public class Peppy {
 		if (Properties.useSpliceVariants) {
 			//gets the first nucleotide sequence in the first sequence file
 			Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
-			RNA_Sequence rna = new RNA_Sequence(sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
+			RNA_Sequence rna = new RNA_Sequence(sequenceFile, sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
 			
-			U.p("digesting...");
+			U.p("digesting with splice variants...");
 			RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
 			ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
+			U.p("generated " + peptides.size() + " peptides");
 			
 			U.p("getting matches...");
 			//TODO get rid of this getMatches function when this is overhauled
@@ -80,7 +81,7 @@ public class Peppy {
 			
 		} else {	
 			if (Properties.useSequenceRegion) {
-				U.p("digesting on part of sequence");
+				U.p("digesting part of sequence");
 				ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
 				oneSequenceList.add(sequences.get(0));
 				sequences = oneSequenceList;
@@ -218,28 +219,44 @@ public class Peppy {
 				/* This is where we get a chunk of peptides */
 				ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
 				
-				while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
-					
-					/* clear previous chunk of peptides and reclaim memory */
-					peptideSegment.clear();
-					System.gc();
+				/* if we use a region, extract that region, else go through all sequences getting a chunk at a time. */
+				if (Properties.useSequenceRegion) {
 					
 					/* collect peptides */
 					peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
+					peptides.addAll(peptideSegment);
 					
-					/* advance to the next sequence if we don't have any more peptides in this sequence */
-					if (peptideSegment.size() == 0) {
-						sequences.get(sequenceIndex).reset();
-						sequenceIndex++;
+					/* reset the sequence so that the next batch of spectra can scan it */
+					sequences.get(sequenceIndex).reset();
 					
-					/* add peptides to the main list if we have some to add */
-					} else {
-						peptides.addAll(peptideSegment);
-					}
-					
-					/* if we have advanced past the last sequence, then exit this loop */
-					if (sequenceIndex == sequences.size()) {
-						break;
+				} else {
+					while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
+						
+						/* clear previous chunk of peptides and reclaim memory */
+						if (peptideSegment != null) {	
+							peptideSegment.clear();
+							System.gc();
+						}	
+						
+						/* collect peptides */
+						peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
+						
+							
+						/* advance to the next sequence if we don't have any more peptides in this sequence */
+						if (peptideSegment == null) {
+							sequences.get(sequenceIndex).reset();
+							sequenceIndex++;
+						
+						/* add peptides to the main list if we have some to add */
+						} else {
+							peptides.addAll(peptideSegment);
+						}
+						
+						
+						/* if we have advanced past the last sequence, then exit this loop */
+						if (sequenceIndex == sequences.size()) {
+							break;
+						}
 					}
 				}
 				
@@ -269,10 +286,11 @@ public class Peppy {
 				peptides.clear();
 				System.gc();
 					
-				
-				if (sequenceIndex == sequences.size()) {
+				/* break if we have covered our last sequence or if we are only using a region */
+				if (sequenceIndex == sequences.size() || Properties.useSequenceRegion) {
 					break;
 				}
+
 			}
 
 			
@@ -280,7 +298,7 @@ public class Peppy {
 			removeDuplicateMatches(segmentMatches);
 			assignConfidenceValuesToMatches(segmentMatches, spectra);
 			assignRankToMatches(segmentMatches);
-			removePoorMatches(segmentMatches);
+			segmentMatches = removePoorMatches(segmentMatches);
 			
 			
 			/* add segment matches to the full list of matches */
@@ -316,12 +334,17 @@ public class Peppy {
 		//This is where the bulk of the processing in long jobs takes
 		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 
-		//Add only matches with a decent e value		
-		removeDuplicateMatches(matches);
+		//Add only matches with a decent e value	
+//		U.p("removing duplicate matches...");
+//		removeDuplicateMatches(matches);
+		U.p("assigning rank to matches...");
 		assignRankToMatches(matches);
+		U.p("assigning repeated peptide count to matches...");
 		assignRepeatedPeptideCount(matches);
+		U.p("assigning confidence values to matches...");
 		assignConfidenceValuesToMatches(matches, spectra);
-		removePoorMatches(matches);
+		U.p("removing poor matches...");
+		matches = removePoorMatches(matches);
 		
 		return matches;
 	}
@@ -463,14 +486,11 @@ public class Peppy {
 	 * @param newMatches
 	 * @param matches
 	 */
-	public static void removePoorMatches(ArrayList<Match> matches) {	
+	public static ArrayList<Match> removePoorMatches(ArrayList<Match> matches) {	
 
-		Match match;
 		boolean remove;
-		for (int i = 0; i < matches.size(); i++) {
-			
-			/* get our match */
-			match = matches.get(i);
+		ArrayList<Match> paredDownMatches = new ArrayList<Match>();
+		for (Match match: matches) {
 			
 			/* the remove flag initially set to false */
 			remove = false;
@@ -481,9 +501,9 @@ public class Peppy {
 			}
 			
 			/* flagging matches with high E values */
-//			if (match.getEValue() > Properties.maxEValue) {
-//				remove = true;
-//			}
+			if (match.getEValue() > Properties.maxEValue) {
+				remove = true;
+			}
 			
 			/* flagging matches with weirdly low E values */
 //			if (match.getIMP() > match.getEValue()) {
@@ -491,17 +511,18 @@ public class Peppy {
 //			}
 			
 			/* removing the match if it was flagged */
-			if (remove) {
-				matches.remove(i);
-				i--;
+			if (!remove) {
+				paredDownMatches.add(match);
 			}
 			
 		}
+		
+		return paredDownMatches;
 	}
 	
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
-		U.p("Proteogenomic mapping software.");
+		U.p("Protein identification / proteogenomic software.");
 		U.p("Developed 2010 by Brian Risk");
 		U.p();
 		
@@ -518,6 +539,23 @@ public class Peppy {
 	protected static void printFarewell() {
 		U.p("max memory used: " + (double) maxMemoryUsed / (1024 * 1024 * 1024) + " gigabytes");
 		U.p("done");
+	}
+
+
+	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
+		Collections.sort(matches);
+		int previousID = -1;
+		int id;
+		ArrayList<Match> out = new ArrayList<Match>();
+		for (Match match: matches) {
+			id = match.getSpectrum().getId();
+			if (id != previousID) {
+				previousID = id;
+				out.add(match);
+			}
+		}
+		return out;
 	}
 	
 	
