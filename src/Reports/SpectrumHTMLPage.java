@@ -19,7 +19,7 @@ public class SpectrumHTMLPage extends HTMLPage {
 	public SpectrumHTMLPage(Spectrum spectrum, ArrayList<Match> matches, File destinationFile) {
 		super(destinationFile);
 		this.spectrum = spectrum;
-		theseMatches =  MatchSearches.getMatchesWithSpectrum(spectrum, matches);
+		theseMatches =  CommonMatchSearches.getMatchesWithSpectrum(spectrum, matches);
 		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(theseMatches);
 	}

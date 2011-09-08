@@ -6,7 +6,13 @@ import Peppy.Match;
 import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 
-public class MatchSearches {
+/**
+ * These are common searches that one might perform on a body of matches
+ * @author Brian Risk
+ *
+ */
+
+public class CommonMatchSearches {
 	
 	public static ArrayList<Match> getMatchesWithSpectrum(Spectrum spectrum, ArrayList<Match> theseMatches) {
 		ArrayList<Match> out = new ArrayList<Match>();

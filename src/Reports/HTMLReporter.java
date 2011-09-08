@@ -271,12 +271,9 @@ public class HTMLReporter {
 		//our report object
 		HTMLPage page;
 		
-		//select which type of spectrum report to give
-		if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
-			page = new SpectrumMultiMod(spectrum, matches, indexFile);
-		} else {
-			page = new SpectrumHTMLPage(spectrum, matches, indexFile);
-		}
+
+		page = new SpectrumHTMLPage(spectrum, matches, indexFile);
+
 		page.makePage();
 	}
 	

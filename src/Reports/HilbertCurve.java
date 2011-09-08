@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import Peppy.Definitions;
 import Peppy.DigestionThread_DNA;
 import Peppy.Nucleotides;
-import Peppy.Definitions;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;

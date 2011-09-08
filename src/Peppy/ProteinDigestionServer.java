@@ -3,8 +3,6 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Utilities.U;
-
 
 public class ProteinDigestionServer {
 	

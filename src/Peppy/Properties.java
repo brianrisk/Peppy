@@ -28,9 +28,6 @@ public class Properties {
 	//Define our scoring method
 	public static String scoringMethodName = "Peppy.Match_IMP";
 	public static MatchConstructor matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-	
-	//TODO need to set up modification possibilities
-	public static ModificationPossibilities modificationPossibilities = new ModificationPossibilities();
 
 	//properties for spectral cleaning
 	public static boolean highIntensityCleaning = false;

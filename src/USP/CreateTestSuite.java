@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import Peppy.Match;
 import Peppy.MatchConstructor;
-import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ScoringThreadServer;
