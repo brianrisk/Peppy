@@ -11,10 +11,10 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Spectrum;
 
-public class MatchHTMLPage extends HTMLPage {
+public class HTMLPageMatch extends HTMLPage {
 	
 	Match match;
-	public MatchHTMLPage(Match match, File destinationFile) {
+	public HTMLPageMatch(Match match, File destinationFile) {
 		super(destinationFile);
 		this.match = match;
 	}

@@ -143,13 +143,8 @@ public class HTMLReporter {
 				sb.append("</td>");
 				
 				sb.append("<td>");
-//				sb.append("<a href=\"neighborhoods/");
-//				sb.append(i);
-//				sb.append(Properties.reportWebSuffix);
-//				sb.append("\">");
 				sb.append(match.getPeptide().getStartIndex());
 				sb.append(" (" + match.getPeptide().getStartIndex() % 3 + ")");
-//				sb.append("</a>");
 				sb.append("</td>");
 				
 				sb.append("<td>");
@@ -272,7 +267,7 @@ public class HTMLReporter {
 		HTMLPage page;
 		
 
-		page = new SpectrumHTMLPage(spectrum, matches, indexFile);
+		page = new HTMLPageSpectrum(spectrum, matches, indexFile);
 
 		page.makePage();
 	}

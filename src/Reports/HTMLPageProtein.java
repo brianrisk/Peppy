@@ -8,12 +8,12 @@ import java.util.Collections;
 import Peppy.Match;
 import Peppy.Protein;
 
-public class ProteinHTMLPage extends HTMLPage{
+public class HTMLPageProtein extends HTMLPage{
 	
 	static Color PINK = new Color(255, 128, 128);
 	private Protein protein;
 	
-	public ProteinHTMLPage(Protein protein, File destinationFile) {
+	public HTMLPageProtein(Protein protein, File destinationFile) {
 		super(destinationFile);
 		this.protein = protein;
 	}
@@ -79,7 +79,7 @@ public class ProteinHTMLPage extends HTMLPage{
 				
 				//make a page for the match
 				File matchFile = new File(destinationFile.getParentFile(), match.getPeptide().getAcidSequenceString() + ".html");
-				MatchHTMLPage matchPage = new MatchHTMLPage(match, matchFile);
+				HTMLPageMatch matchPage = new HTMLPageMatch(match, matchFile);
 				matchPage.makePage();
 			}
 			print("</tbody>");

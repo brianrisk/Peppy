@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import Peppy.Properties;
 import Peppy.Protein;
 
-public class ProteinsHTMLPage extends HTMLPage {
+public class HTMLPageProteins extends HTMLPage {
 	
 	private ArrayList<Protein> proteins;
 	
-	public ProteinsHTMLPage(ArrayList<Protein> proteins, File destinationFile) {
+	public HTMLPageProteins(ArrayList<Protein> proteins, File destinationFile) {
 		super(destinationFile);
 		this.proteins = proteins;
 	}
@@ -41,7 +41,7 @@ public class ProteinsHTMLPage extends HTMLPage {
 			File proteinDir = new File(proteinsDir, protein.getName());
 			proteinDir.mkdirs();
 			File proteinFile = new File(proteinDir, "index.html");
-			ProteinHTMLPage php = new ProteinHTMLPage(protein, proteinFile);
+			HTMLPageProtein php = new HTMLPageProtein(protein, proteinFile);
 			php.makePage();
 			
 			//print out the table row

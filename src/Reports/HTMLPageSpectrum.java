@@ -11,12 +11,12 @@ import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;
 
-public class SpectrumHTMLPage extends HTMLPage {
+public class HTMLPageSpectrum extends HTMLPage {
 
 	ArrayList<Match> theseMatches;
 	Spectrum spectrum;
 	
-	public SpectrumHTMLPage(Spectrum spectrum, ArrayList<Match> matches, File destinationFile) {
+	public HTMLPageSpectrum(Spectrum spectrum, ArrayList<Match> matches, File destinationFile) {
 		super(destinationFile);
 		this.spectrum = spectrum;
 		theseMatches =  CommonMatchSearches.getMatchesWithSpectrum(spectrum, matches);
