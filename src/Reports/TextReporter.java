@@ -11,6 +11,7 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
+import Peppy.Regions;
 import Peppy.Sequence;
 import Peppy.Spectrum;
 import Utilities.U;
@@ -54,7 +55,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 12");
+			pw.println("format version 13");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -122,59 +123,7 @@ public class TextReporter {
 			
 			//print rows
 			for (Match match: matches) {
-				sb = new StringBuffer();
-				sb.append(match.getSpectrum().getId());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getMD5());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getFile().getName());
-				sb.append('\t');
-				sb.append(match.getScore());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getPrecursorMZ());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getMass());
-				sb.append('\t');
-				sb.append(match.getEValue());
-				sb.append('\t');
-				sb.append(match.getPeptide().getAcidSequenceString());
-				sb.append('\t');
-				sb.append(match.getPeptide().getStartIndex());
-				sb.append('\t');
-				sb.append(match.getPeptide().getStopIndex());
-				sb.append('\t');
-				if (Peppy.Properties.isSequenceFileDNA) {
-					sb.append(match.getPeptide().getParentSequence().getSequenceFile().getName());
-					sb.append('\t');
-					if (Properties.useSpliceVariants) {
-						sb.append("null");
-					} else {
-						sb.append(match.getPeptide().getProtein().getName());
-					}
-					sb.append('\t');
-					sb.append(match.getPeptide().getIntronStartIndex());
-					sb.append('\t');
-					sb.append(match.getPeptide().getIntronStopIndex());
-					sb.append('\t');
-					sb.append(match.getPeptide().isForward() ? "+" : "-");
-					sb.append('\t');
-					sb.append(match.getPeptide().isSpliced());
-				} else {
-					sb.append(match.getPeptide().getProtein().getName());
-				}
-				sb.append('\t');
-				sb.append(match.rank);
-				sb.append('\t');
-				sb.append(match.repeatCount);
-				sb.append('\t');
-				sb.append(match.getIonMatchTally());
-				sb.append('\t');
-				sb.append(match.isIsotopeLabeled());
-				sb.append('\t');
-				sb.append(match.getSpectrum().getCharge());
-				sb.append('\t');
-				sb.append(match.getPeptide().getCleavageAcidCount());
-				pw.println(sb);
+				pw.println(match.toString());
 			}
 			
 
@@ -189,6 +138,11 @@ public class TextReporter {
 			U.p("could not read file: " + reportFile.getName());
 			e.printStackTrace();
 		}
+		
+		/* create region report */
+		Regions regions = new Regions(matches, sequences, spectra);
+		regions.createReport(reportDir);
+		regions.clearRegions();
 	}
 	
 	

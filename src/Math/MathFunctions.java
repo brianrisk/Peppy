@@ -2,6 +2,8 @@ package Math;
 
 import java.util.ArrayList;
 
+import Utilities.U;
+
 
 
 
@@ -45,6 +47,17 @@ public class MathFunctions {
 		
 	}
 	
+	public static void main(String args[]) {
+//		int max = 20;
+//		for (int i = 1; i < max; i++) {
+//			U.p(approximateBinomialProbability(max, i, 0.5) / getCachedBinomialProbability50(max, i));
+////			U.p(i + ": " + approximateBinomialProbability(max, i, 0.5));
+////			U.p(cachedNChooseK(max, i) / approximateNChooseK(max, i));
+////			U.p(i + ": " + approximateNChooseK(max, i) / cachedNChooseK(max, i));
+//		}
+//		U.p(approximateBinomialProbability(527, 10, 0.014084507042253521));
+	}
+	
 	public static double cachedLog(int n) {
 		return logs[n];
 	}
@@ -58,7 +71,36 @@ public class MathFunctions {
 	}
 	
 	public static double approximateFactorial(int n) {
-		return Math.exp(n * Math.log(n) - n + 1);
+		if (n == 0) return 1;
+		double out = Math.sqrt(2.0 * Math.PI * n);
+		out *= Math.pow((double) n / Math.E, n);
+		return out;
+	}
+	
+	public static double approximateBinomialProbability(int n, int k, double p) {
+		if (k <= n * p) return 1;
+		double total = 0.0;
+		double mean = n * p;
+		double variance = mean * ( 1.0 - p);
+		for (int i = k; i <= n; i++) {
+			total += gaussian(i, mean, variance);
+		}
+		return total;
+	}
+	
+	public static double approximateSingleBinomialProbability(int n, int k, double p) {
+		double mu = n * p;
+		double sigma = Math.sqrt(mu * ( 1.0 - p));
+		return (k - mu) / sigma;
+	}
+	
+	public static double gaussian(double x, double mean, double variance) {
+		double exponent = - (x - mean) * (x - mean);
+		exponent /= 2.0 * variance;
+		double out = 1.0 / (Math.sqrt(2 * Math.PI * variance));
+		out *= Math.exp(exponent);
+		return out;
+		
 	}
 	
 	public static double getCachedBinomialProbability50(int n, int k) {
@@ -70,7 +112,7 @@ public class MathFunctions {
 		double total = 0.0;
 		double probability;
 		for (int i = k; i <= n; i++) {
-			probability = MathFunctions.cachedNChooseK(n, i);
+			probability = cachedNChooseK(n, i);
 			probability *= Math.pow(p, i);
 			probability *= Math.pow(1 - p, n - i);
 			total += probability;
