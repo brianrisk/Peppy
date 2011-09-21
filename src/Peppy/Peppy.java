@@ -89,6 +89,8 @@ public class Peppy {
 			matches = getMatches(sequences, spectra);
 		}
 		
+		
+		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
 		textReport.generateFullReport();
@@ -349,7 +351,11 @@ public class Peppy {
 		return matches;
 	}
 	
-		
+	/**
+	 * For every spectrum there is one or a set of #1 ranking matches, #2 ranking matches, etc
+	 * There can be a set because the same peptide can appear in multiple places within a genome
+	 * @param matches
+	 */
 	public static void assignRankToMatches(ArrayList<Match> matches) {
 		/* first make sure we have matches */
 		if (matches.size() == 0) return;

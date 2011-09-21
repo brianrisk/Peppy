@@ -482,7 +482,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		if (Properties.isSequenceFileDNA) {
 			sb.append(getPeptide().getParentSequence().getSequenceFile().getName());
 			sb.append('\t');
-			sb.append(getPeptide().getProtein().getName());
+			if (Properties.useSpliceVariants) {
+				sb.append("null");
+			} else {
+				sb.append(getPeptide().getProtein().getName());
+			}
 			sb.append('\t');
 			sb.append(getPeptide().getIntronStartIndex());
 			sb.append('\t');
@@ -492,11 +496,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			sb.append('\t');
 			sb.append(getPeptide().isSpliced());
 		} else {
-			if (getPeptide().getProtein() != null) {
-				sb.append(getPeptide().getProtein().getName());
-			} else {
-				sb.append("null");
-			}
+			sb.append(getPeptide().getProtein().getName());
 		}
 		sb.append('\t');
 		sb.append(rank);

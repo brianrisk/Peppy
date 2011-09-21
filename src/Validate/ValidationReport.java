@@ -18,6 +18,7 @@ import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
+import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
 import Reports.ReportStrings;
 import Utilities.U;

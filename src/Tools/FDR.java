@@ -88,8 +88,8 @@ public class FDR {
 		
 		
 		//printing the matches
-		printMatches(forwardsMatches, "FPR-" + scoreName + "-forwards.txt");
-		printMatches(reverseMatches, "FPR-" + scoreName + "-reverse.txt");
+		printMatches(forwardsMatches, "FDR-" + scoreName + "-forwards.txt");
+		printMatches(reverseMatches, "FDR-" + scoreName + "-reverse.txt");
 			
 		
 		//Save FPRs
@@ -226,12 +226,12 @@ public class FDR {
 			
 			//print results
 			pw.println("database: " + Properties.sequenceDirectoryOrFile.getName());
-			pw.println("1% FPR: " + fpr01);
-			pw.println("percent found at 1% FPR: " + nfPercent.format(percent01));
+			pw.println("1% FDR: " + fpr01);
+			pw.println("percent found at 1% FDR: " + nfPercent.format(percent01));
 			pw.println("number of unique spectra at 1%: " + uniqueSpectrumIDsOnePercent.size());
 			pw.println();
-			pw.println("5% FPR: " + fpr05);
-			pw.println("percent found at 5% FPR: " + nfPercent.format(percent05));
+			pw.println("5% FDR: " + fpr05);
+			pw.println("percent found at 5% FDR: " + nfPercent.format(percent05));
 			pw.println("number of unique spectra at 5%: " + uniqueSpectrumIDsFivePercent.size());
 			pw.println();
 			
@@ -239,7 +239,7 @@ public class FDR {
 			pw.println("mass stats at 1%:");
 			pw.println("average absolute value of mass difference: " + averageAbsMassDifference);
 			pw.println("lowest mass difference: " + lowestMassDifference);
-			pw.println("higest mass difference: " + highestMassDifference);
+			pw.println("highest mass difference: " + highestMassDifference);
 			pw.println();
 			
 			
