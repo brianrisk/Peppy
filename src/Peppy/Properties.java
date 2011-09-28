@@ -45,7 +45,8 @@ public class Properties {
 	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
-	public static double peptideMassThreshold = 500.0;
+	public static double peptideMassMinimum = 500.0;
+	public static double peptideMassMaximum = 2000.0;
 	public static int minPeptideLength = 5;
 	public static int maxPeptideLength = 80;
 	public static boolean useSequenceRegion = false;
@@ -125,6 +126,11 @@ public class Properties {
 	//Multiple Modifications
 	public static double multiModPrecursorMargin = 0.1;
 	
+	/* for testing purposes */
+	public static File testSequence;
+	public static boolean testSequenceIsProtein = true;
+	public static File testDirectory; 
+	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
 		loadProperties(propertiesFile);
@@ -179,7 +185,11 @@ public class Properties {
 		if (propertyName.equals("numberOfMissedCleavages")) 
 			numberOfMissedCleavages =Integer.valueOf(propertyValue);
 		if (propertyName.equals("peptideMassThreshold")) 
-			peptideMassThreshold = Double.valueOf(propertyValue);
+			peptideMassMinimum = Double.valueOf(propertyValue);
+		if (propertyName.equals("peptideMassMinimum")) 
+			peptideMassMinimum = Double.valueOf(propertyValue);
+		if (propertyName.equals("peptideMassMaximum")) 
+			peptideMassMaximum = Double.valueOf(propertyValue);
 		if (propertyName.equals("useSequenceRegion"))
 			useSequenceRegion = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("sequenceRegionStart")) 
@@ -282,6 +292,13 @@ public class Properties {
 		if (propertyName.equals("multiModPrecursorMargin")) 
 			multiModPrecursorMargin = Double.valueOf(propertyValue);
 		
+		/* for testing purposes */
+		if (propertyName.equals("testSequence")) 
+			testSequence = new File(propertyValue);
+		if (propertyName.equals("testSequenceIsProtein")) 
+			testSequenceIsProtein = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("testDirectory")) 
+			testDirectory = new File(propertyValue);
 		
 	}
 
@@ -335,21 +352,22 @@ public class Properties {
 			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
 			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
 			pw.println();
-			pw.println("//no fragments that weigh less than this will be admitted into the fragment list ");
-			pw.println("//units are daltons. ");
-			pw.println("peptideMassThreshold " + Properties.peptideMassThreshold);
+			pw.println("##no fragments that weigh less than this will be admitted into the fragment list ");
+			pw.println("##units are daltons. ");
+			pw.println("peptideMassMinimum " + Properties.peptideMassMinimum);
+			pw.println("peptideMassMaximum " + Properties.peptideMassMaximum);
 			pw.println();
 			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
 			pw.println();
-			pw.println("//splicing ");
+			pw.println("##splicing ");
 			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
 			pw.println();
-			pw.println("//This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
-			pw.println("//it will produce (at least) 35 matches per spectrum ");
-			pw.println("//the final number of results also varies depending on the digestionWindowSize ");
+			pw.println("##This is per sequence file, so if this value is 5 and you use 7 FASTA files ");
+			pw.println("##it will produce (at least) 35 matches per spectrum ");
+			pw.println("##the final number of results also varies depending on the digestionWindowSize ");
 			pw.println("maximumNumberOfMatchesForASpectrum " + Properties.maximumNumberOfMatchesForASpectrum);
 			pw.println();
-			pw.println("//where we store our reports ");
+			pw.println("##where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);
 			pw.println();
 			pw.println();

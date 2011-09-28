@@ -1,13 +1,13 @@
 ##FASTA files can be either DNA or amino acid sequences
-isSequenceFileDNA false
+isSequenceFileDNA true
 sequenceFilesContainMultipleSequences false
 useOnlyForwardsFrames false
 useIsotopeLabeling false
 useReverseDatabase false
 
 ##This could be a directory or a file
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/small
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19/chr11.fa
@@ -23,7 +23,8 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
 
 
 ##This could be a directory or a file
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF/CPTC_ELLS-001_2688_126_2-01
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF/CPTC_ELLS-001_2688_126_2-01
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
@@ -58,9 +59,9 @@ minimumNumberOfPeaksForAValidSpectrum 10
 highIntensityCleaning false
 
 //Parses jobs with a lot of spectra up in to chunks with this max size
-numberOfSpectraPerSegment 60000
+numberOfSpectraPerSegment 1000000
 digestionWindowSize 5000000
-maxNumberOfProteinsToLoadAtOnce 10000
+maxNumberOfProteinsToLoadAtOnce 1000000
 
 //how much precursor mass / theoretical mass difference should we tolerate?
 spectrumToPeptideMassError 0.2
@@ -77,7 +78,8 @@ generateSpectrumReport true
 
 //no fragments that weigh less than this will be admitted into the fragment list
 //units are daltons.
-peptideMassThreshold 400.0
+peptideMassMinimum 400.0
+peptideMassMaximum 2000.0
 
 numberOfMissedCleavages 2
 
@@ -89,5 +91,10 @@ maximumNumberOfMatchesForASpectrum 3
 //where we store our reports
 reportDirectory reports
 reportDirectoryTitle report
+
+## for test purposes
+testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
+testSequenceIsProtein true
+testDirectory /Users/risk2/PeppyOverflow/tests/ 
 
 

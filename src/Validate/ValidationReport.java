@@ -18,6 +18,7 @@ import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
+import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
 import Reports.ReportStrings;
@@ -91,9 +92,6 @@ public class ValidationReport {
 //		Properties.scoringMethodName = "Peppy.Match_HMM";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
-
-//		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
-		databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta");
 //		Properties.spectrumToPeptideMassError = 0.01;
 		Properties.precursorTolerance = 2;
 		Properties.fragmentTolerance = 0.3;
@@ -105,7 +103,7 @@ public class ValidationReport {
 	
 	private static void addTests() {
 		//set up which tests we will perform
-		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+		String testDirectoryName = Properties.testDirectory.getAbsolutePath();
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
 		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
@@ -118,9 +116,12 @@ public class ValidationReport {
 	 * Completes a search on all test sets in our list using the correct (forward) digestion of our protein database.
 	 */
 	public static void forwards() {
-
-		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
-//		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
+		Sequence sequence;
+		if (Properties.testSequenceIsProtein) {
+			sequence = new Sequence_Protein(Properties.testSequence);	
+		} else {
+			sequence = new Sequence_DNA(Properties.testSequence);
+		}
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);

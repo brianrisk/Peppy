@@ -160,7 +160,7 @@ public class RNA_Digestor {
 										);
 							}
 							if (peptide != null) {
-								if (peptide.getMass() >= Properties.peptideMassThreshold) {
+								if (peptide.getMass() >= Properties.peptideMassMinimum) {
 									peptides.add(peptide);
 								}
 							}
@@ -225,7 +225,7 @@ public class RNA_Digestor {
 						);
 			}
 			if (peptide != null) {
-				if (peptide.getMass() >= Properties.peptideMassThreshold) {
+				if (peptide.getMass() >= Properties.peptideMassMinimum) {
 					peptides.add(peptide);
 				}
 			}

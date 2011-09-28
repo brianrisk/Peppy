@@ -45,31 +45,46 @@ public class MassListGenerator {
 			peptidesFolder.mkdir();
 			
 			/* set up our hashtable for our masses */
-			Hashtable<Double, Double> masses = new Hashtable<Double, Double>();
+			Hashtable<Double, String> masses = new Hashtable<Double, String>();
 			
 			/* get the peptides for each sequence and add the calculated m/z masses to the list */
 			for (Sequence sequence: sequences) {
 				U.p("working on sequence " + sequence.getSequenceFile().getName());
 				
 				ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
+				
+				/* trim the peptides down to unique peptides */
+				Collections.sort(peptides);
+				Peptide previousPeptide = peptides.get(0);
+				Peptide presentPeptide;
+				for (int i = 1; i < peptides.size(); i++) {
+					presentPeptide = peptides.get(i);
+					if (previousPeptide.equals(presentPeptide)) {
+						peptides.remove(i);
+						i--;
+					} else {
+						previousPeptide = presentPeptide;
+					}
+				}
+				
 				String peptideString;
 				double mass;
 				for (Peptide peptide: peptides) {
 					mass = peptide.getMass();
 					
 					/* adding the mass to our list */
-					masses.put(mass, mass);
+					appendStringInHash(mass, peptide.getAcidSequenceString(), masses);
 					
 					/* calculating mass of potential PTM */
 					/* if oxidation is present, we ignore the possibility of phosphorylation */
 					peptideString = peptide.getAcidSequenceString();
 					if (hasChar('M', peptideString)) {
 						mass += oxidation;
-						masses.put(mass, mass);
+						appendStringInHash(mass, peptide.getAcidSequenceString() + " oxidation", masses);
 					} else {
 						if (hasChar('S', peptideString) || hasChar('T', peptideString) || hasChar('Y', peptideString)) {
 							mass += phosphorylation;
-							masses.put(mass, mass);
+							appendStringInHash(mass, peptide.getAcidSequenceString() + " phosphorylation", masses);
 						}
 					}
 				}
@@ -80,43 +95,44 @@ public class MassListGenerator {
 				U.p(sequence.getSequenceFile().getName() + " digested.");
 			}
 			/* save all possible charges in one list */
-			Hashtable<Double, Double> allMOverZ = new Hashtable<Double, Double>();
+			Hashtable<Double, String> allMOverZ = new Hashtable<Double, String>();
 			
 			/* create the files for the different charges */
 			for (int charge = 1; charge <=4; charge++) {
-				/* set up our mass list file */
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder,U.getFileNameWithoutSuffix(Properties.sequenceDirectoryOrFile) + " charge=" + charge + ".txt"))));
-				
+			
 				/* print each mass */
-				ArrayList<Double> massList = new ArrayList<Double>(masses.values());
+				ArrayList<Double> massList = Collections.list((masses.keys()));
 				Collections.sort(massList);
 				double mOverZ;
-				for (Double d: massList) {
-					mOverZ = (d / charge) + Definitions.HYDROGEN_MONO;
-					if (mOverZ < 2000 && mOverZ > 400) {
-						pw.println(mOverZ);
-						
+				for (Double mass: massList) {
+					mOverZ = (mass / charge) + Definitions.HYDROGEN_MONO;
+					String value = masses.get(mass);
+					if (mOverZ < Properties.peptideMassMaximum && mOverZ > Properties.peptideMassMinimum) {
+
 						/* add this new m/z to our big list */
-						allMOverZ.put(mOverZ, mOverZ);
+						appendStringInHash(new Double(mOverZ), value + ": carge " + charge, allMOverZ);
 					}
 				}
-				
-				pw.flush();
-				pw.close();
+
 			}
 			
 			/* save the full list of m over z */
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder,U.getFileNameWithoutSuffix(Properties.sequenceDirectoryOrFile) + " all charges.txt"))));
+			PrintWriter mOverZFile = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder,U.getFileNameWithoutSuffix(Properties.sequenceDirectoryOrFile) + " mOverZ.txt"))));
+			PrintWriter peptideFile = new PrintWriter(new BufferedWriter(new FileWriter(new File(peptidesFolder,U.getFileNameWithoutSuffix(Properties.sequenceDirectoryOrFile) + " mOverZ and peptide.txt"))));
 			
 			/* print each mass */
-			ArrayList<Double> mOverZList = new ArrayList<Double>(allMOverZ.values());
+			ArrayList<Double> mOverZList = Collections.list(allMOverZ.keys());
 			Collections.sort(mOverZList);
-			for (Double d: mOverZList) {
-				pw.println(d);
+			for (Double key: mOverZList) {
+				String value = allMOverZ.get(key);
+				mOverZFile.println(key);
+				peptideFile.println(key + ", " + value);
 
 			}
-			pw.flush();
-			pw.close();
+			mOverZFile.flush();
+			mOverZFile.close();
+			peptideFile.flush();
+			peptideFile.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -134,6 +150,14 @@ public class MassListGenerator {
 		System.setProperty("java.awt.headless", "true"); 
 		Properties.loadProperties(propertiesFile);
 		AminoAcids.init();
+	}
+	
+	private static void appendStringInHash(Double mass, String value, Hashtable<Double, String> masses) {
+		String tag = masses.get(mass);
+		if (tag != null) {
+			value = tag + ", " + value;
+		} 
+		masses.put(mass, value);
 	}
 
 }

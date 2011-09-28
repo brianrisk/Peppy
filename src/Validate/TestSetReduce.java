@@ -110,7 +110,7 @@ public class TestSetReduce {
 				Peptide peptide = new Peptide(correctAcidSequence);
 				
 				//see that the peptide matches the minimum weight
-				if (peptide.getMass() < Properties.peptideMassThreshold) continue;
+				if (peptide.getMass() < Properties.peptideMassMinimum) continue;
 				
 				//see that the difference between the predicted mass and the precursor mass is within tolerance
 				if (Math.abs(peptide.getMass() - spectrum.getMass()) > Properties.precursorTolerance) {

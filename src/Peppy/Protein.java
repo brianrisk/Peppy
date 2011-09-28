@@ -429,7 +429,7 @@ public class Protein implements Comparable<Protein>{
 					isSpliced);
 			
 			//add peptide if it meets certain criteria
-			if (peptide.getMass() >= Properties.peptideMassThreshold) {
+			if (peptide.getMass() >= Properties.peptideMassMinimum) {
 				peptides.add(peptide);
 			}
 		}
