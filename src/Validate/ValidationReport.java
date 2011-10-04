@@ -39,6 +39,7 @@ public class ValidationReport {
 	 * @param args
 	 */
 	public static void main(String[] args) {	
+		Peppy.Peppy.init(args);
 		setUp();
 		addTests();
 		U.startStopwatch();

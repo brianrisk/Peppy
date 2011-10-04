@@ -93,8 +93,8 @@ reportDirectory reports
 reportDirectoryTitle report
 
 ## for test purposes
-testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
+testSequence /Users/dennis/Downloads/peppy-tests/databases/uniprot_sprot 2011_04.fasta
 testSequenceIsProtein true
-testDirectory /Users/risk2/PeppyOverflow/tests/ 
+testDirectory /Users/dennis/Downloads/peppy-tests/
 
 

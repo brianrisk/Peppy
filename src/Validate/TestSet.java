@@ -62,7 +62,7 @@ public class TestSet {
 		this.color = color;
 		
 		//load spectra for this test
-		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + "/" + testName + "/spectra");
 		
 		setSize = spectra.size();	
 		
