@@ -21,6 +21,7 @@ public class HTMLPageRegions extends HTMLPage {
 		printP("<img src=\"histogram.jpg\">");
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
+		printTH("#");
 		printTH("sequence");
 		printTH("start");
 		printTH("stop");
@@ -37,6 +38,7 @@ public class HTMLPageRegions extends HTMLPage {
 			
 			
 			printTR();
+			printTD("" + i);
 			printTD(region.getSequence().getSequenceFile().getName());
 			printTD("<a href=\"regions/" + regionFile.getName() + "\">" + region.getStartLocation() + "</a>");
 			

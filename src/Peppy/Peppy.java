@@ -206,8 +206,8 @@ public class Peppy {
 			/* loops until we have gone through all of our sequences */
 			while (true) {
 				/* check our memory situation */
-				if (maxMemoryUsed < memoryUsage.getCommitted()) {
-					maxMemoryUsed = memoryUsage.getCommitted();
+				if (maxMemoryUsed < memoryUsage.getUsed()) {
+					maxMemoryUsed = memoryUsage.getUsed();
 				}
 				
 				/* Extract a decent size of peptides.  Sequences may be short, so this

@@ -17,6 +17,8 @@ import Utilities.U;
 
 public class Regions {
 	
+	private int maxLength = 1024;
+	
 	/* where we store the interesting regions */
 	ArrayList<Region> regions = new ArrayList<Region>();
 	
@@ -52,7 +54,7 @@ public class Regions {
 					if (locus != previousLocus) {
 						
 						/* create a new region */
-						regions.add(new Region(locus, 1024, sequence));
+						regions.add(new Region(locus, maxLength, sequence));
 						
 						/* find our new index where we are still building */
 						for (int i = activeRegionIndex; i < regions.size(); i++) {
@@ -113,9 +115,10 @@ public class Regions {
 //				region.setEValue(evc.calculateEValueOfScore(region.getScore()));
 //			}
 			double eValue;
-			double probability = 1.0 / (double) regions.size();
+			//double probability = 1.0 / (double) regions.size();
+			double probability = (double) maxLength / 3000000000.0; // region divided by length of genome 
 			for (Region region: regions) {
-				eValue = MathFunctions.approximateBinomialProbability(spectra.size(), region.getNumberOfMatches(), probability);
+				eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
 				region.setEValue(eValue);
 			}
 

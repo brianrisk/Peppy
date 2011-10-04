@@ -20,11 +20,45 @@ public class HTMLPageRegion extends HTMLPage {
 
 	@Override
 	public void makePage() {
-		printHeader();
+		String regionName = region.getSequence().getSequenceFile().getName() + ": " + region.getStartLocation() + " to " + region.getStopLocation();
+		printHeader(regionName, "<script src=\"http://peppyresearch.com/js/processing.js\"></script>");
 		printP("Sequence: " + region.getSequence().getSequenceFile().getName());
 		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation());
 		printP("region E value: " + region.getEValue());
 		
+		/* get access to the matches */
+		ArrayList<Match> matches = region.getMatches();
+		
+		/* print out the processing section */
+		int frameHeight = 15;
+		int processngHeight = 6 * frameHeight;
+		int processingWidth = 800;
+		print("<script type=\"application/processing\">");
+		print("void setup() {");
+		print("noLoop();");
+		print("size(" + processingWidth + ", " + processngHeight + ");");
+		
+		print("}");
+		print("void draw() {");
+		print("rect(0,0," + (processingWidth - 1) + " ," +  (processngHeight - 1) + ");");
+		print("noStroke();");
+		print("fill(0, 64);"); //a 25% black
+		int x, y, width;
+		y = 0;
+		for(Match match: matches) {
+			x = match.getPeptide().getStartIndex() - region.getStartLocation();
+			x = scaleInt(x, region.getMaxLength(), processingWidth);
+			y =  (match.getPeptide().getStartIndex() % 3) * frameHeight;
+			if (match.getPeptide().isForward()) y += frameHeight * 3;
+			width = match.getPeptide().getStopIndex() - match.getPeptide().getStartIndex();
+			width = scaleInt(width, region.getMaxLength(), processingWidth);
+			print("rect(" + x + ", " + y + ", " + width + ", " + frameHeight + ");");
+		}
+		print("}");
+		print("</script><canvas width=\"" +  region.getMaxLength() + "px\" height=\"" + processngHeight + "px\"></canvas>");
+		
+		
+		/* print out the table */
 		print(ReportStrings.getTableHeader());
 		
 		NumberFormat nfDecimal = NumberFormat.getInstance();
@@ -32,7 +66,7 @@ public class HTMLPageRegion extends HTMLPage {
 		NumberFormat nfPercent = NumberFormat.getPercentInstance();
 		nfPercent.setMaximumFractionDigits(2);
 		
-		ArrayList<Match> matches = region.getMatches();
+		
 		for(Match match: matches) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("<tr>");
@@ -118,6 +152,20 @@ public class HTMLPageRegion extends HTMLPage {
 		
 		printFooter();
 
+	}
+	
+	/**
+	 * math func to let us scale coordinates when we are drawing a region smaller (or larger) than it is.
+	 * @param x
+	 * @param oldWidth
+	 * @param newWidth
+	 * @return
+	 */
+	private int scaleInt(int x, int oldWidth, int newWidth) {
+		double dx = x;
+		dx *= newWidth;
+		dx /= oldWidth;
+		return (int) Math.round(dx);
 	}
 
 }
