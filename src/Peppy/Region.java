@@ -57,6 +57,10 @@ public class Region implements HasEValue, Comparable<Region> {
 		return startLocation;
 	}
 
+	public int getMaxLength() {
+		return maxLength;
+	}
+
 	public Sequence getSequence() {
 		return sequence;
 	}

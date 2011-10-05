@@ -210,6 +210,8 @@ public class Properties {
 			numberOfSpectraPerSegment =Integer.valueOf(propertyValue);
 		if (propertyName.equals("digestionWindowSize")) 
 			digestionWindowSize =Integer.valueOf(propertyValue);
+		if (propertyName.equals("desiredPeptideDatabaseSize")) 
+			desiredPeptideDatabaseSize =Integer.valueOf(propertyValue);
 		if (propertyName.equals("maxNumberOfProteinsToLoadAtOnce")) 
 			maxNumberOfProteinsToLoadAtOnce =Integer.valueOf(propertyValue);
 		

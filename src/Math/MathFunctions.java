@@ -77,6 +77,14 @@ public class MathFunctions {
 		return out;
 	}
 	
+	/**
+	 * Assumes Gaussian distribution is a decent approximation
+	 * http://en.wikipedia.org/wiki/Binomial_distribution#Normal_approximation
+	 * @param n
+	 * @param k
+	 * @param p
+	 * @return
+	 */
 	public static double approximateBinomialProbability(int n, int k, double p) {
 		if (k <= n * p) return 1;
 		double total = 0.0;
@@ -88,19 +96,34 @@ public class MathFunctions {
 		return total;
 	}
 	
+	/**
+	 * Uses the approximation found here:
+	 * http://en.wikipedia.org/wiki/Binomial_probability#Binomial_approximation
+	 * @param n
+	 * @param k
+	 * @param p
+	 * @return
+	 */
 	public static double approximateSingleBinomialProbability(int n, int k, double p) {
 		double mu = n * p;
 		double sigma = Math.sqrt(mu * ( 1.0 - p));
 		return (k - mu) / sigma;
 	}
 	
+	/**
+	 * Assuming a gaussian distribution and given the mean and variance,
+	 * we are finding the value on the curve for x
+	 * @param x
+	 * @param mean
+	 * @param variance
+	 * @return
+	 */
 	public static double gaussian(double x, double mean, double variance) {
 		double exponent = - (x - mean) * (x - mean);
 		exponent /= 2.0 * variance;
 		double out = 1.0 / (Math.sqrt(2 * Math.PI * variance));
 		out *= Math.exp(exponent);
 		return out;
-		
 	}
 	
 	public static double getCachedBinomialProbability50(int n, int k) {
