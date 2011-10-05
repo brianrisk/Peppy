@@ -774,6 +774,13 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		return eValueCalculator.calculateEValueOfScore(score);
 	}
 	
+	/* Assuming: https://github.com/giddingslab/peppy/issues/6
+	 * P value is, roughly, the E value of a match 
+	 * divided by the total number of peptides 
+	 *  to which a spectrum was compared. */
+	public double getPValue(double score) {
+		return this.getEValue(score) / eValueCalculator.getNumberOfMatches();
+	}
 	
 	public String getMD5() {
 		if (MD5 != null) {
