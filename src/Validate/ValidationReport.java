@@ -21,7 +21,6 @@ import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
-import Reports.ReportStrings;
 import Utilities.U;
 
 public class ValidationReport {
@@ -540,7 +539,7 @@ public class ValidationReport {
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(testFile)));
 				
 				//print the header of the file
-				pw.println(ReportStrings.getHeader());
+				//pw.println(ReportStrings.getHeader());
 				pw.println(test.getName());
 				
 				pw.println("number of matches: " + testedMatches.size());

@@ -267,5 +267,38 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		return getMass();
 	}
 	
+	public double getHydrophobicProportion() {
+		double out = 0;
+		for (int i = 0; i < acidSequence.length; i++) {
+			/* (leucine, valine, isoleucine, phenylalanine, methionine, cysteine and tryptophan */
+			if (acidSequence[i] == AminoAcids.G) out++;
+			if (acidSequence[i] == AminoAcids.A) out++;
+			if (acidSequence[i] == AminoAcids.V) out++;
+			if (acidSequence[i] == AminoAcids.L) out++;
+			if (acidSequence[i] == AminoAcids.I) out++;
+			if (acidSequence[i] == AminoAcids.M) out++;
+			if (acidSequence[i] == AminoAcids.F) out++;
+			if (acidSequence[i] == AminoAcids.W) out++;
+			if (acidSequence[i] == AminoAcids.P) out++;
+		}
+		out /= acidSequence.length;
+		return out;
+	}
+	
+	public double getHydrophillicProportion() {
+		double out = 0;
+		for (int i = 0; i < acidSequence.length; i++) {
+			/* (leucine, valine, isoleucine, phenylalanine, methionine, cysteine and tryptophan */
+			if (acidSequence[i] == AminoAcids.S) out++;
+			if (acidSequence[i] == AminoAcids.T) out++;
+			if (acidSequence[i] == AminoAcids.C) out++;
+			if (acidSequence[i] == AminoAcids.Y) out++;
+			if (acidSequence[i] == AminoAcids.N) out++;
+			if (acidSequence[i] == AminoAcids.Q) out++;
+		}
+		out /= acidSequence.length;
+		return out;
+	}
+	
 
 }

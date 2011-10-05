@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Region;
+import Utilities.U;
 
 
-public class HTMLPageRegion extends HTMLPage {
+public class HTMLPageRegion extends HTMLPageMatches {
 	
 	Region region;
 	
 	public HTMLPageRegion(File destinationFile, Region region) {
-		super(destinationFile);
+		super(region.getMatches(), region.getMatches().size(), destinationFile);
 		this.region = region;
 	}
 
@@ -41,7 +42,13 @@ public class HTMLPageRegion extends HTMLPage {
 		print("}");
 		print("void draw() {");
 		print("rect(0,0," + (processingWidth - 1) + " ," +  (processngHeight - 1) + ");");
+		
 		print("noStroke();");
+		
+		/* color to mark reverse frame */
+		print("fill(255,255,0, 64);"); //a 25% yellow
+		print("rect(1,1," + (processingWidth - 1)  + "," + (3 * frameHeight - 1)  + ");");
+		
 		print("fill(0, 64);"); //a 25% black
 		int x, y, width;
 		y = 0;
@@ -54,100 +61,17 @@ public class HTMLPageRegion extends HTMLPage {
 			width = scaleInt(width, region.getMaxLength(), processingWidth);
 			print("rect(" + x + ", " + y + ", " + width + ", " + frameHeight + ");");
 		}
+		/* draw the lines delineating the different frames */
+		print("stroke(64);");
+		for (int i = 0; i < 5; i++) {
+			int lineLevel = (i + 1) * frameHeight;
+			print("line(1," + lineLevel + "," + (processingWidth - 1) + "," + lineLevel + ");");
+		}
 		print("}");
 		print("</script><canvas width=\"" +  region.getMaxLength() + "px\" height=\"" + processngHeight + "px\"></canvas>");
 		
 		
-		/* print out the table */
-		print(ReportStrings.getTableHeader());
-		
-		NumberFormat nfDecimal = NumberFormat.getInstance();
-		nfDecimal.setMaximumFractionDigits(4);
-		NumberFormat nfPercent = NumberFormat.getPercentInstance();
-		nfPercent.setMaximumFractionDigits(2);
-		
-		
-		for(Match match: matches) {
-			StringBuffer sb = new StringBuffer();
-			sb.append("<tr>");
-			
-			sb.append("<td>");
-			sb.append("<a href=\"spectra/");
-			sb.append(match.getSpectrum().getId());
-			sb.append(Properties.reportWebSuffix);
-			sb.append("\">");
-			sb.append(match.getSpectrum().getId());
-			sb.append("</a>");
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getPeptide().getAcidSequenceString());
-			sb.append("</td>");
-			
-//			sb.append("<td>");
-//			sb.append(match.getSpectrum().getFile().getAbsolutePath());
-//			sb.append("</td>");
-			
-			
-			sb.append("<td>");
-			if (Properties.useSpliceVariants) {
-				sb.append("null");
-			} else {
-				sb.append(match.getPeptide().getProtein().getName());
-			}
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getPeptide().getStartIndex());
-			sb.append(" (" + match.getPeptide().getStartIndex() % 3 + ")");
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getPeptide().getStopIndex());
-			sb.append(" (" + match.getPeptide().getStopIndex() % 3 + ")");
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getPeptide().isForward() ? "+" : "-");
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getPeptide().isSpliced());
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getSpectrum().getCharge());
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getNumberOfModifications());
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(nfDecimal.format(match.getScore()));
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getIonMatchTally());
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			double matchPercent = (double) match.getIonMatchTally() / match.getPeptide().getAcidSequence().length;		
-			sb.append(nfPercent.format(matchPercent));
-			sb.append("</td>");
-			
-//			sb.append("<td>");
-//			sb.append(nfDecimal.format(match.getScoreRatio()));
-//			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(match.getEValue());
-			sb.append("</td>");
-			
-			//print out our table row
-			print(sb.toString());
-			
-		}
+		printMatchTable();
 		
 		
 		printFooter();
