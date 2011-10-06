@@ -111,6 +111,27 @@ public class MathFunctions {
 	}
 	
 	/**
+	 * I took the ln of this
+	 * http://en.wikipedia.org/wiki/Binomial_probability#Poisson_probability_function
+	 * @param n
+	 * @param k
+	 * @param p
+	 * @return
+	 */
+	public static double approximateNegativeLog10OfBinomialProbability(int n, int k, double p) {
+		double out = 0;
+		double lamda = n * p;
+		out -= lamda;
+		out += k * Math.log(lamda);
+		for (int i = 1; i <= k; i++) {
+			out -= Math.log(k);
+		}
+		out /= Math.log(10);
+		out *= -1;
+		return out;
+	}
+	
+	/**
 	 * Assuming a gaussian distribution and given the mean and variance,
 	 * we are finding the value on the curve for x
 	 * @param x

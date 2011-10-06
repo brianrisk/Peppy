@@ -55,7 +55,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 13");
+			pw.println("format version 14");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -119,6 +119,10 @@ public class TextReporter {
 			sb.append("Charge");	
 			sb.append('\t');
 			sb.append("CleavageAcidCount");
+			sb.append('\t');
+			sb.append("Hydrophobic");
+			sb.append('\t');
+			sb.append("Hydrophilic");
 			pw.println(sb);		
 			
 			//print rows
@@ -139,10 +143,6 @@ public class TextReporter {
 			e.printStackTrace();
 		}
 		
-		/* create region report */
-		Regions regions = new Regions(matches, sequences, spectra);
-		regions.createReport(reportDir);
-		regions.clearRegions();
 	}
 	
 	

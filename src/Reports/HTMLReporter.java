@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
+import Peppy.Regions;
 import Peppy.Sequence;
 import Peppy.Spectrum;
 import Utilities.U;
@@ -93,11 +94,17 @@ public class HTMLReporter {
 		HTMLPageMatches hpm = new HTMLPageMatches(bestMatches, maxDisplay, indexFile);
 		hpm.makePage();
 
+		/* create spectrum reports */
 		if (Properties.generateSpectrumReport) {
 			for (Match match: bestMatches) {
 				generateSpectrumReport(match.getSpectrum());
 			}
 		}
+		
+		/* create region report */
+		Regions regions = new Regions(matches, sequences, spectra);
+		regions.createReport(reportDir);
+		regions.clearRegions();
 
 	}
 	

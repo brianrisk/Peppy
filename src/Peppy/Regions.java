@@ -115,10 +115,16 @@ public class Regions {
 //				region.setEValue(evc.calculateEValueOfScore(region.getScore()));
 //			}
 			double eValue;
-			//double probability = 1.0 / (double) regions.size();
-			double probability = (double) maxLength / 3000000000.0; // region divided by length of genome 
+			/* this will actually compensate for the fact that we will have less
+			 * regions in reverse searches due to E value cutoffs.  If we assumed the
+			 * same amount of regions (or maxlength / genome size) then it would appear
+			 * that probabilities for the reverse search were lower than they actually are
+			 */
+			double probability = 1.0 / (double) regions.size();
+//			double probability = (double) maxLength / 3000000000.0; // region divided by length of genome 
 			for (Region region: regions) {
-				eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
+//				eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
+				eValue = MathFunctions.approximateNegativeLog10OfBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
 				region.setEValue(eValue);
 			}
 
@@ -128,8 +134,6 @@ public class Regions {
 	
 	public void createReport(File reportDir) {
 		try {
-			
-			
 			
 			/* set up the regions folders */
 			File regionsTextFolder = new File(reportDir, "regions");
@@ -174,10 +178,6 @@ public class Regions {
 				pw.flush();
 				pw.close();
 			}
-			
-			/* make the histogram */
-			File histogramFile = new File(regionsHTMLFolder, "histogram.jpg");
-			HistogramVisualizer.drawHistogram(evc.getSmoothedHistogram(), 300, 300, histogramFile);
 			
 		} catch (IOException e) {
 			e.printStackTrace();

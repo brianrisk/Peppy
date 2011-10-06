@@ -71,6 +71,10 @@ public abstract class HTMLPage {
 		print("</li>");
 	}
 	
+	protected void printLink(String link, String text) {
+		print("<a href=\"" + link + "\">" + text + "</a>");
+	}
+	
 	protected void print(String string) {
 		pw.println(string);
 	}

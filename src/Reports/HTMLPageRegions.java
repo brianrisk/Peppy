@@ -18,7 +18,6 @@ public class HTMLPageRegions extends HTMLPage {
 	@Override
 	public void makePage() {
 		printHeader();
-		printP("<img src=\"histogram.jpg\">");
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
 		printTH("#");
