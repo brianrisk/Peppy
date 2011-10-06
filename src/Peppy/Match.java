@@ -510,6 +510,10 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		sb.append(getSpectrum().getCharge());
 		sb.append('\t');
 		sb.append(getPeptide().getCleavageAcidCount());
+		sb.append('\t');
+		sb.append(getPeptide().getHydrophobicProportion());
+		sb.append('\t');
+		sb.append(getPeptide().getHydrophilicProportion());
 		return sb.toString();
 	}
 	

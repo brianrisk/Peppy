@@ -24,6 +24,8 @@ public class HTMLPageMatches extends HTMLPage {
 		
 		printHeader();
 		
+		printLink("regions html/index.html", "View regions report");
+		
 		printMatchTable();
 		
 		
@@ -53,6 +55,8 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("charge");
 		printTH("score");
 		printTH("e value");
+		printTH("Hydrophobic percentage");
+		printTH("Hydrophilic percentage");
 		
 		for (int i = 0; i < maxDisplay; i++) {
 			/* get our match */
@@ -71,7 +75,7 @@ public class HTMLPageMatches extends HTMLPage {
 			link += "%3A";
 			link += match.getPeptide().getStartIndex();
 			link += "-";
-			link += match.getPeptide().getStartIndex();
+			link += match.getPeptide().getStopIndex();
 			link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
 			printTD("(<a href=\"" +link + "\">UCSC</a>)");
 			
@@ -105,6 +109,12 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* e value */
 			printTD(nfDecimal.format(-Math.log10(match.getEValue())));
+			
+			/* hydrophobic */
+			printTD(nfDecimal.format(match.getPeptide().getHydrophobicProportion()));
+			
+			/* hydrophilic */
+			printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
 		}
 		
 		print("</table>");
