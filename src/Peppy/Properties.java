@@ -109,9 +109,6 @@ public class Properties {
 	
 	//Report related
 	public static boolean createHTMLReport = true;
-	public static boolean generateNeighborhoodReport = false;
-	public static boolean generateSequenceReport = false;
-	public static boolean generateSpectrumReport = true;
 	
 	public static String reportWebSuffix = ".html";
 	public static File reportWebHeaderFile = new File("resources/reports/header.txt");
@@ -283,12 +280,6 @@ public class Properties {
 			reportDirectory = new File(propertyValue);
 		if (propertyName.equals("createHTMLReport")) 
 			createHTMLReport = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("generateNeighborhoodReport")) 
-			generateNeighborhoodReport = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("generateSequenceReport")) 
-			generateSequenceReport = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("generateSpectrumReport")) 
-			generateSpectrumReport = Boolean.valueOf(propertyValue);
 		
 		//Multi PTMS
 		if (propertyName.equals("multiModPrecursorMargin")) 
@@ -350,9 +341,6 @@ public class Properties {
 			pw.println();
 			pw.println("##Report variables ");
 			pw.println("createHTMLReport " + Properties.createHTMLReport);
-			pw.println("generateNeighborhoodReport " + Properties.generateNeighborhoodReport);
-			pw.println("generateSequenceReport " + Properties.generateSequenceReport);
-			pw.println("generateSpectrumReport " + Properties.generateSpectrumReport);
 			pw.println();
 			pw.println("##no fragments that weigh less than this will be admitted into the fragment list ");
 			pw.println("##units are daltons. ");

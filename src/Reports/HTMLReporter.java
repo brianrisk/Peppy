@@ -95,10 +95,8 @@ public class HTMLReporter {
 		hpm.makePage();
 
 		/* create spectrum reports */
-		if (Properties.generateSpectrumReport) {
-			for (Match match: bestMatches) {
-				generateSpectrumReport(match.getSpectrum());
-			}
+		for (Match match: bestMatches) {
+			generateSpectrumReport(match.getSpectrum());
 		}
 		
 		/* create region report */
