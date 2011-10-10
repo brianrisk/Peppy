@@ -478,8 +478,11 @@ public class Protein implements Comparable<Protein>{
 	}
 	
 	public static boolean isBreak(char aminoAcid) {
+		if (Properties.isYale) {
+			return ( aminoAcid == 'Y' || aminoAcid == 'W' || aminoAcid == 'F' || aminoAcid == 'X');
+		}
 		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
-//		return ( aminoAcid == 'Y' || aminoAcid == 'W' || aminoAcid == 'F' || aminoAcid == 'X');
+		
 	}
 	
 	

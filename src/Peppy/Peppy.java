@@ -89,6 +89,9 @@ public class Peppy {
 			matches = getMatches(sequences, spectra);
 		}
 		
+		/*print peptide tally */
+		U.p("The total number of peptides produced is: " + peptideTally);
+		
 		
 		
 		U.p("creating text reports");

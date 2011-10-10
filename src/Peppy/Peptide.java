@@ -288,7 +288,6 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	public double getHydrophilicProportion() {
 		double out = 0;
 		for (int i = 0; i < acidSequence.length; i++) {
-			/* (leucine, valine, isoleucine, phenylalanine, methionine, cysteine and tryptophan */
 			if (acidSequence[i] == AminoAcids.S) out++;
 			if (acidSequence[i] == AminoAcids.T) out++;
 			if (acidSequence[i] == AminoAcids.C) out++;

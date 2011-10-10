@@ -46,7 +46,7 @@ public class Properties {
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 2;
 	public static double peptideMassMinimum = 500.0;
-	public static double peptideMassMaximum = 2000.0;
+	public static double peptideMassMaximum = 10000.0;
 	public static int minPeptideLength = 5;
 	public static int maxPeptideLength = 80;
 	public static boolean useSequenceRegion = false;
@@ -82,7 +82,7 @@ public class Properties {
 	
 	//cut offs.  sexy, sexy cutoffs.
 	public static double maxEValue = 0.1;
-	public static double maxIMP = 0.0000000001;
+	public static double maxIMP = 0.000001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -127,6 +127,9 @@ public class Properties {
 	public static File testSequence;
 	public static boolean testSequenceIsProtein = true;
 	public static File testDirectory; 
+	
+	/* for custom jobs... */
+	public static boolean isYale = false;
 	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);

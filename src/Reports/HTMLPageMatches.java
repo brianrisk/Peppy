@@ -69,8 +69,10 @@ public class HTMLPageMatches extends HTMLPage {
 			printTD(spectrumLink);
 			
 			/* UCSC link */
-			//String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
 			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=mm9&position=";
+			if (Properties.isYale) {
+				link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
+			}
 			link += U.getFileNameWithoutSuffix(match.getPeptide().getParentSequence().getSequenceFile());
 			link += "%3A";
 			link += match.getPeptide().getStartIndex();
