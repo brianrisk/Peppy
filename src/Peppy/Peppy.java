@@ -477,8 +477,9 @@ public class Peppy {
 		/* now calculate e values for all matches */
 		for (Match match: matches) {
 			
-			/* determine and set the E value */
+			/* determine and set the E, P values */
 			match.calculateEValue();
+			match.calculatePValue();
 			
 			/* this is a sanity check for overly confident e values */
 			if (match.getEValue() < match.getIMP()) {

@@ -131,6 +131,9 @@ public class Properties {
 	public static boolean testSequenceIsProtein = true;
 	public static File testDirectory; 
 	
+	/*for VCF Files*/
+	public static String VCFFileString;
+	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
 		loadProperties(propertiesFile);
@@ -301,6 +304,8 @@ public class Properties {
 			testSequenceIsProtein = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("testDirectory")) 
 			testDirectory = new File(propertyValue);
+		if (propertyName.equals("VCFFileString")) 
+			VCFFileString = propertyValue;
 		
 	}
 
@@ -371,6 +376,9 @@ public class Properties {
 			pw.println();
 			pw.println("##where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);
+			pw.println();
+			pw.println("##VCF");
+			pw.println("VCFFileString " + VCFFileString);
 			pw.println();
 			pw.println();
 	

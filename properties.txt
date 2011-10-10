@@ -92,6 +92,9 @@ maximumNumberOfMatchesForASpectrum 3
 reportDirectory reports
 reportDirectoryTitle report
 
+// VCF
+VCFFileString /Users/dennis/Downloads/hg18_whim_vcf/whim2/WHIM2.TUMOR.vcf
+
 ## for test purposes
 testSequence /Users/dennis/Downloads/peppy-tests/databases/uniprot_sprot 2011_04.fasta
 testSequenceIsProtein true

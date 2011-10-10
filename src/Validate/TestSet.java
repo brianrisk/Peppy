@@ -108,7 +108,7 @@ public class TestSet {
 		topReverseMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		
 		//Sort matches by e value	
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 		Collections.sort(topReverseMatches);
 		
 		//see if any are actually true!
@@ -195,7 +195,7 @@ public class TestSet {
 
 		//sorting by confidence
 //		Match.setSortParameter(Match.SORT_BY_RANK_THEN_E_VALUE);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 //		Match.setSortParameter(Match.SORT_BY_SCORE_RATIO);
 //		Match.setSortParameter(Match.SORT_BY_P_VALUE);
@@ -504,14 +504,14 @@ public class TestSet {
 	}
 
 	public double getEValueAtPercentForwards(double percent) {
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 		Collections.sort(topForwardsMatches);
 		int level = (int) (topForwardsMatches.size() * percent);
 		return topForwardsMatches.get(level).getEValue();
 	}
 	
 	public double getEValueAtPercentReverse(double percent) {
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_P_VALUE);
 		Collections.sort(topReverseMatches);
 		int level = (int) (topReverseMatches.size() * percent);
 		return topReverseMatches.get(level).getEValue();
