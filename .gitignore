@@ -1,0 +1,67 @@
+._DS_Store
+._ecoli.fasta
+bin
+chr4.fasta
+chr22.fasta
+entire ecoli digestion
+JainabCleaned
+JainabCode
+peptides
+reports
+reports - saved
+sequences ecoli
+sequences encode
+spectra ecoli
+spectra ecoli579
+spectra encode
+spectra human677
+spectra problem
+spectraB
+src copy
+tests
+UPS
+other
+spectra
+sequences
+validation
+jobs
+peptides.txt
+
+/chr22.fa
+/FPR/
+/src/Validate/FPRimp.java
+/FPR-TandemFit-forwards.txt
+/FPR-TandemFit-reverse.txt
+/FPR-TandemFit.txt
+/PTM_IS_AWESOME.jpg
+/spectrumPTM.jpg
+/spectrumPTM18.jpg
+/spectrumPTM23.jpg
+/spectrumPTM8.jpg
+/spectrumPTM9.jpg
+/FPR-Peppy.Match_IMP-forwards.txt
+/FPR-Peppy.Match_IMP-reverse.txt
+/FPR-Peppy.Match_IMP.txt
+/FPRimp-TandemFit-forwards.txt
+/FPRimp-TandemFit-reverse.txt
+/FPRimp-TandemFit.txt
+/AltSpliceTool.jar
+/chr12_65160417-65210417.csv
+/chr12_65160417-65210417.fasta
+/jobs-complete/
+/optimal paramters/
+/Peppy.zip
+/Peppy/
+/.classpath
+/errors.txt
+/gencode.v7.pc_translations-reduced.fa
+/gencode.v7.pc_translations.fa
+/ipi-reduced.fasta
+/ipi.HUMANnobreaks.fasta
+/properties.txt
+/exported peptides/
+/Peppy-no-e-cutoff.jar
+/Peppy-regions.jar
+/exported mass lists/
+/jobs-off/
+/MassListGenerator.jar
