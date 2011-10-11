@@ -208,8 +208,8 @@ public class FDR {
 		}
 			
 		File fprFile = null;
-		if (confidenceMethod == Evalue) fprFile = new File("FPR-E-" + Properties.scoringMethodName + ".txt");
-		if (confidenceMethod == IMP) fprFile = new File("FPR-IMP-" + Properties.scoringMethodName + ".txt");
+		if (confidenceMethod == Evalue) fprFile = new File("FDR-E-" + Properties.scoringMethodName + ".txt");
+		if (confidenceMethod == IMP) fprFile = new File("FDR-IMP-" + Properties.scoringMethodName + ".txt");
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(fprFile)));
 			

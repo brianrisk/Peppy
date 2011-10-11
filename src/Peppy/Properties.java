@@ -129,7 +129,7 @@ public class Properties {
 	public static File testDirectory; 
 	
 	/* for custom jobs... */
-	public static boolean isYale = true;
+	public static boolean isYale = false;
 	
 	/*for VCF Files*/
 	public static String VCFFileString;
@@ -265,8 +265,12 @@ public class Properties {
 			rightIonDifference = Double.valueOf(propertyValue);
 		
 		//e value
-		if (propertyName.equals("eValueCutOff")) 
+		if (propertyName.equals("maxEValue")) 
 			maxEValue = Double.valueOf(propertyValue);
+		
+		//imp
+		if (propertyName.equals("maxIMP")) 
+			maxIMP = Double.valueOf(propertyValue);
 
 		//Ion and precursor threshold values
 		if (propertyName.equals("precursorTolerance")) 
@@ -336,12 +340,13 @@ public class Properties {
 			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
 			pw.println();
 			pw.println("##limit returned matches by confidence ");
-			pw.println("eValueCutOff " + Properties.maxEValue);
+			pw.println("maxEValue " + Properties.maxEValue);
+			pw.println("maxIMP " + Properties.maxIMP);
 			pw.println();
 			pw.println("##a preference for digestion of large DNA windows ");
 			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
 			pw.println();
-			pw.println("##how many spectra to process at once");
+			pw.println("##number of spectra to process at once ");
 			pw.println("numberOfSpectraPerSegment " + Properties.numberOfSpectraPerSegment);
 			pw.println();
 			pw.println("##how much precursor mass / theoretical mass difference should we tolerate? ");
