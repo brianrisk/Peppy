@@ -19,6 +19,9 @@ public class Nucleotides {
 		this.parentSequence = parentSequence;
 	}
 	
+	public String getChromosomeNumberString() {
+		return sequenceDescription.substring(">chr".length());
+	}
 
 	public String getSequenceDescription() {
 		return sequenceDescription;

@@ -26,6 +26,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public int rank = Integer.MAX_VALUE;
 	
 	protected double eValue;
+	protected double pValue;
 	protected double impValue = -1;
 	
 	private static int sortTracker = 0;
@@ -34,6 +35,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_LOCUS = sortTracker++;
 	public final static int SORT_BY_SCORE_RATIO = sortTracker++;
 	public final static int SORT_BY_E_VALUE = sortTracker++;
+	public final static int SORT_BY_P_VALUE = sortTracker++;
 	public final static int SORT_BY_RANK_THEN_E_VALUE = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_ID_THEN_PEPTIDE = sortTracker++;
@@ -334,6 +336,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (eValue < match.getEValue()) return -1;
 				if (eValue > match.getEValue()) return  1;
 				return 0;
+			} else 
+			if (sortParameter == SORT_BY_P_VALUE) {
+				if (pValue < match.getPValue()) return -1;
+				if (pValue > match.getPValue()) return  1;
+				return 0;
 			} else
 			if (sortParameter == SORT_BY_IMP_VALUE) {
 				if (impValue < match.getIMP()) return -1;
@@ -434,6 +441,10 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return eValue;
 	}
 
+	public double getPValue() {
+		return pValue;
+	}
+	
 	/**
 	 * @return the ionMatchTally
 	 */
@@ -455,6 +466,10 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 
 	public void setEValue(double eValue) {
 		this.eValue = eValue;
+	}
+	
+	public void setPValue(double pValue) {
+		this.pValue = pValue;
 	}
 
 	public String toString() {
@@ -520,6 +535,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public double calculateEValue() {
 		eValue = spectrum.getEValue(getScore());
 		return eValue;
+	}
+	
+	public double calculatePValue() {
+		pValue = spectrum.getPValue(getScore());
+		return pValue;
 	}
 	
 	public boolean hasModification() {

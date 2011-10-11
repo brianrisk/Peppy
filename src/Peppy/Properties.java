@@ -129,7 +129,10 @@ public class Properties {
 	public static File testDirectory; 
 	
 	/* for custom jobs... */
-	public static boolean isYale = false;
+	public static boolean isYale = true;
+	
+	/*for VCF Files*/
+	public static String VCFFileString;
 	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
@@ -295,6 +298,8 @@ public class Properties {
 			testSequenceIsProtein = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("testDirectory")) 
 			testDirectory = new File(propertyValue);
+		if (propertyName.equals("VCFFileString")) 
+			VCFFileString = propertyValue;
 		
 	}
 
@@ -336,6 +341,9 @@ public class Properties {
 			pw.println("##a preference for digestion of large DNA windows ");
 			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
 			pw.println();
+			pw.println("##how many spectra to process at once");
+			pw.println("numberOfSpectraPerSegment " + Properties.numberOfSpectraPerSegment);
+			pw.println();
 			pw.println("##how much precursor mass / theoretical mass difference should we tolerate? ");
 			pw.println("spectrumToPeptideMassError " + Properties.precursorTolerance);
 			pw.println();
@@ -362,6 +370,9 @@ public class Properties {
 			pw.println();
 			pw.println("##where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);
+			pw.println();
+			pw.println("##VCF");
+			pw.println("VCFFileString " + VCFFileString);
 			pw.println();
 			pw.println();
 	
