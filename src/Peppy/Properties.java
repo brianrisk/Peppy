@@ -82,7 +82,7 @@ public class Properties {
 	
 	//cut offs.  sexy, sexy cutoffs.
 	public static double maxEValue = 0.1;
-	public static double maxIMP = 0.000001;
+	public static double maxIMP = 0.0000001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
@@ -133,6 +133,9 @@ public class Properties {
 	
 	/*for VCF Files*/
 	public static String VCFFileString;
+	
+	/* FDR false discovery rate */
+	public static int numberOfSpectraToUseForFDR = 10000;
 	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
@@ -305,6 +308,14 @@ public class Properties {
 		if (propertyName.equals("VCFFileString")) 
 			VCFFileString = propertyValue;
 		
+		/* custom jobs */
+		if (propertyName.equals("isYale")) 
+			isYale = Boolean.valueOf(propertyValue);
+		
+		/* FDR */
+		if (propertyName.equals("numberOfSpectraToUseForFDR"))
+			numberOfSpectraToUseForFDR = Integer.valueOf(propertyValue);	
+		
 	}
 
 
@@ -379,7 +390,12 @@ public class Properties {
 			pw.println("##VCF");
 			pw.println("VCFFileString " + VCFFileString);
 			pw.println();
+			pw.println("##False Discovery Rates");
+			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println();
+			pw.println();
+			
+			
 	
 			pw.flush();
 			pw.close();

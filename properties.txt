@@ -6,7 +6,7 @@ useIsotopeLabeling false
 useReverseDatabase false
 
 ##This could be a directory or a file
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/small
@@ -18,12 +18,12 @@ useReverseDatabase false
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/sequences/
 
 
 ##This could be a directory or a file
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF/CPTC_ELLS-001_2688_126_2-01
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
@@ -35,7 +35,7 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra encode membrane/SDS
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/CNV_PKLFiles
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra USP
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/spectra/
 
 //Scoring Method
@@ -74,28 +74,25 @@ peakDifferenceThreshold 0.3
 
 //Report variables
 createHTMLReport true
-generateNeighborhoodReport false
-generateSequenceReport false
-generateSpectrumReport true
 
 //no fragments that weigh less than this will be admitted into the fragment list
 //units are daltons.
 peptideMassMinimum 400.0
-peptideMassMaximum 2000.0
+peptideMassMaximum 10000.0
 
-numberOfMissedCleavages 1
+numberOfMissedCleavages 2
 
 //This is per sequence file, so if this value is 5 and you use 7 FASTA files
 //it will produce (at least) 35 matches per spectrum
 //the final number of results also varies depending on the digestionWindowSize
-maximumNumberOfMatchesForASpectrum 3
+maximumNumberOfMatchesForASpectrum 2
 
 //where we store our reports
 reportDirectory reports
 reportDirectoryTitle report
 
 // VCF
-VCFFileString /Users/dennis/Downloads/hg18_whim_vcf/whim2/WHIM2.TUMOR.vcf
+VCFFileString /Users/risk2/PeppyOverflow/WASHU/vcf-merge-whim2-xeno.vcf.txt
 
 ## for test purposes
 testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
