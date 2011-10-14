@@ -57,6 +57,9 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("e value");
 		printTH("Hydrophobic percentage");
 		printTH("Hydrophilic percentage");
+		if (Properties.useIsotopeLabeling) {
+			printTH("isotope confirmed");
+		}
 		
 		for (int i = 0; i < maxDisplay; i++) {
 			/* get our match */
@@ -69,16 +72,7 @@ public class HTMLPageMatches extends HTMLPage {
 			printTD(spectrumLink);
 			
 			/* UCSC link */
-			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=mm9&position=";
-			if (Properties.isYale) {
-				link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
-			}
-			link += U.getFileNameWithoutSuffix(match.getPeptide().getParentSequence().getSequenceFile());
-			link += "%3A";
-			link += match.getPeptide().getStartIndex();
-			link += "-";
-			link += match.getPeptide().getStopIndex();
-			link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
+			String link = UCSC.getLink(match);
 			printTD("(<a href=\"" +link + "\">UCSC</a>)");
 			
 			/* the acid string */
@@ -117,6 +111,10 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* hydrophilic */
 			printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
+			
+			if (Properties.useIsotopeLabeling) {
+				printTD("" + match.isHasIsotopeConfirmation());
+			}
 		}
 		
 		print("</table>");

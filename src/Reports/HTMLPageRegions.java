@@ -42,13 +42,7 @@ public class HTMLPageRegions extends HTMLPage {
 			printTD("<a href=\"regions/" + regionFile.getName() + "\">" + region.getStartLocation() + "</a>");
 			
 			/* UCSC link */
-			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
-			link += U.getFileNameWithoutSuffix(region.getSequence().getSequenceFile());
-			link += "%3A";
-			link += region.getStartLocation();
-			link += "-";
-			link += region.getStopLocation();
-			link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
+			String link = UCSC.getLink(region.getStartLocation(), region.getStopLocation(), region.getSequence());
 			printTD(region.getStopLocation() + " (<a href=\"" +link + "\">UCSC</a>)");
 			
 			printTD("" + region.getEValue());

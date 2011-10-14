@@ -82,6 +82,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		//Our table
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
+		printTH("UCSC");
 		printTH("peptide");
 		printTH("sequence");
 		printTH("indicies");
@@ -111,6 +112,10 @@ public class HTMLPageSpectrum extends HTMLPage {
 	private void printTableRow(Match match) {
 		printTR();
 		
+		/* UCSC link */
+		String link = UCSC.getLink(match);
+		printTD("(<a href=\"" +link + "\">UCSC</a>)");
+		
 		//peptide sequence
 		StringBuffer peptideLine = new StringBuffer();
 		peptideLine.append("<a href=\"\" class=\"spectrumTrigger\" onClick=\"javascript:changePeptide('");
@@ -126,8 +131,6 @@ public class HTMLPageSpectrum extends HTMLPage {
 		} else {
 			printTD(match.getPeptide().getProtein().getName());
 		}
-		
-		
 		//start / stop
 		printTD( match.getPeptide().getStartIndex() + ", " + match.getPeptide().getStopIndex());
 		

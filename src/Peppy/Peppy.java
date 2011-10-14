@@ -86,7 +86,10 @@ public class Peppy {
 				oneSequenceList.add(sequences.get(0));
 				sequences = oneSequenceList;
 			}
+			
+			/* nothing weird.  Just do a normal search */
 			matches = getMatches(sequences, spectra);
+
 		}
 		
 		/*print peptide tally */
@@ -112,7 +115,6 @@ public class Peppy {
 		
 		U.stopStopwatch();
 	}
-	
 	
 	public static void runJobs(String [] args) {
 		File jobsDir = new File("jobs");
@@ -173,7 +175,11 @@ public class Peppy {
 	 * @return
 	 */
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		if (Properties.useIsotopeLabeling) {
+			return getLabeledMatches(sequences, spectra);
+		} else {
 		return getMatches(sequences, spectra, Properties.useReverseDatabase);
+		}
 	}
 
 	/**
@@ -186,10 +192,13 @@ public class Peppy {
 	 */
 	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
 		
+		/* define the chunk of spectra on which we will work */
 		int spectraStart = 0;
 		int spectraStop = Properties.numberOfSpectraPerSegment;
 		if (spectraStop > spectra.size()) spectraStop = spectra.size();
-		ArrayList<Match> matches = new ArrayList<Match>();
+		
+		/* initialize matches and set the initial capacity to be a multiple of the spectra size */
+		ArrayList<Match> matches = new ArrayList<Match>(spectra.size() * Properties.maximumNumberOfMatchesForASpectrum);
 		
 		/* This loop breaks when we have run our last chunk of spectra */
 		while (true) {
@@ -354,6 +363,66 @@ public class Peppy {
 		return matches;
 	}
 	
+	public static ArrayList<Match> getLabeledMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		U.p("performing isotope labeling analysis");
+		
+		/* getting labeled matches */
+		ArrayList<Match> labeledMatches = getMatches(sequences, spectra, Properties.useReverseDatabase);
+		
+		/*getting unlabled... */
+		Properties.useIsotopeLabeling = false;
+		ArrayList<Match> unLabeledMatches = getMatches(sequences, spectra, Properties.useReverseDatabase);
+		
+		/* resetting the property */
+		//TODO we should set up a different property
+		Properties.useIsotopeLabeling = true;
+		
+		/*initializing our final output */
+		ArrayList<Match> matches = new ArrayList<Match>(unLabeledMatches.size() + labeledMatches.size());
+		
+		
+		boolean next = false;
+		for (Match match: labeledMatches) {
+			if (next) {
+				next = false;
+				continue;
+			}
+			for (Match other: unLabeledMatches) {
+				if (match.getPeptide().equals(other.getPeptide())) {
+					next = true;
+					match.setScore(match.getScore() + 6);
+					match.calculateEValue();
+					match.setHasIsotopeConfirmation(true);
+					break;
+				}
+			}			
+		}
+		
+		/* now reverse the order -- do unLabeledMatches first */
+		for (Match match: unLabeledMatches) {
+			if (next) {
+				next = false;
+				continue;
+			}
+			for (Match other: labeledMatches) {
+				if (match.getPeptide().equals(other.getPeptide())) {
+					next = true;
+					match.setScore(match.getScore() + 10);
+					match.calculateEValue();
+					match.setHasIsotopeConfirmation(true);
+					break;
+				}
+			}	
+		}
+		
+		/* combine sets */
+		matches.addAll(labeledMatches);
+		matches.addAll(unLabeledMatches);
+		
+		return matches;
+	}
+
+
 	/**
 	 * For every spectrum there is one or a set of #1 ranking matches, #2 ranking matches, etc
 	 * There can be a set because the same peptide can appear in multiple places within a genome
