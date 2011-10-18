@@ -23,12 +23,14 @@ public class Region implements HasEValue, Comparable<Region> {
 	private int numberOfMatches = 0;
 	private double eValue;
 	private boolean flag = false;
+	private boolean isForward;
 	
-	public Region(int startLocation, int maxLength, Sequence sequence) {
+	public Region(int startLocation, int maxLength, Sequence sequence, boolean isForward) {
 		this.startLocation = startLocation;
 		this.maxLength = maxLength;
 		stopLocation = startLocation + maxLength;
 		this.sequence = sequence;
+		this.isForward = isForward;
 	}
 	
 	/**
@@ -128,6 +130,10 @@ public class Region implements HasEValue, Comparable<Region> {
 		return !flag;
 	}
 
+	public boolean isForward() {
+		return isForward;
+	}
+
 	public void flag() {
 		flag = true;
 	}
@@ -142,5 +148,21 @@ public class Region implements HasEValue, Comparable<Region> {
 	
 	public int getNumberOfMatches() {
 		return numberOfMatches;
+	}
+	
+	public int getTrueStart() {
+		int out = Integer.MAX_VALUE;
+		for (Match match: matches) {
+			if (match.getPeptide().getStartIndex() < out) out = match.getPeptide().getStartIndex();
+		}
+		return out;
+	}
+	
+	public int getTrueStop() {
+		int out = 0;
+		for (Match match: matches) {
+			if (match.getPeptide().getStopIndex() > out) out = match.getPeptide().getStartIndex();
+		}
+		return out;
 	}
 }

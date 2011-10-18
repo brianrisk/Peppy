@@ -13,6 +13,7 @@ import Math.MathFunctions;
  */
 public abstract class Match implements Comparable<Match>, HasEValue{
 	
+	private int id;
 	protected Spectrum spectrum;
 	protected Peptide peptide;
 	
@@ -20,6 +21,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	protected int ionMatchTally = 0;
 	
 	private boolean isIsotopeLabeled = Properties.useIsotopeLabeling;
+	private boolean hasIsotopeConfirmation = false;
 	
 	public double scoreRatio = -1;
 	public int repeatCount = 0; 
@@ -452,8 +454,23 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return ionMatchTally;
 	}
 
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public boolean isIsotopeLabeled() {
 		return isIsotopeLabeled;
+	}
+	public boolean isHasIsotopeConfirmation() {
+		return hasIsotopeConfirmation;
+	}
+	public void setHasIsotopeConfirmation(boolean hasIsotopeConfirmation) {
+		this.hasIsotopeConfirmation = hasIsotopeConfirmation;
+	}
+	public void setScore(double score) {
+		this.score = score;
 	}
 	public static void setSortParameter(int sortParameter) {
 		Match.sortParameter = sortParameter;
@@ -474,6 +491,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
+		sb.append(getId());
+		sb.append('\t');
 		sb.append(getSpectrum().getId());
 		sb.append('\t');
 		sb.append(getSpectrum().getMD5());

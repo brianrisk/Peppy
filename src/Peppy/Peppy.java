@@ -424,6 +424,8 @@ public class Peppy {
 
 
 	/**
+	 * First, this sets the ID of a match.
+	 * 
 	 * For every spectrum there is one or a set of #1 ranking matches, #2 ranking matches, etc
 	 * There can be a set because the same peptide can appear in multiple places within a genome
 	 * @param matches
@@ -443,6 +445,10 @@ public class Peppy {
 		for (int i = 1; i < matches.size(); i++) {
 			//see if these are matches for a different spectrum
 			match = matches.get(i);
+			
+			/* assign an ID to each match */
+			match.setId(i);
+			
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				rank = 1;
 			} else {
@@ -466,6 +472,7 @@ public class Peppy {
 				previousScore = match.getScore();
 			}
 		}
+		
 	}
 	
 	/**
