@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class VCFFile {
 	ArrayList<VCFEntry> entries = new ArrayList<VCFEntry>();
+	ArrayList<VCFEntry> invalidEntries = new ArrayList<VCFEntry>();
 	
 	public VCFFile (String file) {
 		try {
@@ -29,6 +30,7 @@ public class VCFFile {
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -36,6 +38,10 @@ public class VCFFile {
 
 	public ArrayList<VCFEntry> getEntries() {
 		return entries;
+	}
+
+	public ArrayList<VCFEntry> getInvalidEntries() {
+		return invalidEntries;
 	}
 
 }

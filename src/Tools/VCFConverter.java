@@ -26,14 +26,22 @@ public class VCFConverter {
 		String nucleotideSequenceString;
 		char[] bases;
 		
-		VCFFile vcf = new VCFFile(Properties.VCFFileString);
-		
-		ArrayList<VCFEntry> entries = vcf.getEntries();
 		
 		String chromosomeNumberString;
 		
-		File parentDir = new File(System.getenv("HOME")+"/peppy/mutatedGenome");
+		File parentDir = new File("mutatedGenome");
 		parentDir.mkdirs();
+		
+		/* loading the VCF contents */
+		VCFFile vcf = new VCFFile(Properties.VCFFileString);
+		ArrayList<VCFEntry> entries = vcf.getEntries();
+		
+		/* report on how the loading went */
+		U.p("found this many entries: " + entries.size());
+		U.p("found this many invalid entries: "+ vcf.getInvalidEntries().size());
+		
+		/* track how many times the expected nucleotide was wrong */
+		int numberOfTimesExpectedNucleotideWasWrong = 0;
 		
 		for(Sequence s : sequences) {
 			sequenceFile = (Sequence_DNA) s;
@@ -48,6 +56,7 @@ public class VCFConverter {
 					for (int i = 0; i < entry.getAlt().length(); i++) {
 						if (bases[startIndex+i] != entry.getRef().charAt(i)) {
 							U.p("What the hell?");
+							numberOfTimesExpectedNucleotideWasWrong++;
 						}
 						bases[startIndex+i] = entry.getAlt().charAt(i);
 					}
@@ -70,6 +79,8 @@ public class VCFConverter {
 				e.printStackTrace();
 			}	
 		}
+		
+		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong);
 		U.p("... done.");
 	}
 }

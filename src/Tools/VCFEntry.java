@@ -17,6 +17,7 @@ public class VCFEntry {
 		chrom = chunks[0].trim();
 		try {
 			pos = Integer.parseInt(chunks[1]);
+			pos++;
 		} catch (NumberFormatException nfe) {
 			valid = false;
 		}
@@ -41,6 +42,10 @@ public class VCFEntry {
 
 	public String getAlt() {
 		return alt;
+	}
+	
+	public String toString() {
+		return chrom + " " + pos + " " + ref + " " + alt;
 	}
 
 }
