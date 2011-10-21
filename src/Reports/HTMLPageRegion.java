@@ -25,7 +25,7 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		printHeader(regionName, "<script src=\"http://peppyresearch.com/js/processing.js\"></script>");
 		printP("Sequence: " + region.getSequence().getSequenceFile().getName());
 		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation());
-		printP("region E value: " + region.getEValue());
+		printP("region P value: " + region.getPValue());
 		
 		/* get access to the matches */
 		ArrayList<Match> matches = region.getMatches();

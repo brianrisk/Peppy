@@ -60,22 +60,12 @@ public class HTMLReporter {
 		ArrayList<Match> bestMatches = new ArrayList<Match>();
 		
 		int spectrumID = -1; //an ID will never be -1
-		int matchRank = 0;
-		double scoreRatio;
-		Match previousMatch = null;
 		for (Match match: matches) {
 			if (spectrumID != match.getSpectrum().getId()) {
 				spectrumID = match.getSpectrum().getId();
-				matchRank = 1;
 				bestMatches.add(match);
 			} else {
-				matchRank++;
 			}
-			if (matchRank == 2) {
-				scoreRatio = previousMatch.getScore() / match.getScore();
-				previousMatch.setScoreRatio(scoreRatio);
-			}
-			previousMatch = match;
 		}
 		
 		//sort our best matches

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Graphs.HistogramVisualizer;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
 import Peppy.Peak;
@@ -87,7 +88,9 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTH("sequence");
 		printTH("indicies");
 		printTH("F");
-		printTH("S");
+		if (Properties.useSpliceVariants) {
+			printTH("S");
+		}
 		printTH("score");
 		printTH("ions");
 		printTH("E value");
@@ -139,8 +142,10 @@ public class HTMLPageSpectrum extends HTMLPage {
 		else {printTD("-");}
 		
 		//isSpliced
-		if (match.getPeptide().isSpliced()) {printTD("Y");}
-		else {printTD("N");}
+		if (Properties.useSpliceVariants) {
+			if (match.getPeptide().isSpliced()) {printTD("Y");}
+			else {printTD("N");}
+		}
 		
 		//score
 		printTD("" + match.getScore());

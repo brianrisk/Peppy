@@ -1,4 +1,4 @@
-package Reports;
+package Graphs;
 
 import java.awt.Color;
 import java.awt.Point;

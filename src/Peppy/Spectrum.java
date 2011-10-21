@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import Graphs.HistogramVisualizer;
 import Math.EValueCalculator;
 import Math.HasValue;
-import Reports.HistogramVisualizer;
 import Utilities.U;
 
 /**

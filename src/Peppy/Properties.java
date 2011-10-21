@@ -82,7 +82,7 @@ public class Properties {
 	
 	//cut offs.  sexy, sexy cutoffs.
 	public static double maxEValue = 0.1;
-	public static double maxIMP = 0.0000001;
+	public static double maxIMP = 0.0000000001;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");

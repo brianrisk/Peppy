@@ -44,6 +44,7 @@ public class Regions {
 			regions = new ArrayList<Region>(forwardRegions.size() + reverseRegions.size());
 			regions.addAll(forwardRegions);
 			regions.addAll(reverseRegions);
+			Collections.sort(regions);
 			
 		}
 	}
@@ -131,13 +132,9 @@ public class Regions {
 			region.calculateScore();
 		}
 		
-		/* calculate E values */
-//		evc.addScores(regions);
-//		evc.calculateHistogramProperties();
-//		for (Region region: regions) {
-//			region.setEValue(evc.calculateEValueOfScore(region.getScore()));
-//		}
+		/* calculate P values */
 		double eValue;
+		
 		/* this will actually compensate for the fact that we will have less
 		 * regions in reverse searches due to E value cutoffs.  If we assumed the
 		 * same amount of regions (or maxlength / genome size) then it would appear
@@ -148,7 +145,7 @@ public class Regions {
 		for (Region region: returnedRegions) {
 //			eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
 			eValue = MathFunctions.approximateNegativeLog10OfBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
-			region.setEValue(eValue);
+			region.getPValue(eValue);
 		}
 		
 		return returnedRegions;
@@ -199,7 +196,7 @@ public class Regions {
 				regionsText.print('\t');
 				regionsText.print(region.getScore());
 				regionsText.print('\t');
-				regionsText.print(region.getEValue());
+				regionsText.print(region.getPValue());
 				regionsText.print('\t');
 				ArrayList<Match> matches = region.getMatches();
 				int noComma = matches.size() - 1;
@@ -222,7 +219,7 @@ public class Regions {
 						}
 					}
 				}
-				int neatE = (int) Math.round(-Math.log10(region.getEValue()));
+				int neatE = (int) Math.round(-Math.log10(region.getPValue()));
 				
 				/* create the text report for this one region */
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(regionsTextFolder, "region " + spacer + i + " " + neatE + ".txt"))));

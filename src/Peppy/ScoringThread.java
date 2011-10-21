@@ -30,14 +30,10 @@ public class ScoringThread implements Runnable {
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			int firstPeptideIndex;
-			if (Properties.scoringMethodName.equals("Peppy.Match_IMP_MultiMod")) {
-				firstPeptideIndex = 0;
-			} else {
-				double lowestPeptideMassToConsider = spectrum.getMass() - Properties.precursorTolerance;
-				firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
-				firstPeptideIndex -= 8;
-				if (firstPeptideIndex < 0) firstPeptideIndex = 0;
-			}
+			double lowestPeptideMassToConsider = spectrum.getMass() - Properties.precursorTolerance;
+			firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
+			firstPeptideIndex -= 8;
+			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
 			
 			
 			//find the last index, compensate for rounding error

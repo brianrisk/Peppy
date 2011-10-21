@@ -24,7 +24,7 @@ public class HTMLPageRegions extends HTMLPage {
 		printTH("sequence");
 		printTH("start");
 		printTH("stop");
-		printTH("E value");
+		printTH("-log10(P)");
 		for(int i = 0; i < regions.size(); i++) {
 			Region region = regions.get(i);
 			
@@ -45,7 +45,7 @@ public class HTMLPageRegions extends HTMLPage {
 			String link = UCSC.getLink(region.getStartLocation(), region.getStopLocation(), region.getSequence());
 			printTD(region.getStopLocation() + " (<a href=\"" +link + "\">UCSC</a>)");
 			
-			printTD("" + region.getEValue());
+			printTD("" + region.getPValue());
 			
 			
 		}

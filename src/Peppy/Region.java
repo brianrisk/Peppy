@@ -11,7 +11,7 @@ import Math.HasEValue;
  * @author Brian Risk
  *
  */
-public class Region implements HasEValue, Comparable<Region> {
+public class Region implements Comparable<Region> {
 	
 	private ArrayList<Match> matches = new ArrayList<Match>();
 	private Sequence sequence;
@@ -21,7 +21,7 @@ public class Region implements HasEValue, Comparable<Region> {
 	private double score = 0;
 	private int coverage = 0;
 	private int numberOfMatches = 0;
-	private double eValue;
+	private double pValue;
 	private boolean flag = false;
 	private boolean isForward;
 	
@@ -67,8 +67,8 @@ public class Region implements HasEValue, Comparable<Region> {
 		return sequence;
 	}
 
-	public double getEValue() {
-		return eValue;
+	public double getPValue() {
+		return pValue;
 	}
 
 	public double getScore() {
@@ -98,8 +98,8 @@ public class Region implements HasEValue, Comparable<Region> {
 		return coverage;
 	}
 
-	public void setEValue(double eValue) {
-		this.eValue = eValue;
+	public void getPValue(double eValue) {
+		this.pValue = eValue;
 	}
 
 

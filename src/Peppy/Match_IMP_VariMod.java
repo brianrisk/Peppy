@@ -65,7 +65,7 @@ public class Match_IMP_VariMod extends Match {
 	@Override
 	public void calculateScore() {
 		modificationMass = spectrum.getMass() - peptide.getMass();
-		score = -Math.log(calculateIMP());
+		score = -Math.log10(calculateIMP());
 	}
 	
 	@Override

@@ -23,7 +23,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	private boolean isIsotopeLabeled = Properties.useIsotopeLabeling;
 	private boolean hasIsotopeConfirmation = false;
 	
-	public double scoreRatio = -1;
 	public int repeatCount = 0; 
 	public int rank = Integer.MAX_VALUE;
 	
@@ -35,7 +34,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_SCORE = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_ID_THEN_SCORE = sortTracker++;
 	public final static int SORT_BY_LOCUS = sortTracker++;
-	public final static int SORT_BY_SCORE_RATIO = sortTracker++;
 	public final static int SORT_BY_E_VALUE = sortTracker++;
 	public final static int SORT_BY_P_VALUE = sortTracker++;
 	public final static int SORT_BY_RANK_THEN_E_VALUE = sortTracker++;
@@ -46,6 +44,9 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	
 	//default is that we sort matches by score
 	private static int sortParameter = SORT_BY_SCORE;
+	
+	/* for tracking FDR */
+	private boolean isDecoy = false;
 
 	
 	public abstract void calculateScore();
@@ -320,12 +321,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (score < match.getScore()) return  1;
 				return 0;
 			} else
-			if (sortParameter == SORT_BY_SCORE_RATIO) {
-				//want to sort from greatest to least
-				if (scoreRatio > match.getScoreRatio()) return -1;
-				if (scoreRatio < match.getScoreRatio()) return  1;
-				return 0;
-			} else
 			if (sortParameter == SORT_BY_LOCUS) {
 				if (peptide.getParentSequence().getId() < match.getPeptide().getParentSequence().getId()) return -1;
 				if (peptide.getParentSequence().getId() > match.getPeptide().getParentSequence().getId()) return  1;
@@ -428,10 +423,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return spectrum;
 	}
 
-	public double getScoreRatio() {
-		return scoreRatio;
-	}
-
 	/**
 	 * @return the peptide
 	 */
@@ -460,6 +451,12 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public void setId(int id) {
 		this.id = id;
 	}
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+	public void setDecoy(boolean isDecoy) {
+		this.isDecoy = isDecoy;
+	}
 	public boolean isIsotopeLabeled() {
 		return isIsotopeLabeled;
 	}
@@ -474,11 +471,6 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	}
 	public static void setSortParameter(int sortParameter) {
 		Match.sortParameter = sortParameter;
-	}
-
-
-	public void setScoreRatio(double scoreRatio) {
-		this.scoreRatio = scoreRatio;
 	}
 
 	public void setEValue(double eValue) {

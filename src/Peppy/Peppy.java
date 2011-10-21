@@ -460,19 +460,6 @@ public class Peppy {
 			rank++;
 			previousMatch = match;
 		}
-		/* Setting Score ratios for those with rank 1 
-		 * Works backwards through the list */
-		int i = matches.size() - 1;
-		double previousScore = match.getScore();
-		for (; i >= 0; i--) {
-			match = matches.get(i);
-			if (match.rank == 1) {
-				match.setScoreRatio(match.getScore() / previousScore);
-			} else {
-				previousScore = match.getScore();
-			}
-		}
-		
 	}
 	
 	/**
@@ -633,7 +620,7 @@ public class Peppy {
 		Collections.sort(matches);
 		int previousID = -1;
 		int id;
-		ArrayList<Match> out = new ArrayList<Match>();
+		ArrayList<Match> out = new ArrayList<Match>(matches.size());
 		for (Match match: matches) {
 			id = match.getSpectrum().getId();
 			if (id != previousID) {
