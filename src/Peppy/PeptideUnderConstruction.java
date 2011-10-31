@@ -11,10 +11,12 @@ public class PeptideUnderConstruction {
 	private int breakCount = 0;
 	private int startIndex;
 	private StringBuffer buffer = new StringBuffer();
+	private boolean inORF;
 	
-	public PeptideUnderConstruction(int startIndex, char aminoAcid) {
+	public PeptideUnderConstruction(int startIndex, char aminoAcid, boolean inORF) {
 		this.startIndex = startIndex;
 		addAminoAcid(aminoAcid);
+		this.inORF = inORF;
 	}
 	
 	public PeptideUnderConstruction(int sequenceIndex) {
@@ -36,6 +38,10 @@ public class PeptideUnderConstruction {
 	
 	public int getStartIndex() {
 		return startIndex;
+	}
+
+	public boolean isInORF() {
+		return inORF;
 	}
 
 }

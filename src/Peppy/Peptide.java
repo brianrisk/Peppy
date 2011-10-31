@@ -29,6 +29,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private boolean isMatched = false;
 	private int lengthMinusOne;
 	private int cleavageAcidCount;
+	private boolean inORF;
 	
 	
 	public boolean isMatched() {
@@ -44,14 +45,14 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false);
+		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false);
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, boolean isSpliced) {
-		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced);
+		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false);
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced, boolean inORF) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -63,6 +64,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.protein = protein;
 		this.isSpliced = isSpliced;
 		this.lengthMinusOne = this.acidSequence.length - 1;
+		this.inORF = inORF;
 		
 		cleavageAcidCount = 0;
 		for (int i = 0; i < this.acidSequence.length; i++) {
@@ -223,6 +225,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 
 	public boolean isSpliced() {
 		return isSpliced;
+	}
+
+	public boolean isInORF() {
+		return inORF;
 	}
 
 	/**

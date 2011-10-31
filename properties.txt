@@ -11,7 +11,8 @@ useReverseDatabase false
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
 sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/small
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19/chr11.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19/chr7.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome/chr7.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/CD44.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
@@ -51,8 +52,8 @@ useSpliceVariants false
 
 //digest only part of a sequence
 useSequenceRegion false
-sequenceRegionStart 35160417
-sequenceRegionStop 35253949
+sequenceRegionStart 10482206
+sequenceRegionStop 10502206
 
 
 

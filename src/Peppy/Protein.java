@@ -192,8 +192,12 @@ public class Protein implements Comparable<Protein>{
 		//if our peptide has only 3 acids, return an empty list
 		if (acidString.length() < 4) return peptides;
 		
+		/* track if in ORF */
+		boolean inORF = false;
+		
 		char aminoAcid = acidString.charAt(0);
 		char previousAminoAcid = aminoAcid;
+		if (aminoAcid == 'M') inORF = true;
 
 		//setting up the acid indicies
 		int [] acidIndicies = new int[acidString.length()];
@@ -240,7 +244,7 @@ public class Protein implements Comparable<Protein>{
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
 		
 		//start the first amino acid as peptide
-		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid));
+		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF));
 		
 		//special cases happen at the end of the sequence.  These indicies will come into play
 		int finalIndex = acidString.length() - 1;
@@ -251,6 +255,9 @@ public class Protein implements Comparable<Protein>{
 
 			//getting the present amino acid
 			aminoAcid = acidString.charAt(i);
+			
+			/* see if we are in ORF */
+			if (aminoAcid == 'M') inORF = true;
 			
 			//add the present amino acid to all forming peptides
 			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
@@ -263,14 +270,14 @@ public class Protein implements Comparable<Protein>{
 					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
 					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
 				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
 				}
 				
 			/* 'M' Does not mean a new peptide should form in proteins */
 			} else {
 				// Create new peptides after a break
 				if (isBreak(previousAminoAcid)) {		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
 				}
 			}
 			
@@ -426,7 +433,8 @@ public class Protein implements Comparable<Protein>{
 					isForward,
 					sequence_DNA,
 					this,
-					isSpliced);
+					isSpliced,
+					puc.isInORF());
 			
 			//add peptide if it meets certain criteria
 			if (peptide.getMass() >= Properties.peptideMassMinimum) {
