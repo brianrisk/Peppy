@@ -25,7 +25,7 @@ public class SixFrameRegion {
 	private static String sequenceDNA;
 	
 	public static void main(String args[]) {
-		U.p("Starting...");
+		U.p("Starting six frame region translation...");
 		
 		/* initializing */
 		Peppy.init(args);
@@ -43,23 +43,45 @@ public class SixFrameRegion {
 		
 		String chrName = U.getFileNameWithoutSuffix(sequenceFile.getSequenceFile());
 		
+		/* where we store the fasta header info */
+		String header;
+		
 		/* produce and write the frames */
 		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("six frame translation.txt")));
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("six frame translation.fasta")));
 			
 			/* do the forwards frames */
 			for (int i = 0; i < 3; i++) {
 				String frame = getFrame (startPosition + i, stopPosition, true);
 				
-				/* write the header */
-				String header = ">" + chrName + " forwards strand: " + (startPosition + i) + ", " + stopPosition + " ";
-				pw.println(header);
+				/* string buffer and string to hold the protein */
+				StringBuffer sb = new StringBuffer();
+				String protein;
 				
-				/* print the acids, newline every 50 chars */
+				/* where we hold the position */
+				int proteinStart, proteinStop;
+				
+				/* print the proteins */
 				for (int j = 0; j < frame.length(); j++) {
-					pw.print(frame.charAt(j));
-					if (j % 50 == 0 && j > 0) {
-						pw.println();
+					if (frame.charAt(j) == '.') {
+						
+						protein = sb.toString();
+						
+						/* print if protein */
+						if (protein.length() > 4) {
+							proteinStart =  (startPosition + i + (j * 3));
+							proteinStop = (startPosition + i + (j * 3) + (protein.length() * 3));
+							header = ">" + chrName + "_fwd_" + proteinStart + "_" + proteinStop;
+							pw.println(header);
+							pw.println(protein);
+							pw.println();
+						}
+						
+						/* clear out the string buffer */
+						sb = new StringBuffer();
+						
+					} else {
+						sb.append(frame.charAt(j));
 					}
 				}
 				
@@ -73,15 +95,34 @@ public class SixFrameRegion {
 			for (int i = 0; i < 3; i++) {
 				String frame = getFrame (stopPosition - i, startPosition, false);
 				
-				/* write the header */
-				String header = ">" + chrName + " reverse strand: " + (startPosition) + ", " + (stopPosition - i) + " ";
-				pw.println(header);
+				/* string buffer and string to hold the protein */
+				StringBuffer sb = new StringBuffer();
+				String protein;
 				
-				/* print the acids, newline every 50 chars */
+				/* where we hold the position */
+				int proteinStart, proteinStop;
+				
+				/* print the proteins */
 				for (int j = 0; j < frame.length(); j++) {
-					pw.print(frame.charAt(j));
-					if (j % 50 == 0 && j > 0) {
-						pw.println();
+					if (frame.charAt(j) == '.') {
+						
+						protein = sb.toString();
+						
+						/* print if protein */
+						if (protein.length() > 4) {
+							proteinStart =  stopPosition - ( i + (j * 3));
+							proteinStop = stopPosition - ( i + (j * 3) + (protein.length() * 3));
+							header = ">" + chrName + "_rev_" + proteinStop + "_" + proteinStart;
+							pw.println(header);
+							pw.println(protein);
+							pw.println();
+						}
+						
+						/* clear out the string buffer */
+						sb = new StringBuffer();
+						
+					} else {
+						sb.append(frame.charAt(j));
 					}
 				}
 				
