@@ -69,7 +69,7 @@ public class HTMLReporter {
 		}
 		
 		//sort our best matches
-		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Match.setSortParameter(Match.SORT_BY_E_VALUE);
 		Collections.sort(bestMatches);
 		
 		NumberFormat nfDecimal = NumberFormat.getInstance();
@@ -89,10 +89,6 @@ public class HTMLReporter {
 			generateSpectrumReport(match.getSpectrum());
 		}
 		
-		/* create region report */
-		Regions regions = new Regions(matches, sequences, spectra);
-		regions.createReport(reportDir);
-		regions.clearRegions();
 
 	}
 	

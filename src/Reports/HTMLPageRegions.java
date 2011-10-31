@@ -21,10 +21,11 @@ public class HTMLPageRegions extends HTMLPage {
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
 		printTH("#");
+		printTH("UCSC");
 		printTH("sequence");
 		printTH("start");
-		printTH("stop");
 		printTH("-log10(P)");
+		printTH("hits");
 		for(int i = 0; i < regions.size(); i++) {
 			Region region = regions.get(i);
 			
@@ -37,15 +38,20 @@ public class HTMLPageRegions extends HTMLPage {
 			
 			
 			printTR();
-			printTD("" + i);
-			printTD(region.getSequence().getSequenceFile().getName());
-			printTD("<a href=\"regions/" + regionFile.getName() + "\">" + region.getStartLocation() + "</a>");
+			
+			/* region number */
+			printTD("<a href=\"regions/" + regionFile.getName() + "\">" + i + "</a>");
 			
 			/* UCSC link */
 			String link = UCSC.getLink(region.getStartLocation(), region.getStopLocation(), region.getSequence());
-			printTD(region.getStopLocation() + " (<a href=\"" +link + "\">UCSC</a>)");
+			printTD("(<a href=\"" +link + "\">UCSC</a>)");
+			
+			printTD(region.getSequence().getSequenceFile().getName());
+			printTD("" + region.getStartLocation());
+
 			
 			printTD("" + region.getPValue());
+			printTD("" + region.getMatches().size());
 			
 			
 		}

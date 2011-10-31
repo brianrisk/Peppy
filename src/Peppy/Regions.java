@@ -240,6 +240,10 @@ public class Regions {
 		}
 	}
 	
+	public ArrayList<Region> getRegions() {
+		return regions;
+	}
+
 	public void clearRegions() {
 		for (Region region: regions) {
 			region.clearRegion();

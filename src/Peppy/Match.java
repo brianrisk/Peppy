@@ -537,9 +537,19 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		sb.append('\t');
 		sb.append(getPeptide().getCleavageAcidCount());
 		sb.append('\t');
+		sb.append(getPeptide().isInORF());
+		sb.append('\t');
 		sb.append(getPeptide().getHydrophobicProportion());
 		sb.append('\t');
 		sb.append(getPeptide().getHydrophilicProportion());
+		if (Properties.searchModifications) {
+			sb.append('\t');
+			sb.append(hasMod());
+			sb.append('\t');
+			sb.append(getModMass());
+			sb.append('\t');
+			sb.append(getModIndex());
+		}
 		return sb.toString();
 	}
 	
@@ -553,8 +563,16 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return pValue;
 	}
 	
-	public boolean hasModification() {
+	public boolean hasMod() {
 		return false;
+	}
+	
+	public double getModMass() {
+		return 0;
+	}
+	
+	public int getModIndex() {
+		return 0;
 	}
 	
 	public Modification [] getModifications() {

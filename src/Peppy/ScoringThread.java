@@ -2,6 +2,7 @@ package Peppy;
 import java.util.ArrayList;
 
 import Math.MathFunctions;
+import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -31,6 +32,12 @@ public class ScoringThread implements Runnable {
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			int firstPeptideIndex;
 			double lowestPeptideMassToConsider = spectrum.getMass() - Properties.precursorTolerance;
+			if (Properties.searchModifications) {
+				/* I know subtracting the upper bound seems backwards, but since a 
+				 * modification on the peptide makes the spectrum heavier, this is the
+				 * order things should be*/
+				lowestPeptideMassToConsider -= Properties.modificationUpperBound;
+			}
 			firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
 			firstPeptideIndex -= 8;
 			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
@@ -38,6 +45,10 @@ public class ScoringThread implements Runnable {
 			
 			//find the last index, compensate for rounding error
 			double highestPeptideMassToConsider = spectrum.getMass() + Properties.precursorTolerance;
+			if (Properties.searchModifications) {
+				/* ditto above */
+				highestPeptideMassToConsider -= Properties.modificationLowerBound;
+			}
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
 			lastPeptideIndex += 8;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;

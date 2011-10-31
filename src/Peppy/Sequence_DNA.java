@@ -159,6 +159,56 @@ public class Sequence_DNA extends Sequence{
 		return peptides;
 	}
 	
+	public ArrayList<Peptide> extractPeptidesFromRegion(int startIndex, int stopIndex, boolean isReverse) {
+		
+		
+		//if we have yet to read in all the ATGC data, do that now
+		if (nucleotideSequences == null) getNucleotideSequences();
+		
+		//Get whatever sequence we're working on.  There will most often only be
+		//one sequence in nucleotideSequences, but sometimes more
+		Nucleotides nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+		
+		/* initialize where we will hold the peptides */
+		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+		
+	
+		/* Create our SequenceDigestionThread ArrayList */
+		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
+		for (byte frame = 0; frame < 3; frame++) {
+			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+			if (!Properties.useOnlyForwardsFrames) {
+				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+			}
+		}
+		
+		/* create the threads and start them engines! */
+		ArrayList<Thread> threads = new ArrayList<Thread>(); 
+		for (DigestionThread_DNA digestor: digestors) {
+			Thread thread = new Thread(digestor);
+			thread.start();
+			threads.add(thread);
+		}
+		
+		/* Wait for them all to finish */
+		for (Thread thread: threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				U.p("Digestion thread interrupted!  Bad!");
+				e.printStackTrace();
+			}
+		}
+		
+		/* harvest all digested peptides */
+		for (DigestionThread_DNA digestor: digestors) {
+			peptides.addAll(digestor.getPeptides());
+		}
+		
+		/* return */
+		return peptides;
+	}
+	
 	
 	/**
 	 * in one FASTA file there may be many sequences.

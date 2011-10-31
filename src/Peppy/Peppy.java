@@ -95,7 +95,22 @@ public class Peppy {
 		/*print peptide tally */
 		U.p("The total number of peptides produced is: " + peptideTally);
 		
+		/* regions */
+		Regions regions = new Regions(matches, sequences, spectra);
+		U.p("we found this many regions: " + regions.getRegions().size());
+	
+		/* localized PTM search */
+		U.p("performing localized PTM search");
+		Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
+		Properties.searchModifications = true;
+		Properties.modificationLowerBound = -100;
+		Properties.modificationUpperBound = 100;
+		ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
+		U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
+		matches = getMatchesWithPeptides(peptidesInRegions, spectra);
 		
+		/* rerun the regions analysis */
+		regions = new Regions(matches, sequences, spectra);
 		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
@@ -107,7 +122,12 @@ public class Peppy {
 			report.generateFullReport();
 		}	
 		
+		/* creating regions report */
+		regions.createReport(reportDir);
+		
+		
 		//clear out memory
+		regions.clearRegions();
 		matches.clear();
 		spectra.clear();
 		sequences.clear();
@@ -591,6 +611,25 @@ public class Peppy {
 		}
 		
 		return paredDownMatches;
+	}
+	
+	private static ArrayList<Peptide> getPeptidesInRegions(ArrayList<Region> regions, ArrayList<Sequence> sequences, boolean isReverse) {
+		/* our return */
+		ArrayList<Peptide> out = new ArrayList<Peptide>();
+		
+		/* get peptides along regions */
+		for (Sequence sequence: sequences) {
+			Sequence_DNA dnaSequence = (Sequence_DNA) sequence;
+			for (Region region: regions) {
+				if (dnaSequence.equals(region.getSequence())) {
+					//TODO get rid of this 500
+					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
+				}
+			}
+			sequence.reset();
+		}
+		Collections.sort(out);
+		return out;
 	}
 	
 	protected static void printGreeting() {

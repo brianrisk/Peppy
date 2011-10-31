@@ -55,7 +55,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 15");
+			pw.println("format version 16");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -74,21 +74,21 @@ public class TextReporter {
 			sb = new StringBuffer();
 			sb.append("ID");
 			sb.append('\t');
-			sb.append("Spectrum ID");
+			sb.append("SpectrumID");
 			sb.append('\t');
 			sb.append("MD5");
 			sb.append('\t');
-			sb.append("File Name");
+			sb.append("FileName");
 			sb.append('\t');
 			sb.append("Score");
 			sb.append('\t');
-			sb.append("Precursor M/Z");
+			sb.append("PrecursorM/Z");
 			sb.append('\t');
-			sb.append("Precursor Neutral Mass");
+			sb.append("PrecursorNeutralMass");
 			sb.append('\t');
 			sb.append("E Value");
 			sb.append('\t');
-			sb.append("Peptide Sequence");
+			sb.append("PeptideSequence");
 			sb.append('\t');
 			sb.append("START");
 			sb.append('\t');
@@ -110,11 +110,11 @@ public class TextReporter {
 				sb.append("Protein Name");
 			}
 			sb.append('\t');
-			sb.append("Match Rank");
+			sb.append("MatchRank");
 			sb.append('\t');
-			sb.append("Rank Count");
+			sb.append("RankCount");
 			sb.append('\t');
-			sb.append("Ion Count");	
+			sb.append("IonCount");	
 			sb.append('\t');
 			sb.append("Labeled");	
 			sb.append('\t');
@@ -122,9 +122,19 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("CleavageAcidCount");
 			sb.append('\t');
+			sb.append("inORF");
+			sb.append('\t');
 			sb.append("Hydrophobic");
 			sb.append('\t');
 			sb.append("Hydrophilic");
+			if (Properties.searchModifications) {
+				sb.append('\t');
+				sb.append("isModified");
+				sb.append('\t');
+				sb.append("modMass");
+				sb.append('\t');
+				sb.append("modIndex");
+			}
 			pw.println(sb);		
 			
 			//print rows

@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Graphs.HistogramVisualizer;
+import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
+import Peppy.Modification;
 import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;
@@ -51,12 +53,12 @@ public class HTMLPageSpectrum extends HTMLPage {
 		}
 		spectrumScript.append("];");
 		
-		if (theseMatches.get(0).hasModification()) {
+		if (theseMatches.get(0).hasMod()) {
 			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) theseMatches.get(0);
 			spectrumScript.append("var modifications = [");
 			for (int i = 0; i < theseMatches.get(0).getPeptide().getLength(); i++) {
-				if (i == match_IMP_VariMod.getModificationIndex()) {
-					spectrumScript.append(match_IMP_VariMod.getModificationMass());
+				if (i == match_IMP_VariMod.getModIndex()) {
+					spectrumScript.append(match_IMP_VariMod.getModMass());
 				} else {
 					spectrumScript.append("0");
 				}
@@ -80,6 +82,20 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
+		/* modifications */
+		if (theseMatches.get(0).hasMod()) {
+			printP("known modifications which are close in mass to the observed modification:");
+			print("<ul>");
+			Match_IMP_VariMod modifiedMatch = (Match_IMP_VariMod) theseMatches.get(0);
+			for (Modification mod: Definitions.modifications) {
+				if (Math.abs(modifiedMatch.getModMass() - mod.getMonoMass()) <= Properties.fragmentTolerance) {
+					print("<li>" + mod.getDescription() + "</li>");
+				}
+			}
+			print("</ul>");
+		}
+		
+		
 		//Our table
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
@@ -94,6 +110,12 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTH("score");
 		printTH("ions");
 		printTH("E value");
+		if (Properties.searchModifications) {
+			printTH("has mod");
+			printTH("mod index");
+			printTH("mod mass");
+		}
+		/* print all the rows */
 		for(Match match: theseMatches) {
 			printTableRow(match);
 		}
@@ -155,6 +177,13 @@ public class HTMLPageSpectrum extends HTMLPage {
 		
 		//E value
 		printTD("" + match.getEValue());
+		
+		if (Properties.searchModifications) {
+			Match_IMP_VariMod modMatch = (Match_IMP_VariMod) match;
+			printTD("" + modMatch.hasMod());
+			printTD("" + (modMatch.getModIndex() + 1) + " (" + modMatch.getPeptide().getAcidSequenceString().charAt(modMatch.getModIndex()) + ")");
+			printTD("" + modMatch.getModMass());
+		}
 	}
 	
 

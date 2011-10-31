@@ -75,7 +75,7 @@ public class Match_IMP_VariMod extends Match {
 		if (impValue < 0) {
 			double impValue1 = calculateIMP(modificationMass, 0);
 			double impValue2 = calculateIMP(modificationMass, peptide.getAcidSequence().length - 1);
-			if (impValue1 < 1.0E-9 || impValue2 < 1.0E-9) {
+			if (impValue1 < 1.0E-8 || impValue2 < 1.0E-8) {
 				double bestIMP = impValue1;
 				double tempIMP;
 				for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
@@ -198,22 +198,36 @@ public class Match_IMP_VariMod extends Match {
 		return calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
 	}
 	
-	public double getModificationMass() {return modificationMass;}
+	public double getModMass() {return modificationMass;}
 	
-	public int getModificationIndex() {
+	public int getModIndex() {
 		return modificationIndex;
 	}
 
-	public boolean hasModification() {
-		return (modificationMass > Properties.fragmentTolerance);
+	public boolean hasMod() {
+		return (Math.abs(modificationMass) > Properties.fragmentTolerance);
 	}
 	
 	public int getNumberOfModifications() {
-		if (hasModification()) {
+		if (hasMod()) {
 			return 1;
 		} else {
 			return 0;
 		}
+	}
+	
+	public String toString() {
+		String out = super.toString();
+		StringBuffer sb = new StringBuffer(out);
+		if (Properties.searchModifications) {
+			sb.append('\t');
+			sb.append(hasMod());
+			sb.append('\t');
+			sb.append(getModMass());
+			sb.append('\t');
+			sb.append(getModIndex() + 1);
+		}
+		return sb.toString();
 	}
 
 }

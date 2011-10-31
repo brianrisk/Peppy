@@ -71,7 +71,7 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		print("</script><canvas width=\"" +  region.getMaxLength() + "px\" height=\"" + processngHeight + "px\"></canvas>");
 		
 		
-		printMatchTable();
+		printMatchTable("../../spectra/");
 		
 		
 		printFooter();

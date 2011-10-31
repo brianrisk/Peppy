@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import Peppy.Match;
+import Peppy.Match_IMP_VariMod;
 import Peppy.Properties;
 import Utilities.U;
 
@@ -26,13 +27,13 @@ public class HTMLPageMatches extends HTMLPage {
 		
 		printLink("regions html/index.html", "View regions report");
 		
-		printMatchTable();
+		printMatchTable("spectra/");
 		
 		
 		printFooter();
 	}
 	
-	protected void printMatchTable() {
+	protected void printMatchTable(String spectraPath) {
 		/* set up how we will round */
 		NumberFormat nfDecimal = NumberFormat.getInstance();
 		nfDecimal.setMaximumFractionDigits(2);
@@ -41,26 +42,27 @@ public class HTMLPageMatches extends HTMLPage {
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
 		printTH("ID");
-		printTH("UCSC");
 		printTH("acid");
-		if (!Properties.useSpliceVariants) {
-			printTH("sequence");
-		}
-		printTH("start");
-		printTH("stop");
-		printTH("strand");
+		printTH("location");
 		if (Properties.useSpliceVariants) {
 			printTH("spliced");
 		}
-		printTH("charge");
 		printTH("score");
 		printTH("e value");
-		printTH("Hydrophobic percentage");
-		printTH("Hydrophilic percentage");
+		if (Properties.isYale) {
+			printTH("inORF");
+			printTH("Hydrophobic percentage");
+			printTH("Hydrophilic percentage");
+		}
 		if (Properties.useIsotopeLabeling) {
 			printTH("isotope confirmed");
 		}
 		
+		if (Properties.searchModifications) {
+			printTH("has mod");
+		}
+		
+
 		for (int i = 0; i < maxDisplay; i++) {
 			/* get our match */
 			Match match = matches.get(i);
@@ -68,37 +70,22 @@ public class HTMLPageMatches extends HTMLPage {
 			printTR();
 			
 			/* spectrum ID link */
-			String spectrumLink = "<a href=\"spectra/" + match.getSpectrum().getId() + Properties.reportWebSuffix + "\">" + match.getSpectrum().getId() + "</a>";
+			String spectrumLink = "<a href=\""  + spectraPath + match.getSpectrum().getId() + Properties.reportWebSuffix + "\">" + match.getSpectrum().getId() + "</a>";
 			printTD(spectrumLink);
-			
-			/* UCSC link */
-			String link = UCSC.getLink(match);
-			printTD("(<a href=\"" +link + "\">UCSC</a>)");
 			
 			/* the acid string */
 			printTD(match.getPeptide().getAcidSequenceString());
 			
 			/* the sequence / protein name */
 			if (!Properties.useSpliceVariants) {
-				printTD(match.getPeptide().getProtein().getName());
+				printTD(match.getPeptide().getProtein().getName() + " " + match.getPeptide().getStartIndex() + " " + ( match.getPeptide().isForward() ? "+" : "-"));
 			}
-			
-			/* start */
-			printTD("" + match.getPeptide().getStartIndex());
-			
-			/* stop */
-			printTD("" + match.getPeptide().getStopIndex());
-			
-			/* strand */
-			printTD(match.getPeptide().isForward() ? "+" : "-");
+
 			
 			/* is spliced? */
 			if (Properties.useSpliceVariants) {
 				printTD("" + match.getPeptide().isSpliced());
 			}
-			
-			/* spectrum charge */
-			printTD("" + match.getSpectrum().getCharge());
 			
 			/* score */
 			printTD(nfDecimal.format(match.getScore()));
@@ -106,14 +93,24 @@ public class HTMLPageMatches extends HTMLPage {
 			/* e value */
 			printTD(nfDecimal.format(-Math.log10(match.getEValue())));
 			
-			/* hydrophobic */
-			printTD(nfDecimal.format(match.getPeptide().getHydrophobicProportion()));
-			
-			/* hydrophilic */
-			printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
+			if (Properties.isYale) {
+				/* ORF */
+				printTD("" + match.getPeptide().isInORF());
+				
+				/* hydrophobic */
+				printTD(nfDecimal.format(match.getPeptide().getHydrophobicProportion()));
+				
+				/* hydrophilic */
+				printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
+			}
 			
 			if (Properties.useIsotopeLabeling) {
 				printTD("" + match.isHasIsotopeConfirmation());
+			}
+			
+			/* PTM */
+			if (Properties.searchModifications) {
+				printTD("" + match.hasMod());
 			}
 		}
 		

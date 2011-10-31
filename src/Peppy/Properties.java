@@ -137,6 +137,13 @@ public class Properties {
 	/* FDR false discovery rate */
 	public static int numberOfSpectraToUseForFDR = 10000;
 	
+	/* PTMs */
+	public static boolean searchModifications = false;
+	public static double modificationLowerBound = 0;
+	public static double modificationUpperBound = 100;
+	
+	
+	
 	public static void loadProperties(String fileName) {
 		File propertiesFile = new File(fileName);
 		loadProperties(propertiesFile);
@@ -316,6 +323,13 @@ public class Properties {
 		if (propertyName.equals("numberOfSpectraToUseForFDR"))
 			numberOfSpectraToUseForFDR = Integer.valueOf(propertyValue);	
 		
+		/* PTMs */
+		if (propertyName.equals("searchModifications")) 
+			searchModifications = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("modificationLowerBound")) 
+			modificationLowerBound = Double.valueOf(propertyValue);
+		if (propertyName.equals("modificationUpperBound")) 
+			modificationUpperBound = Double.valueOf(propertyValue);
 	}
 
 
@@ -393,6 +407,10 @@ public class Properties {
 			pw.println("##False Discovery Rates");
 			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println();
+			pw.println("##PTMs");
+			pw.println("searchModifications " + searchModifications);
+			pw.println("modificationLowerBound " + modificationLowerBound);
+			pw.println("modificationUpperBound " + modificationUpperBound);
 			pw.println();
 			
 			
