@@ -22,21 +22,60 @@ import Utilities.U;
 
 public class FDR {
 	
-	public static final int Evalue = 1;
-	public static final int IMP = 2;
-	
 	public static void main(String args[]) {
-		U.p("running FDR report...");
+		U.p("running FDR comparison report...");
+		/* the tolerances we will be exploring */
+		double [] precursorTolerances = {5, 10, 25};
+		double [] fragmentTolerances = {10, 25, 50};
+		
+		/* the file where we will save the report summary */
+		File reportDir = new File("FDR");
+		reportDir.mkdir();
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "FDR comparison report.txt"))));
+			pw.println("precursor\tfragment\tarea");
+			double area, precursor, fragment;
+			for (int precursorIndex = 0; precursorIndex < precursorTolerances.length; precursorIndex++) {
+				for (int fragmentIndex = 0; fragmentIndex < fragmentTolerances.length; fragmentIndex++) {
+					precursor = precursorTolerances[precursorIndex];
+					fragment = fragmentTolerances[fragmentIndex];
+					area = findFDR(precursor, fragment, args);
+					pw.println(precursor + "\t" + fragment + "\t" + area);
+				}
+			}
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		U.p("done");
+	}
+	
+	/**
+	 * 
+	 * @param fragmentTolerance set to a negative number to ignore
+	 * @param precursorTolerance set to a negative number to ignore
+	 * @param args
+	 */
+	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[]) {
+		
 		U.startStopwatch();
 		
 		//grab our properties file, set up.
 		Peppy.init(args);
+		
+		/* if we have specially defined tolerances, set those here */
+		if (fragmentTolerance > 0) {
+			Properties.fragmentTolerance = fragmentTolerance;
+			U.p("fragmentTolerance: " + fragmentTolerance);
+		}
+		if (precursorTolerance > 0) {
+			Properties.precursorTolerance = precursorTolerance;
+			U.p("precursorTolerance: " + precursorTolerance);
+		}
 		NumberFormat nfPercent = NumberFormat.getPercentInstance();
 		nfPercent.setMaximumFractionDigits(2);
-		
-		//What scoring mechanism?
-		String scoreName = Properties.scoringMethodName;
-		U.p("running report for " + scoreName);
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
@@ -126,13 +165,19 @@ public class FDR {
 			}
 		}
 		
+		/* set a folder to store our reports */
+		String identifierString = Properties.precursorTolerance + "-" + Properties.fragmentTolerance;
+		File reportDir = new File("FDR/" + identifierString);
+		reportDir.mkdirs();
+		
 		/* save curve image */
 		PRCurve prCurve = new PRCurve(points);
-		prCurve.writeFile(new File("pr.jpg"));
+		prCurve.writeFile(new File(reportDir, "pr-" + identifierString + ".jpg"));
 		
 		/* save FDR report */
+		double areaUndrePRCurve = -1;
 		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("FDR.txt")));
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "FDR-" + identifierString + ".txt"))));
 			/* parameters */
 			pw.println("sequenceDirectoryOrFile: " +Properties.sequenceDirectoryOrFile.getAbsolutePath());
 			pw.println("spectraDirectoryOrFile: " +Properties.spectraDirectoryOrFile.getAbsolutePath());
@@ -141,7 +186,8 @@ public class FDR {
 			pw.println();
 			
 			/*print nice stats */
-			pw.println("Area under PR curve: " + prCurve.calculateAreaUnderCurve());
+			areaUndrePRCurve = prCurve.calculateAreaUnderCurve();
+			pw.println("Area under PR curve: " + areaUndrePRCurve);
 			pw.println();
 			
 			/*print first line*/
@@ -162,10 +208,10 @@ public class FDR {
 			e.printStackTrace();
 		}
 		
-
-		
 		U.stopStopwatch();
-		U.p("done");
+		
+		return areaUndrePRCurve;
+		
 	}
 	
 	
