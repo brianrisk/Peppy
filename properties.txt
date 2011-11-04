@@ -7,9 +7,9 @@ useReverseDatabase false
 
 ##This could be a directory or a file
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/small
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19/chr7.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome/chr7.fa
@@ -25,9 +25,9 @@ sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
 
 
 ##This could be a directory or a file
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF/CPTC_ELLS-001_2688_126_2-01
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra Ellis
@@ -68,11 +68,11 @@ digestionWindowSize 5000000
 maxNumberOfProteinsToLoadAtOnce 1000000
 
 //how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 0.1
+spectrumToPeptideMassError 5
 //spectrumToPeptideMassError 200.0
 
 //TandemFit property
-peakDifferenceThreshold 0.3
+peakDifferenceThreshold 10
 
 //Report variables
 createHTMLReport true

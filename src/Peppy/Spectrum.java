@@ -229,15 +229,14 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		if (coverage < 0) {
 			double covered = 0;
 			double upperBound, lowerBound, lastUpperBound = 0;
-			double windowSize = 2 * Properties.fragmentTolerance;
 			for (Peak peak: peaks) {
 				if (peak.getMass() < mass) {
-					upperBound = peak.getMass() + Properties.fragmentTolerance;
-					lowerBound = peak.getMass() - Properties.fragmentTolerance;
+					upperBound = peak.getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
+					lowerBound = peak.getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
 					if (lowerBound < lastUpperBound) {
 						covered += upperBound - lastUpperBound;
 					} else {
-						covered += windowSize;
+						covered += upperBound - lowerBound;
 					}
 					lastUpperBound = upperBound;
 				}
@@ -352,8 +351,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			perfectY += Properties.leftIonDifference;
 			//add the right ion difference to get the y ion mass
 			perfectY += Properties.rightIonDifference;
-			massLowerBound = perfectY - Properties.fragmentTolerance;
-			massUpperBound = perfectY + Properties.fragmentTolerance;
+			massLowerBound = perfectY - MassError.getDaltonError(Properties.fragmentTolerance, perfectY);
+			massUpperBound = perfectY + MassError.getDaltonError(Properties.fragmentTolerance, perfectY);
 			for (int y = b + 1; y < stop; y++) {
 				peakY = peaks.get(y);
 				if (peakY.used) continue;
@@ -380,8 +379,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		
 		//note: > stop as we save final one for inside loop
 		for (int i = start; i > stop; i--) {
-			lowerBound = peaks.get(i).getMass() - Properties.fragmentTolerance;
-			upperBound = peaks.get(i).getMass() + Properties.fragmentTolerance;
+			lowerBound = peaks.get(i).getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
+			upperBound = peaks.get(i).getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
 			for (int j = i - 1; j >= stop; j--) {
 				if (peaks.get(j).getMass() > lowerBound) {
 					if (peaks.get(j).getMass() < upperBound) {
@@ -395,51 +394,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		sortPeaksByMass();
 	}
 	
-	/**
-	 * There may be some peaks that don't ever get considered with
-	 * scoring mechanisms like tandemFit.  For example, if a very strong peak
-	 * is at 1000 Da and another, weaker peak is at 1000.1 Da with nothing close after it
-	 * then it will never be used as it will always be overshadowed.  This method
-	 * removes those vestigial peaks.
-	 */
-	private void cleanWithWindow() {
-		ArrayList<Peak> retPeaks = new ArrayList<Peak>();
-		//add the first peak
-		retPeaks.add(peaks.get(0));
-		boolean left, right;
-		for (int i = 1; i < peaks.size() - 1; i++) {
-			left = false;
-			right = false;
-			for (int j = i - 1; j >=0; j--) {
-				if (peaks.get(i).getMass() - peaks.get(j).getMass() <= Properties.fragmentTolerance) {
-					if (peaks.get(i).getIntensity() < peaks.get(j).getIntensity()) {
-						left = true;
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-			if (left) {
-				for (int j = i + 1; j < peaks.size(); j++) {
-					if ( peaks.get(j).getMass() - peaks.get(i).getMass() <= Properties.fragmentTolerance) {
-						if (peaks.get(i).getIntensity() < peaks.get(j).getIntensity()) {
-							right = true;
-							break;
-						}
-					} else {
-						break;
-					}
-				}
-			}
-			if (!(left && right)) {
-				retPeaks.add(peaks.get(i));
-			}
-		}
-		//add the final peak
-		retPeaks.add(peaks.get(peaks.size() - 1));
-		peaks = retPeaks;
-	}
+
 	
 	//mark the 100 most intense peaks.  Intense!
 	private void cleanPeaksKeepingHighIntensity() {

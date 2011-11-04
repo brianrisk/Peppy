@@ -31,7 +31,7 @@ public class ScoringThread implements Runnable {
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			int firstPeptideIndex;
-			double lowestPeptideMassToConsider = spectrum.getMass() - Properties.precursorTolerance;
+			double lowestPeptideMassToConsider = spectrum.getMass() - MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass());
 			if (Properties.searchModifications) {
 				/* I know subtracting the upper bound seems backwards, but since a 
 				 * modification on the peptide makes the spectrum heavier, this is the
@@ -44,7 +44,7 @@ public class ScoringThread implements Runnable {
 			
 			
 			//find the last index, compensate for rounding error
-			double highestPeptideMassToConsider = spectrum.getMass() + Properties.precursorTolerance;
+			double highestPeptideMassToConsider = spectrum.getMass() + MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass());
 			if (Properties.searchModifications) {
 				/* ditto above */
 				highestPeptideMassToConsider -= Properties.modificationLowerBound;

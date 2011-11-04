@@ -7,6 +7,7 @@ import java.util.Collections;
 
 import Graphs.HistogramVisualizer;
 import Peppy.Definitions;
+import Peppy.MassError;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
 import Peppy.Modification;
@@ -87,8 +88,9 @@ public class HTMLPageSpectrum extends HTMLPage {
 			printP("known modifications which are close in mass to the observed modification:");
 			print("<ul>");
 			Match_IMP_VariMod modifiedMatch = (Match_IMP_VariMod) theseMatches.get(0);
+			double fragmentTolerance = MassError.getDaltonError(Properties.fragmentTolerance, 1000);
 			for (Modification mod: Definitions.modifications) {
-				if (Math.abs(modifiedMatch.getModMass() - mod.getMonoMass()) <= Properties.fragmentTolerance) {
+				if (Math.abs(modifiedMatch.getModMass() - mod.getMonoMass()) <= fragmentTolerance) {
 					print("<li>" + mod.getDescription() + "</li>");
 				}
 			}

@@ -242,8 +242,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
 		
 		peakIndex = spectrum.getPeakCount() - 1;
@@ -288,8 +288,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
 		
 		peakIndex = 0;

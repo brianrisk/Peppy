@@ -63,9 +63,9 @@ public class Properties {
 	public static int sequenceRegionStart = 0;
 	public static int sequenceRegionStop = 0;
 	
-	//mass error tolerances
-	public static double precursorTolerance = 2.0;
-	public static double fragmentTolerance = 0.3;
+	//mass error tolerances in PPM
+	public static double precursorTolerance = 100;
+	public static double fragmentTolerance = 300;
 	
 	//TandemFit
 	public static double peakIntensityExponent = 0.33333333;
@@ -141,6 +141,7 @@ public class Properties {
 	public static boolean searchModifications = false;
 	public static double modificationLowerBound = 0;
 	public static double modificationUpperBound = 100;
+//	public static double pValueRegion
 	
 	
 	

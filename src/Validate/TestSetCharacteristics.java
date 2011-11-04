@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.AminoAcids;
+import Peppy.MassError;
 import Peppy.Match;
 import Peppy.Peak;
 import Peppy.Peptide;
@@ -95,8 +96,8 @@ public class TestSetCharacteristics {
 			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
 				theoreticalPeakMass -= AminoAcids.getWeightMono(peptideString.charAt(i));
-				theoreticalPeakLeft = theoreticalPeakMass - Properties.fragmentTolerance;
-				theoreticalPeakRight = theoreticalPeakMass + Properties.fragmentTolerance;
+				theoreticalPeakLeft = theoreticalPeakMass -  MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+				theoreticalPeakRight = theoreticalPeakMass +  MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 				maxIntensity = -1;
 				for(Peak peak: peaks) {
 					peakMass = peak.getMass();
@@ -118,8 +119,8 @@ public class TestSetCharacteristics {
 			theoreticalPeakMass = Properties.leftIonDifference;
 			for (i = 0; i < peptideLengthMinusOne; i++) {
 				theoreticalPeakMass += AminoAcids.getWeightMono(peptideString.charAt(i));
-				theoreticalPeakLeft = theoreticalPeakMass - Properties.fragmentTolerance;
-				theoreticalPeakRight = theoreticalPeakMass + Properties.fragmentTolerance;
+				theoreticalPeakLeft = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+				theoreticalPeakRight = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 				maxIntensity = -1;
 				for(Peak peak: peaks) {
 					peakMass = peak.getMass();

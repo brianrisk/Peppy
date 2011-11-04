@@ -70,10 +70,10 @@ public class FindOptimialParameters {
 			PrintWriter fprGrid = new PrintWriter(new FileWriter(new File (parentDirectory, "FPR-grid-005.html")));
 			prGrid.println("<html><body><table>");
 			fprGrid.println("<html><body><table>");
-			for (double precursorTolerance = 0.005; precursorTolerance < 0.6; precursorTolerance += 0.005){
+			for (double precursorTolerance = 5; precursorTolerance < 600; precursorTolerance += 5){
 				prGrid.println("<tr>");
 				fprGrid.println("<tr>");
-				for (double fragmentTolerance = 0.06; fragmentTolerance < .61; fragmentTolerance += 0.01){
+				for (double fragmentTolerance = 5; fragmentTolerance < 600; fragmentTolerance += 5){
 					Properties.precursorTolerance = precursorTolerance;
 //					double fragmentTolerance = 0.34;
 					Properties.fragmentTolerance = fragmentTolerance;

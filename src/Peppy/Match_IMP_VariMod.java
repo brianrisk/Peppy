@@ -136,8 +136,8 @@ public class Match_IMP_VariMod extends Match {
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
 			if (i == modifiedIndex) theoreticalPeakMass -= offset;
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;	
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);	
 		}
 		
 		peakIndex = spectrum.getPeakCount() - 1;
@@ -171,8 +171,8 @@ public class Match_IMP_VariMod extends Match {
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
 			if (i == modifiedIndex) theoreticalPeakMass += offset;
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - Properties.fragmentTolerance;
-			theoreticalPeaksRight[i] = theoreticalPeakMass + Properties.fragmentTolerance;
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
 		
 		peakIndex = 0;
@@ -205,7 +205,7 @@ public class Match_IMP_VariMod extends Match {
 	}
 
 	public boolean hasMod() {
-		return (Math.abs(modificationMass) > Properties.fragmentTolerance);
+		return (Math.abs(modificationMass) > MassError.getDaltonError(Properties.fragmentTolerance, spectrum.getMass()));
 	}
 	
 	public int getNumberOfModifications() {

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Peppy.MassError;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;
@@ -113,7 +114,7 @@ public class TestSetReduce {
 				if (peptide.getMass() < Properties.peptideMassMinimum) continue;
 				
 				//see that the difference between the predicted mass and the precursor mass is within tolerance
-				if (Math.abs(peptide.getMass() - spectrum.getMass()) > Properties.precursorTolerance) {
+				if (Math.abs(peptide.getMass() - spectrum.getMass()) > MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass())) {
 //					U.p("Peptided outside of mass error range: " + peptide.getAcidSequenceString());
 					continue;
 				}
