@@ -138,11 +138,11 @@ public class Properties {
 	public static int numberOfSpectraToUseForFDR = 10000;
 	
 	/* PTMs */
+	public static boolean multipass = false;
+	public static double regionPValueMinimum = 40;
 	public static boolean searchModifications = false;
-	public static double modificationLowerBound = 0;
+	public static double modificationLowerBound = -100;
 	public static double modificationUpperBound = 100;
-//	public static double pValueRegion
-	
 	
 	
 	public static void loadProperties(String fileName) {
@@ -324,7 +324,11 @@ public class Properties {
 		if (propertyName.equals("numberOfSpectraToUseForFDR"))
 			numberOfSpectraToUseForFDR = Integer.valueOf(propertyValue);	
 		
-		/* PTMs */
+		/* multipass */
+		if (propertyName.equals("multipass")) 
+			multipass = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("regionPValueMinimum")) 
+			regionPValueMinimum = Double.valueOf(propertyValue);
 		if (propertyName.equals("searchModifications")) 
 			searchModifications = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("modificationLowerBound")) 
@@ -369,17 +373,16 @@ public class Properties {
 			pw.println("maxEValue " + Properties.maxEValue);
 			pw.println("maxIMP " + Properties.maxIMP);
 			pw.println();
-			pw.println("##a preference for digestion of large DNA windows ");
+			pw.println("##Memory contols ");
 			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
+			pw.println("desiredPeptideDatabaseSize " + Properties.desiredPeptideDatabaseSize);
 			pw.println();
 			pw.println("##number of spectra to process at once ");
 			pw.println("numberOfSpectraPerSegment " + Properties.numberOfSpectraPerSegment);
 			pw.println();
-			pw.println("##how much precursor mass / theoretical mass difference should we tolerate? ");
-			pw.println("spectrumToPeptideMassError " + Properties.precursorTolerance);
-			pw.println();
-			pw.println("##TandemFit property ");
-			pw.println("peakDifferenceThreshold " + Properties.fragmentTolerance);
+			pw.println("##error thresholds in PPM");
+			pw.println("precursorTolerance " + Properties.precursorTolerance);
+			pw.println("fragmentTolerance " + Properties.fragmentTolerance);
 			pw.println();
 			pw.println("##Report variables ");
 			pw.println("createHTMLReport " + Properties.createHTMLReport);
@@ -408,10 +411,13 @@ public class Properties {
 			pw.println("##False Discovery Rates");
 			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println();
-			pw.println("##PTMs");
+			pw.println("##multipass");
+			pw.println("multipass " + multipass);
 			pw.println("searchModifications " + searchModifications);
 			pw.println("modificationLowerBound " + modificationLowerBound);
 			pw.println("modificationUpperBound " + modificationUpperBound);
+			pw.println("regionPValueMinimum " + regionPValueMinimum);
+			
 			pw.println();
 			
 			

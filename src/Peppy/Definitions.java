@@ -19,7 +19,6 @@ public class Definitions {
 	public final static double HYDROGEN_AVERAGE = 1.00794076;
 	public final static double CARBON_MONO = 12.00000000;
 	public final static double CARBON_AVERAGE = 12.01073590;
-	//TODO this .98 is from my observations of theoretical and measured peptide mass differences.  check validity.
 	public final static double WATER_MONO = OXYGEN_MONO + HYDROGEN_MONO + HYDROGEN_MONO;
 	public final static double WATER_AVERAGE = OXYGEN_AVERAGE + HYDROGEN_AVERAGE + HYDROGEN_AVERAGE;
 	
@@ -29,21 +28,6 @@ public class Definitions {
 	
 	//protein modifications
 	public static ArrayList<Modification> modifications = Modification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
-	
-	//HMM state constant
-	public final static int NUMBER_OF_IONS =12;
-	public final static int B_ION =0;
-	public final static int Y_ION= 1;
-	public final static int A_ION =2;
-	public final static int J_ION = 3;
-	public final static int B17_ION =4;
-	public final static int Y17_ION =5;
-	public final static int B18_ION =6;
-	public final static int Y18_ION =7;
-	public final static int IMM_ION =8;
-	public final static int INTERNAL_ION = 9;
-	public final static int INTERNAL17 = 10;
-	public final static int INTERNAL18 =11;
 	
 	
 }

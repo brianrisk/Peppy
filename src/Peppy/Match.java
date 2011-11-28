@@ -1,6 +1,7 @@
 package Peppy;
 
 import Math.HasEValue;
+import Math.MassError;
 import Math.MathFunctions;
 
 /**
@@ -23,7 +24,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	private boolean isIsotopeLabeled = Properties.useIsotopeLabeling;
 	private boolean hasIsotopeConfirmation = false;
 	
-	public int repeatCount = 0; 
+	public int rankCount = 0; 
 	public int rank = Integer.MAX_VALUE;
 	
 	protected double eValue;
@@ -400,11 +401,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		}
 
 	public boolean equals(Match match) {
-		if (getScore() == match.getScore()) {
+//		if (getScore() == match.getScore()) {
 			if (peptide.equals(match.getPeptide())) 
 				if (spectrum.equals(match.getSpectrum()))
 					return true;
-		}
+//		}
 		return false;
 	}
 	
@@ -527,7 +528,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		sb.append('\t');
 		sb.append(rank);
 		sb.append('\t');
-		sb.append(repeatCount);
+		sb.append(rankCount);
 		sb.append('\t');
 		sb.append(getIonMatchTally());
 		sb.append('\t');
@@ -544,11 +545,11 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		sb.append(getPeptide().getHydrophilicProportion());
 		if (Properties.searchModifications) {
 			sb.append('\t');
-			sb.append(hasMod());
+			sb.append(hasModification());
 			sb.append('\t');
-			sb.append(getModMass());
+			sb.append(getMoificationdMass());
 			sb.append('\t');
-			sb.append(getModIndex());
+			sb.append(getModificationIndex());
 		}
 		return sb.toString();
 	}
@@ -563,15 +564,24 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		return pValue;
 	}
 	
-	public boolean hasMod() {
+	public boolean hasModification() {
 		return false;
 	}
 	
-	public double getModMass() {
+	/**
+	 * A match might exceed the precursor tolerance of a non-modified search, but still
+	 * wouldn't be what we would consider to be modified.  This addresses that distinction.
+	 * @return
+	 */
+	public boolean isFromModificationSearches() {
+		return false;
+	}
+	
+	public double getMoificationdMass() {
 		return 0;
 	}
 	
-	public int getModIndex() {
+	public int getModificationIndex() {
 		return 0;
 	}
 	

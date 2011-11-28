@@ -1,4 +1,4 @@
-package Peppy;
+package Math;
 
 /**
  * Mass error can be measured absolutely in Daltons (atomic mass units)

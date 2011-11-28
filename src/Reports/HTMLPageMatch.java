@@ -31,12 +31,12 @@ public class HTMLPageMatch extends HTMLPage {
 		StringBuffer spectrumScript = new StringBuffer();
 		spectrumScript.append("<script type=\"text/javascript\">");
 		//TODO this only accounts for vari_mods when this could be a multi mod
-		if (match.hasMod()) {
+		if (match.hasModification()) {
 			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) match;
 			spectrumScript.append("var modifications = [");
 			for (int i = 0; i < peptide.getLength(); i++) {
-				if (i == match_IMP_VariMod.getModIndex()) {
-					spectrumScript.append(match_IMP_VariMod.getModMass());
+				if (i == match_IMP_VariMod.getModificationIndex()) {
+					spectrumScript.append(match_IMP_VariMod.getMoificationdMass());
 				} else {
 					spectrumScript.append("0");
 				}
@@ -95,7 +95,7 @@ public class HTMLPageMatch extends HTMLPage {
 //		printP("peptide start: " + peptide.getStartIndex());
 //		printP("IMP value: " + match.getImpValue());
 		
-		if (match.hasMod()) {
+		if (match.hasModification()) {
 			//this is a Modification match, make it so
 			Match_IMP_VariMod match_IMP_VariMod = (Match_IMP_VariMod) match;
 			
@@ -105,12 +105,12 @@ public class HTMLPageMatch extends HTMLPage {
 			print("<td>");
 			
 			printH2("Modification properties");
-			printP("mass difference: " + match_IMP_VariMod.getModMass());
+			printP("mass difference: " + match_IMP_VariMod.getMoificationdMass());
 			
 			//print the probable modifications
 			ArrayList<Modification> potentialModifications = new ArrayList<Modification>(); 
 			for (Modification pm: Definitions.modifications) {
-				if (Math.abs(match_IMP_VariMod.getModMass() - pm.getMonoMass()) < 0.1) {
+				if (Math.abs(match_IMP_VariMod.getMoificationdMass() - pm.getMonoMass()) < 0.1) {
 					potentialModifications.add(pm);
 				}
 			}
@@ -138,7 +138,7 @@ public class HTMLPageMatch extends HTMLPage {
 			
 			for (int i= 0; i < acidString.length(); i++) {
 				Match_IMP_VariMod indexModificationMatch = new Match_IMP_VariMod(spectrum, peptide);
-				double indexIMP = indexModificationMatch.calculateIMP(match_IMP_VariMod.getModMass(), i);
+				double indexIMP = indexModificationMatch.calculateIMP(match_IMP_VariMod.getMoificationdMass(), i);
 				
 				//building the link
 				StringBuffer modificationLink = new StringBuffer();

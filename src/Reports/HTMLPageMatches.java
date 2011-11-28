@@ -61,6 +61,8 @@ public class HTMLPageMatches extends HTMLPage {
 		if (Properties.searchModifications) {
 			printTH("has mod");
 		}
+		printTH("rank");
+		printTH("count");
 		
 
 		for (int i = 0; i < maxDisplay; i++) {
@@ -74,7 +76,11 @@ public class HTMLPageMatches extends HTMLPage {
 			printTD(spectrumLink);
 			
 			/* the acid string */
-			printTD(match.getPeptide().getAcidSequenceString());
+			String peptideMarkup = "";
+			if (match.rank > 1) peptideMarkup += "<font color=#444444>";
+			peptideMarkup += match.getPeptide().getAcidSequenceString();
+			if (match.rank > 1) peptideMarkup += "</font>";
+			printTD(peptideMarkup);
 			
 			/* the sequence / protein name */
 			if (!Properties.useSpliceVariants) {
@@ -110,8 +116,12 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* PTM */
 			if (Properties.searchModifications) {
-				printTD("" + match.hasMod());
+				printTD("" + match.hasModification());
 			}
+			
+			/* rank */
+			printTD("" + match.rank);
+			printTD("" + match.rankCount);
 		}
 		
 		print("</table>");

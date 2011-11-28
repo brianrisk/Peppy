@@ -1,5 +1,6 @@
 package Peppy;
 
+import Math.MassError;
 import Utilities.U;
 
 public class Match_IMP_VariMod extends Match {
@@ -198,18 +199,22 @@ public class Match_IMP_VariMod extends Match {
 		return calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
 	}
 	
-	public double getModMass() {return modificationMass;}
+	public double getMoificationdMass() {return modificationMass;}
 	
-	public int getModIndex() {
+	public int getModificationIndex() {
 		return modificationIndex;
 	}
 
-	public boolean hasMod() {
+	public boolean hasModification() {
 		return (Math.abs(modificationMass) > MassError.getDaltonError(Properties.fragmentTolerance, spectrum.getMass()));
 	}
 	
+	public boolean isFromModificationSearches() {
+		return (Math.abs(modificationMass) > MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass()));
+	}
+	
 	public int getNumberOfModifications() {
-		if (hasMod()) {
+		if (hasModification()) {
 			return 1;
 		} else {
 			return 0;
@@ -221,11 +226,11 @@ public class Match_IMP_VariMod extends Match {
 		StringBuffer sb = new StringBuffer(out);
 		if (Properties.searchModifications) {
 			sb.append('\t');
-			sb.append(hasMod());
+			sb.append(hasModification());
 			sb.append('\t');
-			sb.append(getModMass());
+			sb.append(getMoificationdMass());
 			sb.append('\t');
-			sb.append(getModIndex() + 1);
+			sb.append(getModificationIndex() + 1);
 		}
 		return sb.toString();
 	}

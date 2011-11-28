@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Math.MassError;
 import Peppy.AminoAcids;
-import Peppy.MassError;
 import Peppy.Match;
 import Peppy.Peak;
 import Peppy.Peptide;

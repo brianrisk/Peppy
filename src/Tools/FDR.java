@@ -24,9 +24,19 @@ public class FDR {
 	
 	public static void main(String args[]) {
 		U.p("running FDR comparison report...");
+		U.startStopwatch();
+		
+//		findFDR(-1, -1, args);
+		iterate(args);
+		
+		U.stopStopwatch();
+		U.p("done");
+	}
+	
+	public static void iterate(String args[]) {
 		/* the tolerances we will be exploring */
-		double [] precursorTolerances = {5, 10, 25};
-		double [] fragmentTolerances = {10, 25, 50};
+		double [] precursorTolerances = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100};
+		double [] fragmentTolerances = {50};
 		
 		/* the file where we will save the report summary */
 		File reportDir = new File("FDR");
@@ -48,8 +58,6 @@ public class FDR {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		U.p("done");
 	}
 	
 	/**
@@ -60,7 +68,7 @@ public class FDR {
 	 */
 	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[]) {
 		
-		U.startStopwatch();
+//		U.startStopwatch();
 		
 		//grab our properties file, set up.
 		Peppy.init(args);
@@ -68,11 +76,11 @@ public class FDR {
 		/* if we have specially defined tolerances, set those here */
 		if (fragmentTolerance > 0) {
 			Properties.fragmentTolerance = fragmentTolerance;
-			U.p("fragmentTolerance: " + fragmentTolerance);
+//			U.p("fragmentTolerance: " + fragmentTolerance);
 		}
 		if (precursorTolerance > 0) {
 			Properties.precursorTolerance = precursorTolerance;
-			U.p("precursorTolerance: " + precursorTolerance);
+//			U.p("precursorTolerance: " + precursorTolerance);
 		}
 		NumberFormat nfPercent = NumberFormat.getPercentInstance();
 		nfPercent.setMaximumFractionDigits(2);
@@ -84,13 +92,13 @@ public class FDR {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//Loading a subset of our spectra
-		U.p("loading spectral files...");
+//		U.p("loading spectral files...");
 		ArrayList<File> spectraFiles = new ArrayList<File>();
 		Spectrum.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
-		U.p("loaded " + spectraFiles.size() + " spectra files");
+//		U.p("loaded " + spectraFiles.size() + " spectra files");
 		int setSize = Properties.numberOfSpectraToUseForFDR;
 		if (setSize > spectraFiles.size()) setSize = spectraFiles.size();
-		U.p("loading subset of spectra from the files...");
+//		U.p("loading subset of spectra from the files...");
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
 		Random random = new Random();
 		File spectrumFile;
@@ -103,10 +111,10 @@ public class FDR {
 		}
 		
 			
-		U.p("running report for " + Properties.spectraDirectoryOrFile.getName());
+//		U.p("running report for " + Properties.spectraDirectoryOrFile.getName());
 		
 		//getting forwards matches
-		U.p("finding forwards matches...");
+//		U.p("finding forwards matches...");
 		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
 		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -119,7 +127,7 @@ public class FDR {
 		}
 		
 		//getting reverse matches -- need to reload the sequences
-		U.p("finding reverse matches...");
+//		U.p("finding reverse matches...");
 		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
 		Match.setSortParameter(Match.SORT_BY_E_VALUE);
@@ -142,16 +150,15 @@ public class FDR {
 		
 		/* construct a list of points on the PR curve */
 		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
-		int targetTally = 0;
-		Match match;
+		int totalCorrect = 0;
 		double precision, recall;
 		for (int i = 0; i < allMatches.size(); i++) {
-			match = allMatches.get(i);
+			Match match = allMatches.get(i);
 			if (!match.isDecoy()) {
-				targetTally++;
+				totalCorrect++;
 			}
-			precision = (double) targetTally / (i + 1);
-			recall = (double) targetTally / setSize;
+			precision = (double) totalCorrect / (i + 1);
+			recall = (double) totalCorrect / setSize;
 			points.add(new Point2D.Double(precision, recall));
 		}
 		/* adjust for non-monotonic decreasing PR curve */
@@ -173,6 +180,14 @@ public class FDR {
 		/* save curve image */
 		PRCurve prCurve = new PRCurve(points);
 		prCurve.writeFile(new File(reportDir, "pr-" + identifierString + ".jpg"));
+		
+		/* print some basic stats */
+		int totalComparisons = 0;
+		for (Match match: allMatches)  {
+			totalComparisons += match.getSpectrum().getEValueCalculator().getNumberOfMatches();
+		}
+		double correctPerComparison = (double) totalCorrect / totalComparisons;
+		U.p(totalComparisons + "\t" + totalCorrect + "\t" + correctPerComparison);
 		
 		/* save FDR report */
 		double areaUndrePRCurve = -1;
@@ -208,10 +223,29 @@ public class FDR {
 			e.printStackTrace();
 		}
 		
-		U.stopStopwatch();
+//		U.stopStopwatch();
 		
 		return areaUndrePRCurve;
 		
+	}
+	
+	private static void printMatches(ArrayList<Match> matches, String fileName) {
+		File reportFile = new File(fileName);
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
+
+			for (int i = 0; i < matches.size(); i++) {
+				Match match = matches.get(i);
+				pw.println(match.toString());
+			}
+
+			pw.flush();
+			pw.close();
+
+		} catch (IOException e) {
+			U.p("ERROR: Could not create file writer for our report");
+			e.printStackTrace();
+		}
 	}
 	
 	

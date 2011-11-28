@@ -15,7 +15,7 @@ public class VCFFile {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line = br.readLine();
 			while (line != null) {
-				if (line.equals("#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NORMAL	PRIMARY")){
+				if (line.startsWith("#CHROM")){
 					break;
 				}
 				line = br.readLine();

@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import Peppy.MassError;
+import Math.MassError;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;

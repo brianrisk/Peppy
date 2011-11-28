@@ -25,10 +25,12 @@ public class ScoringThreadServer {
 	 */
 	ArrayList<ArrayList<Match>> matches;
 	
-	ArrayList<Thread> threads = new ArrayList<Thread>(Properties.numberOfThreads);
+	ArrayList<Thread> threads;
 	
 	//this is how we keep track of which Spectrum to give out next
 	private int spectrumIndex = 0;
+	
+	/* why this simply isn't Properties.numberOfThreads is because we may have less spectra than that number */
 	private int numberOfThreads;
 	
 	/**
@@ -44,6 +46,7 @@ public class ScoringThreadServer {
 		//here we make sure we don't use more threads than we have spectra
 		numberOfThreads = Properties.numberOfThreads;
 		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();
+		threads = new ArrayList<Thread>(numberOfThreads);
 		
 		//spawn new threads as needed
 		for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {

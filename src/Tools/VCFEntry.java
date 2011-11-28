@@ -17,7 +17,7 @@ public class VCFEntry {
 		chrom = chunks[0].trim();
 		try {
 			pos = Integer.parseInt(chunks[1]);
-			pos++;
+			//pos++;
 		} catch (NumberFormatException nfe) {
 			valid = false;
 		}

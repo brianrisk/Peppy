@@ -69,7 +69,7 @@ public class HTMLReporter {
 		}
 		
 		//sort our best matches
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
 		Collections.sort(bestMatches);
 		
 		NumberFormat nfDecimal = NumberFormat.getInstance();

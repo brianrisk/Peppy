@@ -79,11 +79,11 @@ public class ValidationReport {
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
 		
-		Properties.isSequenceFileDNA = false;
+//		Properties.isSequenceFileDNA = false;
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		Properties.maxIMP = 0.0001;
+		Properties.maxIMP = 0.000001;
 		
 		//What scoring mechanism?
 //		Properties.scoringMethodName = "Peppy.Match_Fake";
@@ -92,9 +92,8 @@ public class ValidationReport {
 //		Properties.scoringMethodName = "Peppy.Match_HMM";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 		
-//		Properties.spectrumToPeptideMassError = 0.01;
-		Properties.precursorTolerance = 2;
-		Properties.fragmentTolerance = 0.3;
+		Properties.precursorTolerance = 100;
+		Properties.fragmentTolerance = 500;
 		
 		/* save our properties */
 		Properties.generatePropertiesFile(reportFolder);
@@ -106,8 +105,8 @@ public class ValidationReport {
 		String testDirectoryName = Properties.testDirectory.getAbsolutePath();
 		tests = new ArrayList<TestSet>();
 		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
+//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
+//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
 //		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
 	}
 	

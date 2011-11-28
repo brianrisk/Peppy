@@ -40,8 +40,15 @@ public class VCFConverter {
 		U.p("found this many entries: " + entries.size());
 		U.p("found this many invalid entries: "+ vcf.getInvalidEntries().size());
 		
+		/* exit if nothing */
+		if (entries.size() == 0) {
+			U.p("nothing to do");
+			return;
+		}
+		
 		/* track how many times the expected nucleotide was wrong */
 		int numberOfTimesExpectedNucleotideWasWrong = 0;
+		int numberOfTimesExpectedEqualsNew = 0;
 		
 		for(Sequence s : sequences) {
 			sequenceFile = (Sequence_DNA) s;
@@ -55,9 +62,13 @@ public class VCFConverter {
 				if (entry.getChrom().equals(chromosomeNumberString)) {
 					for (int i = 0; i < entry.getAlt().length(); i++) {
 						if (bases[startIndex+i] != entry.getRef().charAt(i)) {
-							U.p("What the hell?");
+//							U.p("What the hell?");
 							numberOfTimesExpectedNucleotideWasWrong++;
 						}
+						if (bases[startIndex+i] == entry.getAlt().charAt(i)) {
+							numberOfTimesExpectedEqualsNew++;
+						}
+						
 						bases[startIndex+i] = entry.getAlt().charAt(i);
 					}
 				}
@@ -81,6 +92,7 @@ public class VCFConverter {
 		}
 		
 		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong);
+		U.p("the expected nucleotide equaled the new one: " + numberOfTimesExpectedEqualsNew);
 		U.p("... done.");
 	}
 }

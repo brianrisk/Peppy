@@ -26,6 +26,7 @@ public class HTMLPageRegions extends HTMLPage {
 		printTH("start");
 		printTH("-log10(P)");
 		printTH("hits");
+		printTH("uniques");
 		for(int i = 0; i < regions.size(); i++) {
 			Region region = regions.get(i);
 			
@@ -52,6 +53,7 @@ public class HTMLPageRegions extends HTMLPage {
 			
 			printTD("" + region.getPValue());
 			printTD("" + region.getMatches().size());
+			printTD("" + region.getUniqueCount());
 			
 			
 		}

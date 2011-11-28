@@ -145,7 +145,7 @@ public class Regions {
 		for (Region region: returnedRegions) {
 //			eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
 			eValue = MathFunctions.approximateNegativeLog10OfBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
-			region.getPValue(eValue);
+			region.setPValue(eValue);
 		}
 		
 		return returnedRegions;

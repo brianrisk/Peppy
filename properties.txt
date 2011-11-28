@@ -1,30 +1,21 @@
-##FASTA files can be either DNA or amino acid sequences
+##Properties which define how a sequence is digested
 isSequenceFileDNA true
-sequenceFilesContainMultipleSequences false
 useOnlyForwardsFrames false
 useIsotopeLabeling false
 useReverseDatabase false
 
-##This could be a directory or a file
+##This could be a directory or a file 
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/whim2_eEF_seq_chr679.fasta
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/WHIM2 xeno and germline
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/small
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19/chr7.fa
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome/chr7.fa
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/CD44.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences uniprot/uniprot_trembl_human.dat
 //sequenceDirectoryOrFile /Users/risk2/Documents/sprot/encode-data/annotation_sets/uniprot_human_2010_08/uniprot_sprot_human_varsplic.fasta
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/yanbao-histone/uniprot_sprot_mouse_Histone_only.fasta
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences gencodev6-transcripts
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/sequences/
 
-
-##This could be a directory or a file
+##This could be a directory or a file 
 spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF/CPTC_ELLS-001_2688_126_2-01
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
@@ -40,65 +31,73 @@ spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Ellis TTOF
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/spectra/
 
-//Scoring Method
-//scoringMethodName Peppy.Match_Fake
+##Scoring Method 
 scoringMethodName Peppy.Match_IMP
-//scoringMethodName Peppy.Match_IMP_VariMod
-//scoringMethodName Peppy.Match_TandemFit
-//scoringMethodName Peppy.Match_HMM
 
-//splicing
-useSpliceVariants false
+##retain 100 most intense peaks
+highIntensityCleaning false
 
-//digest only part of a sequence
+##digest only part of a sequence 
 useSequenceRegion false
 sequenceRegionStart 10482206
 sequenceRegionStop 10502206
 
+##limit returned matches by confidence 
+maxEValue 0.1
+maxIMP 1.0E-10
 
-
-minimumNumberOfPeaksForAValidSpectrum 10
-
-##DELETE
-highIntensityCleaning false
-
-//Parses jobs with a lot of spectra up in to chunks with this max size
-numberOfSpectraPerSegment 1000000
+##a preference for digestion of large DNA windows 
 digestionWindowSize 5000000
-maxNumberOfProteinsToLoadAtOnce 1000000
 
-//how much precursor mass / theoretical mass difference should we tolerate?
-spectrumToPeptideMassError 5
-//spectrumToPeptideMassError 200.0
+##number of spectra to process at once 
+numberOfSpectraPerSegment 1000000
 
-//TandemFit property
-peakDifferenceThreshold 10
+##error thresholds in PPM
+precursorTolerance 25
+fragmentTolerance 50
 
-//Report variables
+##Report variables 
 createHTMLReport true
 
-//no fragments that weigh less than this will be admitted into the fragment list
-//units are daltons.
+##no fragments that weigh less than this will be admitted into the fragment list 
+##units are daltons. 
 peptideMassMinimum 400.0
 peptideMassMaximum 10000.0
 
 numberOfMissedCleavages 2
 
-//This is per sequence file, so if this value is 5 and you use 7 FASTA files
-//it will produce (at least) 35 matches per spectrum
-//the final number of results also varies depending on the digestionWindowSize
+##splicing 
+useSpliceVariants false
+
+##This is per sequence file, so if this value is 5 and you use 7 FASTA files 
+##it will produce (at least) 35 matches per spectrum 
+##the final number of results also varies depending on the digestionWindowSize 
 maximumNumberOfMatchesForASpectrum 2
 
-//where we store our reports
+##where we store our reports 
 reportDirectory reports
-reportDirectoryTitle report
 
-// VCF
+##VCF
 VCFFileString /Users/risk2/PeppyOverflow/WASHU/vcf-merge-whim2-xeno.vcf.txt
 
+##False Discovery Rates
+numberOfSpectraToUseForFDR 10000
+
+##PTMs
+multipass true
+regionPValueMinimum 60
+searchModifications false
+modificationLowerBound -0.3
+modificationUpperBound 100.0
+
+// VCF
+VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Xenograft-hg19_2011-11-07.vcf
+//VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Normal-hg19_2011-11-07.vcf
+
+
 ## for test purposes
-testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
-testSequenceIsProtein true
+//testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
+testSequence /Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta
+//testSequenceIsProtein true
+testSequenceIsProtein false
 testDirectory /Users/risk2/PeppyOverflow/tests/ 
-
-

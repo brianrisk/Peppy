@@ -11,21 +11,26 @@ public class ProteinDigestionServer {
 	/* every protein produces a "cluster" of peptides */
 	ArrayList<ArrayList<Peptide>> peptidesClusters;
 	
-	ArrayList<Thread> threads = new ArrayList<Thread>(Properties.numberOfThreads);
+	ArrayList<Thread> threads;
 	
 	/* this is how we keep track of which protein to give out next */
 	private int proteinIndex = 0;
+	
+	/* why this simply isn't Properties.numberOfThreads is because we may have less proteins than that number */
+	private int numberOfThreads;
 	
 
 	public ProteinDigestionServer(ArrayList<Protein> proteins) {
 		this.proteins = proteins;	
 		peptidesClusters = new ArrayList<ArrayList<Peptide>>(proteins.size());
 		
-		//here we make sure we don't use more threads than we have spectra
-		if (Properties.numberOfThreads > proteins.size()) Properties.numberOfThreads = proteins.size();
+		//here we make sure we don't use more threads than we have proteins
+		numberOfThreads = Properties.numberOfThreads;
+		if (Properties.numberOfThreads > proteins.size()) numberOfThreads = proteins.size();
+		threads = new ArrayList<Thread>(numberOfThreads);
 		
 		//spawn new threads as needed
-		for (int threadNumber = 0; threadNumber < Properties.numberOfThreads; threadNumber++) {
+		for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
 			ProteinDigestionThread digester = new ProteinDigestionThread(getNextProtein(), this);
 			Thread thread = new Thread(digester);
 			thread.start();
@@ -60,7 +65,7 @@ public class ProteinDigestionServer {
 	public ArrayList<Peptide> getPeptides() {
 		boolean going = true;
 		while (going) {
-			for (int threadNumber = 0; threadNumber < Properties.numberOfThreads; threadNumber++) {
+			for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
 				Thread thread = threads.get(threadNumber);
 				going = thread.isAlive();
 				//if at least one thread is going, break out of this for loop

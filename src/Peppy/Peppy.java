@@ -100,17 +100,39 @@ public class Peppy {
 		U.p("we found this many regions: " + regions.getRegions().size());
 	
 		/* localized PTM search */
-		U.p("performing localized PTM search");
-		Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
-		Properties.searchModifications = true;
-		Properties.modificationLowerBound = -100;
-		Properties.modificationUpperBound = 100;
-		ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
-		U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
-		matches = getMatchesWithPeptides(peptidesInRegions, spectra);
-		
-		/* rerun the regions analysis */
-		regions = new Regions(matches, sequences, spectra);
+		if (Properties.multipass) {
+			U.p("performing localized PTM search");
+			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
+			Properties.searchModifications = true;
+			
+			/* generating peptides in the regions */
+			ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
+			U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
+			
+			/* getting matches to the peptides in the regions */
+			ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectra);
+			
+			/* make room for the modified matches and add them to our main set of matches */
+			int matchesNotFoundInUnmodifiedSearchCount = 0;
+			for (Match match: modMatches) {
+				if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
+			}
+			matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
+			for (Match match: modMatches) {
+				if (match.isFromModificationSearches()) matches.add(match);
+			}
+			
+			/* remove duplicates */
+			removeDuplicateMatches(matches);
+			
+			/* determine some stats */
+			assignRankToMatches(matches);
+			assignRankStats(matches);
+			
+			
+			/* rerun the regions analysis */
+			regions = new Regions(matches, sequences, spectra);
+		}
 		
 		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, spectra, sequences, reportDir);
@@ -210,7 +232,10 @@ public class Peppy {
 	 * @param isReverse if we are doing a normal, forwards search or if this is a null, reverse search
 	 * @return
 	 */
-	private static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra, boolean isReverse) {
+	private static ArrayList<Match> getMatches(
+			ArrayList<Sequence> sequences, 
+			ArrayList<Spectrum> spectra, 
+			boolean isReverse) {
 		
 		/* define the chunk of spectra on which we will work */
 		int spectraStart = 0;
@@ -350,7 +375,7 @@ public class Peppy {
 			
 		}
 		
-		assignRepeatedPeptideCount(matches);
+		assignRankStats(matches);
 				
 		return matches;
 	}
@@ -362,7 +387,9 @@ public class Peppy {
 	 * @param sequence_DNA
 	 * @return
 	 */
-	public static ArrayList<Match> getMatchesWithPeptides(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
+	public static ArrayList<Match> getMatchesWithPeptides(
+			ArrayList<Peptide> peptides, 
+			ArrayList<Spectrum> spectra) {
 		peptideTally += peptides.size();
 		
 		//This is where the bulk of the processing in long jobs takes
@@ -374,7 +401,7 @@ public class Peppy {
 		U.p("assigning rank to matches...");
 		assignRankToMatches(matches);
 		U.p("assigning repeated peptide count to matches...");
-		assignRepeatedPeptideCount(matches);
+		assignRankStats(matches);
 		U.p("assigning confidence values to matches...");
 		assignConfidenceValuesToMatches(matches, spectra);
 		U.p("removing poor matches...");
@@ -486,10 +513,10 @@ public class Peppy {
 	 * finds the number of times a certain amino acid is found for each spectrum 
 	 * @param matches
 	 */
-	public static void assignRepeatedPeptideCount(ArrayList<Match> matches) {
+	public static void assignRankStats(ArrayList<Match> matches) {
 		//first error check
 		if (matches.size() == 0) return;
-		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
 		Match match;
 		Match previousMatch = matches.get(0);
@@ -499,15 +526,15 @@ public class Peppy {
 			match = matches.get(i);
 			if (match.getSpectrum().getId() != previousMatch.getSpectrum().getId()) {
 				for (int j = i - rankCount; j < i; j++) {
-					matches.get(j).repeatCount = rankCount;
+					matches.get(j).rankCount = rankCount;
 				}
 				rankCount = 1;
 			} else {
-				if (match.getPeptide().equals(previousMatch.getPeptide())) {
+				if (match.getScore() == previousMatch.getScore()) {
 					rankCount++;
 				} else {
 					for (int j = i - rankCount; j < i; j++) {
-						matches.get(j).repeatCount = rankCount;
+						matches.get(j).rankCount = rankCount;
 					}
 					rankCount = 1;
 				}
@@ -543,7 +570,12 @@ public class Peppy {
 			spectrumID = match.getSpectrum().getId();
 
 			if (match.equals(previousMatch) && match.getPeptide().getStartIndex() == previousMatch.getPeptide().getStartIndex() && spectrumID == previousSpectrumID) {
-				matches.remove(i);
+				if (previousMatch.getScore() < match.getScore()) {
+					matches.remove(i - 1);
+					previousMatch = match;
+				} else {
+					matches.remove(i);
+				}
 				i--;
 				numberOfMatches--;
 			} else {
@@ -613,6 +645,7 @@ public class Peppy {
 		return paredDownMatches;
 	}
 	
+	//TODO this could probably be made much, much faster
 	private static ArrayList<Peptide> getPeptidesInRegions(ArrayList<Region> regions, ArrayList<Sequence> sequences, boolean isReverse) {
 		/* our return */
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
@@ -621,9 +654,11 @@ public class Peppy {
 		for (Sequence sequence: sequences) {
 			Sequence_DNA dnaSequence = (Sequence_DNA) sequence;
 			for (Region region: regions) {
-				if (dnaSequence.equals(region.getSequence())) {
-					//TODO get rid of this 500
-					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
+				if (region.getPValue() > Properties.regionPValueMinimum) {
+					if (dnaSequence.equals(region.getSequence())) {
+						//TODO get rid of this 500
+						out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
+					}
 				}
 			}
 			sequence.reset();

@@ -7,7 +7,7 @@ entire ecoli digestion
 JainabCleaned
 JainabCode
 peptides
-reports
+/reports
 reports - saved
 sequences ecoli
 sequences encode
@@ -67,3 +67,4 @@ peptides.txt
 /MassListGenerator.jar
 /jobs-doworknow/
 /jobs-yale/
+FDR WHIM2/

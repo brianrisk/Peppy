@@ -98,8 +98,8 @@ public class Region implements Comparable<Region> {
 		return coverage;
 	}
 
-	public void getPValue(double eValue) {
-		this.pValue = eValue;
+	public void setPValue(double pValue) {
+		this.pValue = pValue;
 	}
 
 
@@ -162,6 +162,18 @@ public class Region implements Comparable<Region> {
 		int out = 0;
 		for (Match match: matches) {
 			if (match.getPeptide().getStopIndex() > out) out = match.getPeptide().getStartIndex();
+		}
+		return out;
+	}
+	
+	/**
+	 * returns the number of PSMs where rank = 1 and rankCount = 1
+	 * @return
+	 */
+	public int getUniqueCount() {
+		int out = 0;
+		for (Match match: matches) {
+			if (match.rank == 1 && match.rankCount == 1) out++;
 		}
 		return out;
 	}

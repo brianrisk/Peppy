@@ -65,7 +65,7 @@ public class HTMLPageProtein extends HTMLPage{
 			Match match;
 			for (int i = 0; i < matches.size(); i++) {
 				match = matches.get(i);
-				if (match.hasMod()) {
+				if (match.hasModification()) {
 					print("<tr bgcolor=\"#00FF00\">");
 				} else {
 					print("<tr>");	
@@ -75,7 +75,7 @@ public class HTMLPageProtein extends HTMLPage{
 				printTD("" + match.getPeptide().getStartIndex());
 				printTD("" + match.getIMP());
 				printTD("" + match.getScore());
-				printTD("" + match.hasMod());
+				printTD("" + match.hasModification());
 				
 				//make a page for the match
 				File matchFile = new File(destinationFile.getParentFile(), match.getPeptide().getAcidSequenceString() + ".html");
