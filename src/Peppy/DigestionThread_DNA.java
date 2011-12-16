@@ -5,24 +5,11 @@ public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 	Nucleotides nucleotideSequence;
-	byte frame;
+	int frame;
 	boolean isForwardsStrand;
 	int startIndex;
 	int stopIndex;
 	boolean reverseDatabase;
-
-	public void run() {
-		//go through each character in the line, skipping ahead "frame" characters
-		if (isForwardsStrand) {
-			digest(startIndex + frame, stopIndex);
-		} else {
-			/* the "startIndex -1" is because we go while our 
-			 * index does not equal to that number.  Therefore it goes
-			 * right up to startIndex  */
-			digest(stopIndex - frame - 1, startIndex - 1);	
-		}
-	}
-	
 
 	/**
 	 * @param nucleotideSequence
@@ -30,7 +17,7 @@ public class DigestionThread_DNA implements Runnable {
 	 * @param forwardsStrand
 	 */
 	public DigestionThread_DNA(Nucleotides nucleotideSequence,
-			byte frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
+			int frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
 		
 		/* because of the digestion window overlap, sometimes this will be < 0 */
 		if (startIndex < 0) startIndex = 0;
@@ -43,14 +30,27 @@ public class DigestionThread_DNA implements Runnable {
 		this.stopIndex = stopIndex;
 		this.reverseDatabase = reverseDatabase;
 	}
+
+
+	public void run() {
+		digest();
+	}
 	
-	
-	public ArrayList<Peptide> getPeptides( ) {
-		return peptides;
+
+	public ArrayList<Peptide> digest() {
+		/* go through each character in the line, skipping ahead "frame" characters */
+		if (isForwardsStrand) {
+			 return digest(startIndex + frame, stopIndex);
+		} else {
+			/* the "startIndex -1" is because we go while our 
+			 * index does not equal to that number.  Therefore it goes
+			 * right up to startIndex  */
+			return digest(stopIndex - frame - 1, startIndex - 1);	
+		}
 	}
 	
 	
-	public ArrayList<Peptide> digest(int startPosition, int stopPosition) {
+	private ArrayList<Peptide> digest(int startPosition, int stopPosition) {
 		ArrayList<Protein> proteins = translateToProteins(startPosition, stopPosition);
 		peptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins);
 		return peptides;
@@ -294,6 +294,11 @@ public class DigestionThread_DNA implements Runnable {
 		} else {
 			return -1; //return STOP
 		}
+	}
+
+
+	public ArrayList<Peptide> getPeptides( ) {
+		return peptides;
 	}
 
 }
