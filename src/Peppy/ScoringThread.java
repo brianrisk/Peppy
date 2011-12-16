@@ -3,7 +3,6 @@ import java.util.ArrayList;
 
 import Math.MassError;
 import Math.MathFunctions;
-import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -61,7 +60,9 @@ public class ScoringThread implements Runnable {
 				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
 				
 				/* add the match we find */
-				matchesForOneSpectrum.add(match);
+				if (match.getIMP() <= 1.0E-8) {
+					matchesForOneSpectrum.add(match);
+				}
 						
 				/* only add the match if it is decent */
 				if (match.getIMP() <= Properties.maxIMP) {
