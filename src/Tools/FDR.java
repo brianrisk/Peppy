@@ -26,7 +26,7 @@ public class FDR {
 		U.p("running FDR comparison report...");
 		U.startStopwatch();
 		
-//		findFDR(-1, -1, args);
+//		findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
 		iterate(args);
 		
 		U.stopStopwatch();
@@ -35,8 +35,8 @@ public class FDR {
 	
 	public static void iterate(String args[]) {
 		/* the tolerances we will be exploring */
-		double [] precursorTolerances = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100};
-		double [] fragmentTolerances = {50};
+		double [] precursorTolerances = {10, 30};
+		double [] fragmentTolerances = {500};
 		
 		/* the file where we will save the report summary */
 		File reportDir = new File("FDR");
@@ -49,7 +49,7 @@ public class FDR {
 				for (int fragmentIndex = 0; fragmentIndex < fragmentTolerances.length; fragmentIndex++) {
 					precursor = precursorTolerances[precursorIndex];
 					fragment = fragmentTolerances[fragmentIndex];
-					area = findFDR(precursor, fragment, args);
+					area = findFDR(precursor, fragment, args, Match.SORT_BY_IMP_VALUE);
 					pw.println(precursor + "\t" + fragment + "\t" + area);
 				}
 			}
@@ -66,7 +66,7 @@ public class FDR {
 	 * @param precursorTolerance set to a negative number to ignore
 	 * @param args
 	 */
-	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[]) {
+	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[], int sortParameter) {
 		
 //		U.startStopwatch();
 		
@@ -117,7 +117,7 @@ public class FDR {
 //		U.p("finding forwards matches...");
 		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
 		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(sortParameter);
 		Collections.sort(forwardsMatches);
 		
 		//need to initialize things now that we have found matches
@@ -130,7 +130,7 @@ public class FDR {
 //		U.p("finding reverse matches...");
 		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(sortParameter);
 		Collections.sort(reverseMatches);
 		
 		/* label the reverse matches as being from a reverse database */
@@ -145,7 +145,7 @@ public class FDR {
 		Peppy.reduceMatchesToOnePerSpectrum(allMatches);
 		
 		/* sort the matches */
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
+		Match.setSortParameter(sortParameter);
 		Collections.sort(allMatches);
 		
 		/* construct a list of points on the PR curve */
@@ -206,7 +206,7 @@ public class FDR {
 			pw.println();
 			
 			/*print first line*/
-			pw.println("Precision\tPercent Found\tE value");
+			pw.println("Precision\tPercent Found\tIMP value");
 			
 			/* print the rest of the lines */
 			double percent = 1;
@@ -214,7 +214,7 @@ public class FDR {
 			for (int i = 1; i < points.size(); i++) {
 				if (points.get(i).x < percent && points.get(i - 1).x != points.get(i).x) {
 					percent -= increment;
-					pw.println(points.get(i - 1).x + "\t" + points.get(i - 1).y + "\t" + allMatches.get(i - 1).getEValue());
+					pw.println(points.get(i - 1).x + "\t" + points.get(i - 1).y + "\t" + allMatches.get(i - 1).getIMP());
 				}
 			}
 			pw.flush();
