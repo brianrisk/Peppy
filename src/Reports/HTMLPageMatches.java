@@ -3,11 +3,11 @@ package Reports;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import Peppy.Match;
-import Peppy.Match_IMP_VariMod;
+import Peppy.Peptide;
 import Peppy.Properties;
-import Utilities.U;
 
 public class HTMLPageMatches extends HTMLPage {
 	
@@ -27,17 +27,36 @@ public class HTMLPageMatches extends HTMLPage {
 		
 		printLink("regions html/index.html", "View regions report");
 		
-		printMatchTable("spectra/");
-		
+		/* print table of best matches */
+		printH2("Best matches for each peptide");
+		printBestMatchTable("spectra/");
 		
 		printFooter();
 	}
 	
+	protected void printBestMatchTable(String spectraPath) {
+		/* create a list of best matches */
+		ArrayList<Match> bestMatches = new ArrayList<Match>();
+		Match.setSortParameter(Match.SORT_BY_PEPTIDE_THEN_SCORE);
+		Collections.sort(matches);
+		Peptide peptide = new Peptide("k");
+		for (Match match: matches) {
+			if (!peptide.equals(match.getPeptide())) {
+				peptide = match.getPeptide();
+				bestMatches.add(match);
+			}
+		}
+		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Collections.sort(matches);
+		Collections.sort(bestMatches);
+		printMatchTable(spectraPath, bestMatches);
+	}
+	
 	protected void printMatchTable(String spectraPath) {
-		/* set up how we will round */
-		NumberFormat nfDecimal = NumberFormat.getInstance();
-		nfDecimal.setMaximumFractionDigits(2);
-		
+		printMatchTable(spectraPath, matches);
+	}
+	
+	protected void printMatchTable(String spectraPath, ArrayList<Match> matches) {
 		/* print our table headers */
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
@@ -64,7 +83,24 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("rank");
 		printTH("count");
 		
-
+		/*print the rows */
+		printMatchRows(matches, spectraPath);	
+		
+		print("</table>");
+	}
+	
+	
+	protected void printMatchRows(ArrayList<Match> matches, String spectraPath) {
+		/* some basic bounds checks */
+		if (matches == null) return;
+		if (matches.size() == 0) return;
+		int maxDisplay = this.maxDisplay;
+		if (matches.size() < maxDisplay) maxDisplay = matches.size();
+		
+		/* set up how we will round */
+		NumberFormat nfDecimal = NumberFormat.getInstance();
+		nfDecimal.setMaximumFractionDigits(2);
+		
 		for (int i = 0; i < maxDisplay; i++) {
 			/* get our match */
 			Match match = matches.get(i);
@@ -80,7 +116,9 @@ public class HTMLPageMatches extends HTMLPage {
 			if (match.rank > 1) peptideMarkup += "<font color=#444444>";
 			peptideMarkup += match.getPeptide().getAcidSequenceString();
 			if (match.rank > 1) peptideMarkup += "</font>";
-			printTD(peptideMarkup);
+			/* google link */
+			String link = "http://www.google.com/search?hl=en&q=" + match.getPeptide().getAcidSequenceString();
+			printTD("(<a href=\"" +link + "\">" + peptideMarkup + "</a>)");
 			
 			/* the sequence / protein name */
 			if (!Properties.useSpliceVariants) {
@@ -123,8 +161,6 @@ public class HTMLPageMatches extends HTMLPage {
 			printTD("" + match.rank);
 			printTD("" + match.rankCount);
 		}
-		
-		print("</table>");
 	}
 
 }

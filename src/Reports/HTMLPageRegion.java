@@ -1,13 +1,10 @@
 package Reports;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import Peppy.Match;
-import Peppy.Properties;
 import Peppy.Region;
-import Utilities.U;
 
 
 public class HTMLPageRegion extends HTMLPageMatches {
@@ -24,7 +21,10 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		String regionName = region.getSequence().getSequenceFile().getName() + ": " + region.getStartLocation() + " to " + region.getStopLocation();
 		printHeader(regionName, "<script src=\"http://peppyresearch.com/js/processing.js\"></script>");
 		printP("Sequence: " + region.getSequence().getSequenceFile().getName());
-		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation());
+		
+		/* UCSC link */
+		String link = UCSC.getLink(region.getStartLocation(), region.getStopLocation(), region.getSequence());
+		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation() + "(<a href=\"" +link + "\">UCSC</a>)");
 		printP("region P value: " + region.getPValue());
 		
 		/* get access to the matches */
@@ -71,6 +71,9 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		print("</script><canvas width=\"" +  region.getMaxLength() + "px\" height=\"" + processngHeight + "px\"></canvas>");
 		
 		
+		printH2("Best Matches");
+		printBestMatchTable("../../spectra/");
+		printH2("All Matches");
 		printMatchTable("../../spectra/");
 		
 		

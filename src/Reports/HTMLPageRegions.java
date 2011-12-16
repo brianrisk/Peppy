@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import Peppy.Region;
-import Utilities.U;
 
 public class HTMLPageRegions extends HTMLPage {
 	
@@ -24,7 +23,6 @@ public class HTMLPageRegions extends HTMLPage {
 		printTH("UCSC");
 		printTH("sequence");
 		printTH("start");
-		printTH("-log10(P)");
 		printTH("hits");
 		printTH("uniques");
 		for(int i = 0; i < regions.size(); i++) {
@@ -51,7 +49,6 @@ public class HTMLPageRegions extends HTMLPage {
 			printTD("" + region.getStartLocation());
 
 			
-			printTD("" + region.getPValue());
 			printTD("" + region.getMatches().size());
 			printTD("" + region.getUniqueCount());
 			

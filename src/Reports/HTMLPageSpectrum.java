@@ -1,11 +1,9 @@
 package Reports;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Graphs.HistogramVisualizer;
 import Math.MassError;
 import Peppy.Definitions;
 import Peppy.Match;
@@ -79,6 +77,8 @@ public class HTMLPageSpectrum extends HTMLPage {
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
 		
+		printP("<ul><li>mass: " + spectrum.getMass() + "<li>charge: " + spectrum.getCharge() + "<li>m/z: " + spectrum.getPrecursorMZ() + "</ul>");
+		
 		//spectrum
 		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
@@ -102,6 +102,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		print("<table class=\"sortable\" id=\"box-table-a\" width=\"95%\">");
 		printTR();
 		printTH("UCSC");
+		printTH("Google");
 		printTH("peptide");
 		printTH("sequence");
 		printTH("indicies");
@@ -124,14 +125,14 @@ public class HTMLPageSpectrum extends HTMLPage {
 		print("</table>");
 		
 		//histogram
-		printH2("E value histogram for spectrum " + spectrum.getId());
-		File histogramFile = new File(destinationFile.getParent(), spectrum.getId() + "-hist.jpg");
-		try {
-			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		printP("<img src=\"" + histogramFile.getName() + "\">");
+//		printH2("E value histogram for spectrum " + spectrum.getId());
+//		File histogramFile = new File(destinationFile.getParent(), spectrum.getId() + "-hist.jpg");
+//		try {
+//			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		printP("<img src=\"" + histogramFile.getName() + "\">");
 
 		printFooter();
 	}
@@ -142,6 +143,11 @@ public class HTMLPageSpectrum extends HTMLPage {
 		/* UCSC link */
 		String link = UCSC.getLink(match);
 		printTD("(<a href=\"" +link + "\">UCSC</a>)");
+		
+		/* google link */
+		link = "http://www.google.com/search?hl=en&q=" + match.getPeptide().getAcidSequenceString();
+		printTD("(<a href=\"" +link + "\">Google</a>)");
+		
 		
 		//peptide sequence
 		StringBuffer peptideLine = new StringBuffer();

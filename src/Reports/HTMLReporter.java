@@ -1,21 +1,14 @@
 package Reports;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
-import Peppy.Regions;
 import Peppy.Sequence;
 import Peppy.Spectrum;
-import Utilities.U;
 
 
 /**
@@ -53,18 +46,15 @@ public class HTMLReporter {
 		reportDir.mkdirs();
 		File indexFile = new File(reportDir, "index" + Properties.reportWebSuffix);
 
-		//sorting our matches by spectrum then score
+		/* create a list of best matches */
+		ArrayList<Match> bestMatches = new ArrayList<Match>();
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
-		
-		ArrayList<Match> bestMatches = new ArrayList<Match>();
-		
 		int spectrumID = -1; //an ID will never be -1
 		for (Match match: matches) {
 			if (spectrumID != match.getSpectrum().getId()) {
 				spectrumID = match.getSpectrum().getId();
 				bestMatches.add(match);
-			} else {
 			}
 		}
 		
@@ -78,7 +68,7 @@ public class HTMLReporter {
 		nfPercent.setMaximumFractionDigits(2);
 		
 		//limit how many we will display
-		int maxDisplay = 10000;
+		int maxDisplay = 1000;
 		if (maxDisplay > bestMatches.size()) maxDisplay = bestMatches.size();
 		
 		HTMLPageMatches hpm = new HTMLPageMatches(bestMatches, maxDisplay, indexFile);

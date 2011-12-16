@@ -26,17 +26,21 @@ public class UCSC {
 	}
 	
 	public static String getLink(int start, int stop, Sequence sequence) {
-		String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
-		if (Properties.isYale) {
-			link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
+		if (Properties.isSequenceFileDNA) {
+			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
+			if (Properties.isYale) {
+				link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
+			}
+			link += U.getFileNameWithoutSuffix(sequence.getSequenceFile());
+			link += "%3A";
+			link += start;
+			link += "-";
+			link += stop;
+	//		link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
+			return link;
+		} else {
+			return "";
 		}
-		link += U.getFileNameWithoutSuffix(sequence.getSequenceFile());
-		link += "%3A";
-		link += start;
-		link += "-";
-		link += stop;
-//		link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
-		return link;
 	}
 
 }
