@@ -24,7 +24,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	private boolean isIsotopeLabeled = Properties.useIsotopeLabeling;
 	private boolean hasIsotopeConfirmation = false;
 	
-	public int rankCount = 0; 
+	public int rankCount = Integer.MAX_VALUE; 
 	public int rank = Integer.MAX_VALUE;
 	
 	protected double eValue;
@@ -42,6 +42,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public final static int SORT_BY_SPECTRUM_ID_THEN_PEPTIDE = sortTracker++;
 	public final static int SORT_BY_RANK_THEN_SCORE = sortTracker++;
 	public final static int SORT_BY_IMP_VALUE = sortTracker++;
+	public final static int SORT_BY_PEPTIDE_THEN_SCORE = sortTracker++;
 	
 	//default is that we sort matches by score
 	private static int sortParameter = SORT_BY_SCORE;
@@ -54,7 +55,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 	public abstract String getScoringMethodName();
 	
 	
-	public double calculateIMP() {
+	protected double calculateIMP() {
 		if (impValue < 0) {
 			ionMatchTally = 0;
 			byte [] acidSequence = peptide.getAcidSequence();
@@ -381,7 +382,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (score < match.getScore()) return 1;
 				if (score > match.getScore()) return -1;
 				return 0;
-			} else 
+			} else 				
 			if (sortParameter == SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE) {
 				//i'm putting this calculation in here as this is a not-often-used sort
 				//so calculating and storing this for every match is unnecessary
@@ -391,6 +392,24 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (myDifference < theirDifference) return  1;
 				return 0;
 			} else 
+			if (sortParameter == SORT_BY_PEPTIDE_THEN_SCORE) {
+				/* first sorting by mass */
+				if (getPeptide().getMass() > match.getPeptide().getMass()) return  1;
+				if (getPeptide().getMass() < match.getPeptide().getMass()) return -1;
+				
+				/* sorting alphabetically */
+				int shortLength = peptide.getAcidSequence().length;
+				if (match.getPeptide().getAcidSequence().length < shortLength) shortLength = match.getPeptide().getAcidSequence().length;
+				for (int i = 0; i < shortLength; i++) {
+					if (match.getPeptide().getAcidSequence()[i] != peptide.getAcidSequence()[i]) return match.getPeptide().getAcidSequence()[i] - peptide.getAcidSequence()[i];
+				}
+				
+				/* sorting by score */
+				if (score < match.getScore()) return 1;
+				if (score > match.getScore()) return -1;
+				return 0;
+			} else 
+					
 			{
 				//we want to sort from greatest to least great
 				//so -1 is returned where 1 usually is
