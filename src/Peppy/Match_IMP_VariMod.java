@@ -9,6 +9,9 @@ public class Match_IMP_VariMod extends Match {
 	double modificationMass;
 	int modificationIndex = 0;
 	
+	/* true if mass difference between peptide and spectrum is significant */
+	boolean hasModification;
+	
 	//this is which amino acid we think has the modification
 	boolean [] potentialPlacesForModification;
 	
@@ -65,14 +68,42 @@ public class Match_IMP_VariMod extends Match {
 
 	@Override
 	public void calculateScore() {
+		
+		/* modification mass is the difference between our precursor and our theoretical mass */
 		modificationMass = spectrum.getMass() - peptide.getMass();
-		score = -Math.log10(calculateIMP());
+		
+		/*
+		 * if a modification is less than the fragment tolerance, then it would not affect the score when
+		 * compared to a non-modified search.
+		 */
+		hasModification = (Math.abs(modificationMass) > MassError.getDaltonError(Properties.fragmentTolerance, spectrum.getMass()));
+		
+		/* determining our score */
+		if (hasModification) {
+			score = -Math.log10(calculateIMP());
+			
+			/* this very slight punishment will serve as a tie breaker for comparing
+			 * matches with modifications and those without.  If we find a spectrum matching
+			 * two different peptides with the same score, we should believe the unmodified
+			 * match more.
+			 * 
+			 * the if is to avoid less than zero values as this would create a bug
+			 * when trying to find our histogram for e values.
+			 * we don't really worry about ties at this level of score anyway.
+			 */
+			if (score > 0.001) {
+				score -= .001;
+			}
+		} else {
+			score = -Math.log10(super.calculateIMP());
+		}
+		
 	}
 	
 	@Override
 	public String getScoringMethodName() {return "IMP VariMod";}
 	
-	public double calculateIMP() {
+	protected double calculateIMP() {
 		if (impValue < 0) {
 			double impValue1 = calculateIMP(modificationMass, 0);
 			double impValue2 = calculateIMP(modificationMass, peptide.getAcidSequence().length - 1);
@@ -95,7 +126,6 @@ public class Match_IMP_VariMod extends Match {
 				impValue = impValue1;
 				if (impValue2 < impValue) impValue = impValue2;
 			}
-			
 		}
 		return impValue;
 	}
@@ -105,11 +135,11 @@ public class Match_IMP_VariMod extends Match {
 	 * This eventually calls Match's calculateIMP, but first calculates b and y ions
 	 * given the modification.
 	 * 
-	 * @param offset
+	 * @param modificationMass
 	 * @param modifiedIndex
 	 * @return
 	 */
-	public double calculateIMP(double offset, int modifiedIndex) {
+	protected double calculateIMP(double modificationMass, int modifiedIndex) {
 		byte [] acidSequence = peptide.getAcidSequence();
 
 		int i;
@@ -133,10 +163,10 @@ public class Match_IMP_VariMod extends Match {
 		
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = offset + peptide.getMass() + Properties.rightIonDifference;
+		theoreticalPeakMass = modificationMass + peptide.getMass() + Properties.rightIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
-			if (i == modifiedIndex) theoreticalPeakMass -= offset;
+			if (i == modifiedIndex) theoreticalPeakMass -= modificationMass;
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);	
 		}
@@ -171,7 +201,7 @@ public class Match_IMP_VariMod extends Match {
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
-			if (i == modifiedIndex) theoreticalPeakMass += offset;
+			if (i == modifiedIndex) theoreticalPeakMass += modificationMass;
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
@@ -206,7 +236,7 @@ public class Match_IMP_VariMod extends Match {
 	}
 
 	public boolean hasModification() {
-		return (Math.abs(modificationMass) > MassError.getDaltonError(Properties.fragmentTolerance, spectrum.getMass()));
+		return hasModification;
 	}
 	
 	public boolean isFromModificationSearches() {
