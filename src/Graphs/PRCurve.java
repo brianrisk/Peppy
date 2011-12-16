@@ -15,8 +15,6 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import Utilities.U;
-
 public class PRCurve {
 	
 	private double areaUnderCurve = 0;

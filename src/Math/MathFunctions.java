@@ -2,8 +2,6 @@ package Math;
 
 import java.util.ArrayList;
 
-import Utilities.U;
-
 
 
 
@@ -183,6 +181,12 @@ public class MathFunctions {
 			else {index += increment;}
 			increment /= 2;
 		}
+		
+//		/* accounting for the remainder possibly produced by rounding error */
+//		while (values.get(index).getValue() > value) {
+//			index--;
+//		}
+//		index++;
 		return index;
 	}
 	

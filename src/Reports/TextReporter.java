@@ -11,7 +11,6 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
-import Peppy.Regions;
 import Peppy.Sequence;
 import Peppy.Spectrum;
 import Utilities.U;
