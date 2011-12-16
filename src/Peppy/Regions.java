@@ -39,6 +39,7 @@ public class Regions {
 			/* set sort parameter to sort by locus */
 			Match.setSortParameter(Match.SORT_BY_LOCUS);
 			
+			/* finds forwards strand and reverse strand regions */
 			ArrayList<Region> forwardRegions = findRegions(true);
 			ArrayList<Region> reverseRegions = findRegions(false);
 			regions = new ArrayList<Region>(forwardRegions.size() + reverseRegions.size());
@@ -133,7 +134,7 @@ public class Regions {
 		}
 		
 		/* calculate P values */
-		double eValue;
+		double pValue;
 		
 		/* this will actually compensate for the fact that we will have less
 		 * regions in reverse searches due to E value cutoffs.  If we assumed the
@@ -144,9 +145,12 @@ public class Regions {
 //		double probability = (double) maxLength / 3000000000.0; // region divided by length of genome 
 		for (Region region: returnedRegions) {
 //			eValue = MathFunctions.approximateBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
-			eValue = MathFunctions.approximateNegativeLog10OfBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
-			region.setPValue(eValue);
+			pValue = MathFunctions.approximateNegativeLog10OfBinomialProbability(matches.size(), region.getNumberOfMatches(), probability);
+			region.setPValue(pValue);
 		}
+		
+		/* I know the regions should already be sorted by now, but this just makes me feel better  */
+		Collections.sort(returnedRegions);
 		
 		return returnedRegions;
 	}
@@ -198,37 +202,43 @@ public class Regions {
 				regionsText.print('\t');
 				regionsText.print(region.getPValue());
 				regionsText.print('\t');
-				ArrayList<Match> matches = region.getMatches();
-				int noComma = matches.size() - 1;
-				for (int j = 0; j < matches.size(); j++) {
-					Match match = matches.get(j);
-					regionsText.print(match.getId());
-					if (j != noComma) regionsText.print(',');
-				}
-				regionsText.println();
+				regionsText.print(region.getMatches().size());
+				regionsText.print('\t');
+				regionsText.print(region.getUniqueCount());
+				regionsText.print('\t');
+				
+				/* the string of spectrum ids */
+//				ArrayList<Match> matches = region.getMatches();
+//				int noComma = matches.size() - 1;
+//				for (int j = 0; j < matches.size(); j++) {
+//					Match match = matches.get(j);
+//					regionsText.print(match.getId());
+//					if (j != noComma) regionsText.print(',');
+//				}
+//				regionsText.println();
 				
 				
-				/*setting up the file name for this region*/
-				String spacer = "";
-				if (i < 1000) {
-					spacer += "0";
-					if (i < 100) {
-						spacer += "0";
-						if (i < 10) {
-							spacer += "0";
-						}
-					}
-				}
-				int neatE = (int) Math.round(-Math.log10(region.getPValue()));
-				
-				/* create the text report for this one region */
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(regionsTextFolder, "region " + spacer + i + " " + neatE + ".txt"))));
-				ArrayList<Match> regionMatches = region.getMatches();
-				for (Match match: regionMatches) {
-					pw.println(match);
-				}
-				pw.flush();
-				pw.close();
+//				/*setting up the file name for this region*/
+//				String spacer = "";
+//				if (i < 1000) {
+//					spacer += "0";
+//					if (i < 100) {
+//						spacer += "0";
+//						if (i < 10) {
+//							spacer += "0";
+//						}
+//					}
+//				}
+//				int neatE = (int) Math.round(-Math.log10(region.getPValue()));
+//				
+//				/* create the text report for this one region */
+//				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(regionsTextFolder, "region " + spacer + i + " " + neatE + ".txt"))));
+//				ArrayList<Match> regionMatches = region.getMatches();
+//				for (Match match: regionMatches) {
+//					pw.println(match);
+//				}
+//				pw.flush();
+//				pw.close();
 			}
 			
 			/* closing out the main regions text file */

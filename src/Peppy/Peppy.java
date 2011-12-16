@@ -95,12 +95,16 @@ public class Peppy {
 		/*print peptide tally */
 		U.p("The total number of peptides produced is: " + peptideTally);
 		
-		/* regions */
-		Regions regions = new Regions(matches, sequences, spectra);
-		U.p("we found this many regions: " + regions.getRegions().size());
+		
 	
-		/* localized PTM search */
-		if (Properties.multipass) {
+		/* Multipass (only works with DNA) */
+		if (Properties.multipass && Properties.isSequenceFileDNA) {
+			
+			/* regions */
+			Regions regions = new Regions(matches, sequences, spectra);
+			U.p("we found this many regions: " + regions.getRegions().size());
+			
+			
 			U.p("performing localized PTM search");
 			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
 			Properties.searchModifications = true;
@@ -129,9 +133,14 @@ public class Peppy {
 			assignRankToMatches(matches);
 			assignRankStats(matches);
 			
-			
 			/* rerun the regions analysis */
 			regions = new Regions(matches, sequences, spectra);
+			
+			/* creating regions report */
+			regions.createReport(reportDir);
+			
+			/* clear memory */
+			regions.clearRegions();
 		}
 		
 		U.p("creating text reports");
@@ -143,13 +152,9 @@ public class Peppy {
 			HTMLReporter report = new HTMLReporter(matches, spectra, sequences, reportDir);
 			report.generateFullReport();
 		}	
-		
-		/* creating regions report */
-		regions.createReport(reportDir);
-		
+			
 		
 		//clear out memory
-		regions.clearRegions();
 		matches.clear();
 		spectra.clear();
 		sequences.clear();
@@ -220,7 +225,7 @@ public class Peppy {
 		if (Properties.useIsotopeLabeling) {
 			return getLabeledMatches(sequences, spectra);
 		} else {
-		return getMatches(sequences, spectra, Properties.useReverseDatabase);
+			return getMatches(sequences, spectra, Properties.useReverseDatabase);
 		}
 	}
 
@@ -273,7 +278,7 @@ public class Peppy {
 				 */
 				
 				/*  Initialize our list of peptides */
-				ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+				ArrayList<Peptide> peptides = new ArrayList<Peptide>(Properties.desiredPeptideDatabaseSize);
 				
 				/* This is where we get a chunk of peptides */
 				ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
@@ -650,15 +655,20 @@ public class Peppy {
 		/* our return */
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 		
+		/* determine how many regions we will use to generate our new set of peptides */
+		int numberOfRegionsToKeep = Properties.numberOfRegionsToKeep;
+		if (numberOfRegionsToKeep > regions.size()) numberOfRegionsToKeep = regions.size();
+		
 		/* get peptides along regions */
+		Region region;
 		for (Sequence sequence: sequences) {
 			Sequence_DNA dnaSequence = (Sequence_DNA) sequence;
-			for (Region region: regions) {
-				if (region.getPValue() > Properties.regionPValueMinimum) {
-					if (dnaSequence.equals(region.getSequence())) {
-						//TODO get rid of this 500
-						out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
-					}
+			for (int regionIndex = 0; regionIndex < numberOfRegionsToKeep; regionIndex++) {
+				region = regions.get(regionIndex);
+				if (dnaSequence.equals(region.getSequence())) {
+					
+					//TODO get rid of this 500
+					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
 				}
 			}
 			sequence.reset();

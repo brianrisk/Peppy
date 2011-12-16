@@ -116,12 +116,7 @@ public class Properties {
 	public static File reportWebFooterFile = new File("resources/reports/footer.txt");
 	public static File reportWebTableHeader = new File("resources/reports/index-table-header.txt");
 	
-	//the number of nucleotides away from a specific location on a chromosome for it to be
-	//considered part of the "neighborhood"
-	public static int locusNeighborhood = 3000;
-	
-	//Multiple Modifications
-	public static double multiModPrecursorMargin = 0.1;
+
 	
 	/* for testing purposes */
 	public static File testSequence;
@@ -139,7 +134,7 @@ public class Properties {
 	
 	/* PTMs */
 	public static boolean multipass = false;
-	public static double regionPValueMinimum = 40;
+	public static int numberOfRegionsToKeep = 1000;
 	public static boolean searchModifications = false;
 	public static double modificationLowerBound = -100;
 	public static double modificationUpperBound = 100;
@@ -302,10 +297,6 @@ public class Properties {
 		if (propertyName.equals("createHTMLReport")) 
 			createHTMLReport = Boolean.valueOf(propertyValue);
 		
-		//Multi PTMS
-		if (propertyName.equals("multiModPrecursorMargin")) 
-			multiModPrecursorMargin = Double.valueOf(propertyValue);
-		
 		/* for testing purposes */
 		if (propertyName.equals("testSequence")) 
 			testSequence = new File(propertyValue);
@@ -327,8 +318,8 @@ public class Properties {
 		/* multipass */
 		if (propertyName.equals("multipass")) 
 			multipass = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("regionPValueMinimum")) 
-			regionPValueMinimum = Double.valueOf(propertyValue);
+		if (propertyName.equals("numberOfRegionsToKeep"))
+			numberOfRegionsToKeep = Integer.valueOf(propertyValue);	
 		if (propertyName.equals("searchModifications")) 
 			searchModifications = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("modificationLowerBound")) 
@@ -416,7 +407,7 @@ public class Properties {
 			pw.println("searchModifications " + searchModifications);
 			pw.println("modificationLowerBound " + modificationLowerBound);
 			pw.println("modificationUpperBound " + modificationUpperBound);
-			pw.println("regionPValueMinimum " + regionPValueMinimum);
+			pw.println("numberOfRegionsToKeep " + numberOfRegionsToKeep);
 			
 			pw.println();
 			

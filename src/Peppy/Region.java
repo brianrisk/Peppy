@@ -2,8 +2,6 @@ package Peppy;
 
 import java.util.ArrayList;
 
-import Math.HasEValue;
-
 /**
  * A way of grouping matches by regions and scoring those regions
  * 
@@ -20,7 +18,6 @@ public class Region implements Comparable<Region> {
 	private int maxLength;
 	private double score = 0;
 	private int coverage = 0;
-	private int numberOfMatches = 0;
 	private double pValue;
 	private boolean flag = false;
 	private boolean isForward;
@@ -43,8 +40,8 @@ public class Region implements Comparable<Region> {
 			matches.add(match);
 //			score += match.getPeptide().getLength() * match.getPeptide().getLength();
 //			score -= Math.log10(match.getEValue());
-			score += 1;
-			numberOfMatches++;
+//			if (match.rank == 1  && match.rankCount == 1) score += 1;
+			if (match.rank == 1) score += (1.0 / match.rankCount);
 			return true;
 		} else {
 			return false;
@@ -76,7 +73,11 @@ public class Region implements Comparable<Region> {
 	}
 	
 	public double calculateScore() {
-		score = Math.log(score);
+//		score = 0;
+//		for (Match match: matches) {
+//			if (match.rank == 1) score += 1.0 / match.rankCount;
+//		}
+//		score = Math.log(score);
 		return score;
 	}
 	
@@ -147,7 +148,7 @@ public class Region implements Comparable<Region> {
 	}
 	
 	public int getNumberOfMatches() {
-		return numberOfMatches;
+		return matches.size();
 	}
 	
 	public int getTrueStart() {

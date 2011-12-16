@@ -102,36 +102,51 @@ public class Sequence_DNA extends Sequence{
 		
 		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
 		
-		/* Create our SequenceDigestionThread ArrayList */
-		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
-		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+		/* If a sequence is very short, it might not be worth the
+		 * computing overhead to do the threaded digestion;
+		 */
+		if (nucleotideSequence.getSequence().length() < 10000) {
+			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 0, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 1, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 2, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
 			if (!Properties.useOnlyForwardsFrames) {
-				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 0, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 1, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 2, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
 			}
-		}
+		} else {
 		
-		/* create the threads and start them engines! */
-		ArrayList<Thread> threads = new ArrayList<Thread>(); 
-		for (DigestionThread_DNA digestor: digestors) {
-			Thread thread = new Thread(digestor);
-			thread.start();
-			threads.add(thread);
-		}
-		
-		/* Wait for them all to finish */
-		for (Thread thread: threads) {
-			try {
-				thread.join();
-			} catch (InterruptedException e) {
-				U.p("Digestion thread interrupted!  Bad!");
-				e.printStackTrace();
+			/* Create our SequenceDigestionThread ArrayList */
+			ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
+			for (int frame = 0; frame < 3; frame++) {
+				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+				if (!Properties.useOnlyForwardsFrames) {
+					digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+				}
 			}
-		}
-		
-		/* harvest all digested peptides */
-		for (DigestionThread_DNA digestor: digestors) {
-			peptides.addAll(digestor.getPeptides());
+			
+			/* create the threads and start them engines! */
+			ArrayList<Thread> threads = new ArrayList<Thread>(); 
+			for (DigestionThread_DNA digestor: digestors) {
+				Thread thread = new Thread(digestor);
+				thread.start();
+				threads.add(thread);
+			}
+			
+			/* Wait for them all to finish */
+			for (Thread thread: threads) {
+				try {
+					thread.join();
+				} catch (InterruptedException e) {
+					U.p("Digestion thread interrupted!  Bad!");
+					e.printStackTrace();
+				}
+			}
+			
+			/* harvest all digested peptides */
+			for (DigestionThread_DNA digestor: digestors) {
+				peptides.addAll(digestor.getPeptides());
+			}
 		}
 		
 		/* free up nucleotides */
@@ -161,13 +176,16 @@ public class Sequence_DNA extends Sequence{
 	
 	public ArrayList<Peptide> extractPeptidesFromRegion(int startIndex, int stopIndex, boolean isReverse) {
 		
-		
 		//if we have yet to read in all the ATGC data, do that now
 		if (nucleotideSequences == null) getNucleotideSequences();
 		
 		//Get whatever sequence we're working on.  There will most often only be
 		//one sequence in nucleotideSequences, but sometimes more
 		Nucleotides nucleotideSequence = nucleotideSequences.get(nucleotideSequenceIndex);
+		
+		/* bounds checking */
+		if (startIndex < 0) startIndex = 0;
+		if (stopIndex > nucleotideSequence.getSequence().length()) stopIndex = nucleotideSequence.getSequence().length();
 		
 		/* initialize where we will hold the peptides */
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
