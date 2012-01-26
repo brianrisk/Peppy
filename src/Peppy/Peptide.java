@@ -26,19 +26,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private Sequence_DNA parentSequence;
 	private Protein protein;
 	private boolean isSpliced;
-	private boolean isMatched = false;
 	private int lengthMinusOne;
 	private int cleavageAcidCount;
 	private boolean inORF;
 	
-	
-	public boolean isMatched() {
-		return isMatched;
-	}
-
-	public void setMatched(boolean isMatched) {
-		this.isMatched = isMatched;
-	}
 
 	/**
 	 * just gets an amino acid sequence.

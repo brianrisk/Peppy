@@ -165,7 +165,7 @@ public class Regions {
 			regionsHTMLFolder.mkdirs();
 			
 			/* determine how many regions we are reporting */
-			int max = 1000;
+			int max = Properties.numberOfRegionsToKeep;
 			if (regions.size() < max) max = regions.size();
 			
 			/* trim down regions to this amount */

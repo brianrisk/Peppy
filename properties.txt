@@ -1,46 +1,36 @@
 ##Properties which define how a sequence is digested
-isSequenceFileDNA false
-useOnlyForwardsFrames true
+isSequenceFileDNA true
+useOnlyForwardsFrames false
 useIsotopeLabeling false
 useReverseDatabase false
 
 ##This could be a directory or a file 
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/WHIM2 xeno and germline
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/WHIM2 germline
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WASHU/xeno genome
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/ecoli
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/sequences/mouse/
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/sequences/
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/V7Transcript_Splitted
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/sequences/uniprot/uniprot_trembl_human.dat
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/HarshaModTest/sPRG2011_reduced_for_rev_07192011.fasta
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/public/sequences/dna/HG19
+sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/public/sequences/dna/HG19/chr15.fa
+//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/sequences/WHIM2 xeno and germline
 
 ##This could be a directory or a file 
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/HarshaModTest/DTA
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/tests/ecoli/spectra
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra isotope labeled
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/spectra human677
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/Yale/spectra/
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/ucla/spectra/
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_033_WHIM2_frac_dta
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_WHIM2_unfrac
+spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/public/ENCODE/Go Cyto/010510_GO_Cyto_2
+
 
 ##Scoring Method 
-//scoringMethodName Peppy.Match_IMP
-scoringMethodName Peppy.Match_IMP_VariMod
+scoringMethodName Peppy.Match_IMP
+//scoringMethodName Peppy.Match_IMP_VariMod
 
 ##retain 100 most intense peaks
 highIntensityCleaning false
 
 ##digest only part of a sequence 
-useSequenceRegion false
-sequenceRegionStart 10482206
-sequenceRegionStop 10502206
+useSequenceRegion true
+sequenceRegionStart 66007655
+sequenceRegionStop 66207655
 
 ##limit returned matches by confidence 
 maxEValue 0.1
-maxIMP 1.0E-20
+maxIMP 1.0E-23
 
 ##a preference for digestion of large DNA windows 
 digestionWindowSize 5000000
@@ -81,13 +71,13 @@ VCFFileString /Users/risk2/PeppyOverflow/WASHU/vcf-merge-whim2-xeno.vcf.txt
 numberOfSpectraToUseForFDR 10000
 
 ##PTMs
-multipass false
+multipass true
 numberOfRegionsToKeep 1000
-searchModifications true
+searchModifications false
 modificationLowerBound -0.3
 modificationUpperBound 100.0
 
-// VCF
+## VCF
 VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Xenograft-hg19_2011-11-07.vcf
 //VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Normal-hg19_2011-11-07.vcf
 

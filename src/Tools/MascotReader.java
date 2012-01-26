@@ -53,7 +53,7 @@ public class MascotReader {
 		));
 		
 		for (TestSet test: testSets) {
-			test.cleanMatches();
+			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		

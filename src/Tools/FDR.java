@@ -1,10 +1,12 @@
 package Tools;
 
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -26,17 +28,26 @@ public class FDR {
 		U.p("running FDR comparison report...");
 		U.startStopwatch();
 		
-//		findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
-		iterate(args);
+		findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
+//		iterate(args);
 		
 		U.stopStopwatch();
 		U.p("done");
 	}
 	
+	public static void getParameters() {
+		
+		
+	}
+	
 	public static void iterate(String args[]) {
-		/* the tolerances we will be exploring */
-		double [] precursorTolerances = {10, 30};
-		double [] fragmentTolerances = {500};
+		/* precursor tolerances we will be exploring */
+		U.p("List the precursor tolerances, separated by commas:");
+		double [] precursorTolerances = extractArrayFromString(U.in());
+		
+		/* the fragment tolerances */
+		U.p("List the fragment tolerances, separated by commas:");
+		double [] fragmentTolerances = extractArrayFromString(U.in());
 		
 		/* the file where we will save the report summary */
 		File reportDir = new File("FDR");
@@ -60,6 +71,15 @@ public class FDR {
 		}
 	}
 	
+	private static double [] extractArrayFromString (String string) {
+		String [] split = string.split(",");
+		double [] values = new double[split.length];
+		for (int i = 0; i < split.length; i++) {
+			values[i] = Double.parseDouble(split[i].trim());
+		}
+		return values;
+	}
+	
 	/**
 	 * 
 	 * @param fragmentTolerance set to a negative number to ignore
@@ -68,7 +88,6 @@ public class FDR {
 	 */
 	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[], int sortParameter) {
 		
-//		U.startStopwatch();
 		
 		//grab our properties file, set up.
 		Peppy.init(args);
@@ -76,11 +95,9 @@ public class FDR {
 		/* if we have specially defined tolerances, set those here */
 		if (fragmentTolerance > 0) {
 			Properties.fragmentTolerance = fragmentTolerance;
-//			U.p("fragmentTolerance: " + fragmentTolerance);
 		}
 		if (precursorTolerance > 0) {
 			Properties.precursorTolerance = precursorTolerance;
-//			U.p("precursorTolerance: " + precursorTolerance);
 		}
 		NumberFormat nfPercent = NumberFormat.getPercentInstance();
 		nfPercent.setMaximumFractionDigits(2);
@@ -92,13 +109,10 @@ public class FDR {
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		//Loading a subset of our spectra
-//		U.p("loading spectral files...");
 		ArrayList<File> spectraFiles = new ArrayList<File>();
 		Spectrum.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
-//		U.p("loaded " + spectraFiles.size() + " spectra files");
 		int setSize = Properties.numberOfSpectraToUseForFDR;
 		if (setSize > spectraFiles.size()) setSize = spectraFiles.size();
-//		U.p("loading subset of spectra from the files...");
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
 		Random random = new Random();
 		File spectrumFile;
@@ -109,12 +123,8 @@ public class FDR {
 		for (int i = 0; i < spectra.size(); i++) {
 			spectra.get(i).setId(i);
 		}
-		
-			
-//		U.p("running report for " + Properties.spectraDirectoryOrFile.getName());
-		
+				
 		//getting forwards matches
-//		U.p("finding forwards matches...");
 		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
 		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
 		Match.setSortParameter(sortParameter);
@@ -127,7 +137,6 @@ public class FDR {
 		}
 		
 		//getting reverse matches -- need to reload the sequences
-//		U.p("finding reverse matches...");
 		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
 		Match.setSortParameter(sortParameter);

@@ -33,7 +33,7 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		/* print out the processing section */
 		int frameHeight = 15;
 		int processngHeight = 6 * frameHeight;
-		int processingWidth = 800;
+		int processingWidth = 683; /* 683 is the approximate width of the UCSC browser */
 		print("<script type=\"application/processing\">");
 		print("void setup() {");
 		print("noLoop();");

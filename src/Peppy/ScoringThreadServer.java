@@ -88,8 +88,7 @@ public class ScoringThreadServer {
 	public ArrayList<Match> getMatches() {
 		boolean going = true;
 		while (going) {
-			for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
-				Thread thread = threads.get(threadNumber);
+			for (Thread thread: threads) {
 				going = thread.isAlive();
 				//if at least one thread is going, break out of this for loop
 				if (going) break;

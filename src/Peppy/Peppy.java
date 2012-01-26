@@ -97,44 +97,11 @@ public class Peppy {
 		
 		
 	
-		/* Multipass (only works with DNA) */
-		if (Properties.multipass && Properties.isSequenceFileDNA) {
-			
-			/* regions */
-			Regions regions = new Regions(matches, sequences, spectra);
-			U.p("we found this many regions: " + regions.getRegions().size());
-			
-			
-			U.p("performing localized PTM search");
-			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
-			Properties.searchModifications = true;
-			
-			/* generating peptides in the regions */
-			ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
-			U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
-			
-			/* getting matches to the peptides in the regions */
-			ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectra);
-			
-			/* make room for the modified matches and add them to our main set of matches */
-			int matchesNotFoundInUnmodifiedSearchCount = 0;
-			for (Match match: modMatches) {
-				if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
-			}
-			matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
-			for (Match match: modMatches) {
-				if (match.isFromModificationSearches()) matches.add(match);
-			}
-			
-			/* remove duplicates */
-			removeDuplicateMatches(matches);
-			
-			/* determine some stats */
-			assignRankToMatches(matches);
-			assignRankStats(matches);
+		/* regions (only work with DNA) */
+		if (Properties.isSequenceFileDNA) {
 			
 			/* rerun the regions analysis */
-			regions = new Regions(matches, sequences, spectra);
+			Regions regions = new Regions(matches, sequences, spectra);
 			
 			/* creating regions report */
 			regions.createReport(reportDir);
@@ -216,7 +183,7 @@ public class Peppy {
 	
 	
 	/**
-	 * Assumes that we are doing the normal, forwards digestion of our sequences
+	 * Does a normal search, then does multipass
 	 * @param sequences
 	 * @param spectra
 	 * @return
@@ -225,7 +192,14 @@ public class Peppy {
 		if (Properties.useIsotopeLabeling) {
 			return getLabeledMatches(sequences, spectra);
 		} else {
-			return getMatches(sequences, spectra, Properties.useReverseDatabase);
+			/* performing our normal search */
+			ArrayList<Match> matches = getMatches(sequences, spectra, Properties.useReverseDatabase);
+			
+			/* performing the multipass search */
+			if (Properties.multipass && Properties.isSequenceFileDNA) {
+				matches = multipass(matches, sequences, spectra);
+			}
+			return matches;
 		}
 	}
 
@@ -279,6 +253,7 @@ public class Peppy {
 				
 				/*  Initialize our list of peptides */
 				ArrayList<Peptide> peptides = new ArrayList<Peptide>(Properties.desiredPeptideDatabaseSize);
+				peptides.ensureCapacity(Properties.desiredPeptideDatabaseSize);
 				
 				/* This is where we get a chunk of peptides */
 				ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
@@ -297,14 +272,13 @@ public class Peppy {
 					while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
 						
 						/* clear previous chunk of peptides and reclaim memory */
-						if (peptideSegment != null) {	
-							peptideSegment.clear();
-							System.gc();
-						}	
+//						if (peptideSegment != null) {	
+//							peptideSegment.clear();
+//							System.gc();
+//						}	
 						
 						/* collect peptides */
 						peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
-						
 							
 						/* advance to the next sequence if we don't have any more peptides in this sequence */
 						if (peptideSegment == null) {
@@ -315,7 +289,6 @@ public class Peppy {
 						} else {
 							peptides.addAll(peptideSegment);
 						}
-						
 						
 						/* if we have advanced past the last sequence, then exit this loop */
 						if (sequenceIndex == sequences.size()) {
@@ -362,7 +335,7 @@ public class Peppy {
 			removeDuplicateMatches(segmentMatches);
 			assignConfidenceValuesToMatches(segmentMatches, spectra);
 			assignRankToMatches(segmentMatches);
-			segmentMatches = removePoorMatches(segmentMatches);
+			segmentMatches = keepTopRankedMatches(segmentMatches);
 			
 			
 			/* add segment matches to the full list of matches */
@@ -385,6 +358,7 @@ public class Peppy {
 		return matches;
 	}
 	
+	
 	/**
 	 * Gets matches where a list of peptides is already derived
 	 * @param peptides
@@ -400,17 +374,20 @@ public class Peppy {
 		//This is where the bulk of the processing in long jobs takes
 		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 
-		//Add only matches with a decent e value	
-//		U.p("removing duplicate matches...");
-//		removeDuplicateMatches(matches);
+		U.p("removing duplicate matches...");
+		removeDuplicateMatches(matches);
+
 		U.p("assigning rank to matches...");
 		assignRankToMatches(matches);
+		
 		U.p("assigning repeated peptide count to matches...");
 		assignRankStats(matches);
+		
 		U.p("assigning confidence values to matches...");
 		assignConfidenceValuesToMatches(matches, spectra);
+		
 		U.p("removing poor matches...");
-		matches = removePoorMatches(matches);
+		matches = keepTopRankedMatches(matches);
 		
 		return matches;
 	}
@@ -612,44 +589,62 @@ public class Peppy {
 	}
 	
 	/**
-	 * Removes matches with poor E values, rank, etc.
+	 * Removes the low ranked matches
 	 * @param newMatches
 	 * @param matches
 	 */
-	public static ArrayList<Match> removePoorMatches(ArrayList<Match> matches) {	
-
-		boolean remove;
+	public static ArrayList<Match> keepTopRankedMatches(ArrayList<Match> matches) {	
 		ArrayList<Match> paredDownMatches = new ArrayList<Match>();
 		for (Match match: matches) {
-			
-			/* the remove flag initially set to false */
-			remove = false;
-			
-			/* flagging matches with low rank */
-			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
-				remove = true;
-			}
-			
-			/* flagging matches with high E values */
-			if (match.getEValue() > Properties.maxEValue) {
-				remove = true;
-			}
-			
-			/* flagging matches with weirdly low E values */
-//			if (match.getIMP() > match.getEValue()) {
-//				remove = true;
-//			}
-			
-			/* removing the match if it was flagged */
-			if (!remove) {
+
+			if (match.rank <= Properties.maximumNumberOfMatchesForASpectrum) {
 				paredDownMatches.add(match);
 			}
-			
+	
 		}
-		
 		return paredDownMatches;
 	}
 	
+	
+	
+	private static ArrayList<Match> multipass(ArrayList<Match> matches, ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+		/* regions */
+		Regions regions = new Regions(matches, sequences, spectra);
+		U.p("we found this many regions: " + regions.getRegions().size());
+		
+		
+		U.p("performing localized PTM search");
+		Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
+		Properties.searchModifications = true;
+		
+		/* generating peptides in the regions */
+		ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
+		U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
+		
+		/* getting matches to the peptides in the regions */
+		ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectra);
+		
+		/* make room for the modified matches and add them to our main set of matches */
+		int matchesNotFoundInUnmodifiedSearchCount = 0;
+		for (Match match: modMatches) {
+			if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
+		}
+		matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
+		for (Match match: modMatches) {
+			if (match.isFromModificationSearches()) matches.add(match);
+		}
+		
+		/* remove duplicates */
+		removeDuplicateMatches(matches);
+		
+		/* determine some stats */
+		assignRankToMatches(matches);
+		assignRankStats(matches);
+		
+		return matches;
+	}
+
+
 	//TODO this could probably be made much, much faster
 	private static ArrayList<Peptide> getPeptidesInRegions(ArrayList<Region> regions, ArrayList<Sequence> sequences, boolean isReverse) {
 		/* our return */

@@ -1,6 +1,17 @@
 package Peppy;
 import java.util.ArrayList;
 
+import Utilities.U;
+
+/**
+ * This is used to parallelize the digestion of DNA.
+ * One digestion thread is made for each of the six frames
+ * of possible translation on DNA.  The digestion thread returns
+ * an array list of proteins which are then further digested.
+ * 
+ * @author Brian Risk
+ *
+ */
 public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();

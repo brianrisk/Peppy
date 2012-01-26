@@ -64,7 +64,7 @@ public class XTandemReader {
 		
 		
 		for (TestSet test: testSets) {
-			test.cleanMatches();
+			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		

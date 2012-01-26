@@ -29,8 +29,7 @@ public class ValidationReport {
 	public static File databaseFile = new File("");
 	public static File reportFolder;
 	public static PrintWriter indexWriter;
-	public static boolean doForwards = true;
-	public static boolean doReverse = false;
+
 	public static int forwardsDatabaseSize = 0;
 	public static int reverseDatabaseSize = 0;
 
@@ -43,8 +42,7 @@ public class ValidationReport {
 		addTests();
 		U.startStopwatch();
 //		createListOfPeptidesNotFoundInTheDatabase();
-		if (doForwards) forwards();
-//		if (doReverse) reverse();
+		searchTestSets();
 		createReport();
 //		createWrongReport();
 		U.stopStopwatch();
@@ -74,7 +72,11 @@ public class ValidationReport {
 		} catch (IOException e) {
 			U.p("ERROR: Could not create file writer for our report");
 			e.printStackTrace();
+			
 		}
+		
+		/* definitely using the whole sequence */
+		Properties.useSequenceRegion = false;
 		
 		//how many missed cleavages when we digest
 		Properties.numberOfMissedCleavages = 2;
@@ -83,10 +85,9 @@ public class ValidationReport {
 		
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		Properties.maxIMP = 0.000001;
+		Properties.maxIMP = 5;
 		
 		//What scoring mechanism?
-//		Properties.scoringMethodName = "Peppy.Match_Fake";
 		Properties.scoringMethodName = "Peppy.Match_IMP";
 //		Properties.scoringMethodName = "Peppy.Match_TandemFit";
 //		Properties.scoringMethodName = "Peppy.Match_HMM";
@@ -99,6 +100,7 @@ public class ValidationReport {
 		Properties.generatePropertiesFile(reportFolder);
 		
 	}
+	
 	
 	private static void addTests() {
 		//set up which tests we will perform
@@ -114,7 +116,7 @@ public class ValidationReport {
 	/**
 	 * Completes a search on all test sets in our list using the correct (forward) digestion of our protein database.
 	 */
-	public static void forwards() {
+	public static void searchTestSets() {
 		Sequence sequence;
 		if (Properties.testSequenceIsProtein) {
 			sequence = new Sequence_Protein(Properties.testSequence);	
@@ -142,17 +144,18 @@ public class ValidationReport {
 		}
 		
 		for (TestSet test: tests) {
-			test.cleanMatches();
+			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		
 	}
 	
+	
 	private static void createListOfPeptidesNotFoundInTheDatabase() {
 		U.p("creating list of unfound peptides...");
 		
-		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
-//		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
+//		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
+		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
@@ -201,25 +204,6 @@ public class ValidationReport {
 		
 	}
 	
-	/**
-	 * Get the reverse of the database.  Should produce a database of about the same size but
-	 * with, most likely, nearly no correct matches.
-	 */
-	public static void reverse() {
-		//We only want one match per spectrum
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		
-		Sequence_Protein peptideDatabase = new Sequence_Protein(databaseFile);
-//		Sequence_DNA peptideDatabase = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences ecoli/ecoli.fasta"));	
-		ArrayList<Peptide> peptides = peptideDatabase.extractAllPeptides(true);
-		reverseDatabaseSize = peptides.size();
-		
-		for (TestSet test: tests) {
-			U.p("Getting false matches for: " + test.getName());
-			test.findFalsePositiveMatches(peptides);
-		}		
-	}
-	
 	
 	
 	public static void createReport() {
@@ -256,16 +240,6 @@ public class ValidationReport {
 			
 			pw.println("<br>");
 			pw.println("Database: " + databaseFile.getName());
-			
-			if (doForwards) {
-				pw.println("<br>");
-				pw.println("Forwards Database Size: " + forwardsDatabaseSize);
-			}
-			
-			if (doReverse) {
-				pw.println("<br>");
-				pw.println("Reverse Database Size: " + reverseDatabaseSize);
-			}
 			
 			pw.println("<h2>Basic performance metrics</h2>");
 			pw.println("<table border=1>");
@@ -355,9 +329,7 @@ public class ValidationReport {
 				pw.println("<td>" + nfPercent.format(testSet.getAreaUnderPRCurve()) + "</td>");
 			}
 			
-			pw.println("</table>");
-			
-			
+			pw.println("</table>");		
 
 			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
 			pw.println("<h3>Forwards</h3>");
@@ -395,45 +367,6 @@ public class ValidationReport {
 				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
 			}
 			pw.println("</table>");
-			
-			//REVERSE
-			if (doReverse) {
-				pw.println("<h3>Reverse</h3>");
-				pw.println("<table border=1>");
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 1% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.01) + "</td>");
-				}
-				
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 5% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.05) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 25% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.25) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 50% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.50) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 75% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.75) + "</td>");
-				}
-				pw.println("<tr>");
-				pw.println("<td>E value marking top 95% (reverse)</td>");
-				for (TestSet testSet: tests) {
-					pw.println("<td>" + testSet.getEValueAtPercentReverse(0.95) + "</td>");
-				}
-				pw.println("</table>");
-			}
-
 
 			pw.println("</table>");
 

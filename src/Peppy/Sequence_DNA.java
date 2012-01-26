@@ -98,55 +98,38 @@ public class Sequence_DNA extends Sequence{
 			}
 		}
 		
-
+//		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
 		
-		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
-		
-		/* If a sequence is very short, it might not be worth the
-		 * computing overhead to do the threaded digestion;
-		 */
-		if (nucleotideSequence.getSequence().length() < 10000) {
-			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 0, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
-			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 1, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
-			peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 2, true, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+		/* Create our SequenceDigestionThread ArrayList */
+		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
+		for (int frame = 0; frame < 3; frame++) {
+			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
 			if (!Properties.useOnlyForwardsFrames) {
-				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 0, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
-				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 1, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
-				peptides.addAll((new DigestionThread_DNA(nucleotideSequence, 2, false, startIndex - digestionFrameOverlap, stopIndex, isReverse)).digest());
+				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
 			}
-		} else {
+		}
 		
-			/* Create our SequenceDigestionThread ArrayList */
-			ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
-			for (int frame = 0; frame < 3; frame++) {
-				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
-				if (!Properties.useOnlyForwardsFrames) {
-					digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
-				}
+		/* create the threads and start them engines! */
+		ArrayList<Thread> threads = new ArrayList<Thread>(); 
+		for (DigestionThread_DNA digestor: digestors) {
+			Thread thread = new Thread(digestor);
+			thread.start();
+			threads.add(thread);
+		}
+		
+		/* Wait for them all to finish */
+		for (Thread thread: threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				U.p("Digestion thread interrupted!  Bad!");
+				e.printStackTrace();
 			}
-			
-			/* create the threads and start them engines! */
-			ArrayList<Thread> threads = new ArrayList<Thread>(); 
-			for (DigestionThread_DNA digestor: digestors) {
-				Thread thread = new Thread(digestor);
-				thread.start();
-				threads.add(thread);
-			}
-			
-			/* Wait for them all to finish */
-			for (Thread thread: threads) {
-				try {
-					thread.join();
-				} catch (InterruptedException e) {
-					U.p("Digestion thread interrupted!  Bad!");
-					e.printStackTrace();
-				}
-			}
-			
-			/* harvest all digested peptides */
-			for (DigestionThread_DNA digestor: digestors) {
-				peptides.addAll(digestor.getPeptides());
-			}
+		}
+		
+		/* harvest all digested peptides */
+		for (DigestionThread_DNA digestor: digestors) {
+			peptides.addAll(digestor.getPeptides());
 		}
 		
 		/* free up nucleotides */
@@ -301,7 +284,7 @@ public class Sequence_DNA extends Sequence{
 			}
 			nucleotideSequences.clear();
 		}
-		System.gc();
+//		System.gc();
 	}
 
 }

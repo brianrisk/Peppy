@@ -22,10 +22,6 @@ public class Definitions {
 	public final static double WATER_MONO = OXYGEN_MONO + HYDROGEN_MONO + HYDROGEN_MONO;
 	public final static double WATER_AVERAGE = OXYGEN_AVERAGE + HYDROGEN_AVERAGE + HYDROGEN_AVERAGE;
 	
-	//indicies in our amino acid list which define trypsin cleavages
-	public final static int [] NoCleavageBefore = {20, 23, 22, 21}; 
-	public final static int [] Cleavages = {8, 10, 24, 25, 26, 0, 2}; 
-	
 	//protein modifications
 	public static ArrayList<Modification> modifications = Modification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
 	

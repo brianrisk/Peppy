@@ -126,8 +126,8 @@ public class EValueCalculator {
 		
 		//finding the least squares fit for that region
 		// y = m * x + b
-		m = U.calculateM(xValues, survivability, smoothedHistogram, chopIndex, topIndex);
-		b = U.calculateB(xValues, survivability, smoothedHistogram, chopIndex, topIndex, m);
+		m = LeastSquares.calculateM(xValues, survivability, smoothedHistogram, chopIndex, topIndex);
+		b = LeastSquares.calculateB(xValues, survivability, smoothedHistogram, chopIndex, topIndex, m);
 		
 	}
 

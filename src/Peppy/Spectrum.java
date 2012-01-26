@@ -404,24 +404,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		sortPeaksByMass();
 	}
 	
-	/**
-	 * Finds the peak with maximum intensity.  Goes through
-	 * each peak and divides intensity by the max intensity.
-	 */
-	public void normalizePeaks() {
-		double maxIntensity = getMaxIntensity();
-		for (Peak peak: peaks) {
-			peak.setIntensity((float) (peak.getIntensity() * 100.0 / maxIntensity));
-		}
-	}
 	
-	public void print() {
-		for (int i = 0; i < peaks.size(); i++) {
-			Peak p = (Peak) peaks.get(i);
-			System.out.println(p.getMass() + "\t" + p.getIntensity());
-		}
-		System.out.println("");
-	}
+
 	
 	public static ArrayList<Spectrum> loadSpectra() {
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();

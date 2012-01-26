@@ -79,7 +79,7 @@ public class FindOptimialParameters {
 					Properties.fragmentTolerance = fragmentTolerance;
 					test.resetTest();
 					test.findPositiveMatches(peptides);
-					test.cleanMatches();
+					test.keepTopRankedMatches();
 					test.calculateStastics();
 					String reportString = 
 						numberFormat.format(precursorTolerance) + "," +
@@ -157,7 +157,7 @@ public class FindOptimialParameters {
 				Properties.peakIntensityExponent = peakIntensityExponent;
 				test.resetTest();
 				test.findPositiveMatches(peptides);
-				test.cleanMatches();
+				test.keepTopRankedMatches();
 				test.calculateStastics();
 				String reportString = 
 					numberFormat.format(peakIntensityExponent) + "," +

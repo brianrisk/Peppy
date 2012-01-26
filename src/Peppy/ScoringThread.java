@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import Math.MassError;
 import Math.MathFunctions;
+import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
@@ -26,11 +27,10 @@ public class ScoringThread implements Runnable {
 		
 		while (spectrum != null) {
 			
-			ArrayList<Match> matchesForOneSpectrum = new ArrayList<Match>();
+			ArrayList<Match> matchesForEValueCalculation = new ArrayList<Match>();
 			ArrayList<Match> topMatches = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-			int firstPeptideIndex;
 			double lowestPeptideMassToConsider = spectrum.getMass() - MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass());
 			if (Properties.searchModifications) {
 				/* I know subtracting the upper bound seems backwards, but since a 
@@ -38,7 +38,7 @@ public class ScoringThread implements Runnable {
 				 * order things should be*/
 				lowestPeptideMassToConsider -= Properties.modificationUpperBound;
 			}
-			firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
+			int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
 			firstPeptideIndex -= 8;
 			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
 			
@@ -59,9 +59,9 @@ public class ScoringThread implements Runnable {
 				
 				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
 				
-				/* add the match we find */
+				/* add the match to our E value calculations list*/
 				if (match.getIMP() <= 1.0E-8) {
-					matchesForOneSpectrum.add(match);
+					matchesForEValueCalculation.add(match);
 				}
 						
 				/* only add the match if it is decent */
@@ -72,7 +72,7 @@ public class ScoringThread implements Runnable {
 			}
 			
 			/* keep track of scores for e values */
-			spectrum.getEValueCalculator().addScores(matchesForOneSpectrum);
+			spectrum.getEValueCalculator().addScores(matchesForEValueCalculation);
 
 			/* return results, get new task */
 			spectrum = scoringThreadServer.getNextSpectrum(topMatches);

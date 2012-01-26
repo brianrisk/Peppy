@@ -3,7 +3,13 @@ package Peppy;
 import Utilities.U;
 
 
-
+/**
+ * Contains information about amino acids
+ * Statically defined amino acids as bytes
+ * amino acid masses
+ * @author Brian Risk
+ *
+ */
 public class AminoAcids {
 	
 	private static char [] acids = {'.', 'A', 'C',	'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y'};

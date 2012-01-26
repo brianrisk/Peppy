@@ -53,7 +53,6 @@ public class TestSet {
 	public TestSet(String testDirectoryName, String testName, ArrayList<Match> matches, Color color) {
 		this(testDirectoryName, testName, color);
 		positiveMatches = matches;
-		cleanMatches();
 	}
 	
 
@@ -80,7 +79,6 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {
 		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
-//		ArrayList<Match> matches = (new ScoringThreadServer(peptides, spectra)).getMatches();
 		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectra);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
@@ -89,6 +87,10 @@ public class TestSet {
 		if (matches != null) {
 			positiveMatches.addAll(matches);
 		}
+	}
+	
+	public void keepTopRankedMatches() {
+		positiveMatches = Peppy.Peppy.keepTopRankedMatches(positiveMatches);
 	}
 
 	/**
@@ -124,50 +126,6 @@ public class TestSet {
 		
 	}
 	
-
-	public void cleanMatches() {
-		/* Do a little house cleaning */
-//		Peppy.Peppy.assignRankToMatches(positiveMatches);
-//		Peppy.Peppy.assignConfidenceValuesToMatches(positiveMatches, spectra);
-//		Peppy.Peppy.removeDuplicateMatches(positiveMatches);
-		
-		/* remove duplicate matches */
-//		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
-//		Collections.sort(positiveMatches);
-//		Match theMatch;
-//		Match previousMatch = positiveMatches.get(0);
-//		for (int i = 1; i < positiveMatches.size(); i++) {
-//			theMatch = positiveMatches.get(i);
-//			
-//			if (theMatch.getPeptide().equals(previousMatch.getPeptide()) ) {
-//				if (theMatch.getSpectrum().getId() == previousMatch.getSpectrum().getId()) {
-//					positiveMatches.remove(i);
-//					i--;
-//				}
-//			} else {
-//				previousMatch = theMatch;
-//			}
-//		}
-		positiveMatches = Peppy.Peppy.reduceMatchesToOnePerSpectrum(positiveMatches);
-		
-		/*removing matches with low rank */
-//		Match match;
-//		int size = positiveMatches.size();
-//		for (int i = 0; i < size; i++) {
-//			
-//			
-//			/* get our match */
-//			match = positiveMatches.get(i);
-//			
-//			/* remove matches with low rank */
-//			if (match.rank > Properties.maximumNumberOfMatchesForASpectrum) {
-//				positiveMatches.remove(i);
-//				size--;
-//				i--;
-//			}
-//			
-//		}
-	}
 	
 	
 	public ArrayList<Match> getPositiveMatches() {

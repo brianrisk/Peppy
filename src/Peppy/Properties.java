@@ -117,8 +117,8 @@ public class Properties {
 	public static File reportWebTableHeader = new File("resources/reports/index-table-header.txt");
 	
 
-	
 	/* for testing purposes */
+	public static boolean thisIsATest = false;
 	public static File testSequence;
 	public static boolean testSequenceIsProtein = true;
 	public static File testDirectory; 
@@ -126,7 +126,7 @@ public class Properties {
 	/* for custom jobs... */
 	public static boolean isYale = false;
 	
-	/*for VCF Files*/
+	/* for VCF Files*/
 	public static String VCFFileString;
 	
 	/* FDR false discovery rate */
@@ -298,6 +298,8 @@ public class Properties {
 			createHTMLReport = Boolean.valueOf(propertyValue);
 		
 		/* for testing purposes */
+		if (propertyName.equals("thisIsATest")) 
+			thisIsATest = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("testSequence")) 
 			testSequence = new File(propertyValue);
 		if (propertyName.equals("testSequenceIsProtein")) 
