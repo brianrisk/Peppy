@@ -16,7 +16,7 @@ import Peppy.Properties;
 import Peppy.ScoringThreadServer;
 import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 public class CreateTestSuite {
 

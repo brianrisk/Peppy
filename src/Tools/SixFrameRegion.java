@@ -12,7 +12,7 @@ import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * A tool which lets you specify a region in a sequence and it comes up with

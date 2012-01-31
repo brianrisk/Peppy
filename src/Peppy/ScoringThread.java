@@ -3,14 +3,21 @@ import java.util.ArrayList;
 
 import Math.MassError;
 import Math.MathFunctions;
-import Utilities.U;
 
 
 public class ScoringThread implements Runnable {
 	
+	/* this holds the full list of peptides (sorted by mass), though we will only be using a section for the given spectrum */
 	ArrayList<Peptide> peptides;
+	
+	/* the spectrum for which we will be searching */
 	Spectrum spectrum;
+	
+	/* our commanding server; results get reported back to this and new spectra to search come from here */
 	ScoringThreadServer scoringThreadServer;
+	
+	/* due to the imperfections of my binary search, we need this extra margin */
+	private static int extraMargin = 8;
 	
 	/**
 	 * @param peptides
@@ -26,9 +33,6 @@ public class ScoringThread implements Runnable {
 	public void run() {
 		
 		while (spectrum != null) {
-			
-			ArrayList<Match> matchesForEValueCalculation = new ArrayList<Match>();
-			ArrayList<Match> topMatches = new ArrayList<Match>();
 	
 			//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
 			double lowestPeptideMassToConsider = spectrum.getMass() - MassError.getDaltonError(Properties.precursorTolerance, spectrum.getMass());
@@ -39,7 +43,7 @@ public class ScoringThread implements Runnable {
 				lowestPeptideMassToConsider -= Properties.modificationUpperBound;
 			}
 			int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
-			firstPeptideIndex -= 8;
+			firstPeptideIndex -= extraMargin;
 			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
 			
 			
@@ -50,9 +54,14 @@ public class ScoringThread implements Runnable {
 				highestPeptideMassToConsider -= Properties.modificationLowerBound;
 			}
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
-			lastPeptideIndex += 8;
+			lastPeptideIndex += extraMargin;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
 			
+			/* set up where to hold the matches */
+			int peptideCount = lastPeptideIndex - firstPeptideIndex;
+			ArrayList<Match> matchesForEValueCalculation = new ArrayList<Match>();
+			ArrayList<Match> topMatches = new ArrayList<Match>(peptideCount);
+						
 			//examine only peptides in our designated mass range
 			for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
 				Peptide peptide = peptides.get(peptideIndex);
@@ -60,7 +69,7 @@ public class ScoringThread implements Runnable {
 				Match match = Properties.matchConstructor.createMatch(spectrum, peptide);
 				
 				/* add the match to our E value calculations list*/
-				if (match.getIMP() <= 1.0E-8) {
+				if (Properties.calculateEValues) {
 					matchesForEValueCalculation.add(match);
 				}
 						
@@ -72,7 +81,9 @@ public class ScoringThread implements Runnable {
 			}
 			
 			/* keep track of scores for e values */
-			spectrum.getEValueCalculator().addScores(matchesForEValueCalculation);
+			if (Properties.calculateEValues) {
+				spectrum.getEValueCalculator().addScores(matchesForEValueCalculation);
+			}
 
 			/* return results, get new task */
 			spectrum = scoringThreadServer.getNextSpectrum(topMatches);

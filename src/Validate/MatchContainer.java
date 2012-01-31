@@ -9,7 +9,7 @@ import java.io.IOException;
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * This is a place which will hold a SpecatrumPeptideMatch

@@ -1,6 +1,5 @@
 package Validate;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,7 +11,7 @@ import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * IMPORTANT NOTE:  When running this, be sure to turn all peak cleaning of spectra off.
@@ -49,7 +48,7 @@ public class FindOptimialParameters {
 		//set up our tests
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
 //		TestSet test = new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY);
-		TestSet test = new TestSet(testDirectoryName, "aurum", Color.DARK_GRAY);
+		TestSet test = new TestSet(testDirectoryName, "aurum");
 		
 		//get our peptides
 		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
@@ -79,7 +78,6 @@ public class FindOptimialParameters {
 					Properties.fragmentTolerance = fragmentTolerance;
 					test.resetTest();
 					test.findPositiveMatches(peptides);
-					test.keepTopRankedMatches();
 					test.calculateStastics();
 					String reportString = 
 						numberFormat.format(precursorTolerance) + "," +
@@ -133,7 +131,7 @@ public class FindOptimialParameters {
 		
 		//set up our tests
 		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
-		TestSet test = new TestSet(testDirectoryName, "human", Color.DARK_GRAY);
+		TestSet test = new TestSet(testDirectoryName, "human");
 		
 		//get our peptides
 		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
@@ -157,7 +155,6 @@ public class FindOptimialParameters {
 				Properties.peakIntensityExponent = peakIntensityExponent;
 				test.resetTest();
 				test.findPositiveMatches(peptides);
-				test.keepTopRankedMatches();
 				test.calculateStastics();
 				String reportString = 
 					numberFormat.format(peakIntensityExponent) + "," +

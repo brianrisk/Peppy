@@ -2,8 +2,6 @@ package Math;
 
 import java.util.ArrayList;
 
-import Utilities.U;
-
 /**
  * For the calculation and storing of E Values.
  * 

@@ -12,7 +12,7 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Test sets often contain matches that will not be found with

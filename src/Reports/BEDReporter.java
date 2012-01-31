@@ -13,7 +13,7 @@ import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 
 /**

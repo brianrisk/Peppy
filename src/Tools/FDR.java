@@ -1,12 +1,10 @@
 package Tools;
 
 import java.awt.geom.Point2D;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 public class FDR {
 	
@@ -170,16 +168,7 @@ public class FDR {
 			recall = (double) totalCorrect / setSize;
 			points.add(new Point2D.Double(precision, recall));
 		}
-		/* adjust for non-monotonic decreasing PR curve */
-		double previousPrecision = points.get(points.size() - 1).x;
-		for (int i = points.size() - 2; i >= 0; i--) {
-			Point2D.Double point = points.get(i);
-			if (point.x < previousPrecision) {
-				point.x = previousPrecision;
-			} else {
-				previousPrecision = point.x;
-			}
-		}
+		
 		
 		/* set a folder to store our reports */
 		String identifierString = Properties.precursorTolerance + "-" + Properties.fragmentTolerance;

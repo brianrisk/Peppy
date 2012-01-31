@@ -159,6 +159,7 @@ public class MathFunctions {
 			probability *= Math.pow(1 - p, n - i);
 			total += probability;
 		}
+		
 		return total;
 	}
 	

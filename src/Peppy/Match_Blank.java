@@ -8,12 +8,12 @@ package Peppy;
  */
 public class Match_Blank extends Match{
 	
-	public Match_Blank(Spectrum spectrum, Peptide peptide, double score, double eValue) {
+	public Match_Blank(Spectrum spectrum, Peptide peptide, double eValue) {
 		this.spectrum = spectrum;
 		this.peptide = peptide;
-		this.score = score;
 		this.eValue = eValue;
 		this.rank = 1;
+		this.score = -Math.log10(eValue);
 	}
 
 	@Override

@@ -8,13 +8,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
-import Graphs.HistogramVisualizer;
 import Math.EValueCalculator;
 import Math.HasValue;
 import Math.MassError;
-import Utilities.U;
 
 /**
  * Holds peaks and meta-data for a MS/MS peak file.
@@ -77,7 +74,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		addPrecursorFromString(line);
 	}
 	
-	public void addPeakFromString(String s) {
+	private void addPeakFromString(String s) {
 		try {
 			Peak p = new Peak(s);
 			if (p.getMass() <= mass) peaks.add(new Peak(s));
@@ -86,7 +83,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		}	
 	}
 	
-	public void addPrecursorFromString(String s) {
+	private void addPrecursorFromString(String s) {
 		String [] chunks;
 		chunks = s.split("\\s+"); //split on all white space
 		try {
@@ -117,7 +114,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	}
 	
 	
-	public void sortPeaksByIntensity() {
+	private void sortPeaksByIntensity() {
 		Peak p;
 		for (int i = 0; i < peaks.size(); i++) {
 			p = (Peak) peaks.get(i);
@@ -279,6 +276,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			//cleanWithWindow();
 			keepStrongestPeakInRegions();
 		}
+		sortPeaksByMass();
 		
 //		markTwinPeaks();
 //		markPeaksWithHighestIntensity();
@@ -376,7 +374,6 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				}
 			}
 		}
-		sortPeaksByMass();
 	}
 	
 
@@ -391,19 +388,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		}
 		
 		peaks = retPeaks;	
-		sortPeaksByMass();
 	}
-	
-	//keep the 100 most intense peaks.  Intense!
-	private void markPeaksWithHighestIntensity() {
-		if (peaks.size() <= Properties.numberOfHighIntensityPeaksToRetain) return;
-		sortPeaksByIntensity();
-		for (int i = peaks.size() - 1; i >= peaks.size() - Properties.numberOfHighIntensityPeaksToRetain; i--) {
-			peaks.get(i).used = true;
-		}
-		sortPeaksByMass();
-	}
-	
 	
 
 	
@@ -462,7 +447,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				if (line.trim().equals("")) {
 					if (fileOpen) {
 						fileOpen = false;
-//						spectrum.sortByMass();
+						/* clean peaks also sorts the peaks by mass */
 						spectrum.cleanPeaks();
 						if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
 							spectra.add(spectrum);
@@ -484,7 +469,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				line = inBR.readLine();
 			}
 			if (fileOpen) {
-//				spectrum.sortByMass();
+				/* clean peaks also sorts the peaks by mass */
 				spectrum.cleanPeaks();
 				if (Properties.ignoreSpectraWithChargeGreaterThanTwo && spectrum.getCharge() <= 2) {
 					spectra.add(spectrum);
@@ -499,108 +484,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		return spectra;
 	}
 	
-	/**
-	 * ionMathTally is how many ions match with a theoretical peptide.
-	 * this uses a stochastic approach to find an upper bound for what the
-	 * maximum value of ionMatchTally peak intensities is.
-	 * @param ionMatchTally
-	 * @return
-	 */
-	public double getMaxValueForCombination(int ionMatchTally) {
-		if (maxValueForCombination[ionMatchTally] == 0) {
-//			Random random = new Random();
-//			for (int i = 0; i < 10000; i++) {
-//				double intensityTotal = 0;
-//				for (int j = 0; j < ionMatchTally; j++) {
-//					intensityTotal += peaks.get(random.nextInt(peaks.size())).getIntensity();
-//				}
-//				if (intensityTotal > maxValueForCombination[ionMatchTally]) maxValueForCombination[ionMatchTally] = intensityTotal;
-//			}
-			sortPeaksByIntensity();
-			for (int i = peaks.size() - ionMatchTally; i < peaks.size(); i++) {
-				if (i < 0) continue;
-				maxValueForCombination[ionMatchTally] += peaks.get(i).getIntensity();
-			}
-			sortPeaksByMass();
-		}
-		return maxValueForCombination[ionMatchTally];
-	}
-	private double maxValueForCombination[] = new double[100];
-	
-	public static void main(String args[]) {
-		U.p("printing spectrum intensity histograms");
-		final int numberOfHistogramBars = 100;
-		File dir = new File("SpectraHistograms");
-		dir.mkdir();
-		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
-		loadSpectraFromFolder(new File("/Users/risk2/PeppyOverflow/tests/USP/spectra/"), spectra);
-		int ionMatchTally = 20;
-		Random random = new Random();
-		for (int spectrumCount = 0; spectrumCount < 20; spectrumCount++) {
-			Spectrum spectrum = spectra.get(spectrumCount);
-			spectrum.sortPeaksByIntensity();
-			double [] histogram = new double[numberOfHistogramBars];
-			ArrayList<Peak> peaks = spectrum.getPeaks();
-			double min = ionMatchTally * peaks.get(0).getIntensity();
-//			double max = ionMatchTally * peaks.get(peaks.size() - 1).getIntensity();
-			double max = spectrum.getMaxValueForCombination(ionMatchTally);
-			double barWidth = (max - min) / numberOfHistogramBars;
-			int bin;
-			double intensityTotal;
-//			double histoScale = Math.sqrt(peaks.get(peaks.size() - 1).getIntensity() 
-//			max = 0;
-//			for (int i = 0; i < 200000; i++) {
-//				intensityTotal = 0;
-//				for (int j = 0; j < ionMatchTally; j++) {
-//					intensityTotal += peaks.get(random.nextInt(peaks.size())).getIntensity();
-//				}
-//				if (intensityTotal > max) max = intensityTotal;
-//			}
-//			barWidth = (max - min) / numberOfHistogramBars;
-			
-			for (int i = 0; i < 100000; i++) {
-				intensityTotal = 0;
-				for (int j = 0; j < ionMatchTally; j++) {
-					intensityTotal += peaks.get(random.nextInt(peaks.size())).getIntensity();
-				}
-				bin = (int) Math.floor(( intensityTotal - min) / barWidth);
-				if (bin < numberOfHistogramBars) {
-					histogram[bin]++;
-				} else {
-					histogram[numberOfHistogramBars - 1]++;
-				}
-			}
-//			for (Peak peak: peaks) {
-//				bin = (int) Math.floor((transform(peak.getIntensity()) - min) / barWidth);
-//				if (bin < numberOfHistogramBars) {
-//					histogram[bin]++;
-//				} else {
-//					histogram[numberOfHistogramBars - 1]++;
-//				}
-//			}
-//			//probabilities
-//			for (int i=0; i<numberOfHistogramBars; i++) {
-//				histogram[i] /= peaks.size();
-//			}
-			//make survival
-			for (int i=numberOfHistogramBars - 2; i >=0 ; i--) {
-				histogram[i] += histogram[i + 1];
-			}
-			//log of the bars
-			for (int i=0; i<numberOfHistogramBars; i++) {
-				if (histogram[i] > 0) {
-					histogram[i] = Math.abs(Math.log(histogram[i]));
-				}
-			}
-			try {
-				String fileName = U.getFileNameWithoutSuffix(spectrum.getFile()) + ".jpg";
-				HistogramVisualizer.drawHistogram(histogram, 600, 800, new File(dir, fileName));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		U.p("done");
-	}
+
 	
 	/**
 	 * recursively goes through folder.

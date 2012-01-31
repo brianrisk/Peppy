@@ -3,7 +3,7 @@ package Reports;
 import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Utilities.U;
+import Peppy.U;
 
 
 /** an object to help construct UCSC links

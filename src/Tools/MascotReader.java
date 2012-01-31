@@ -1,7 +1,6 @@
 package Tools;
 
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +14,7 @@ import Peppy.Match_Blank;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 import Validate.TestSet;
 import Validate.ValidationReport;
 
@@ -28,28 +27,24 @@ public class MascotReader {
 	
 	
 	public static void main(String args[]) {
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		testSets.add(getTestSet(
 				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/ecoli.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
-				"ecoli",
-				Color.red
+				"ecoli"
 		));
 		
 		testSets.add(getTestSet(
 				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/kapp.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
-				"human",
-				Color.blue
+				"human"
 		));
 		
 		testSets.add(getTestSet(
 				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/aurum.txt",
 				"/Users/risk2/PeppyOverflow/tests/",
-				"aurum",
-				Color.green
+				"aurum"
 		));
 		
 		for (TestSet test: testSets) {
@@ -58,11 +53,12 @@ public class MascotReader {
 		}
 		
 		ValidationReport vr = new ValidationReport(testSets);
+		Properties.scoringMethodName = "Mascot";
 		vr.createReport();
 		U.p("done");
 	}
 	
-	private static TestSet getTestSet(String reportLocation, String testLocation, String testName, Color color) {
+	private static TestSet getTestSet(String reportLocation, String testLocation, String testName) {
 		//where our matches are
 		File matchesFile = new File(reportLocation);
 		
@@ -77,10 +73,8 @@ public class MascotReader {
 		
 		//get the matches that correspond with the spectra
 		ArrayList<Match> matches = extractMatchesFromFile(matchesFile, spectra);
-		Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		Collections.sort(matches);
 		
-		return new TestSet(testLocation, testName, matches, color);
+		return new TestSet(testLocation, testName, matches, spectra);
 	}
 	
 	private static ArrayList<Match> extractMatchesFromFile(File file, ArrayList<Spectrum> spectra) {
@@ -98,24 +92,8 @@ public class MascotReader {
 				eValue = Double.parseDouble(chunks[1]);
 				peptide = chunks[2];
 				
-				Match_Blank match = new Match_Blank(spectra.get(id), new Peptide(peptide), 0.0, eValue);
-				
-				//look for other match with this id
-				//delete if one exists with higher e value
-				boolean addMatch = true;
-				for (int i = 0; i < matches.size(); i++) {
-					if (matches.get(i).getSpectrum().getId() == id) {
-						if (matches.get(i).getEValue() < eValue) {
-							addMatch = false;
-						} else {
-							if (matches.get(i).getEValue() > eValue) {
-								matches.remove(i);
-							}
-						}
-					}
-				}
-				
-				if (addMatch) matches.add(match);
+				Match_Blank match = new Match_Blank(spectra.get(id), new Peptide(peptide), eValue);
+				matches.add(match);
 
 				line=br.readLine();
 			}

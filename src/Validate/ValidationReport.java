@@ -1,6 +1,5 @@
 	package Validate;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +20,7 @@ import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
-import Utilities.U;
+import Peppy.U;
 
 public class ValidationReport {
 	
@@ -44,11 +43,11 @@ public class ValidationReport {
 //		createListOfPeptidesNotFoundInTheDatabase();
 		searchTestSets();
 		createReport();
+		createResultsFiles();
 //		createWrongReport();
 		U.stopStopwatch();
 		U.p("done.");
 		
-//		createResultsFiles();
 	}
 	
 	/**
@@ -62,8 +61,11 @@ public class ValidationReport {
 	
 	private static void setUp() {
 		System.setProperty("java.awt.headless", "true"); 
-		//Hello, world!
+		
+		/* Hello, world! */
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
+		
+		/* set up where we will save these reports */
 		reportFolder =  new File(Properties.validationDirectory, "" + System.currentTimeMillis() + "/");
 		reportFolder.mkdirs();
 		File indexFile = new File(reportFolder, "index.html");
@@ -72,29 +74,39 @@ public class ValidationReport {
 		} catch (IOException e) {
 			U.p("ERROR: Could not create file writer for our report");
 			e.printStackTrace();
-			
 		}
 		
 		/* definitely using the whole sequence */
 		Properties.useSequenceRegion = false;
+		Properties.useOnlyForwardsFrames = false;
 		
-		//how many missed cleavages when we digest
+		/* these properties are fixed for our text sets */
 		Properties.numberOfMissedCleavages = 2;
+		Properties.precursorTolerance = 2000;
+		Properties.fragmentTolerance = 500;
 		
-//		Properties.isSequenceFileDNA = false;
-		
+		/* the nature of these tests is we want one answer per spectrum.
+		 * the results are further reduced in TestSet
+		 */
 		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		Properties.maxIMP = 5;
+		/* a decent filter that shouldn't get any significant match */
+		Properties.maxIMP = .00001;
 		
-		//What scoring mechanism?
-		Properties.scoringMethodName = "Peppy.Match_IMP";
-//		Properties.scoringMethodName = "Peppy.Match_TandemFit";
-//		Properties.scoringMethodName = "Peppy.Match_HMM";
+		/* this needs to happen or the text reports at the end crash */
+		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
+		
+		/* What scoring mechanism? */
+		boolean useIMP = true;
+		if (useIMP) {
+			Properties.scoringMethodName = "Peppy.Match_IMP";
+		} else {
+			Properties.scoringMethodName = "Peppy.Match_HMM";
+			Properties.calculateEValues = true;
+			Properties.highIntensityCleaning = true;
+		}
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-		
-		Properties.precursorTolerance = 100;
-		Properties.fragmentTolerance = 500;
+			
 		
 		/* save our properties */
 		Properties.generatePropertiesFile(reportFolder);
@@ -106,10 +118,10 @@ public class ValidationReport {
 		//set up which tests we will perform
 		String testDirectoryName = Properties.testDirectory.getAbsolutePath();
 		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli", Color.RED));
-//		tests.add(new TestSet(testDirectoryName, "human", Color.BLUE));
-//		tests.add(new TestSet(testDirectoryName, "aurum", Color.GREEN));	
-//		tests.add(new TestSet(testDirectoryName, "USP top 10", Color.DARK_GRAY));
+		tests.add(new TestSet(testDirectoryName, "ecoli"));
+		tests.add(new TestSet(testDirectoryName, "human"));
+		tests.add(new TestSet(testDirectoryName, "aurum"));	
+		tests.add(new TestSet(testDirectoryName, "USP top 10"));
 	}
 	
 	
@@ -129,8 +141,14 @@ public class ValidationReport {
 			
 		/* repeat extracting peptides until end of sequence has been reached */
 		while (peptides != null) {
+			/* sort the peptides */
+			Collections.sort(peptides);
+			
 			/* track database size */
 			forwardsDatabaseSize += peptides.size();
+			
+			/* report on peptides size */
+			U.p("peptide count for this batch is: " + peptides.size());
 			
 			/* get matches for each of our sets for each of these peptides */
 			for (TestSet test: tests) {
@@ -138,13 +156,11 @@ public class ValidationReport {
 			}
 			
 			/* get our peptides and report size */
-			peptides.clear();
-			System.gc();
 			peptides = sequence.extractMorePeptides(false);
+			
 		}
 		
 		for (TestSet test: tests) {
-			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		
@@ -331,44 +347,7 @@ public class ValidationReport {
 			
 			pw.println("</table>");		
 
-			pw.println("<h2>E value distribution for forwards and reverse database search</h2>");
-			pw.println("<h3>Forwards</h3>");
-			pw.println("<table border=1>");
 			
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 1% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.01) + "</td>");
-			}
-			
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 5% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.05) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 25% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.25) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 50% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.50) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 75% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.75) + "</td>");
-			}
-			pw.println("<tr>");
-			pw.println("<td>E value marking top 95% (forwards)</td>");
-			for (TestSet testSet: tests) {
-				pw.println("<td>" + testSet.getEValueAtPercentForwards(0.95) + "</td>");
-			}
-			pw.println("</table>");
-
-			pw.println("</table>");
 
 			pw.println("</body>");
 			pw.println("</html>");
@@ -388,7 +367,7 @@ public class ValidationReport {
 			try {
 				File indexFile = new File(reportFolder, test.getName() + ".txt");
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
-				ArrayList<MatchContainer> topForwardsTestedMatches = test.getTopForwardsTestedMatches();
+				ArrayList<MatchContainer> topForwardsTestedMatches = test.getTestedMatches();
 				U.p("number of topForwardsTestedMatches: " + topForwardsTestedMatches.size());
 				Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
 				Collections.sort(topForwardsTestedMatches);
@@ -398,7 +377,7 @@ public class ValidationReport {
 					sb.append('\t');
 					sb.append(match.isTrue());
 					sb.append('\t');
-					sb.append(match.getEValue());
+					sb.append(match.getMatch().getScore());
 					pw.println(sb.toString());
 				}
 				pw.flush();
@@ -459,83 +438,6 @@ public class ValidationReport {
 		}
 	}
 	
-
-	
-	private static void createWrongReport() {
-		for (TestSet test: tests) {
-			ArrayList<MatchContainer> testedMatches = test.getTopForwardsTestedMatches();
-
-			File testFileFolder = new File(reportFolder, test.getName());
-			testFileFolder.mkdirs();
-			File testFile = new File(testFileFolder, "wrong.html");
-			try {
-				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(testFile)));
-				
-				//print the header of the file
-				//pw.println(ReportStrings.getHeader());
-				pw.println(test.getName());
-				
-				pw.println("number of matches: " + testedMatches.size());
-				pw.println("<table border=1 cellspacing=0>");
-				pw.println("<th>E value</th>");
-				pw.println("<th>name</th>");
-				pw.println("<th>our score</th>");
-				pw.println("<th>true score</th>");
-				pw.println("<th>true sequence</th>");
-				pw.println("<th>mass difference</th>");
-				
-				for (MatchContainer matchContainer: testedMatches) {
-					Match ourMatch = matchContainer.getMatch();
-					Match trueMatch = matchContainer.getTrueMatch();
-					if (!matchContainer.isTrue()) {
-						
-						if (ourMatch.getScore() < trueMatch.getScore()) {
-							pw.println("<tr bgcolor=\"red\">");
-						} else {
-							if (ourMatch.getScore() == trueMatch.getScore()) {
-								pw.println("<tr bgcolor=\"#BBBBBB\">");
-							} else {
-								pw.println("<tr>");
-							}
-						}
-						
-						pw.println("<td>");
-						pw.println(ourMatch.getEValue());
-						pw.println("</td>");
-						
-						pw.println("<td>");
-						pw.println(ourMatch.getSpectrum().getFile().getName());
-						pw.println("</td>");
-						
-						pw.println("<td>");
-						pw.println(ourMatch.getScore());
-						pw.println("</td>");
-		
-						pw.println("<td>");
-						pw.println(trueMatch.getScore());
-						pw.println("</td>");
-		
-						pw.println("<td>");
-						pw.println(trueMatch.getPeptide().getAcidSequenceString());
-						pw.println("</td>");
-						
-						pw.println("<td>");
-						pw.println(trueMatch.getPeptide().getMass() - trueMatch.getSpectrum().getMass());
-						pw.println("</td>");
-		
-					}
-
-				}
-				
-				//print the footer and close out
-				pw.println("</table></body></html>");
-				pw.flush();
-				pw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 	
 
 	

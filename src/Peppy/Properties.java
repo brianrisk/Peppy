@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
-import Utilities.U;
 
 /**
  * This is were property defaults are defined.
@@ -122,6 +121,7 @@ public class Properties {
 	public static File testSequence;
 	public static boolean testSequenceIsProtein = true;
 	public static File testDirectory; 
+	public static boolean calculateEValues = false;
 	
 	/* for custom jobs... */
 	public static boolean isYale = false;

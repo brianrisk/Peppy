@@ -13,7 +13,7 @@ import Peppy.Match;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 
 /**
@@ -64,7 +64,7 @@ public class TextReporter {
 			pw.println("> scoring method:" + Properties.scoringMethodName);
 			
 			//sorting our matches by spectrum then score
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
+			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(matches);
 			
 			

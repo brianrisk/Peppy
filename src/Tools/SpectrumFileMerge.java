@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Built because some search tools use one file containing all spectra rather than many spectrum files

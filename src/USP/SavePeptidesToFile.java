@@ -10,7 +10,7 @@ import java.util.Collections;
 
 import Peppy.Peptide;
 import Peppy.Sequence_Protein;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * takes our file of extracted proteins and then

@@ -11,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -20,11 +21,22 @@ public class PRCurve {
 	private double areaUnderCurve = 0;
 	ArrayList<Point2D.Double> points;
 	int width = 500;
-	Color color = Color.RED;
+	Color color = Color.BLACK;
 	
 	
 	public PRCurve(ArrayList<Point2D.Double> points) {
 		this.points = points;
+		
+		/* adjust for non-monotonic decreasing PR curve */
+		double previousPrecision = points.get(points.size() - 1).x;
+		for (int i = points.size() - 2; i >= 0; i--) {
+			Point2D.Double point = points.get(i);
+			if (point.x < previousPrecision) {
+				point.x = previousPrecision;
+			} else {
+				previousPrecision = point.x;
+			}
+		}
 		calculateAreaUnderCurve();
 	}
 	
@@ -94,6 +106,13 @@ public class PRCurve {
 		axisGraphics.drawString("0", indent - fm.stringWidth("0") - axisSpace, width + fm.getHeight());
 		axisGraphics.drawString("1", indent - fm.stringWidth("1") - axisSpace, fm.getHeight() + axisSpace);
 		axisGraphics.drawString("1", width + indent - fm.stringWidth("1") - axisSpace, width + fm.getHeight());
+		
+		/* label the curve with the percentage of area covered */
+		NumberFormat nfPercent = NumberFormat.getPercentInstance();
+		nfPercent.setMaximumFractionDigits(2);
+		String areaLabel = nfPercent.format(areaUnderCurve);
+		axisGraphics.setColor(Color.white);
+		axisGraphics.drawString(areaLabel,  indent +  (width - fm.stringWidth(areaLabel)) / 2 , indent +  (width - fm.getHeight()) / 2);
 		
 		return axisImage;
 		

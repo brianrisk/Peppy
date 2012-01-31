@@ -1,6 +1,5 @@
 package Tools;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,8 +10,9 @@ import java.util.ArrayList;
 import Peppy.Match;
 import Peppy.Match_Blank;
 import Peppy.Peptide;
+import Peppy.Properties;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 import Validate.TestSet;
 import Validate.ValidationReport;
 
@@ -41,7 +41,6 @@ public class XTandemReader {
 			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/EColi",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"ecoli",
-			Color.red,
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/"
 		));
 		
@@ -49,7 +48,6 @@ public class XTandemReader {
 			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Kapp",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"human",
-			Color.blue,
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/"
 		));
 		
@@ -57,7 +55,6 @@ public class XTandemReader {
 			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Aurum",
 			"/Users/risk2/PeppyOverflow/tests/",
 			"aurum",
-			Color.green,
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/"
 		));
 		
@@ -69,11 +66,12 @@ public class XTandemReader {
 		}
 		
 		ValidationReport vr = new ValidationReport(testSets);
+		Properties.scoringMethodName = "XTandem";
 		vr.createReport();
 		U.p("done");
 	}
 	
-	private static TestSet getTestSet(String reportLocation, String testLocation, String testName, Color color, String spectrumStart) {
+	private static TestSet getTestSet(String reportLocation, String testLocation, String testName, String spectrumStart) {
 		
 		/* get files from report folder */
 		File reportFolder = new File(reportLocation);
@@ -88,7 +86,7 @@ public class XTandemReader {
 			
 		for (int fileIndex = 0; fileIndex < reportFiles.length; fileIndex++) {
 			if (!reportFiles[fileIndex].getName().toLowerCase().endsWith(suffix)) continue;
-			match = extractHitsFromFile(reportFiles[fileIndex], spectrumStart, testLocation, testName);
+			match = extractMatcheFromFile(reportFiles[fileIndex], spectrumStart, testLocation, testName);
 			if (match != null) {
 				
 				/* set the proper spectrum ID */
@@ -105,11 +103,11 @@ public class XTandemReader {
 		}
 		U.p("found this many matches: " + matches.size());
 		
-		return new TestSet(testLocation, testName, matches, color);
+		return new TestSet(testLocation, testName, matches, spectra);
 		
 	}
 	
-	private static Match_Blank extractHitsFromFile(File file, String spectrumStart, String testLocation, String testName) {
+	private static Match_Blank extractMatcheFromFile(File file, String spectrumStart, String testLocation, String testName) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			Spectrum spectrum = null;
@@ -139,7 +137,7 @@ public class XTandemReader {
 					subIndexStop = line.indexOf("\"", subIndexStart);
 					nugget = line.substring(subIndexStart, subIndexStop);
 					
-					return new Match_Blank(spectrum, new Peptide(nugget), 0.0, evalue);
+					return new Match_Blank(spectrum, new Peptide(nugget), evalue);
 					
 					
 				}

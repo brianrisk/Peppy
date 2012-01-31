@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
-import Utilities.U;
 
 /**
  * A "sequence" is a DNA sequence, typically in a FASTA file
@@ -136,6 +136,9 @@ public class Sequence_DNA extends Sequence{
 		if(atLastBit) {
 			clearNucleotideSequences();
 		}
+		
+		/* sort our list of peptides by mass */
+		Collections.sort(peptides);
 		
 		/* return */
 		return peptides;

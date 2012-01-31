@@ -115,19 +115,20 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		int totalIonsAbove25 = 0;
 		int totalIonsAbove12 = 0;
 		int totalIonsAbove06 = 0;
-		double totalMatchingIntensity = 0.0;
-		boolean yIonMatch, bIonMatch, ionMatch = false;
-		int acidMatchTally = 0;
+		
+		/* the totalMatchingIntensity variably MIGHT be very 
+		 * useful in the future as an extra probability to incorporate 
+		 * don't get rid of it just yet! */
+//		double totalMatchingIntensity = 0.0;
+		boolean yIonMatch, bIonMatch = false;
 		int appropriateIonIsMoreIntenseTally = 0;
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
 			yIonMatch = yIonMatchesWithHighestIntensity[i] > 0.0;
 			bIonMatch = bIonMatchesWithHighestIntensity[i] > 0.0;
-			ionMatch = bIonMatch || yIonMatch;
-			if (ionMatch) acidMatchTally++;
 			if (yIonMatchesWithHighestIntensity[i] > bIonMatchesWithHighestIntensity[i]) appropriateIonIsMoreIntenseTally++;
 			if (yIonMatch) {
 				ionMatchTally++;
-				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
+//				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
 				if (yIonMatchesWithHighestIntensity[i] > spectrum.getMedianIntensity()) {
 					totalIonsAbove50++;
 					if (yIonMatchesWithHighestIntensity[i] > spectrum.getIntensity25Percent()) {
@@ -143,7 +144,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			}
 			if (bIonMatch) {
 				ionMatchTally++;
-				totalMatchingIntensity += bIonMatchesWithHighestIntensity[i];
+//				totalMatchingIntensity += bIonMatchesWithHighestIntensity[i];
 				if (bIonMatchesWithHighestIntensity[i] > spectrum.getMedianIntensity()) {
 					totalIonsAbove50++;
 					if (bIonMatchesWithHighestIntensity[i] > spectrum.getIntensity25Percent()) {
@@ -165,7 +166,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		double p;
 		
 		//peak match probability is the binomial distribution
-		n = peptide.getLength() * 2;
+//		n = peptide.getLength() * 2;
+		n = peptideLengthMinusOne * 2;
 		k = ionMatchTally;
 		p = spectrum.getCoverage();
 		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
@@ -219,13 +221,19 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		
 		impValue =  peakMatchProbability  * intensityProbability * appropriateIonIsMoreIntenseProbablity;
 		
-		//this is a normalizing factor as a true match with a long peptide will get a greater
-		//score than a true match with a short pepitide, though they are equally true
-		//impValue *= MathFunctions.cachedLog(peptide.getAcidSequence().length);
+		/* some testing.  you can get rid of this later, b */
+//		if (peptide.equals("GGSGGSYGGGGSGGGYGGGSGSR")) {	
+//			U.p("peptideLengthMinusOne * 2: " + peptideLengthMinusOne * 2);
+//			U.p("ionMatchTally: " + ionMatchTally);
+//			U.p("spectrum coverage: " + spectrum.getCoverage());
+//			U.p("peakMatchProbability: " + -Math.log10(peakMatchProbability));
+//			U.p("intensityProbability: " + -Math.log10(intensityProbability));
+//			U.p("appropriateIonIsMoreIntenseProbablity: " + -Math.log10(appropriateIonIsMoreIntenseProbablity));
+//		}
+//		
 		if (impValue > 1) impValue = 1;
 		return impValue;
 	}
-	
 	
 	
 	
@@ -359,8 +367,8 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 				if (spectrum.getId() < match.getSpectrum().getId()) return -1;
 				if (spectrum.getId() > match.getSpectrum().getId()) return  1;
 				//then by start location
-//				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
-//				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
+				if(peptide.getStartIndex() < match.getPeptide().getStartIndex()) return -1;
+				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
 				//then by alphabetical order of peptides
 				int shortLength = peptide.getAcidSequence().length;
 				if (match.getPeptide().getAcidSequence().length < shortLength) shortLength = match.getPeptide().getAcidSequence().length;
@@ -542,7 +550,9 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 			sb.append('\t');
 			sb.append(getPeptide().isSpliced());
 		} else {
-			sb.append(getPeptide().getProtein().getName());
+			if (getPeptide().getProtein() != null) {
+				sb.append(getPeptide().getProtein().getName());
+			}
 		}
 		sb.append('\t');
 		sb.append(rank);

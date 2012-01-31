@@ -1,8 +1,6 @@
 package Peppy;
 import java.util.ArrayList;
 
-import Utilities.U;
-
 /**
  * This is used to parallelize the digestion of DNA.
  * One digestion thread is made for each of the six frames

@@ -13,7 +13,7 @@ import Peppy.RNA_Digestor;
 import Peppy.RNA_Sequence;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Meant to be a tool to output FASTA and CSV 

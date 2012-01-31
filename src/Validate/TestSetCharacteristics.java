@@ -15,7 +15,7 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Test set's have some basic properties which would be cool to know

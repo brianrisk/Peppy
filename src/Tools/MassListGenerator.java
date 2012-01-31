@@ -14,7 +14,7 @@ import Peppy.Definitions;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Takes the protein file specified in your properties.txt file.

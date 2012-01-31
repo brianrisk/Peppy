@@ -15,7 +15,7 @@ import Peppy.Nucleotides;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
-import Utilities.U;
+import Peppy.U;
 
 public class HilbertCurve {
 	

@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import Utilities.U;
+import Peppy.U;
 
 public class ConvertDATtoFASTA {
 	

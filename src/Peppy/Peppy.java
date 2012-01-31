@@ -8,7 +8,6 @@ import java.util.Collections;
 
 import Reports.HTMLReporter;
 import Reports.TextReporter;
-import Utilities.U;
 
 /**
  * Peppy
@@ -87,6 +86,15 @@ public class Peppy {
 				sequences = oneSequenceList;
 			}
 			
+			/* set our missed cleavage number.  since we are using
+			 * mulitpass for DNA sequences we can set a lower number
+			 */
+			if (Properties.isSequenceFileDNA && Properties.multipass) {
+				Properties.numberOfMissedCleavages = 1;
+			} else {
+				Properties.numberOfMissedCleavages = 2;
+			}
+			
 			/* nothing weird.  Just do a normal search */
 			matches = getMatches(sequences, spectra);
 
@@ -99,6 +107,9 @@ public class Peppy {
 	
 		/* regions (only work with DNA) */
 		if (Properties.isSequenceFileDNA) {
+			
+			/* set our missed cleavage count to higher */
+			Properties.numberOfMissedCleavages = 3;
 			
 			/* rerun the regions analysis */
 			Regions regions = new Regions(matches, sequences, spectra);
@@ -237,7 +248,6 @@ public class Peppy {
 			
 			/* track which sequence we are examining */
 			int sequenceIndex = 0;
-			
 				
 			/* loops until we have gone through all of our sequences */
 			while (true) {
@@ -294,6 +304,7 @@ public class Peppy {
 						if (sequenceIndex == sequences.size()) {
 							break;
 						}
+						
 					}
 				}
 				
@@ -321,7 +332,7 @@ public class Peppy {
 				/* free up memory */
 				newMatches.clear();
 				peptides.clear();
-				System.gc();
+//				System.gc();
 					
 				/* break if we have covered our last sequence or if we are only using a region */
 				if (sequenceIndex == sequences.size() || Properties.useSequenceRegion) {
@@ -343,7 +354,7 @@ public class Peppy {
 			
 			/* clear out memory */
 			segmentMatches.clear();
-			System.gc();
+//			System.gc();
 			
 			/* increment our spectrum segment markers */
 			if (spectraStop == spectra.size()) break;
@@ -374,19 +385,10 @@ public class Peppy {
 		//This is where the bulk of the processing in long jobs takes
 		ArrayList<Match> matches  = (new ScoringThreadServer(peptides, spectra)).getMatches();
 
-		U.p("removing duplicate matches...");
 		removeDuplicateMatches(matches);
-
-		U.p("assigning rank to matches...");
 		assignRankToMatches(matches);
-		
-		U.p("assigning repeated peptide count to matches...");
 		assignRankStats(matches);
-		
-		U.p("assigning confidence values to matches...");
 		assignConfidenceValuesToMatches(matches, spectra);
-		
-		U.p("removing poor matches...");
 		matches = keepTopRankedMatches(matches);
 		
 		return matches;
@@ -466,6 +468,7 @@ public class Peppy {
 		/* sort by spectrum ID, then score */
 		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
 		Collections.sort(matches);
+		
 		Match match = matches.get(0);
 		Match previousMatch = matches.get(0);
 		//set for the first
@@ -569,21 +572,26 @@ public class Peppy {
 	
 
 	public static void assignConfidenceValuesToMatches(ArrayList<Match> matches, ArrayList<Spectrum> spectra) {
-		/* tally histograms for all spectra so E values can be calculated */
-		for (Spectrum spectrum: spectra) {
-			spectrum.getEValueCalculator().calculateHistogramProperties();
-		}
 		
-		/* now calculate e values for all matches */
-		for (Match match: matches) {
+		/* we only use this method when doing HMM Score, which we only should use in test sets */
+		if (Properties.calculateEValues) {
 			
-			/* determine and set the E, P values */
-			match.calculateEValue();
-			match.calculatePValue();
+			/* tally histograms for all spectra so E values can be calculated */
+			for (Spectrum spectrum: spectra) {
+				spectrum.getEValueCalculator().calculateHistogramProperties();
+			}
 			
-			/* this is a sanity check for overly confident e values */
-			if (match.getEValue() < match.getIMP()) {
-				match.setEValue(Double.MAX_VALUE);
+			/* now calculate e values for all matches */
+			for (Match match: matches) {
+				
+				/* determine and set the E, P values */
+				match.calculateEValue();
+				match.calculatePValue();
+				
+				/* this is a sanity check for overly confident e values */
+				if (match.getEValue() < match.getIMP()) {
+					match.setEValue(Double.MAX_VALUE);
+				}
 			}
 		}
 	}
@@ -607,6 +615,23 @@ public class Peppy {
 	
 	
 	
+	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
+		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
+		Collections.sort(matches);
+		int previousID = -1;
+		int id;
+		ArrayList<Match> out = new ArrayList<Match>(matches.size());
+		for (Match match: matches) {
+			id = match.getSpectrum().getId();
+			if (id != previousID) {
+				previousID = id;
+				out.add(match);
+			}
+		}
+		return out;
+	}
+
+
 	private static ArrayList<Match> multipass(ArrayList<Match> matches, ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
 		/* regions */
 		Regions regions = new Regions(matches, sequences, spectra);
@@ -663,7 +688,7 @@ public class Peppy {
 				if (dnaSequence.equals(region.getSequence())) {
 					
 					//TODO get rid of this 500
-					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 500, region.getStopLocation(), isReverse));
+					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 200, region.getStopLocation() + 200, isReverse));
 				}
 			}
 			sequence.reset();
@@ -689,25 +714,7 @@ public class Peppy {
 	}
 	
 	protected static void printFarewell() {
-		U.p("max memory used: " + (double) maxMemoryUsed / (1024 * 1024 * 1024) + " gigabytes");
 		U.p("done");
-	}
-
-
-	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
-		Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_SCORE);
-		Collections.sort(matches);
-		int previousID = -1;
-		int id;
-		ArrayList<Match> out = new ArrayList<Match>(matches.size());
-		for (Match match: matches) {
-			id = match.getSpectrum().getId();
-			if (id != previousID) {
-				previousID = id;
-				out.add(match);
-			}
-		}
-		return out;
 	}
 	
 	

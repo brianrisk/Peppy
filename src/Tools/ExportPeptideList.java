@@ -11,7 +11,7 @@ import Peppy.AminoAcids;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * Save a list of digested peptides
@@ -26,6 +26,10 @@ public class ExportPeptideList {
 		U.p("exporting peptide list");
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		
+		if (Properties.useOnlyForwardsFrames) {
+			U.p("using only forwards frames");
+		}
 		
 		try {
 			//loop through each sequence in the sequences ArrayList

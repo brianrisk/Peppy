@@ -84,7 +84,6 @@ public class HMMClass {
 //			peaks = EmitionProb.getHighIntensityPeaks(peaks);
 //		}
 		int massSize = peaks.size();
-		spectrum.sortPeaksByMass();
 	
 		int[][] traceBack = new int[massSize + 1][numberOfState];
 		double[][] viterbi = new double[numberOfState][massSize + 1];

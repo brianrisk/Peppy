@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import Peppy.Peak;
 import Peppy.Spectrum;
-import Utilities.U;
+import Peppy.U;
 
 /**
  * How many format conversion tools will I write in my lifetime?

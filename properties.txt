@@ -1,18 +1,17 @@
 ##Properties which define how a sequence is digested
 isSequenceFileDNA true
-useOnlyForwardsFrames false
+useOnlyForwardsFrames true
 useIsotopeLabeling false
 useReverseDatabase false
 
 ##This could be a directory or a file 
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/public/sequences/dna/HG19
-sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/public/sequences/dna/HG19/chr15.fa
 //sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/sequences/WHIM2 xeno and germline
 
 ##This could be a directory or a file 
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_033_WHIM2_frac_dta
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_WHIM2_unfrac
-spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/
+//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/
 //spectraDirectoryOrFile /Users/risk2/PeppyOverflow/public/ENCODE/Go Cyto/010510_GO_Cyto_2
 
 
@@ -24,13 +23,13 @@ scoringMethodName Peppy.Match_IMP
 highIntensityCleaning false
 
 ##digest only part of a sequence 
-useSequenceRegion true
+useSequenceRegion false
 sequenceRegionStart 66007655
 sequenceRegionStop 66207655
 
 ##limit returned matches by confidence 
 maxEValue 0.1
-maxIMP 1.0E-23
+maxIMP 1.0E-15
 
 ##a preference for digestion of large DNA windows 
 digestionWindowSize 5000000
@@ -41,7 +40,7 @@ numberOfSpectraPerSegment 2000000
 
 ##error thresholds in PPM
 precursorTolerance 25
-fragmentTolerance 50
+fragmentTolerance 500
 
 ##Report variables 
 createHTMLReport true
@@ -71,7 +70,7 @@ VCFFileString /Users/risk2/PeppyOverflow/WASHU/vcf-merge-whim2-xeno.vcf.txt
 numberOfSpectraToUseForFDR 10000
 
 ##PTMs
-multipass true
+multipass false
 numberOfRegionsToKeep 1000
 searchModifications false
 modificationLowerBound -0.3
@@ -83,8 +82,9 @@ VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Xenograft-hg19_2011-11-07.v
 
 
 ## for test purposes
-//testSequence /Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot 2011_04.fasta
-testSequence /Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta
-//testSequenceIsProtein true
-testSequenceIsProtein false
+testSequence /Users/risk2/PeppyOverflow/public/sequences/protein/uniprot_sprot 2011_04.fasta
+//testSequence /Users/risk2/PeppyOverflow/public/sequences/protein/ipi.HUMAN.fasta
+//testSequence /Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta
+testSequenceIsProtein true
+//testSequenceIsProtein false
 testDirectory /Users/risk2/PeppyOverflow/tests/ 
