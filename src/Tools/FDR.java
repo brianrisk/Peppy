@@ -26,8 +26,11 @@ public class FDR {
 		U.p("running FDR comparison report...");
 		U.startStopwatch();
 		
-		findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
-//		iterate(args);
+		if (args.length == 0) {
+			findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
+		} else {
+			iterate(args);
+		}
 		
 		U.stopStopwatch();
 		U.p("done");
@@ -123,6 +126,7 @@ public class FDR {
 		}
 				
 		//getting forwards matches
+		U.p("getting forwards matches");
 		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
 		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
 		Match.setSortParameter(sortParameter);
@@ -135,6 +139,7 @@ public class FDR {
 		}
 		
 		//getting reverse matches -- need to reload the sequences
+		U.p("getting reverse matches");
 		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
 		Match.setSortParameter(sortParameter);
@@ -146,6 +151,7 @@ public class FDR {
 		}
 		
 		/* combine the matches */
+		U.p("combining sets and analysing...");
 		ArrayList<Match> allMatches = new ArrayList<Match>(forwardsMatches.size() + reverseMatches.size());
 		allMatches.addAll(forwardsMatches);
 		allMatches.addAll(reverseMatches);
@@ -212,7 +218,7 @@ public class FDR {
 			for (int i = 1; i < points.size(); i++) {
 				if (points.get(i).x < percent && points.get(i - 1).x != points.get(i).x) {
 					percent -= increment;
-					pw.println(points.get(i - 1).x + "\t" + points.get(i - 1).y + "\t" + allMatches.get(i - 1).getIMP());
+					pw.println(points.get(i - 1).x + "\t" + points.get(i - 1).y + "\t" + allMatches.get(i - 1).getIMP() + "\t" + allMatches.get(i - 1).getScore());
 				}
 			}
 			pw.flush();

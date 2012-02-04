@@ -8,6 +8,7 @@ import Math.MassError;
 import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
+import Peppy.Matches;
 import Peppy.Modification;
 import Peppy.Peak;
 import Peppy.Properties;
@@ -21,7 +22,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 	public HTMLPageSpectrum(Spectrum spectrum, ArrayList<Match> matches, File destinationFile) {
 		super(destinationFile);
 		this.spectrum = spectrum;
-		theseMatches =  CommonMatchSearches.getMatchesWithSpectrum(spectrum, matches);
+		theseMatches =  Matches.getMatchesWithSpectrum(spectrum, matches);
 		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(theseMatches);
 	}
@@ -112,12 +113,11 @@ public class HTMLPageSpectrum extends HTMLPage {
 		}
 		printTH("score");
 		printTH("ions");
-		printTH("E value");
-		if (Properties.searchModifications) {
+//		if (Properties.searchModifications) {
 			printTH("has mod");
 			printTH("mod index");
 			printTH("mod mass");
-		}
+//		}
 		/* print all the rows */
 		for(Match match: theseMatches) {
 			printTableRow(match);
@@ -183,10 +183,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		//ion matdch tally
 		printTD("" + match.getIonMatchTally());
 		
-		//E value
-		printTD("" + match.getEValue());
-		
-		if (Properties.searchModifications) {
+//		if (Properties.searchModifications) {
 			printTD("" + match.hasModification());
 			if (match.hasModification()) {
 				printTD((match.getModificationIndex() + 1) + " (" + match.getPeptide().getAcidSequenceString().charAt(match.getModificationIndex()) + ")");
@@ -197,7 +194,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 			}
 			
 			
-		}
+//		}
 	}
 	
 

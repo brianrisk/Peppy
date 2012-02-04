@@ -41,7 +41,8 @@ public class Region implements Comparable<Region> {
 //			score += match.getPeptide().getLength() * match.getPeptide().getLength();
 //			score -= Math.log10(match.getEValue());
 //			if (match.rank == 1  && match.rankCount == 1) score += 1;
-			if (match.rank == 1) score += (1.0 / match.rankCount);
+//			if (match.rank == 1) score += (1.0 / match.rankCount);
+			if (score < match.getScore()) score = match.getScore();
 			return true;
 		} else {
 			return false;

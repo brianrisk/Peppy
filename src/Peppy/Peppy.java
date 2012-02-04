@@ -27,6 +27,8 @@ public class Peppy {
 	static MemoryUsage memoryUsage;
 	static long maxMemoryUsed = 0;
 	
+	private static final long expiration = 1328292741160L + (1000 * 60 * 60 * 24 * 30);
+	
 	
 	public static void main(String [] args) {
 		/* set up initial state */
@@ -86,15 +88,6 @@ public class Peppy {
 				sequences = oneSequenceList;
 			}
 			
-			/* set our missed cleavage number.  since we are using
-			 * mulitpass for DNA sequences we can set a lower number
-			 */
-			if (Properties.isSequenceFileDNA && Properties.multipass) {
-				Properties.numberOfMissedCleavages = 1;
-			} else {
-				Properties.numberOfMissedCleavages = 2;
-			}
-			
 			/* nothing weird.  Just do a normal search */
 			matches = getMatches(sequences, spectra);
 
@@ -108,8 +101,6 @@ public class Peppy {
 		/* regions (only work with DNA) */
 		if (Properties.isSequenceFileDNA) {
 			
-			/* set our missed cleavage count to higher */
-			Properties.numberOfMissedCleavages = 3;
 			
 			/* rerun the regions analysis */
 			Regions regions = new Regions(matches, sequences, spectra);
@@ -168,7 +159,16 @@ public class Peppy {
 
 
 	public static void init(String propertiesFile) {
-		System.setProperty("java.awt.headless", "true"); 
+		/* check to see if this version is too old */
+//		if (System.currentTimeMillis() > expiration) {
+//			U.p("Welcome to Peppy");
+//			U.p("This is an out of date version.  Please access PeppyResearch.com for the current version.");
+//			System.exit(0);
+//		}
+		
+		/* this allows us to do our graphics */
+		System.setProperty("java.awt.headless", "true");
+		
 		Properties.loadProperties(propertiesFile);
 		AminoAcids.init();
 		
@@ -189,7 +189,23 @@ public class Peppy {
 	
 	
 	public static ArrayList<Match> getReverseMatches(ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
-		return getMatches(sequences, spectra, true);
+		/* set our missed cleavage number.  since we are using
+		 * mulitpass for DNA sequences we can set a lower number
+		 */
+		if (Properties.isSequenceFileDNA && Properties.multipass) {
+			Properties.numberOfMissedCleavages = 2;
+		} else {
+			Properties.numberOfMissedCleavages = 2;
+		}
+		
+		/* performing our normal search */
+		ArrayList<Match> matches = getMatches(sequences, spectra, true);
+		
+		/* performing the multipass search */
+		if (Properties.multipass && Properties.isSequenceFileDNA) {
+			matches = multipass(matches, sequences, spectra);
+		}
+		return matches;
 	}
 	
 	
@@ -203,6 +219,15 @@ public class Peppy {
 		if (Properties.useIsotopeLabeling) {
 			return getLabeledMatches(sequences, spectra);
 		} else {
+			/* set our missed cleavage number.  since we are using
+			 * mulitpass for DNA sequences we can set a lower number
+			 */
+			if (Properties.isSequenceFileDNA && Properties.multipass) {
+				Properties.numberOfMissedCleavages = 2;
+			} else {
+				Properties.numberOfMissedCleavages = 2;
+			}
+			
 			/* performing our normal search */
 			ArrayList<Match> matches = getMatches(sequences, spectra, Properties.useReverseDatabase);
 			
@@ -282,10 +307,10 @@ public class Peppy {
 					while (peptides.size() < Properties.desiredPeptideDatabaseSize) {
 						
 						/* clear previous chunk of peptides and reclaim memory */
-//						if (peptideSegment != null) {	
-//							peptideSegment.clear();
-//							System.gc();
-//						}	
+						if (peptideSegment != null) {	
+							peptideSegment.clear();
+							System.gc();
+						}	
 						
 						/* collect peptides */
 						peptideSegment = sequences.get(sequenceIndex).extractMorePeptides(isReverse);
@@ -332,7 +357,7 @@ public class Peppy {
 				/* free up memory */
 				newMatches.clear();
 				peptides.clear();
-//				System.gc();
+				System.gc();
 					
 				/* break if we have covered our last sequence or if we are only using a region */
 				if (sequenceIndex == sequences.size() || Properties.useSequenceRegion) {
@@ -637,34 +662,41 @@ public class Peppy {
 		Regions regions = new Regions(matches, sequences, spectra);
 		U.p("we found this many regions: " + regions.getRegions().size());
 		
+		if (regions.getRegions().size() > 0) {
 		
-		U.p("performing localized PTM search");
-		Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
-		Properties.searchModifications = true;
-		
-		/* generating peptides in the regions */
-		ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
-		U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
-		
-		/* getting matches to the peptides in the regions */
-		ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectra);
-		
-		/* make room for the modified matches and add them to our main set of matches */
-		int matchesNotFoundInUnmodifiedSearchCount = 0;
-		for (Match match: modMatches) {
-			if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
+			U.p("performing localized PTM search");
+			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
+			Properties.searchModifications = true;
+			Properties.numberOfMissedCleavages = 2;
+			
+			/* generating peptides in the regions */
+			ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
+			U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
+			
+			/* getting matches to the peptides in the regions */
+			ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectra);
+			
+			/* make room for the modified matches and add them to our main set of matches */
+			int matchesNotFoundInUnmodifiedSearchCount = 0;
+			for (Match match: modMatches) {
+				if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
+			}
+			matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
+			for (Match match: modMatches) {
+				if (match.isFromModificationSearches()) matches.add(match);
+			}
+			
+			/* remove duplicates */
+			removeDuplicateMatches(matches);
+			
+			/* determine some stats */
+			assignRankToMatches(matches);
+			assignRankStats(matches);
+			
+			/* return things to the way they were */
+			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP");
+			Properties.searchModifications = false;
 		}
-		matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
-		for (Match match: modMatches) {
-			if (match.isFromModificationSearches()) matches.add(match);
-		}
-		
-		/* remove duplicates */
-		removeDuplicateMatches(matches);
-		
-		/* determine some stats */
-		assignRankToMatches(matches);
-		assignRankStats(matches);
 		
 		return matches;
 	}

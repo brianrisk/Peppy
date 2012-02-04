@@ -66,10 +66,12 @@ public class Properties {
 	public static double precursorTolerance = 100;
 	public static double fragmentTolerance = 300;
 	
-	//TandemFit
-	public static double peakIntensityExponent = 0.33333333;
+	/* ion types */
 	public static double rightIonDifference = 1.0; //x, y, z ion
 	public static double leftIonDifference = 1.0;  //a, b, c ion
+	
+	//TandemFit
+	public static double peakIntensityExponent = 0.33333333;
 	public static double YBtrue = 1.1;
 	public static double YBfalse = 0.9;
 	public static double BYtrue = 1.1;
@@ -77,7 +79,7 @@ public class Properties {
 	
 	
 	//matches per spectrum
-	public static int maximumNumberOfMatchesForASpectrum = 5;
+	public static int maximumNumberOfMatchesForASpectrum = 1;
 	
 	//cut offs.  sexy, sexy cutoffs.
 	public static double maxEValue = 0.1;

@@ -1,7 +1,9 @@
 package Peppy;
 
 /**
- * This class is for when we already have a score, E value, etc for a match
+ * Used for loading in Mascot and X!Tandem results
+ * 
+ * We already have a score, E value, etc for a match
  * and simply need to contain it in an object
  * @author Brian Risk
  *

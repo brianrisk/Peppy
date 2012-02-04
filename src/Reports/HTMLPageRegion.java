@@ -23,9 +23,8 @@ public class HTMLPageRegion extends HTMLPageMatches {
 		printP("Sequence: " + region.getSequence().getSequenceFile().getName());
 		
 		/* UCSC link */
-		String link = UCSC.getLink(region.getStartLocation(), region.getStopLocation(), region.getSequence());
-		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation() + "(<a href=\"" +link + "\">UCSC</a>)");
-		printP("region P value: " + region.getPValue());
+		printP("region: " + region.getStartLocation() + " to " + region.getStopLocation());
+		printP(UCSC.getButton(region.getStartLocation(), region.getStopLocation(), region.getSequence(), matches));
 		
 		/* get access to the matches */
 		ArrayList<Match> matches = region.getMatches();

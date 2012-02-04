@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import Peppy.Match;
+import Peppy.Matches;
 import Peppy.Peptide;
 import Peppy.Properties;
 
@@ -35,21 +36,7 @@ public class HTMLPageMatches extends HTMLPage {
 	}
 	
 	protected void printBestMatchTable(String spectraPath) {
-		/* create a list of best matches */
-		ArrayList<Match> bestMatches = new ArrayList<Match>();
-		Match.setSortParameter(Match.SORT_BY_PEPTIDE_THEN_SCORE);
-		Collections.sort(matches);
-		Peptide peptide = new Peptide("k");
-		for (Match match: matches) {
-			if (!peptide.equals(match.getPeptide())) {
-				peptide = match.getPeptide();
-				bestMatches.add(match);
-			}
-		}
-		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
-		Collections.sort(matches);
-		Collections.sort(bestMatches);
-		printMatchTable(spectraPath, bestMatches);
+		printMatchTable(spectraPath, Matches.getBestMatches(matches));
 	}
 	
 	protected void printMatchTable(String spectraPath) {
@@ -67,7 +54,6 @@ public class HTMLPageMatches extends HTMLPage {
 			printTH("spliced");
 		}
 		printTH("score");
-		printTH("e value");
 		if (Properties.isYale) {
 			printTH("inORF");
 			printTH("Hydrophobic percentage");
@@ -133,9 +119,6 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* score */
 			printTD(nfDecimal.format(match.getScore()));
-			
-			/* e value */
-			printTD(nfDecimal.format(-Math.log10(match.getEValue())));
 			
 			if (Properties.isYale) {
 				/* ORF */

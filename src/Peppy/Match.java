@@ -173,6 +173,7 @@ public abstract class Match implements Comparable<Match>, HasEValue{
 		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
 		
 		//TODO: optimize this.  it is a great place to improve performance
+		//NOTE:  if we end up changing the binomial probability to return the log, this will need to get changed
 		if (peakMatchProbability > 0.25) {
 			impValue = 1;
 			return 1;

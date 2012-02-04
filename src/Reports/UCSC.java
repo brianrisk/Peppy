@@ -1,6 +1,9 @@
 package Reports;
 
+import java.util.ArrayList;
+
 import Peppy.Match;
+import Peppy.Matches;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.U;
@@ -41,6 +44,30 @@ public class UCSC {
 		} else {
 			return "";
 		}
+	}
+	
+	public static String getButton(int start, int stop, Sequence sequence, ArrayList<Match> matches) {
+		ArrayList<Match> bestMatches = Matches.getBestMatches(matches);
+		String chromosome = U.getFileNameWithoutSuffix(sequence.getSequenceFile());
+		StringBuffer out = new StringBuffer();
+		out.append("<FORM ACTION=\"http://genome.ucsc.edu/cgi-bin/hgCustom\" METHOD=\"POST\"  ENCTYPE=\"multipart/form-data\" NAME=\"mainForm\" >");
+		out.append("<INPUT TYPE=HIDDEN NAME='clade' VALUE='Mammal'>");
+		out.append("<INPUT TYPE=HIDDEN NAME='org' VALUE='Human'>");
+		out.append("<INPUT TYPE=HIDDEN NAME='db' VALUE='hg19'>");
+		out.append("<INPUT TYPE=HIDDEN NAME='hgct_customText' VALUE=\"");
+		out.append('\r');
+		out.append("browser position " + chromosome + ":" + start + "-" + stop);
+		out.append('\r');
+		out.append("track name=PeppyRegion description='Peppy Region' visibility=2");
+		out.append('\r');
+		for (Match match: bestMatches) {
+			out.append(chromosome + " " + match.getPeptide().getStartIndex() + " " + match.getPeptide().getStopIndex() + " " + match.getPeptide().getAcidSequenceString());
+			out.append('\r');
+		}
+		out.append("\">");
+		out.append('\r');
+		out.append("<input type=\"submit\" name=\"Submit\" value=\"UCSC\" >");
+		return out.toString();
 	}
 
 }

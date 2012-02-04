@@ -1,18 +1,26 @@
-package Reports;
+package Peppy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-import Peppy.Match;
-import Peppy.Sequence_DNA;
-import Peppy.Spectrum;
-
-/**
- * These are common searches that one might perform on a body of matches
- * @author Brian Risk
- *
- */
-
-public class CommonMatchSearches {
+public class Matches {
+	
+	public static ArrayList<Match> getBestMatches(ArrayList<Match> matches) {
+		ArrayList<Match> bestMatches = new ArrayList<Match>();
+		Match.setSortParameter(Match.SORT_BY_PEPTIDE_THEN_SCORE);
+		Collections.sort(matches);
+		Peptide peptide = new Peptide("k");
+		for (Match match: matches) {
+			if (!peptide.equals(match.getPeptide())) {
+				peptide = match.getPeptide();
+				bestMatches.add(match);
+			}
+		}
+		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Collections.sort(matches);
+		Collections.sort(bestMatches);
+		return bestMatches;
+	}
 	
 	public static ArrayList<Match> getMatchesWithSpectrum(Spectrum spectrum, ArrayList<Match> theseMatches) {
 		ArrayList<Match> out = new ArrayList<Match>();

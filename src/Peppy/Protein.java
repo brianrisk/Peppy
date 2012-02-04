@@ -266,12 +266,20 @@ public class Protein implements Comparable<Protein>{
 			
 			//create new forming peptides if necessary
 			if (Properties.isSequenceFileDNA) {
-				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
-					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
+				if (Properties.searchModifications) {
+					if ( (isStart(aminoAcid)) ||  // start a new peptide at M
+						 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+						 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+					{		
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
+					}
+				} else {
+					if (isBreak(previousAminoAcid)  ) {		
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
+					}
 				}
+				
+			
 				
 			/* 'M' Does not mean a new peptide should form in proteins */
 			} else {

@@ -54,7 +54,7 @@ public class BEDReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			//sorting our matches by spectrum then score
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
+			Match.setSortParameter(Match.SORT_BY_SCORE);
 			Collections.sort(matches);
 			
 			//print the header
@@ -87,10 +87,10 @@ public class BEDReporter {
 				name = match.getSpectrum().getFile().getName();
 				
 				//score
-				rawScore = Math.log(match.getEValue());
+				rawScore = match.getScore();
 				score = 0;
 				if (rawScore < -0.1) {
-					score = (int) rawScore * -20;
+					score = (int) rawScore * 20;
 					if (score > 1000) score = 1000;
 				}
 				
