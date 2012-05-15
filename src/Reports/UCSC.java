@@ -36,14 +36,28 @@ public class UCSC {
 			}
 			link += U.getFileNameWithoutSuffix(sequence.getSequenceFile());
 			link += "%3A";
-			link += start;
+			link += start - 100;
 			link += "-";
-			link += stop;
+			link += stop + 100;
 	//		link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
 			return link;
 		} else {
 			return "";
 		}
+	}
+	
+	public static String getLink(int start, int stop, String sequenceName) {
+		String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
+		if (Properties.isYale) {
+			link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
+		}
+		link += sequenceName;
+		link += "%3A";
+		link += start - 100;
+		link += "-";
+		link += stop + 100;
+//		link += "&hgt.suggest=&hgt.suggestTrack=knownGene&&hgt.newJQuery=1&pix=922";
+		return link;
 	}
 	
 	public static String getButton(int start, int stop, Sequence sequence, ArrayList<Match> matches) {
@@ -67,6 +81,7 @@ public class UCSC {
 		out.append("\">");
 		out.append('\r');
 		out.append("<input type=\"submit\" name=\"Submit\" value=\"UCSC\" >");
+		out.append("</form>");
 		return out.toString();
 	}
 

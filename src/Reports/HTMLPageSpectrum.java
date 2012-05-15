@@ -9,7 +9,7 @@ import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.Match_IMP_VariMod;
 import Peppy.Matches;
-import Peppy.Modification;
+import Peppy.ModificationEntry;
 import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;
@@ -89,8 +89,8 @@ public class HTMLPageSpectrum extends HTMLPage {
 			printP("known modifications which are close in mass to the observed modification:");
 			print("<ul>");
 			Match_IMP_VariMod modifiedMatch = (Match_IMP_VariMod) theseMatches.get(0);
-			double fragmentTolerance = MassError.getDaltonError(Properties.fragmentTolerance, 1000);
-			for (Modification mod: Definitions.modifications) {
+			double fragmentTolerance = MassError.getDaltonError(Properties.fragmentTolerance, spectrum.getMass());
+			for (ModificationEntry mod: Definitions.modificationEntries) {
 				if (Math.abs(modifiedMatch.getMoificationdMass() - mod.getMonoMass()) <= fragmentTolerance) {
 					print("<li>" + mod.getDescription() + "</li>");
 				}
@@ -112,27 +112,21 @@ public class HTMLPageSpectrum extends HTMLPage {
 			printTH("S");
 		}
 		printTH("score");
-		printTH("ions");
-//		if (Properties.searchModifications) {
-			printTH("has mod");
-			printTH("mod index");
-			printTH("mod mass");
-//		}
+		printTH("has mod");
+		printTH("mod index");
+		printTH("mod mass");
+
+		if (Properties.isYale) {
+			printTH("in ORF");
+			printTH("ORF size");
+		}
+		
 		/* print all the rows */
 		for(Match match: theseMatches) {
 			printTableRow(match);
 		}
 		print("</table>");
 		
-		//histogram
-//		printH2("E value histogram for spectrum " + spectrum.getId());
-//		File histogramFile = new File(destinationFile.getParent(), spectrum.getId() + "-hist.jpg");
-//		try {
-//			HistogramVisualizer.drawHistogram(spectrum.getEValueCalculator().getSmoothedHistogram(), 300, 300, histogramFile);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		printP("<img src=\"" + histogramFile.getName() + "\">");
 
 		printFooter();
 	}
@@ -180,21 +174,22 @@ public class HTMLPageSpectrum extends HTMLPage {
 		//score
 		printTD("" + match.getScore());
 		
-		//ion matdch tally
-		printTD("" + match.getIonMatchTally());
+
+		printTD("" + match.hasModification());
+		if (match.hasModification()) {
+			printTD((match.getModificationIndex() + 1) + " (" + match.getPeptide().getAcidSequenceString().charAt(match.getModificationIndex()) + ")");
+			printTD("" + match.getMoificationdMass());
+		} else {
+			printTD("");
+			printTD("");
+		}
 		
-//		if (Properties.searchModifications) {
-			printTD("" + match.hasModification());
-			if (match.hasModification()) {
-				printTD((match.getModificationIndex() + 1) + " (" + match.getPeptide().getAcidSequenceString().charAt(match.getModificationIndex()) + ")");
-				printTD("" + match.getMoificationdMass());
-			} else {
-				printTD("");
-				printTD("");
-			}
+		if (Properties.isYale) {
+			printTD("" + match.getPeptide().isInORF());
+			printTD("" + match.getPeptide().getORFSize());
+		}
 			
-			
-//		}
+
 	}
 	
 

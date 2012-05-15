@@ -1,35 +1,38 @@
 ##Properties which define how a sequence is digested
+useOnlyForwardsFrames false
+
+//sequenceDirectoryOrFile /Users/risk2/PeppyData/akhilesh-pandey/sequences/protein/
+//sequenceDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/genome paternal/
+//sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
+
+
+sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
+isSequenceFileDNA false
+sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/dna/HG19/
 isSequenceFileDNA true
-useOnlyForwardsFrames true
-useIsotopeLabeling false
-useReverseDatabase false
+sequenceDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/genome paternal/
+isSequenceFileDNA true
+
 
 ##This could be a directory or a file 
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/public/sequences/dna/HG19
-//sequenceDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/sequences/WHIM2 xeno and germline
+//spectraDirectoryOrFile /Users/risk2/PeppyData/ucla/spectra
+//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/TPD52/TPD52_WHIM16_dta/
+//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/41/Recalibrated-Ellis-041-WHIM16-dta
+//spectraDirectoryOrFile /Users/risk2/PeppyData/ucla/spectra/Chlamy nitrogen depletion
+//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/41/Recalibrated-Ellis-041-WHIM2-dta
+//spectraDirectoryOrFile /Users/risk2/PeppyData/vanderbilt/spectra/CompRef_VU_whim16_dta_zip/
+//spectraDirectoryOrFile /Users/risk2/PeppyData/johns-hopkins/spectra/WHIM2
+//spectraDirectoryOrFile /Users/risk2/PeppyData/UNC/spectra/CPTAC/WHIM2/
+//spectraDirectoryOrFile /Users/risk2/PeppyData/akhilesh-pandey/spectra/uncompressed/
 
-##This could be a directory or a file 
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_033_WHIM2_frac_dta
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/Ellis_WHIM2_unfrac
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/WashU/spectra/
-//spectraDirectoryOrFile /Users/risk2/PeppyOverflow/public/ENCODE/Go Cyto/010510_GO_Cyto_2
+spectraDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/spectra uncompressed/
 
-
-##Scoring Method 
-scoringMethodName Peppy.Match_IMP
-//scoringMethodName Peppy.Match_IMP_VariMod
-
-##retain 100 most intense peaks
-highIntensityCleaning false
 
 ##digest only part of a sequence 
 useSequenceRegion false
-sequenceRegionStart 66007655
-sequenceRegionStop 66207655
+sequenceRegionStart 62098418
+sequenceRegionStop 62099285
 
-##limit returned matches by confidence 
-maxEValue 0.1
-maxIMP 1.0E-15
 
 ##a preference for digestion of large DNA windows 
 digestionWindowSize 5000000
@@ -39,18 +42,17 @@ desiredPeptideDatabaseSize 10000000
 numberOfSpectraPerSegment 2000000
 
 ##error thresholds in PPM
-precursorTolerance 25
+precursorTolerance 20
 fragmentTolerance 500
 
 ##Report variables 
-createHTMLReport true
+createHTMLReport false
 
 ##no fragments that weigh less than this will be admitted into the fragment list 
 ##units are daltons. 
 peptideMassMinimum 400.0
 peptideMassMaximum 10000.0
 
-numberOfMissedCleavages 2
 
 ##splicing 
 useSpliceVariants false
@@ -58,13 +60,7 @@ useSpliceVariants false
 ##This is per sequence file, so if this value is 5 and you use 7 FASTA files 
 ##it will produce (at least) 35 matches per spectrum 
 ##the final number of results also varies depending on the digestionWindowSize 
-maximumNumberOfMatchesForASpectrum 2
-
-##where we store our reports 
-reportDirectory reports
-
-##VCF
-VCFFileString /Users/risk2/PeppyOverflow/WASHU/vcf-merge-whim2-xeno.vcf.txt
+maximumNumberOfMatchesForASpectrum 1
 
 ##False Discovery Rates
 numberOfSpectraToUseForFDR 10000
@@ -77,14 +73,16 @@ modificationLowerBound -0.3
 modificationUpperBound 100.0
 
 ## VCF
-VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Xenograft-hg19_2011-11-07.vcf
-//VCFFileString /Users/risk2/PeppyOverflow/WASHU/WHIM2-Normal-hg19_2011-11-07.vcf
+//VCFFileString /Users/risk2/Desktop/WHIM16/WHIM16-Xenograft-hg19_2011-11-07.vcf
+VCFFileString /Users/risk2/Desktop/GM12878/CEU.trio.2010_03.genotypes.vcf
+//VCFFileString /Users/risk2/PeppyData/WASHU/WHIM2-Normal-hg19_2011-11-07.vcf
 
 
 ## for test purposes
-testSequence /Users/risk2/PeppyOverflow/public/sequences/protein/uniprot_sprot 2011_04.fasta
-//testSequence /Users/risk2/PeppyOverflow/public/sequences/protein/ipi.HUMAN.fasta
-//testSequence /Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta
+testSequence /Users/risk2/PeppyData/public/sequences/protein/uniprot_sprot 2011_04.fasta
+//testSequence /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
+//testSequence /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
 testSequenceIsProtein true
 //testSequenceIsProtein false
-testDirectory /Users/risk2/PeppyOverflow/tests/ 
+testDirectory /Users/risk2/PeppyData/tests/ 
+isYale false

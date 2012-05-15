@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Stack;
 
 /**
  * A basic utility class.
@@ -27,26 +30,20 @@ public class U {
 	public static final long MINUTE = SECOND * 60;
 	public static final long HOUR = MINUTE * 60;
 	public static final long DAY = HOUR * 24;
-	public static final long YEAR = (long) (DAY * 365.25);
+	public static final long YEAR = DAY * 365;
 	
-	private static long startTimeMilliseconds;
-	private static long stopTimeMilliseconds;
+
+	private static Stack<Long> stopwatchClicks = new Stack<Long>();
 	
 	public static void startStopwatch() {
-		startTimeMilliseconds = System.currentTimeMillis();
+		stopwatchClicks.push(System.currentTimeMillis());
 	}
 	
 	public static long stopStopwatch() {
-		stopTimeMilliseconds = System.currentTimeMillis();
-		long timeElapsed = stopTimeMilliseconds - startTimeMilliseconds;
+		long stopTimeMilliseconds = System.currentTimeMillis();
+		long timeElapsed = stopTimeMilliseconds - stopwatchClicks.pop();
 		U.p("Time Elapsed: " + U.millisecondsToString(timeElapsed));
 		return timeElapsed;
-	}
-	
-	public static void printTimeRemaining(double amountComplete) {
-		double elapsed = System.currentTimeMillis() - startTimeMilliseconds;
-		long timeRemaining = (long) ((elapsed / amountComplete) - elapsed);
-		U.p("Time Remaining: " + U.millisecondsToString(timeRemaining));
 	}
 	
 	public static void save(String fileName, String output) {
@@ -78,10 +75,6 @@ public class U {
 		return sb.toString();
 	}
 	
-	public static void printUserDirectory() {
-		String tmp=System.getProperty("user.dir");
-	    U.p(tmp);
-	}
 	
 	public static String millisecondsToString(long timeElapsed) {
 		String response = "";
@@ -120,6 +113,26 @@ public class U {
 			if (amount != 1) response += "s";
 			timeElapsed -= SECOND * amount;
 		}
+		return response;
+	}
+	
+	public static String getDateString() {
+		String response = "";
+		GregorianCalendar calendar = new GregorianCalendar();
+		Date time = new Date();
+		calendar.setTime(time);
+		response += calendar.get(GregorianCalendar.YEAR);
+		response += "-";
+		response += calendar.get(GregorianCalendar.MONTH);
+		response += "-";
+		response += calendar.get(GregorianCalendar.DAY_OF_MONTH);
+		response += " ";
+		response += calendar.get(GregorianCalendar.HOUR_OF_DAY);
+		response += "-";
+		if (calendar.get(GregorianCalendar.MINUTE) < 10) {
+			response += "0";
+		}
+		response += calendar.get(GregorianCalendar.MINUTE);
 		return response;
 	}
 	

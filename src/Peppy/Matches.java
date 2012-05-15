@@ -3,7 +3,91 @@ package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Matches {
+/**
+ * We want to hold collections of matches for various things.  All matches for a given peptide,
+ * or spectrum or region or protein... This abstract class defines common functionality for all
+ * of these.
+ * 
+ * @author Brian Risk
+ *
+ */
+public abstract class Matches{
+	
+	ArrayList<Match> matches = new ArrayList<Match>();
+	
+	/* the top score of all of our matches */
+	double score = Properties.minimumScore;
+		
+	
+	private static int labelTracker = 0;
+	public static final int KEEP_ONLY_BEST_MATCHES = labelTracker++;
+	public static final int KEEP_ONLY_ONE_BEST_MATCH = labelTracker++;
+	public static final int KEEP_MATCHES_AT_MINIMUM_SCORE = labelTracker++;
+	
+	private int whatToKeep = KEEP_ONLY_BEST_MATCHES;
+	
+	/**
+	 * Add a match only if it's score is greater than or equal to the reigning score.
+	 * If it is greater than, then the existing matches are cleared out.
+	 * 
+	 * NOTE: don't add if it is a duplicate match??
+	 * 
+	 * @param match
+	 */
+	public void addMatch(Match match) {
+		if (whatToKeep == KEEP_ONLY_BEST_MATCHES) {
+			if (match.getScore() > score) {
+				matches.clear();
+				matches.add(match);
+				score = match.getScore();
+			} else {
+				if (match.getScore() == score) {
+					matches.add(match);
+				}
+			}
+			return;
+		}
+		
+		if (whatToKeep == KEEP_ONLY_ONE_BEST_MATCH) {
+			if (matches.size() == 0) {
+				if (match.score >= score) {
+					matches.add(match);
+				}
+			} else {
+				if (match.getScore() > score) {
+					matches.set(0, match);
+					score = match.getScore();
+				} 
+			}
+			return;
+		}
+		
+		if (whatToKeep == KEEP_MATCHES_AT_MINIMUM_SCORE) {
+			if (match.getScore() >= Properties.minimumScore) {
+				matches.add(match);
+				if (match.getScore() > score) {
+					score = match.getScore();
+				}
+			} 
+		}
+	}
+	
+	public void clearMatches() {
+		matches.clear();
+		score = Properties.minimumScore;
+	}
+	
+	public ArrayList<Match> getMatches() {
+		return matches;
+	}
+
+	public double getScore() {
+		if (matches.size() > 0) {
+			return score;
+		} else {
+			return 0;
+		}
+	}
 	
 	public static ArrayList<Match> getBestMatches(ArrayList<Match> matches) {
 		ArrayList<Match> bestMatches = new ArrayList<Match>();
@@ -42,6 +126,14 @@ public class Matches {
 			}
 		}
 		return out;
+	}
+
+	public int getWhatToKeep() {
+		return whatToKeep;
+	}
+
+	public void setWhatToKeep(int whatToKeep) {
+		this.whatToKeep = whatToKeep;
 	}
 
 }

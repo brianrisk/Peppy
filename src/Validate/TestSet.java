@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import Graphs.PRCurve;
 import Peppy.Match;
+import Peppy.MatchesSpectrum;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ScoringThreadServer;
@@ -22,6 +23,7 @@ public class TestSet {
 	
 	private String testName;
 	private ArrayList<Spectrum> spectra;
+	private ArrayList<MatchesSpectrum> spectraMatches;
 	private ArrayList<Match> positiveMatches = new ArrayList<Match>();
 	private ArrayList<Match> topReverseMatches = null;
 	private ArrayList<MatchContainer> testedMatches = null;
@@ -43,6 +45,12 @@ public class TestSet {
 		this(testDirectoryName, testName);
 		positiveMatches = matches;
 		this.spectra = spectra;
+		
+		/* set up where we will hold all of the matches for our spectra */
+		spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		for (Spectrum spectrum: spectra) {
+			spectraMatches.add(new MatchesSpectrum(spectrum));
+		}
 	}
 	
 
@@ -52,7 +60,13 @@ public class TestSet {
 		//load spectra for this test
 		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + "/" + testName + "/spectra");
 		
+		/* set up where we will hold all of the matches for our spectra */
+		spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		for (Spectrum spectrum: spectra) {
+			spectraMatches.add(new MatchesSpectrum(spectrum));
+		}
 		
+		/* spectrum statistics */
 		averageNumberOfPeaksPerSpectrum = 0;
 		for (Spectrum spectrum: spectra) {
 			averageNumberOfPeaksPerSpectrum += spectrum.getPeakCount();
@@ -66,29 +80,10 @@ public class TestSet {
 	}
 	
 
-	public void findPositiveMatches(ArrayList<Peptide> peptides) {
-//		/* test if we have found the correct peptide */
-//		/* should only be used with the ecoli test on ecoli genome*/
-//		ArrayList<Peptide> correctPeptides = loadCorrectPeptides();
-//		U.p("corect peptides size: " + correctPeptides.size());
-//		U.p("printing correct peptides not found:");
-//		boolean peptideFound = false;
-//		for (Peptide correct: correctPeptides) {
-//			for (Peptide peptide: peptides) {
-//				if (peptide.equals(correct)) {
-//					peptideFound = true;
-//					break;
-//				}
-//			}
-//			if (!peptideFound) {
-//				U.p(correct);
-//			}
-//			peptideFound = false;
-//		}
-		
+	public void findPositiveMatches(ArrayList<Peptide> peptides) {		
 		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
-		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectra);
+		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectraMatches);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
 		
@@ -122,11 +117,8 @@ public class TestSet {
 		/* finding how much time per spectrum */
 		milisecondsPerSpectrum = (double) timeElapsed / spectra.size();
 
-		if (Properties.calculateEValues) {
-			Match.setSortParameter(Match.SORT_BY_E_VALUE);
-		} else {
-			Match.setSortParameter(Match.SORT_BY_SCORE);
-		}
+
+		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(positiveMatches);
 		
 		
@@ -144,27 +136,39 @@ public class TestSet {
 		/* reduce the tested matches to one per spectrum, keeping the one that is correct if there is a correct one 
 		 * else keep the match with the best score */
 		ArrayList<MatchContainer> reducedTestedMatches = new ArrayList<MatchContainer>(testedMatches.size());
-		boolean foundTrue = false;
 		for (Spectrum spectrum: spectra) {
+			MatchContainer toAdd = null;
 			for (MatchContainer mc: testedMatches) {
-				if (mc.getMatch().getSpectrum().getId() == spectrum.getId() && mc.isTrue()) {
-					foundTrue = true;
-					reducedTestedMatches.add(mc);
-					break;
-				}
-			}
-			if (!foundTrue) {
-				for (MatchContainer mc: testedMatches) {
-					/* the first one we find should be the best because we sorted tested matches */
-					if (mc.getMatch().getSpectrum().getId() == spectrum.getId()) {
-						reducedTestedMatches.add(mc);
-						break;
+				if (mc.getMatch().getSpectrum().getId() == spectrum.getId()) {
+					if (toAdd == null) {
+						toAdd = mc; 
+						continue;
+					}
+					if (toAdd.getMatch().getScore() < mc.getMatch().getScore()) {
+						toAdd = mc;
+						continue;
+					}
+					if (toAdd.getMatch().getScore() == mc.getMatch().getScore() && mc.isTrue()) {
+						toAdd = mc;
 					}
 				}
 			}
-			foundTrue = false;
+			if (toAdd != null) {
+				reducedTestedMatches.add(toAdd);
+			}
 		}
 		testedMatches = reducedTestedMatches;
+		
+		/* ensure the testedMatches are considering the correct peptide */
+		for (MatchContainer mc: testedMatches) {
+			if (mc.getMatch().getScore() < mc.getTrueMatch().getScore()) {
+				mc.getMatch().setPeptide(mc.getTrueMatch().getPeptide());
+				mc.getMatch().recalculateIMP();
+				mc.getMatch().calculateScore();
+				mc.validate();
+			}
+		}
+		
 		
 		/* again sort the tested matches */
 		Collections.sort(testedMatches);
@@ -184,9 +188,6 @@ public class TestSet {
 				percentAtFivePercentError = (double) trueTallyAtFivePercentError / spectra.size();
 			}
 		}
-		U.p("highestIMP for true found in " + testName + ": " + highestIMP);
-		
-		U.p("true tally for " + testName + " is " + trueTally);
 		
 		generatePrecisionRecallCurve();
 	}
@@ -209,7 +210,7 @@ public class TestSet {
 			precision = (double) trueCount / (i + 1);
 			recall = (double) trueCount / getSetSize();				
 
-			Point2D.Double point =  new Point2D.Double(precision, recall);
+			Point2D.Double point =  new Point2D.Double(recall, precision);
 			points.add(point);
 			
 		}
@@ -259,6 +260,9 @@ public class TestSet {
 				correctPeptides.add(new Peptide(correctAcidSequence));
 			}
 		}
+		
+		/* sorting the peptides is VERY important */
+		Collections.sort(correctPeptides);
 		return correctPeptides;
 	}
 	
@@ -267,9 +271,9 @@ public class TestSet {
 	@SuppressWarnings("unused")
 	private ArrayList<Match> loadCorrectMatches() {
 		ArrayList<Match> correctMatches = new ArrayList<Match>();
-		for(Spectrum spectrum: spectra) {
+		for(MatchesSpectrum matchesSpectrum: spectraMatches) {
 			//find the file for the correct peptide
-			File spectrumFile = spectrum.getFile();
+			File spectrumFile = matchesSpectrum.getSpectrum().getFile();
 			File testFolder = spectrumFile.getParentFile().getParentFile();
 			File peptideFolder = new File(testFolder, "peptides");
 			File peptideFile = new File(peptideFolder, spectrumFile.getName());
@@ -311,7 +315,7 @@ public class TestSet {
 			}
 			//adding to the array list
 			if (validPeptideFile && validPeptide) {
-				correctMatches.add(Properties.matchConstructor.createMatch(spectrum, peptide));
+				correctMatches.add(Properties.matchConstructor.createMatch(matchesSpectrum, peptide));
 			}
 			
 //			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
@@ -329,17 +333,14 @@ public class TestSet {
 	 * @param peptides
 	 */
 	public void findTrueMatchesInAFalseDatabase(ArrayList<Peptide> peptides) {
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
 		
-		//clear E values
-		for (Spectrum spectrum: spectra) {
-			spectrum.clearEValues();
-		}
 		//get the matches
-		topReverseMatches = (new ScoringThreadServer(peptides, spectra)).getMatches();
+		ScoringThreadServer scoringThreadServer = new ScoringThreadServer(peptides, spectraMatches);
+		scoringThreadServer.findMatches();
+		topReverseMatches = Peppy.Peppy.getMatchesFromSpectraMatches(spectraMatches);
 		
 		//Sort matches by e value	
-		Match.setSortParameter(Match.SORT_BY_P_VALUE);
+		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(topReverseMatches);
 		
 		//see if any are actually true!

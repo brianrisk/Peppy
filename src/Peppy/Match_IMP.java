@@ -9,6 +9,6 @@ public class Match_IMP extends Match {
 	}
 	
 	public String getScoringMethodName() {return "IMP";}
-	
+
 
 }

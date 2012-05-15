@@ -17,13 +17,14 @@ public class Definitions {
 	public final static double NITROGEN_AVERAGE = 14.00674309;
 	public final static double HYDROGEN_MONO = 1.00782504;
 	public final static double HYDROGEN_AVERAGE = 1.00794076;
+	public final static double PROTON_MONO = 1.0072764668;
 	public final static double CARBON_MONO = 12.00000000;
 	public final static double CARBON_AVERAGE = 12.01073590;
 	public final static double WATER_MONO = OXYGEN_MONO + HYDROGEN_MONO + HYDROGEN_MONO;
 	public final static double WATER_AVERAGE = OXYGEN_AVERAGE + HYDROGEN_AVERAGE + HYDROGEN_AVERAGE;
 	
 	//protein modifications
-	public static ArrayList<Modification> modifications = Modification.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
+	public static ArrayList<ModificationEntry> modificationEntries = ModificationEntry.getProteinModificationsFromFile(new File("resources/protein-modifications.txt"));
 	
 	
 }

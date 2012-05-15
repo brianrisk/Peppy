@@ -28,17 +28,17 @@ public class SpectrumFileMerge {
 			//Here I was merging the original spectra files
 //			//E. coli
 //			destination = new File("ecoli.pkl");
-//			folder = new File("/Users/risk2/PeppyOverflow/tests/ecoli/spectra");
+//			folder = new File("/Users/risk2/PeppyData/tests/ecoli/spectra");
 //			merge(folder, destination, ".txt");
 //			
 //			//Kapp
 //			destination = new File("kapp.dta");
-//			folder = new File("/Users/risk2/PeppyOverflow/tests/human/spectra");
+//			folder = new File("/Users/risk2/PeppyData/tests/human/spectra");
 //			merge(folder, destination, ".dta");
 //			
 //			//Aurum
 //			destination = new File("aurum.pkl");
-//			folder = new File("/Users/risk2/PeppyOverflow/tests/aurum/spectra");
+//			folder = new File("/Users/risk2/PeppyData/tests/aurum/spectra");
 //			merge(folder, destination, ".pkl");
 			
 			//Here I am merging the MGF files I made

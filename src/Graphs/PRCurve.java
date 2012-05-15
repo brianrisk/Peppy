@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import Peppy.U;
+
 public class PRCurve {
 	
 	private double areaUnderCurve = 0;
@@ -28,14 +30,12 @@ public class PRCurve {
 		this.points = points;
 		
 		/* adjust for non-monotonic decreasing PR curve */
-		double previousPrecision = points.get(points.size() - 1).x;
 		for (int i = points.size() - 2; i >= 0; i--) {
 			Point2D.Double point = points.get(i);
-			if (point.x < previousPrecision) {
-				point.x = previousPrecision;
-			} else {
-				previousPrecision = point.x;
+			if (point.y < points.get(i + 1).y) {
+				point.y =  points.get(i + 1).y;
 			}
+
 		}
 		calculateAreaUnderCurve();
 	}
@@ -43,11 +43,19 @@ public class PRCurve {
 	public double calculateAreaUnderCurve() {
 		areaUnderCurve = 0;
 		double recall;
-		double recallPrevious = points.get(0).y;
-		for (int i = 1; i < points.size(); i++) {
-			recall =  points.get(i).y;
-			areaUnderCurve += (recall - recallPrevious) *  points.get(i).x;
-			recallPrevious = recall;
+		double previousRecall = 0;
+		double precision;
+		double previousPrecision = points.get(0).y;
+		double trapezoidArea;
+		for (int i = 0; i < points.size(); i++) {
+			recall =  points.get(i).x;
+			precision = points.get(i).y;
+			trapezoidArea = (recall - previousRecall) *  precision;
+			trapezoidArea += (recall - previousRecall) *  previousPrecision;
+			trapezoidArea /= 2;
+			areaUnderCurve += trapezoidArea;
+			previousRecall = recall;
+			previousPrecision = precision;
 		}
 		return areaUnderCurve;
 	}
@@ -65,13 +73,13 @@ public class PRCurve {
 		/* construct the polygon */
 		Polygon polygon = new Polygon();
 		for (Point2D.Double point: points) {
-			int x = (int) (point.y * width);
-			int y = (int) (width - (point.x * width));
+			int x = (int) (point.x * width);
+			int y = (int) (width - (point.y * width));
 //			U.p(x + ", " + y);
 			polygon.addPoint(x, y);
 		}
 		/* add the corner points */
-		polygon.addPoint((int) (points.get(points.size() - 1).y * width), width);
+		polygon.addPoint((int) (points.get(points.size() - 1).x * width), width);
 		polygon.addPoint(0, width);
 		
 		

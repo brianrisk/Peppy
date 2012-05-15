@@ -2,6 +2,7 @@ package Peppy;
 
 
 
+
 /**
  * Contains information about amino acids
  * Statically defined amino acids as bytes
@@ -44,6 +45,7 @@ public class AminoAcids {
 		init();
 	}
 	
+	/* this needs to be a call-able method so that more than one job can be run */
 	public static void init(){
 		weightsMono[STOP] = 0.0;
 		weightsMono[A] = 71.03711;
@@ -89,13 +91,18 @@ public class AminoAcids {
 		weightsAverage[W] = 186.2133;
 		weightsAverage[Y] = 163.176;
 		
-		if(Properties.useIsotopeLabeling) {
-			U.p("amino acid weights adjusted for labeling");
-			weightsMono[K] = 136.109159;
-			weightsAverage[K] = 136.1169;
-			weightsMono[R] = 166.109379;
-			weightsAverage[R] = 166.1172;	
-		}
+//		if(Properties.useIsotopeLabeling) {
+//			U.p("amino acid weights adjusted for labeling");
+//			weightsMono[K] = 136.109159;
+//			weightsAverage[K] = 136.1169;
+//			weightsMono[R] = 166.109379;
+//			weightsAverage[R] = 166.1172;	
+//		}
+
+		if (Properties.cysteineCarbamylation) weightsMono[C] += 43.005814;
+		if (Properties.methionineOxidation) weightsMono[M] += 15.994915;
+		if (Properties.iodoacetamideDerivative) weightsMono[C] += 57.021464;
+		
 	}
 	
 	
@@ -195,5 +202,12 @@ public class AminoAcids {
 	public static int getNumberOfAminoAcids() {
 		return acids.length;
 	}
+
+
+	public static char[] getAcids() {
+		return acids;
+	}
+	
+	
 	
 }

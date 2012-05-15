@@ -13,21 +13,12 @@ import java.util.ArrayList;
  */
 public class ScoringThreadServer {
 	
-	ArrayList<Spectrum> spectra;
-	/*
-	 * Having a ArrayList of ArrayLists may look overly complicated, but I am doing this for a reason.
-	 * The easier way is to just have a ArrayList of SpectrumPeptideMatch objects and each time 
-	 * getNextSpectrum we take the result we're given and "addAll".  The unfortunate thing is
-	 * that since getNextSpectrum is synchronized it makes all the other possibly dozens of
-	 * threads wait.  Let's not make them wait.  Let's let them do their work as fast as they
-	 * can and then merge all the match ArrayLists together at the end.
-	 */
-	ArrayList<ArrayList<Match>> matches;
+	ArrayList<MatchesSpectrum> spectraMatches;
 	
 	ArrayList<Thread> threads;
 	
 	//this is how we keep track of which Spectrum to give out next
-	private int spectrumIndex = 0;
+	private int spectrumMatchesIndex = 0;
 	
 	/* why this simply isn't Properties.numberOfThreads is because we may have less spectra than that number */
 	private int numberOfThreads;
@@ -38,18 +29,17 @@ public class ScoringThreadServer {
 	 * @param spectra
 	 * @param matches the ArrayList where we store the best matches
 	 */
-	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<Spectrum> spectra) {
-		this.spectra = spectra;	
-		matches = new ArrayList<ArrayList<Match>>(spectra.size());
+	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<MatchesSpectrum> spectraMatches) {
+		this.spectraMatches = spectraMatches;	
 		
 		//here we make sure we don't use more threads than we have spectra
 		numberOfThreads = Properties.numberOfThreads;
-		if (numberOfThreads > spectra.size()) numberOfThreads = spectra.size();
+		if (numberOfThreads > spectraMatches.size()) numberOfThreads = spectraMatches.size();
 		threads = new ArrayList<Thread>(numberOfThreads);
 		
 		//spawn new threads as needed
 		for (int threadNumber = 0; threadNumber < numberOfThreads; threadNumber++) {
-			ScoringThread scorer = new ScoringThread(getNextSpectrum(), peptides, this);
+			ScoringThread scorer = new ScoringThread(getNextSpectrumMatches(), peptides, this);
 			Thread thread = new Thread(scorer);
 			thread.start();
 			threads.add(thread);	
@@ -57,24 +47,14 @@ public class ScoringThreadServer {
 	}
 	
 	/**
-	 * 
-	 * @param matchesForOneSpectrum
-	 * @return the next Spectrum on the list.  Null if there are no more.
-	 */
-	public synchronized Spectrum getNextSpectrum(ArrayList<Match> matchesForOneSpectrum) {
-		matches.add(matchesForOneSpectrum);
-		return getNextSpectrum();
-	}
-	
-	/**
 	 * takes no parameters because it is used at the start when there are no matches to incorporate.
 	 * @return
 	 */
-	public synchronized Spectrum getNextSpectrum() {
-		Spectrum out =  null;
-		if (spectrumIndex < spectra.size()) {
-			out = spectra.get(spectrumIndex);
-			spectrumIndex++;
+	public synchronized MatchesSpectrum getNextSpectrumMatches() {
+		MatchesSpectrum out =  null;
+		if (spectrumMatchesIndex < spectraMatches.size()) {
+			out = spectraMatches.get(spectrumMatchesIndex);
+			spectrumMatchesIndex++;
 		}
 		return out;
 	}
@@ -84,7 +64,7 @@ public class ScoringThreadServer {
 	 * "Yo ScoringThreads, I'm happy for you and I'ma let you finish"
 	 * @return accumulated 
 	 */
-	public ArrayList<Match> getMatches() {
+	public void findMatches() {
 		boolean going = true;
 		while (going) {
 			for (Thread thread: threads) {
@@ -100,17 +80,7 @@ public class ScoringThreadServer {
 				e.printStackTrace();
 			}
 		}
-		//calculate size of combined ArrayLists
-		int size = 0;
-		for (ArrayList<Match> matchCluster: matches) {
-			size += matchCluster.size();
-		}
-		//combine matches into result and return
-		ArrayList<Match> out = new ArrayList<Match>(size);
-		for (ArrayList<Match> matchCluster: matches) {
-			out.addAll(matchCluster);
-		}
-		return out;
+		
 	}
 
 }

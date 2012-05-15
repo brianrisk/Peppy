@@ -43,7 +43,7 @@ public class AltSpliceTool {
 		
 		//Testing
 //		if (args.length == 0) {
-//			String args2[] = {"/Users/risk2/PeppyOverflow/chr12.fa",  "65160417",  "65210417"};
+//			String args2[] = {"/Users/risk2/PeppyData/chr12.fa",  "65160417",  "65210417"};
 //			args = args2;
 //		}
 		

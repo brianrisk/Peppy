@@ -153,7 +153,7 @@ public class Sequence_Protein extends Sequence {
 			if (isReverse) buffy.reverse();
 	
 			/* this addresses the "*" in some FASTA files */
-			proteinChunks = buffy.toString().split("\\*");
+			proteinChunks = buffy.toString().toUpperCase().split("\\*");
 			
 			/* go through each of our chunks and add them as proteins */
 			for (int i = 0; i < proteinChunks.length; i++) {

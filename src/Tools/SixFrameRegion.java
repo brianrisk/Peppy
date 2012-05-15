@@ -44,11 +44,12 @@ public class SixFrameRegion {
 		String chrName = U.getFileNameWithoutSuffix(sequenceFile.getSequenceFile());
 		
 		/* where we store the fasta header info */
-		String header;
+		String proteinHeader;
 		
 		/* produce and write the frames */
 		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("six frame translation.fasta")));
+			String fileName = chrName + " " + startPosition + "-" + stopPosition +".fasta";
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
 			
 			/* do the forwards frames */
 			for (int i = 0; i < 3; i++) {
@@ -71,10 +72,21 @@ public class SixFrameRegion {
 						if (protein.length() > 4) {
 							proteinStart =  (startPosition + i + (j * 3));
 							proteinStop = (startPosition + i + (j * 3) + (protein.length() * 3));
-							header = ">" + chrName + "_fwd_" + proteinStart + "_" + proteinStop;
-							pw.println(header);
+							
+							proteinHeader =  chrName + "_fwd_" + proteinStart + "_" + proteinStop;
+							pw.println(">" + proteinHeader + " " + proteinHeader );
+							StringBuffer lineBuffer = new StringBuffer();
+							for (int aaIndex = 0; aaIndex < protein.length(); aaIndex++) {
+								lineBuffer.append(protein.charAt(aaIndex));
+								if (aaIndex % 80 == 79) {
+									pw.println(lineBuffer.toString());
+									lineBuffer = new StringBuffer();
+								}
+							}
+							if (lineBuffer.length() > 0) {
+								pw.println(lineBuffer.toString());
+							}
 							pw.println(protein);
-							pw.println();
 						}
 						
 						/* clear out the string buffer */
@@ -112,8 +124,8 @@ public class SixFrameRegion {
 						if (protein.length() > 4) {
 							proteinStart =  stopPosition - ( i + (j * 3));
 							proteinStop = stopPosition - ( i + (j * 3) + (protein.length() * 3));
-							header = ">" + chrName + "_rev_" + proteinStop + "_" + proteinStart;
-							pw.println(header);
+							proteinHeader = ">" + chrName + "_rev_" + proteinStop + "_" + proteinStart;
+							pw.println(proteinHeader);
 							pw.println(protein);
 							pw.println();
 						}

@@ -21,6 +21,7 @@ public class Region implements Comparable<Region> {
 	private double pValue;
 	private boolean flag = false;
 	private boolean isForward;
+	private String name;
 	
 	public Region(int startLocation, int maxLength, Sequence sequence, boolean isForward) {
 		this.startLocation = startLocation;
@@ -175,8 +176,28 @@ public class Region implements Comparable<Region> {
 	public int getUniqueCount() {
 		int out = 0;
 		for (Match match: matches) {
-			if (match.rank == 1 && match.rankCount == 1) out++;
+			if (match.getSpectrumMatches().getMatches().size() == 1) out++;
 		}
 		return out;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setSequence(Sequence sequence) {
+		this.sequence = sequence;
+	}
+
+	public void setStartLocation(int startLocation) {
+		this.startLocation = startLocation;
+	}
+
+	public void setStopLocation(int stopLocation) {
+		this.stopLocation = stopLocation;
 	}
 }

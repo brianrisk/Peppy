@@ -48,13 +48,13 @@ public class TextReporter {
 	public void generateFullReport() {	
 		reportDir.mkdirs();
 		//set up our main index file
-		File reportFile = new File(reportDir, reportDir.getName() + "_report.txt");
+		File reportFile = new File(reportDir, "report.txt");
 		try {	
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
-			//CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT
-			pw.println("format version 16");
+			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
+			pw.println("format version 17");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -71,32 +71,26 @@ public class TextReporter {
 			StringBuffer sb;
 			//print header
 			sb = new StringBuffer();
-			sb.append("ID");
+			sb.append("spectrumID");
 			sb.append('\t');
-			sb.append("SpectrumID");
+			sb.append("spectrumMD5");
 			sb.append('\t');
-			sb.append("MD5");
+			sb.append("FilePath");
 			sb.append('\t');
-			sb.append("FileName");
-			sb.append('\t');
-			sb.append("Score");
+			sb.append("score");
 			sb.append('\t');
 			sb.append("PrecursorM/Z");
 			sb.append('\t');
 			sb.append("PrecursorNeutralMass");
 			sb.append('\t');
-			sb.append("E Value");
+			sb.append("peptideSequence");
 			sb.append('\t');
-			sb.append("PeptideSequence");
+			sb.append("start");
 			sb.append('\t');
-			sb.append("START");
+			sb.append("stop");
 			sb.append('\t');
-			sb.append("STOP");
-			sb.append('\t');
+			sb.append("SequenceName");
 			if (Peppy.Properties.isSequenceFileDNA) {
-				sb.append("Sequence File");
-				sb.append('\t');
-				sb.append("Sequence Description");
 				sb.append('\t');
 				sb.append("INTRON-START");
 				sb.append('\t');
@@ -105,17 +99,9 @@ public class TextReporter {
 				sb.append("Strand");
 				sb.append('\t');
 				sb.append("Is Spliced");
-			} else {
-				sb.append("Protein Name");
 			}
 			sb.append('\t');
-			sb.append("MatchRank");
-			sb.append('\t');
 			sb.append("RankCount");
-			sb.append('\t');
-			sb.append("IonCount");	
-			sb.append('\t');
-			sb.append("Labeled");	
 			sb.append('\t');
 			sb.append("Charge");	
 			sb.append('\t');
@@ -123,17 +109,21 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("inORF");
 			sb.append('\t');
+			sb.append("sizeOfORF");
+			sb.append('\t');
 			sb.append("Hydrophobic");
 			sb.append('\t');
 			sb.append("Hydrophilic");
-			if (Properties.searchModifications) {
-				sb.append('\t');
-				sb.append("isModified");
-				sb.append('\t');
-				sb.append("modMass");
-				sb.append('\t');
-				sb.append("modIndex");
-			}
+			sb.append('\t');
+			sb.append("isModified");
+			sb.append('\t');
+			sb.append("modMass");
+			sb.append('\t');
+			sb.append("modIndex");
+			sb.append('\t');
+			sb.append("modLocCertain");
+			sb.append('\t');
+			sb.append("cScore");
 			pw.println(sb);		
 			
 			//print rows

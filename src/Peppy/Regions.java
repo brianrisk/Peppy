@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Math.EValueCalculator;
 import Math.MathFunctions;
 import Reports.HTMLPageRegions;
 
@@ -17,19 +16,14 @@ public class Regions {
 	private int maxLength = 1024;
 	ArrayList<Match> matches;
 	ArrayList<Sequence> sequences;
-	ArrayList<Spectrum> spectra;
 	
 	/* where we store the interesting regions */
 	ArrayList<Region> regions;
 	
-	/* E values */
-	EValueCalculator evc = new EValueCalculator();
 	
-	
-	public Regions(ArrayList<Match> matches, ArrayList<Sequence> sequences, ArrayList<Spectrum> spectra) {
+	public Regions(ArrayList<Match> matches, ArrayList<Sequence> sequences) {
 		this.matches = matches;
 		this.sequences = sequences;
-		this.spectra = spectra;
 		
 		/* Find interesting regions */
 		if (Properties.isSequenceFileDNA) {
@@ -153,12 +147,11 @@ public class Regions {
 		return returnedRegions;
 	}
 	
+	
+	
 	public void createReport(File reportDir) {
-		try {
 			
 			/* set up the regions folders */
-			File regionsTextFolder = new File(reportDir, "regions");
-			regionsTextFolder.mkdirs();
 			File regionsHTMLFolder = new File(reportDir, "regions html");
 			regionsHTMLFolder.mkdirs();
 			
@@ -176,77 +169,10 @@ public class Regions {
 			/* set up the main regions HTML file */
 			HTMLPageRegions indexPage = new HTMLPageRegions(new File(regionsHTMLFolder, "index.html"), regions);
 			indexPage.makePage();
-			
-			/* the file for the one grand text report */
-			PrintWriter regionsText = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "regions.txt"))));
-			
-			for (int i = 0; i < max; i ++ ) {
-				Region region = regions.get(i);
-				
-				/* putting this region on its line in the main text file */
-				regionsText.print(U.getFileNameWithoutSuffix(region.getSequence().getSequenceFile()));
-				regionsText.print('\t');
-				regionsText.print(region.isForward() ? "+" : "-");
-				regionsText.print('\t');
-				regionsText.print(region.getStartLocation());
-				regionsText.print('\t');
-				regionsText.print(region.getStopLocation());
-				regionsText.print('\t');
-				regionsText.print(region.getTrueStart());
-				regionsText.print('\t');
-				regionsText.print(region.getTrueStop());
-				regionsText.print('\t');
-				regionsText.print(region.getScore());
-				regionsText.print('\t');
-				regionsText.print(region.getPValue());
-				regionsText.print('\t');
-				regionsText.print(region.getMatches().size());
-				regionsText.print('\t');
-				regionsText.print(region.getUniqueCount());
-				regionsText.print('\t');
-				
-				/* the string of spectrum ids */
-//				ArrayList<Match> matches = region.getMatches();
-//				int noComma = matches.size() - 1;
-//				for (int j = 0; j < matches.size(); j++) {
-//					Match match = matches.get(j);
-//					regionsText.print(match.getId());
-//					if (j != noComma) regionsText.print(',');
-//				}
-//				regionsText.println();
-				
-				
-//				/*setting up the file name for this region*/
-//				String spacer = "";
-//				if (i < 1000) {
-//					spacer += "0";
-//					if (i < 100) {
-//						spacer += "0";
-//						if (i < 10) {
-//							spacer += "0";
-//						}
-//					}
-//				}
-//				int neatE = (int) Math.round(-Math.log10(region.getPValue()));
-//				
-//				/* create the text report for this one region */
-//				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(regionsTextFolder, "region " + spacer + i + " " + neatE + ".txt"))));
-//				ArrayList<Match> regionMatches = region.getMatches();
-//				for (Match match: regionMatches) {
-//					pw.println(match);
-//				}
-//				pw.flush();
-//				pw.close();
-			}
-			
-			/* closing out the main regions text file */
-			regionsText.flush();
-			regionsText.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
 	}
+	
+	
 	
 	public ArrayList<Region> getRegions() {
 		return regions;

@@ -11,6 +11,7 @@ import java.util.Collections;
 import Math.MassError;
 import Peppy.AminoAcids;
 import Peppy.Match;
+import Peppy.MatchesSpectrum;
 import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Properties;
@@ -42,7 +43,7 @@ public class TestSetCharacteristics {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyOverflow/tests/" + testName + "/spectra");
+		spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyData/tests/" + testName + "/spectra");
 		
 		//set up correct matches
 		correctMatches = loadCorrectMatches();
@@ -204,12 +205,9 @@ public class TestSetCharacteristics {
 			}
 			//adding to the array list
 			if (validPeptideFile) {
-				correctMatches.add(Properties.matchConstructor.createMatch(spectrum, new Peptide(correctAcidSequence)));	
+				correctMatches.add(Properties.matchConstructor.createMatch(new MatchesSpectrum(spectrum), new Peptide(correctAcidSequence)));	
 			}
 			
-//			if (spectrum.getFile().getName().equals("T10707_Well_H13_1768.77_19185.mgf..pkl")) {
-//				U.p ("Valid? " + validPeptideFile);
-//			}
 		}
 		return correctMatches;
 	}

@@ -30,20 +30,20 @@ public class MascotReader {
 		
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/ecoli.txt",
-				"/Users/risk2/PeppyOverflow/tests/",
+				"/Users/risk2/PeppyData/reports - saved/Mascot/ecoli.txt",
+				"/Users/risk2/PeppyData/tests/",
 				"ecoli"
 		));
 		
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/kapp.txt",
-				"/Users/risk2/PeppyOverflow/tests/",
+				"/Users/risk2/PeppyData/reports - saved/Mascot/kapp.txt",
+				"/Users/risk2/PeppyData/tests/",
 				"human"
 		));
 		
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyOverflow/reports - saved/Mascot/aurum.txt",
-				"/Users/risk2/PeppyOverflow/tests/",
+				"/Users/risk2/PeppyData/reports - saved/Mascot/aurum.txt",
+				"/Users/risk2/PeppyData/tests/",
 				"aurum"
 		));
 		
@@ -55,6 +55,7 @@ public class MascotReader {
 		ValidationReport vr = new ValidationReport(testSets);
 		Properties.scoringMethodName = "Mascot";
 		vr.createReport();
+		vr.createResultsFiles();
 		U.p("done");
 	}
 	

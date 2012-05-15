@@ -100,7 +100,7 @@ public class RNA_Digestor {
 				
 				//if this is the beginning, start a peptide
 				if (nucleotideIndex == startIndexPlusThree) {
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid, false));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid, false, -1));
 				} else {
 					//add this amino acid to all peptides under construction
 					for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
@@ -112,7 +112,7 @@ public class RNA_Digestor {
 					(previousAminoAcid == 'M' && aminoAcid != 'M') || // handle possible N-terminal methionine truncation products
 					(isBreak(previousAminoAcid) && aminoAcid != 'M'))  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
 				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid, false));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndex, aminoAcid, false, -1));
 				}
 
 				//public Peptide(String acidSequence, int index, boolean forward, byte readingFrame, Sequence parentSequence, boolean isSpliced) {

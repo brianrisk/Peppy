@@ -45,16 +45,6 @@ public class MathFunctions {
 		
 	}
 	
-	public static void main(String args[]) {
-//		int max = 20;
-//		for (int i = 1; i < max; i++) {
-//			U.p(approximateBinomialProbability(max, i, 0.5) / getCachedBinomialProbability50(max, i));
-////			U.p(i + ": " + approximateBinomialProbability(max, i, 0.5));
-////			U.p(cachedNChooseK(max, i) / approximateNChooseK(max, i));
-////			U.p(i + ": " + approximateNChooseK(max, i) / cachedNChooseK(max, i));
-//		}
-//		U.p(approximateBinomialProbability(527, 10, 0.014084507042253521));
-	}
 	
 	public static double cachedLog(int n) {
 		return logs[n];
@@ -183,11 +173,15 @@ public class MathFunctions {
 			increment /= 2;
 		}
 		
-//		/* accounting for the remainder possibly produced by rounding error */
-//		while (values.get(index).getValue() > value) {
-//			index--;
-//		}
-//		index++;
+		/* accounting for the remainder possibly produced by rounding error */
+		if (index >= 1) {
+			while (values.get(index).getValue() > value) {
+				index--;
+				if (index < 0) break;
+			}
+		}
+		index++;
+		if(index < 0) index = 0;
 		return index;
 	}
 	

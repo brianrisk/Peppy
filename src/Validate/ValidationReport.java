@@ -59,6 +59,7 @@ public class ValidationReport {
 		setUp();
 	}
 	
+	
 	private static void setUp() {
 		System.setProperty("java.awt.headless", "true"); 
 		
@@ -80,31 +81,19 @@ public class ValidationReport {
 		Properties.useSequenceRegion = false;
 		Properties.useOnlyForwardsFrames = false;
 		
+		/* keep all matches, even bad ones */
+		Properties.minimumScore = 1;
+		
 		/* these properties are fixed for our text sets */
 		Properties.numberOfMissedCleavages = 2;
 		Properties.precursorTolerance = 2000;
-		Properties.fragmentTolerance = 500;
-		
-		/* the nature of these tests is we want one answer per spectrum.
-		 * the results are further reduced in TestSet
-		 */
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
-		
-		/* a decent filter that shouldn't get any significant match */
-		Properties.maxIMP = .00001;
+		Properties.fragmentTolerance = 300;
 		
 		/* this needs to happen or the text reports at the end crash */
 		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
 		
 		/* What scoring mechanism? */
-		boolean useIMP = true;
-		if (useIMP) {
-			Properties.scoringMethodName = "Peppy.Match_IMP";
-		} else {
-			Properties.scoringMethodName = "Peppy.Match_HMM";
-			Properties.calculateEValues = true;
-			Properties.highIntensityCleaning = true;
-		}
+		Properties.scoringMethodName = "Peppy.Match_IMP";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			
 		
@@ -118,7 +107,7 @@ public class ValidationReport {
 		//set up which tests we will perform
 		String testDirectoryName = Properties.testDirectory.getAbsolutePath();
 		tests = new ArrayList<TestSet>();
-		tests.add(new TestSet(testDirectoryName, "ecoli"));
+//		tests.add(new TestSet(testDirectoryName, "ecoli"));
 		tests.add(new TestSet(testDirectoryName, "human"));
 		tests.add(new TestSet(testDirectoryName, "aurum"));	
 		tests.add(new TestSet(testDirectoryName, "USP top 10"));
@@ -138,6 +127,9 @@ public class ValidationReport {
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
+		
+		/* find total peptides */
+		int totalPeptides = 0;
 			
 		/* repeat extracting peptides until end of sequence has been reached */
 		while (peptides != null) {
@@ -149,6 +141,7 @@ public class ValidationReport {
 			
 			/* report on peptides size */
 			U.p("peptide count for this batch is: " + peptides.size());
+			totalPeptides += peptides.size();
 			
 			/* get matches for each of our sets for each of these peptides */
 			for (TestSet test: tests) {
@@ -159,6 +152,8 @@ public class ValidationReport {
 			peptides = sequence.extractMorePeptides(false);
 			
 		}
+		
+		U.p("found this many total peptides: " + totalPeptides);
 		
 		for (TestSet test: tests) {
 			test.calculateStastics();
@@ -171,7 +166,7 @@ public class ValidationReport {
 		U.p("creating list of unfound peptides...");
 		
 //		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
-		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyOverflow/sequences/ecoli/ecoli.fasta"));	
+		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyData/sequences/ecoli/ecoli.fasta"));	
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
@@ -365,12 +360,15 @@ public class ValidationReport {
 	public static void createResultsFiles() {
 		for (TestSet test: tests) {
 			try {
-				File indexFile = new File(reportFolder, test.getName() + ".txt");
+				File folder = new File(reportFolder, test.getName());
+				folder.mkdir();
+				File indexFile = new File(folder, test.getName() + " results.txt");
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(indexFile)));
 				ArrayList<MatchContainer> topForwardsTestedMatches = test.getTestedMatches();
 				U.p("number of topForwardsTestedMatches: " + topForwardsTestedMatches.size());
-				Match.setSortParameter(Match.SORT_BY_SPECTRUM_ID_THEN_PEPTIDE);
+				Match.setSortParameter(Match.SORT_BY_SCORE);
 				Collections.sort(topForwardsTestedMatches);
+				pw.println("id\tveracity\tscore\tsequence\ttrueScore\ttrueSequence");
 				for (MatchContainer match: topForwardsTestedMatches) {
 					StringBuffer sb = new StringBuffer();
 					sb.append(match.getMatch().getSpectrum().getId());
@@ -378,6 +376,12 @@ public class ValidationReport {
 					sb.append(match.isTrue());
 					sb.append('\t');
 					sb.append(match.getMatch().getScore());
+					sb.append('\t');
+					sb.append(match.getMatch().getPeptide().getAcidSequenceString());
+					sb.append('\t');
+					sb.append(match.getTrueMatch().getScore());
+					sb.append('\t');
+					sb.append(match.getTrueMatch().getPeptide().getAcidSequenceString());
 					pw.println(sb.toString());
 				}
 				pw.flush();
@@ -413,10 +417,6 @@ public class ValidationReport {
 					
 					pw.println("<td>");
 					pw.println(ourMatch.getPeptide().getAcidSequenceString());
-					pw.println("</td>");
-					
-					pw.println("<td>");
-					pw.println(ourMatch.getEValue());
 					pw.println("</td>");
 					
 					pw.println("<td>");

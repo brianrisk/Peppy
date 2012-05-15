@@ -16,15 +16,15 @@ public class MatchConstructor {
 		}
 	}
 	
-	public Match createMatch(Spectrum spectrum, Peptide peptide) {
-		return createMatch(spectrum, peptide, true);
+	public Match createMatch(MatchesSpectrum matchesSpectrum, Peptide peptide) {
+		return createMatch(matchesSpectrum, peptide, true);
 	}
 	
-	public Match createMatch(Spectrum spectrum, Peptide peptide, boolean calculateScore) {
+	public Match createMatch(MatchesSpectrum matchesSpectrum, Peptide peptide, boolean calculateScore) {
 		Match out = null;
 		try {
 			out = match.newInstance();
-			out.setSpectrum(spectrum);
+			out.setSpectrumMatches(matchesSpectrum);
 			out.setPeptide(peptide);
 			if (calculateScore) out.calculateScore();
 		} catch (InstantiationException e) {

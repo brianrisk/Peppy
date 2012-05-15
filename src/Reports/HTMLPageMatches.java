@@ -3,11 +3,9 @@ package Reports;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Matches;
-import Peppy.Peptide;
 import Peppy.Properties;
 
 public class HTMLPageMatches extends HTMLPage {
@@ -56,17 +54,12 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("score");
 		if (Properties.isYale) {
 			printTH("inORF");
+			printTH("ORF size");
 			printTH("Hydrophobic percentage");
 			printTH("Hydrophilic percentage");
 		}
-		if (Properties.useIsotopeLabeling) {
-			printTH("isotope confirmed");
-		}
 		
-		if (Properties.searchModifications) {
-			printTH("has mod");
-		}
-		printTH("rank");
+		printTH("has mod");
 		printTH("count");
 		
 		/*print the rows */
@@ -99,9 +92,7 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* the acid string */
 			String peptideMarkup = "";
-			if (match.rank > 1) peptideMarkup += "<font color=#444444>";
 			peptideMarkup += match.getPeptide().getAcidSequenceString();
-			if (match.rank > 1) peptideMarkup += "</font>";
 			/* google link */
 			String link = "http://www.google.com/search?hl=en&q=" + match.getPeptide().getAcidSequenceString();
 			printTD("(<a href=\"" +link + "\">" + peptideMarkup + "</a>)");
@@ -124,6 +115,8 @@ public class HTMLPageMatches extends HTMLPage {
 				/* ORF */
 				printTD("" + match.getPeptide().isInORF());
 				
+				printTD("" + match.getPeptide().getORFSize());
+				
 				/* hydrophobic */
 				printTD(nfDecimal.format(match.getPeptide().getHydrophobicProportion()));
 				
@@ -131,18 +124,11 @@ public class HTMLPageMatches extends HTMLPage {
 				printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
 			}
 			
-			if (Properties.useIsotopeLabeling) {
-				printTD("" + match.isHasIsotopeConfirmation());
-			}
+			/* modifications */
+			printTD("" + match.hasModification());
 			
-			/* PTM */
-			if (Properties.searchModifications) {
-				printTD("" + match.hasModification());
-			}
-			
-			/* rank */
-			printTD("" + match.rank);
-			printTD("" + match.rankCount);
+			/* count */
+			printTD("" + match.getSpectrumMatches().getMatches().size());
 		}
 	}
 

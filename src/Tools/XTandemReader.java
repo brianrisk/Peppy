@@ -38,22 +38,22 @@ public class XTandemReader {
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		
 		testSets.add(getTestSet(
-			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/EColi",
-			"/Users/risk2/PeppyOverflow/tests/",
+			"/Users/risk2/PeppyData/reports - saved/X!Tandem reports/EColi",
+			"/Users/risk2/PeppyData/tests/",
 			"ecoli",
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/ecoli/spectra/"
 		));
 		
 		testSets.add(getTestSet(
-			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Kapp",
-			"/Users/risk2/PeppyOverflow/tests/",
+			"/Users/risk2/PeppyData/reports - saved/X!Tandem reports/Kapp",
+			"/Users/risk2/PeppyData/tests/",
 			"human",
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/kapp/spectra/"
 		));
 		
 		testSets.add(getTestSet(
-			"/Users/risk2/PeppyOverflow/reports - saved/X!Tandem reports/Aurum",
-			"/Users/risk2/PeppyOverflow/tests/",
+			"/Users/risk2/PeppyData/reports - saved/X!Tandem reports/Aurum",
+			"/Users/risk2/PeppyData/tests/",
 			"aurum",
 			"label=\"models from '/Users/khatun/PeppyToRunproteinDatabase/TestData/aurum/spectra/"
 		));
@@ -68,6 +68,7 @@ public class XTandemReader {
 		ValidationReport vr = new ValidationReport(testSets);
 		Properties.scoringMethodName = "XTandem";
 		vr.createReport();
+		vr.createResultsFiles();
 		U.p("done");
 	}
 	

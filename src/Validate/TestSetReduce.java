@@ -23,14 +23,14 @@ import Peppy.U;
  */
 public class TestSetReduce {
 	
-	private static final String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+	private static final String testDirectoryName = "/Users/risk2/PeppyData/tests/";
 	
 	public static void main(String args[]) {
 		
 		//load our peptide database
 		U.p("loading database");
 		Properties.numberOfMissedCleavages = 2;
-		File databaseFile = new File("/Users/risk2/PeppyOverflow/tests/databases/uniprot_sprot.fasta");
+		File databaseFile = new File("/Users/risk2/PeppyData/tests/databases/uniprot_sprot.fasta");
 		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
 		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		

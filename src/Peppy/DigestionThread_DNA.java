@@ -72,7 +72,7 @@ public class DigestionThread_DNA implements Runnable {
 	 * @param startPosition
 	 * @param stopPosition
 	 */
-	private ArrayList<Protein> translateToProteins(int startPosition, int stopPosition) {
+	public ArrayList<Protein> translateToProteins(int startPosition, int stopPosition) {
 		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		char [] codon = new char[3];
 		char aminoAcid;

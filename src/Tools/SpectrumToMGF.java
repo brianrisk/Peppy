@@ -32,7 +32,7 @@ public class SpectrumToMGF {
 	 */
 	public static void main(String args[]) {
 		//read in our array of spectra
-		String testDirectoryName = "/Users/risk2/PeppyOverflow/tests/";
+		String testDirectoryName = "/Users/risk2/PeppyData/tests/";
 		
 		//all you need to change is this one testName variable
 		String testName = "human";

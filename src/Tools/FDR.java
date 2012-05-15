@@ -13,6 +13,7 @@ import java.util.Random;
 
 import Graphs.PRCurve;
 import Peppy.Match;
+import Peppy.MatchesSpectrum;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
@@ -23,21 +24,21 @@ import Peppy.U;
 public class FDR {
 	
 	public static void main(String args[]) {
-		U.p("running FDR comparison report...");
-		U.startStopwatch();
 		
-		if (args.length == 0) {
-			findFDR(-1, -1, args, Match.SORT_BY_IMP_VALUE);
-		} else {
-			iterate(args);
-		}
+		U.startStopwatch();
+		U.p("performing FDR analysis...");
+		
+//		if (args.length == 0) {
+			findFDR(-1, -1, args);
+//		} else {
+//			iterate(args);
+//		}
 		
 		U.stopStopwatch();
 		U.p("done");
 	}
-	
-	public static void getParameters() {
-		
+
+	public FDR(ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences) {
 		
 	}
 	
@@ -50,6 +51,7 @@ public class FDR {
 		U.p("List the fragment tolerances, separated by commas:");
 		double [] fragmentTolerances = extractArrayFromString(U.in());
 		
+		U.p("processing...");
 		/* the file where we will save the report summary */
 		File reportDir = new File("FDR");
 		reportDir.mkdir();
@@ -61,7 +63,8 @@ public class FDR {
 				for (int fragmentIndex = 0; fragmentIndex < fragmentTolerances.length; fragmentIndex++) {
 					precursor = precursorTolerances[precursorIndex];
 					fragment = fragmentTolerances[fragmentIndex];
-					area = findFDR(precursor, fragment, args, Match.SORT_BY_IMP_VALUE);
+					U.p("working on " + precursor + ", " + fragment);
+					area = findFDR(precursor, fragment, args);
 					pw.println(precursor + "\t" + fragment + "\t" + area);
 				}
 			}
@@ -87,7 +90,7 @@ public class FDR {
 	 * @param precursorTolerance set to a negative number to ignore
 	 * @param args
 	 */
-	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[], int sortParameter) {
+	public static double findFDR(double precursorTolerance, double fragmentTolerance, String args[]) {
 		
 		
 		//grab our properties file, set up.
@@ -100,14 +103,10 @@ public class FDR {
 		if (precursorTolerance > 0) {
 			Properties.precursorTolerance = precursorTolerance;
 		}
-		NumberFormat nfPercent = NumberFormat.getPercentInstance();
-		nfPercent.setMaximumFractionDigits(2);
+		
 		
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
-		ArrayList<Sequence> sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
-		
-		//This has to be 1 to properly calculate FDR
-		Properties.maximumNumberOfMatchesForASpectrum = 1;
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//Loading a subset of our spectra
 		ArrayList<File> spectraFiles = new ArrayList<File>();
@@ -121,33 +120,34 @@ public class FDR {
 			spectrumFile = spectraFiles.remove(random.nextInt(spectraFiles.size()));
 			spectra.addAll(Spectrum.loadSpectra(spectrumFile));
 		}
-		for (int i = 0; i < spectra.size(); i++) {
-			spectra.get(i).setId(i);
+		
+		/* set up where we will hold all of the matches for our spectra */
+		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		for (Spectrum spectrum: spectra) {
+			spectraMatches.add(new MatchesSpectrum(spectrum));
 		}
 				
 		//getting forwards matches
 		U.p("getting forwards matches");
-		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectra);
+		ArrayList<Match> forwardsMatches = Peppy.getMatches(sequences, spectraMatches);
 		forwardsMatches = Peppy.reduceMatchesToOnePerSpectrum(forwardsMatches);
-		Match.setSortParameter(sortParameter);
 		Collections.sort(forwardsMatches);
 		
 		//need to initialize things now that we have found matches
-		sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
-		for (Spectrum spectrum: spectra) {
-			spectrum.clearEValues();
+		sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		for (MatchesSpectrum matchesSpectrum: spectraMatches) {
+			matchesSpectrum.clearMatches();
 		}
 		
 		//getting reverse matches -- need to reload the sequences
 		U.p("getting reverse matches");
-		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectra);
+		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectraMatches);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
-		Match.setSortParameter(sortParameter);
 		Collections.sort(reverseMatches);
 		
 		/* label the reverse matches as being from a reverse database */
 		for (Match match: reverseMatches) {
-			match.setDecoy(true);
+			match.getPeptide().setDecoy(true);
 		}
 		
 		/* combine the matches */
@@ -155,47 +155,74 @@ public class FDR {
 		ArrayList<Match> allMatches = new ArrayList<Match>(forwardsMatches.size() + reverseMatches.size());
 		allMatches.addAll(forwardsMatches);
 		allMatches.addAll(reverseMatches);
-		Peppy.reduceMatchesToOnePerSpectrum(allMatches);
+		allMatches = Peppy.reduceMatchesToOnePerSpectrum(allMatches);
 		
 		/* sort the matches */
-		Match.setSortParameter(sortParameter);
 		Collections.sort(allMatches);
 		
 		/* construct a list of points on the PR curve */
 		ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
-		int totalCorrect = 0;
+		int truePositiveCount = 0;
+		int falsePositiveCount = 0;
+		int decoyAssignmentCount = 0;
+		int targetAssignmentCount = 0;
 		double precision, recall;
 		for (int i = 0; i < allMatches.size(); i++) {
 			Match match = allMatches.get(i);
-			if (!match.isDecoy()) {
-				totalCorrect++;
+			if (match.getPeptide().isDecoy()) {
+				decoyAssignmentCount++;
+			} else {
+				targetAssignmentCount++;
 			}
-			precision = (double) totalCorrect / (i + 1);
-			recall = (double) totalCorrect / setSize;
-			points.add(new Point2D.Double(precision, recall));
+			falsePositiveCount = 2 * decoyAssignmentCount;
+			truePositiveCount = (i + 1) - falsePositiveCount;
+			
+			precision = (double) truePositiveCount / (truePositiveCount + falsePositiveCount);
+			recall = (double) truePositiveCount / setSize;
+			Point2D.Double point = new Point2D.Double(recall, precision);
+			points.add(point);
 		}
+		
+		U.p();
+		U.p("falsePositiveCount: " + falsePositiveCount);
+		U.p("truePositiveCount: " + truePositiveCount);
+		U.p("decoyAssignmentCount: " + decoyAssignmentCount);
+		U.p("targetAssignmentCount: " + targetAssignmentCount);
+		U.p("allMatches.size(): " + allMatches.size());
+		U.p("setSize: " + setSize);
+		
+//		int totalCorrect = 0;
+//		double precision, recall;
+//		for (int i = 0; i < allMatches.size(); i++) {
+//			Match match = allMatches.get(i);
+//			if (!match.isDecoy()) totalCorrect++;
+//			precision = (double) totalCorrect / (i + 1);
+//			recall = (double) totalCorrect / setSize;
+//			points.add(new Point2D.Double(precision, recall));
+//		}
 		
 		
 		/* set a folder to store our reports */
 		String identifierString = Properties.precursorTolerance + "-" + Properties.fragmentTolerance;
-		File reportDir = new File("FDR/" + identifierString);
+		File reportDir = new File("FDR/" + identifierString + " " + U.getDateString());
 		reportDir.mkdirs();
+		
+		/* save our properties */
+		Properties.generatePropertiesFile(reportDir);
 		
 		/* save curve image */
 		PRCurve prCurve = new PRCurve(points);
 		prCurve.writeFile(new File(reportDir, "pr-" + identifierString + ".jpg"));
 		
-		/* print some basic stats */
-		int totalComparisons = 0;
-		for (Match match: allMatches)  {
-			totalComparisons += match.getSpectrum().getEValueCalculator().getNumberOfMatches();
-		}
-		double correctPerComparison = (double) totalCorrect / totalComparisons;
-		U.p(totalComparisons + "\t" + totalCorrect + "\t" + correctPerComparison);
-		
 		/* save FDR report */
 		double areaUndrePRCurve = -1;
 		try {
+			
+			/* how we format our percents */
+			NumberFormat nfPercent = NumberFormat.getPercentInstance();
+			nfPercent.setMaximumFractionDigits(2);
+			
+			/* REPORT FOR CALCULATED CUTOFF POINTS */
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "FDR-" + identifierString + ".txt"))));
 			/* parameters */
 			pw.println("sequenceDirectoryOrFile: " +Properties.sequenceDirectoryOrFile.getAbsolutePath());
@@ -216,13 +243,27 @@ public class FDR {
 			double percent = 1;
 			double increment = 0.01;
 			for (int i = 1; i < points.size(); i++) {
-				if (points.get(i).x < percent && points.get(i - 1).x != points.get(i).x) {
+				if (points.get(i).y < percent && points.get(i - 1).x != points.get(i).x) {
 					percent -= increment;
-					pw.println(points.get(i - 1).x + "\t" + points.get(i - 1).y + "\t" + allMatches.get(i - 1).getIMP() + "\t" + allMatches.get(i - 1).getScore());
+					String percentFoundString = nfPercent.format((points.get(i - 1).y * 100)) + "%";
+					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + allMatches.get(i - 1).getScore());
 				}
+			}
+			/* to print out the final one */
+			String percentFoundString = nfPercent.format((points.get(points.size()  - 1).y * 100)) + "%";
+			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + allMatches.get(points.size() - 1).getScore());
+			
+			pw.flush();
+			pw.close();
+			
+			/* FULL LIST OF MATCHES WITH TARGET/DECOY ASSIGNMENTS */
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "target-decoy-" + identifierString + ".txt"))));
+			for (Match match: allMatches) {
+				pw.println(match.getPeptide().isDecoy() + "\t" + match.toString());
 			}
 			pw.flush();
 			pw.close();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -233,24 +274,7 @@ public class FDR {
 		
 	}
 	
-	private static void printMatches(ArrayList<Match> matches, String fileName) {
-		File reportFile = new File(fileName);
-		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 
-			for (int i = 0; i < matches.size(); i++) {
-				Match match = matches.get(i);
-				pw.println(match.toString());
-			}
-
-			pw.flush();
-			pw.close();
-
-		} catch (IOException e) {
-			U.p("ERROR: Could not create file writer for our report");
-			e.printStackTrace();
-		}
-	}
 	
 	
 	

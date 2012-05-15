@@ -15,7 +15,6 @@ import Math.HasValue;
  */
 public class Peptide implements Comparable<Peptide>, HasValue {
 	
-//	private String acidSequence;
 	private byte [] acidSequence;
 	private double mass;
 	private int startIndex;
@@ -23,12 +22,16 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private int intronStartIndex;
 	private int intronStopIndex;
 	private boolean forward;
-	private Sequence_DNA parentSequence;
+	private Sequence parentSequence;
 	private Protein protein;
 	private boolean isSpliced;
 	private int lengthMinusOne;
 	private int cleavageAcidCount;
 	private boolean inORF;
+	private int ORFSize;
+	
+	/* for tracking FDR */
+	private boolean isDecoy = false;
 	
 
 	/**
@@ -36,14 +39,14 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false);
+		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false, -1);
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, boolean isSpliced) {
-		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false);
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
+		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false, -1);
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence_DNA parentSequence, Protein protein, boolean isSpliced, boolean inORF) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced, boolean inORF, int ORFSize) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -56,6 +59,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.isSpliced = isSpliced;
 		this.lengthMinusOne = this.acidSequence.length - 1;
 		this.inORF = inORF;
+		this.ORFSize = ORFSize;
 		
 		cleavageAcidCount = 0;
 		for (int i = 0; i < this.acidSequence.length; i++) {
@@ -168,7 +172,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		if (forward) {
 			return startIndex;
 		} else {
-			return stopIndex + 1;
+			return stopIndex + 3;
 		}
 	}
 	
@@ -176,7 +180,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		if (forward) {
 			return stopIndex;
 		} else {
-			return startIndex + 1;
+			return startIndex + 3;
 		}
 	}
 
@@ -221,11 +225,15 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	public boolean isInORF() {
 		return inORF;
 	}
+	
+	public int getORFSize() {
+		return ORFSize;
+	}
 
 	/**
 	 * @return the parentSequence
 	 */
-	public Sequence_DNA getParentSequence() {
+	public Sequence getParentSequence() {
 		return parentSequence;
 	}
 	
@@ -295,6 +303,18 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		out /= acidSequence.length;
 		return out;
 	}
+	
+	
+
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+
+	public void setDecoy(boolean isDecoy) {
+		this.isDecoy = isDecoy;
+	}
+
+	
 	
 
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  */
 
-public class Protein implements Comparable<Protein>{
+public class Protein {
 	
 	private String name;
 	private int start = -1;
@@ -23,22 +23,7 @@ public class Protein implements Comparable<Protein>{
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
 	private Sequence_DNA sequence_DNA;
-	private ArrayList<Match> matchesAll = new ArrayList<Match>();
-	private ArrayList<Match_IMP_VariMod> matchesWithModifications = new ArrayList<Match_IMP_VariMod>();
-	private ArrayList<Match> matchesWithoutModifications = new ArrayList<Match>();
-	private double score = 0;
-	private int [] matchPositions = null;
-	private double matchCoverage = -1;
-	private int matchArea = -1;
-	private double modCoverage = -1;
-	private int modArea = -1;
-	
-	private static int tracker = 0;
-	public static final int T_NOTHING= tracker++;
-	public static final int T_FPRXX = tracker++;
-	public static final int T_FPR01 = tracker++;
-	public static final int T_FPR05 = tracker++;
-	public static final int T_MOD = tracker++;
+
 	
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
@@ -70,121 +55,6 @@ public class Protein implements Comparable<Protein>{
 		this.sequence_DNA = sequence_DNA;
 	}
 	
-	/**
-	 * Adds the match to our list of matches.  Updates our score;
-	 * @param match
-	 */
-	public void addMatch(Match match) {
-		matchesAll.add(match);
-		matchesWithoutModifications.add(match);
-		//minus because this will be negative for good e values
-//		score -= Math.log(match.getEValue());
-
-		if (matchPositions == null) {
-			matchPositions = new int[acidByteArray.length];
-			for (int i = 0; i < matchPositions.length; i++) {
-				matchPositions[i] = T_NOTHING;
-			}
-		}
-		int type = T_FPRXX;
-		//TODO do not hard code these FPRs!
-		if (match.getEValue() < 0.03359587957603186) type = T_FPR05;
-		if (match.getEValue() < 0.0034847330927202927) type = T_FPR01;
-		for (int i =  match.getPeptide().getStartIndex(); i < match.getPeptide().getStopIndex(); i++) {
-			matchPositions[i] = type;
-		}
-		
-		score += 1;
-	}
-	
-	public void addMatchPTM(Match_IMP_VariMod match) {
-		matchesAll.add(match);
-		matchesWithModifications.add(match);
-		//minus because this will be negative for good e values
-//		score -= Math.log(match.getEValue());
-
-
-		if (matchPositions == null) {
-			matchPositions = new int[acidByteArray.length];
-			for (int i = 0; i < matchPositions.length; i++) {
-				matchPositions[i] = T_NOTHING;
-			}
-		}
-		for (int i =  match.getPeptide().getStartIndex(); i < match.getPeptide().getStopIndex(); i++) {
-			if (matchPositions[i] != T_FPR05 && matchPositions[i] != T_FPR01 )
-			matchPositions[i] = T_MOD;
-		}
-		
-		score += 1;
-	}
-	
-	public ArrayList<Peptide> getUnfoundPeptides() {
-		if (matchPositions != null) {
-			ArrayList<Peptide> unfoundPeptides = new ArrayList<Peptide>();
-			boolean peptideFound;
-			for (Peptide peptide: peptides) {
-				peptideFound = true;
-	
-				//this says that if there is any amino acid that hasn't been accounted for
-				//that exists in this peptide, then the peptide hasn't been matched
-				for (int i =  peptide.getStartIndex(); i < peptide.getStopIndex(); i++) {
-					if (matchPositions[i] == T_NOTHING) {
-						peptideFound = false;
-						break;
-					}
-				}
-				if (!peptideFound) {
-					unfoundPeptides.add(peptide);
-				}
-			}
-			return unfoundPeptides;
-		}
-		return peptides;
-	}
-	
-	public double getMatchCoverage() {
-		if (matchCoverage < 0) {
-			matchCoverage = (double) getMatchArea() / matchPositions.length;
-		}
-		return matchCoverage;
-	}
-	
-	public int getMatchArea() {
-		if (matchArea < 0) {
-			matchArea = 0;
-			for (int i = 0; i < matchPositions.length; i++) {
-				if (matchPositions[i] == T_FPR01) matchArea++;
-				if (matchPositions[i] == T_FPR05) matchArea++;
-			}
-		}
-		return matchArea;
-	}
-	
-	public double getModCoverage() {
-		if (modCoverage < 0) {
-			modCoverage = (double) getModArea() / matchPositions.length;
-		}
-		return modCoverage;
-	}
-	
-	public int getModArea() {
-		if (modArea < 0) {
-			modArea = 0;
-			for (int i = 0; i < matchPositions.length; i++) {
-				if (matchPositions[i] == T_MOD) modArea++;
-			}
-		}
-		return modArea;
-	}
-	
-	public int [] getMatchPositions() {return matchPositions;}
-	
-	
-	public int compareTo(Protein other) {
-		if (other.getScore() < getScore()) return -1;
-		if (other.getScore() > getScore()) return  1;
-		return 0;
-	}
 	
 	private ArrayList<Peptide> digest() {
 		peptides = new ArrayList<Peptide>();
@@ -194,10 +64,14 @@ public class Protein implements Comparable<Protein>{
 		
 		/* track if in ORF */
 		boolean inORF = false;
+		int ORFSize = 0;
 		
 		char aminoAcid = acidString.charAt(0);
 		char previousAminoAcid = aminoAcid;
-		if (aminoAcid == 'M') inORF = true;
+		if (aminoAcid == 'M') {
+			inORF = true;
+			ORFSize = acidString.length();
+		}
 
 		//setting up the acid indicies
 		int [] acidIndicies = new int[acidString.length()];
@@ -244,9 +118,11 @@ public class Protein implements Comparable<Protein>{
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
 		
 		//start the first amino acid as peptide
-		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF));
+		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF, ORFSize));
 		
-		//special cases happen at the end of the sequence.  These indicies will come into play
+		/* special cases happen at the end of the sequence. 
+		 * Don't worry, the final amino acid will eventually be added!
+		 */
 		int finalIndex = acidString.length() - 1;
 	
 		//advance along each amino acid
@@ -257,7 +133,10 @@ public class Protein implements Comparable<Protein>{
 			aminoAcid = acidString.charAt(i);
 			
 			/* see if we are in ORF */
-			if (aminoAcid == 'M') inORF = true;
+			if (aminoAcid == 'M') {
+				inORF = true;
+				ORFSize = acidString.length() - i;
+			}
 			
 			//add the present amino acid to all forming peptides
 			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
@@ -266,26 +145,24 @@ public class Protein implements Comparable<Protein>{
 			
 			//create new forming peptides if necessary
 			if (Properties.isSequenceFileDNA) {
-				if (Properties.searchModifications) {
-					if ( (isStart(aminoAcid)) ||  // start a new peptide at M
-						 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-						 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-					{		
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
-					}
-				} else {
-					if (isBreak(previousAminoAcid)  ) {		
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
-					}
+				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
+					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+				{		
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
 				}
-				
-			
+
 				
 			/* 'M' Does not mean a new peptide should form in proteins */
 			} else {
 				// Create new peptides after a break
 				if (isBreak(previousAminoAcid)) {		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
+				} else {
+					/* this is for when, in proteins, sometimes the first M is dropped */
+					if (i == 1 && isStart(previousAminoAcid)) {
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
+					}
 				}
 			}
 			
@@ -442,7 +319,9 @@ public class Protein implements Comparable<Protein>{
 					sequence_DNA,
 					this,
 					isSpliced,
-					puc.isInORF());
+					puc.isInORF(),
+					puc.getORFSize()
+					);
 			
 			//add peptide if it meets certain criteria
 			if (peptide.getMass() >= Properties.peptideMassMinimum) {
@@ -456,11 +335,6 @@ public class Protein implements Comparable<Protein>{
 	}
 
 
-	public double getScore() {
-		if (matchPositions == null) return 0.0;
-		return (double) getMatchArea() * getMatchArea() / acidByteArray.length;
-//		return score;
-	}
 
 	public String getName() {
 		return name;
@@ -472,20 +346,6 @@ public class Protein implements Comparable<Protein>{
 	public ArrayList<Peptide> getPeptides() {
 		if (peptides == null) digest();
 		return peptides;
-	}
-
-	public ArrayList<Match> getMatchesAll() {
-		return matchesAll;
-	}
-
-
-	public ArrayList<Match_IMP_VariMod> getMatchesWithModifications() {
-		return matchesWithModifications;
-	}
-
-
-	public ArrayList<Match> getMatchesWithoutModifications() {
-		return matchesWithoutModifications;
 	}
 
 

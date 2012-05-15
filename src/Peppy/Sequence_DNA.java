@@ -23,7 +23,8 @@ public class Sequence_DNA extends Sequence{
 	private int nucleotideSequenceIndex = 0;
 	//To avoid missing some peptides when digestion in discrete windows we
 	//are allowing for some overlap
-	private final int digestionFrameOverlap = 999; //divisible by three
+	private final int digestionFrameOverlap = 120
+			; //divisible by three
 	
 	public Sequence_DNA(File sequenceFile) {
 		this.sequenceFile = sequenceFile;
