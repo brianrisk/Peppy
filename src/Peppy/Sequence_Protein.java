@@ -35,12 +35,12 @@ public class Sequence_Protein extends Sequence {
 	
 	public  ArrayList<Peptide> extractAllPeptides(boolean isReverse) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, false);
-		return getPeptidesFromListOfProteins(proteins);	
+		return getPeptidesFromListOfProteins(proteins, isReverse);	
 	}
 	
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, true);
-		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins);
+		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins, isReverse);
 		if (peptides.size() == 0) return null; //TODO fix.  there is the (small) possibility that this may return null and there are still proteins left to digest.
 		return peptides;
 	}
@@ -56,7 +56,7 @@ public class Sequence_Protein extends Sequence {
 	 */
 	public  ArrayList<Peptide> getAllPeptidesFromReverseDatabase(File proteinFile) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(true, false);
-		return getPeptidesFromListOfProteins(proteins);	
+		return getPeptidesFromListOfProteins(proteins, true);	
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class Sequence_Protein extends Sequence {
 		return null;
 	}
 	
-	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
+	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins, boolean isReverse) {
 		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
 		if (proteins.size() != 0) {
 			ProteinDigestionServer pds = new ProteinDigestionServer(proteins);
@@ -158,7 +158,7 @@ public class Sequence_Protein extends Sequence {
 			/* go through each of our chunks and add them as proteins */
 			for (int i = 0; i < proteinChunks.length; i++) {
 				if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
-				proteins.add(new Protein(proteinName, proteinChunks[i]));
+				proteins.add(new Protein(proteinName, proteinChunks[i], isReverse));
 			}
 		}
 	}
@@ -168,7 +168,7 @@ public class Sequence_Protein extends Sequence {
 	 * @param proteinFile
 	 * @return
 	 */
-	private ArrayList<Protein> getProteinsFromUniprotDAT(boolean reverse, boolean limitAmount) {
+	private ArrayList<Protein> getProteinsFromUniprotDAT(boolean isDecoy, boolean limitAmount) {
 		ArrayList<Protein> proteins = new ArrayList<Protein>();
 		try {
 			String line;
@@ -204,8 +204,8 @@ public class Sequence_Protein extends Sequence {
 				}
 				if (line.startsWith("//")) {
 					inSequence = false;
-					if (reverse) buffy.reverse();
-					proteins.add(new Protein(proteinName, buffy.toString()));
+					if (isDecoy) buffy.reverse();
+					proteins.add(new Protein(proteinName, buffy.toString(), isDecoy));
 				}
 				if (limitAmount) {
 					if (proteins.size() > Properties.maxNumberOfProteinsToLoadAtOnce) return proteins;

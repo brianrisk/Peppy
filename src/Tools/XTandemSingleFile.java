@@ -31,19 +31,8 @@ import Validate.ValidationReport;
 public class XTandemSingleFile {
 	
 	
-
-	//the suffix that the files have
-	static String suffix = ".xml";
-	
-	//what surrounds the spectrum file name
-
-	static String spectrumStop = "'\">";
-	static String eStart = "expect=\"";
-	static String seqStart = "seq=\"";
-	
-
-	
 	public static void main(String args[]) {
+		Properties.scoringMethodName = "XTandem";
 		
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		
@@ -68,12 +57,11 @@ public class XTandemSingleFile {
 		
 		
 		for (TestSet test: testSets) {
-			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		
 		ValidationReport vr = new ValidationReport(testSets);
-		Properties.scoringMethodName = "XTandem";
+		
 		vr.createReport();
 		vr.createResultsFiles();
 		U.p("done");
@@ -115,6 +103,7 @@ public class XTandemSingleFile {
             	
             	spectrumNumber = Integer.parseInt(spectrum.split("\\.")[0]) - 1;
             	
+            	/* do we have to take the neg log of the e value here? */
             	match = new Match_Blank(spectra.get(spectrumNumber), new Peptide(peptide), Double.parseDouble(eValue));
             	matches.add(match);
             }

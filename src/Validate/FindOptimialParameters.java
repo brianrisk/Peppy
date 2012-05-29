@@ -255,14 +255,9 @@ public class FindOptimialParameters {
 		
 		//getting reverse matches -- need to reload the sequences
 		U.p("getting reverse matches");
-		ArrayList<Match> reverseMatches = Peppy.getReverseMatches(sequences, spectraMatches);
+		ArrayList<Match> reverseMatches = Peppy.getDecoyMatches(sequences, spectraMatches);
 		reverseMatches = Peppy.reduceMatchesToOnePerSpectrum(reverseMatches);
 		Collections.sort(reverseMatches);
-		
-		/* label the reverse matches as being from a reverse database */
-		for (Match match: reverseMatches) {
-			match.getPeptide().setDecoy(true);
-		}
 		
 		/* reducing our peptides to eliminate repeats */
 		Hashtable <String, Peptide> hash = new Hashtable<String, Peptide>();

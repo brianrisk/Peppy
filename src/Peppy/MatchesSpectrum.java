@@ -34,10 +34,6 @@ public class MatchesSpectrum extends Matches {
 	
 	
 
-
-	
-
-
 	
 
 }

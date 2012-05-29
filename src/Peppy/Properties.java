@@ -71,11 +71,11 @@ public class Properties {
 	public static File sequenceDirectoryOrFile = new File("sequences");
 	
 	/* a list of peptide databases that will be iterated through in our search */
-	public static ArrayList<File> sequenceDirectoryOrFileList = new ArrayList<File>();
+	public static ArrayList<File> sequenceDirectoryOrFileList;
 	/* an ordered list of the database type (DNA, protein etc) for our peptide sources */
-	public static ArrayList<Boolean> isSequenceFileDNAList = new ArrayList<Boolean>();
+	public static ArrayList<Boolean> isSequenceFileDNAList;
 	/* a list of spectra sources that will be iterated through in our search */
-	public static ArrayList<File> spectraDirectoryOrFileList = new ArrayList<File>();
+	public static ArrayList<File> spectraDirectoryOrFileList;
 	
 	//This could be a directory or a file
 	public static File spectraDirectoryOrFile = new File("spectra");
@@ -146,6 +146,13 @@ public class Properties {
 	 * @param fileName the name of our properties file
 	 */
 	public static void loadProperties(File propertiesFile) {
+		
+		/* All arrays must be cleared for multiple jobs to work!  clearing out our arrays */
+		sequenceDirectoryOrFileList = new ArrayList<File>();
+		isSequenceFileDNAList = new ArrayList<Boolean>();
+		spectraDirectoryOrFileList = new ArrayList<File>();
+		
+		/* loading in the values from the properties file */
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
 			String line = br.readLine();
@@ -164,6 +171,8 @@ public class Properties {
 		
 		/* for our formatting */
 		nfPercent.setMaximumFractionDigits(2);
+		
+		
 		
 	}
 	

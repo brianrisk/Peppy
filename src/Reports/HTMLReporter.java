@@ -22,8 +22,6 @@ import Peppy.Spectrum;
 public class HTMLReporter {
 	
 	ArrayList<Match> matches;
-	ArrayList<Spectrum> spectra;
-	ArrayList<Sequence> sequences;
 	File reportDir;
 	
 	
@@ -32,11 +30,8 @@ public class HTMLReporter {
 	 * @param spectra
 	 * @param sequence_DNAs
 	 */
-	public HTMLReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
+	public HTMLReporter(ArrayList<Match> matches, File reportDir) {
 		this.matches = matches;
-		this.spectra = spectra;
-		this.sequences = sequences;
 		this.reportDir = reportDir;
 	}
 
@@ -59,7 +54,7 @@ public class HTMLReporter {
 		}
 		
 		//sort our best matches
-		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(bestMatches);
 		
 		NumberFormat nfDecimal = NumberFormat.getInstance();

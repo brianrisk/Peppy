@@ -48,7 +48,6 @@ public class MascotReader {
 		));
 		
 		for (TestSet test: testSets) {
-			test.keepTopRankedMatches();
 			test.calculateStastics();
 		}
 		

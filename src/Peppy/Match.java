@@ -41,7 +41,6 @@ public abstract class Match implements Comparable<Match>{
 	public final static int SORT_BY_LOCUS = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_PEPTIDE_MASS_DIFFERENCE = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_ID_THEN_PEPTIDE = sortTracker++;
-	public final static int SORT_BY_IMP_VALUE = sortTracker++;
 	public final static int SORT_BY_PEPTIDE_THEN_SCORE = sortTracker++;
 	
 	//default is that we sort matches by score
@@ -345,11 +344,6 @@ public abstract class Match implements Comparable<Match>{
 				if(peptide.getStartIndex() > match.getPeptide().getStartIndex()) return  1;
 				return 0;
 			} else
-			if (sortParameter == SORT_BY_IMP_VALUE) {
-				if (impValue < match.getIMP()) return -1;
-				if (impValue > match.getIMP()) return  1;
-				return 0;
-			} else
 			if (sortParameter == SORT_BY_SPECTRUM_ID_THEN_SCORE) {
 				if (matchesSpectrum.getSpectrum().getId() < match.getSpectrum().getId()) return -1;
 				if (matchesSpectrum.getSpectrum().getId() > match.getSpectrum().getId()) return  1;
@@ -500,8 +494,6 @@ public abstract class Match implements Comparable<Match>{
 		sb.append('\t');
 		sb.append(getSpectrum().getCharge());
 		sb.append('\t');
-		sb.append(getPeptide().getCleavageAcidCount());
-		sb.append('\t');
 		sb.append(getPeptide().isInORF());
 		sb.append('\t');
 		sb.append(getPeptide().getORFSize());
@@ -569,14 +561,6 @@ public abstract class Match implements Comparable<Match>{
 	public double getMassDifference() {
 		return peptide.getMass() - matchesSpectrum.getSpectrum().getMass();
 	}
-	
-	public int getTrackingIdentifier() {
-		return trackingIdentifier;
-	}
 
-	public void setTrackingIdentifier(int trackingIdentifier) {
-		this.trackingIdentifier = trackingIdentifier;
-	}
-	
 
 }

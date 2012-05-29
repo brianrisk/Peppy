@@ -11,7 +11,7 @@ import java.util.Collections;
  * @author Brian Risk
  *
  */
-public abstract class Matches{
+public abstract class Matches implements Comparable<Matches> {
 	
 	ArrayList<Match> matches = new ArrayList<Match>();
 	
@@ -21,10 +21,14 @@ public abstract class Matches{
 	
 	private static int labelTracker = 0;
 	public static final int KEEP_ONLY_BEST_MATCHES = labelTracker++;
-	public static final int KEEP_ONLY_ONE_BEST_MATCH = labelTracker++;
+//	public static final int KEEP_ONLY_ONE_BEST_MATCH = labelTracker++;
 	public static final int KEEP_MATCHES_AT_MINIMUM_SCORE = labelTracker++;
 	
 	private int whatToKeep = KEEP_ONLY_BEST_MATCHES;
+	
+	/* only keep decoy hits if they trump our existing score 
+	 * For FDR we only need to know when the decoy trumps the target hits */
+	private boolean ignoreLesserDecoys = true;
 	
 	/**
 	 * Add a match only if it's score is greater than or equal to the reigning score.
@@ -35,6 +39,14 @@ public abstract class Matches{
 	 * @param match
 	 */
 	public void addMatch(Match match) {
+		if (! ignoreLesserDecoys) {
+			if (match.getPeptide().isDecoy()) {
+				if (match.getScore() <= score) {
+					return;
+				} 
+			}
+		}
+		
 		if (whatToKeep == KEEP_ONLY_BEST_MATCHES) {
 			if (match.getScore() > score) {
 				matches.clear();
@@ -48,19 +60,19 @@ public abstract class Matches{
 			return;
 		}
 		
-		if (whatToKeep == KEEP_ONLY_ONE_BEST_MATCH) {
-			if (matches.size() == 0) {
-				if (match.score >= score) {
-					matches.add(match);
-				}
-			} else {
-				if (match.getScore() > score) {
-					matches.set(0, match);
-					score = match.getScore();
-				} 
-			}
-			return;
-		}
+//		if (whatToKeep == KEEP_ONLY_ONE_BEST_MATCH) {
+//			if (matches.size() == 0) {
+//				if (match.score >= score) {
+//					matches.add(match);
+//				}
+//			} else {
+//				if (match.getScore() > score) {
+//					matches.set(0, match);
+//					score = match.getScore();
+//				} 
+//			}
+//			return;
+//		}
 		
 		if (whatToKeep == KEEP_MATCHES_AT_MINIMUM_SCORE) {
 			if (match.getScore() >= Properties.minimumScore) {
@@ -100,7 +112,7 @@ public abstract class Matches{
 				bestMatches.add(match);
 			}
 		}
-		Match.setSortParameter(Match.SORT_BY_IMP_VALUE);
+		Match.setSortParameter(Match.SORT_BY_SCORE);
 		Collections.sort(matches);
 		Collections.sort(bestMatches);
 		return bestMatches;
@@ -134,6 +146,21 @@ public abstract class Matches{
 
 	public void setWhatToKeep(int whatToKeep) {
 		this.whatToKeep = whatToKeep;
+	}
+	
+	
+	public int compareTo(Matches o) {
+		if (getScore() < o.getScore()) return 1;
+		if (getScore() > o.getScore()) return -1;
+		return 0;
+	}
+
+	public boolean ignoreLesserDecoys() {
+		return ignoreLesserDecoys;
+	}
+
+	public void setIgnoreLesserDecoys(boolean ignoreLesserDecoys) {
+		this.ignoreLesserDecoys = ignoreLesserDecoys;
 	}
 
 }

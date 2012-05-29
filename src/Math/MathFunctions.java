@@ -99,7 +99,7 @@ public class MathFunctions {
 	}
 	
 	/**
-	 * I took the ln of this
+	 * I took the natural log of this
 	 * http://en.wikipedia.org/wiki/Binomial_probability#Poisson_probability_function
 	 * @param n
 	 * @param k
@@ -157,9 +157,6 @@ public class MathFunctions {
 	 * Boolean search to locate the first peptide in the SORTED list of peptides that has
 	 * a mass greater than the "mass" parameter.
 	 * 
-	 * CAUTION:  this method is not perfect due to rounding error.  However, returns
-	 * very good ballpark.
-	 * 
 	 * @param values
 	 * @param value
 	 * @return
@@ -171,17 +168,14 @@ public class MathFunctions {
 			if (values.get(index).getValue() > value) {index -= increment;}
 			else {index += increment;}
 			increment /= 2;
+			if (index < 0) return 0;
+			if (index >= values.size()) return values.size() -1;
 		}
-		
-		/* accounting for the remainder possibly produced by rounding error */
-		if (index >= 1) {
-			while (values.get(index).getValue() > value) {
-				index--;
-				if (index < 0) break;
-			}
+		while (values.get(index).getValue() > value) {
+			index--;
+			if (index < 0) break;
 		}
 		index++;
-		if(index < 0) index = 0;
 		return index;
 	}
 	

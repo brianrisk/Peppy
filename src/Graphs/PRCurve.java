@@ -30,13 +30,9 @@ public class PRCurve {
 		this.points = points;
 		
 		/* adjust for non-monotonic decreasing PR curve */
-		for (int i = points.size() - 2; i >= 0; i--) {
-			Point2D.Double point = points.get(i);
-			if (point.y < points.get(i + 1).y) {
-				point.y =  points.get(i + 1).y;
-			}
-
-		}
+		ensureMonotonicity();
+		
+		/* find area */
 		calculateAreaUnderCurve();
 	}
 	
@@ -58,6 +54,28 @@ public class PRCurve {
 			previousPrecision = precision;
 		}
 		return areaUnderCurve;
+	}
+	
+	public void ensureMonotonicity() {
+		/* ensure monotonicity  of precision*/
+		for (int i = points.size() - 2; i >= 0; i--) {
+			Point2D.Double point = points.get(i);
+			if (point.y < points.get(i + 1).y) {
+				point.y =  points.get(i + 1).y;
+			}
+
+		}
+		
+		/* ensure monotonicity  of recall*/
+		double previousRecall = points.get(0).getX();
+		for (Point2D.Double point: points) {
+			if (point.getX() < previousRecall) {
+				point.x = previousRecall;
+			} else {
+				previousRecall = point.x;
+			}
+
+		}
 	}
 	
 	public BufferedImage generatePrecisionRecallCurve() {

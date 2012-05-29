@@ -15,7 +15,7 @@ import Peppy.Match;
 import Peppy.MatchesSpectrum;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.ScoringThreadServer;
+import Peppy.ScoringServer;
 import Peppy.Spectrum;
 import Peppy.U;
 
@@ -142,11 +142,9 @@ public class TestSet {
 				if (mc.getMatch().getSpectrum().getId() == spectrum.getId()) {
 					if (toAdd == null) {
 						toAdd = mc; 
-						continue;
 					}
 					if (toAdd.getMatch().getScore() < mc.getMatch().getScore()) {
 						toAdd = mc;
-						continue;
 					}
 					if (toAdd.getMatch().getScore() == mc.getMatch().getScore() && mc.isTrue()) {
 						toAdd = mc;
@@ -335,8 +333,8 @@ public class TestSet {
 	public void findTrueMatchesInAFalseDatabase(ArrayList<Peptide> peptides) {
 		
 		//get the matches
-		ScoringThreadServer scoringThreadServer = new ScoringThreadServer(peptides, spectraMatches);
-		scoringThreadServer.findMatches();
+		ScoringServer scoringServer = new ScoringServer(peptides, spectraMatches);
+		scoringServer.findMatches();
 		topReverseMatches = Peppy.Peppy.getMatchesFromSpectraMatches(spectraMatches);
 		
 		//Sort matches by e value	
@@ -394,10 +392,6 @@ public class TestSet {
 		return testedMatches;
 	}
 	
-	
-	public void keepTopRankedMatches() {
-//		positiveMatches = Peppy.Peppy.keepTopRankedMatches(positiveMatches);
-	}
 
 
 

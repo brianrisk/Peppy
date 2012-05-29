@@ -23,13 +23,14 @@ public class Protein {
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
 	private Sequence_DNA sequence_DNA;
+	private boolean isDecoy;
 
 	
 	
 	static final int maxCleavages = Properties.numberOfMissedCleavages + 1;
 
-	public Protein(String name, String acidString) {
-		this(name, 0, acidString, false, -1, -1, true, null);
+	public Protein(String name, String acidString, boolean isDecoy) {
+		this(name, 0, acidString, false, -1, -1, true, null, isDecoy);
 	}
 
 
@@ -44,7 +45,7 @@ public class Protein {
 	 * @param isForward
 	 * @param sequence_DNA
 	 */
-	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence_DNA sequence_DNA) {
+	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence_DNA sequence_DNA, boolean isDecoy) {
 		this.name = name;
 		this.start = start;
 		this.acidString = acidString;
@@ -53,6 +54,7 @@ public class Protein {
 		this.intronStop = intronStop;
 		this.isForward = isForward;
 		this.sequence_DNA = sequence_DNA;
+		this.isDecoy = isDecoy;
 	}
 	
 	
@@ -153,7 +155,8 @@ public class Protein {
 				}
 
 				
-			/* 'M' Does not mean a new peptide should form in proteins */
+			/* 'M' Does not mean a new peptide should form in proteins 
+			 * Also, we don't need to explicitly say start with 'M' because in the lines above we have that the beginning of every protein begins a new peptide */
 			} else {
 				// Create new peptides after a break
 				if (isBreak(previousAminoAcid)) {		
@@ -241,6 +244,13 @@ public class Protein {
 						isForward,
 						name,
 						peptides);
+			}
+		}
+		
+		/* mark all peptides as coming from a decoy database, if that is the case */
+		if (isDecoy) {
+			for (Peptide peptide: peptides) {
+				peptide.setDecoy(true);
 			}
 		}
 		

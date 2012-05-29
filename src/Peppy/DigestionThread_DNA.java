@@ -61,7 +61,7 @@ public class DigestionThread_DNA implements Runnable {
 	
 	private ArrayList<Peptide> digest(int startPosition, int stopPosition) {
 		ArrayList<Protein> proteins = translateToProteins(startPosition, stopPosition);
-		peptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins);
+		peptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins, reverseDatabase);
 		return peptides;
 	}
 	
@@ -92,7 +92,7 @@ public class DigestionThread_DNA implements Runnable {
 				if (aminoAcid == '.') {
 					if (buildingProtein.length() > 3) {
 						if (reverseDatabase) buildingProtein.reverse();
-						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA));
+						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA, reverseDatabase));
 					}
 					buildingProtein = new StringBuffer();
 					proteinStart = index + increment;
@@ -106,7 +106,7 @@ public class DigestionThread_DNA implements Runnable {
 		}
 		
 		if (buildingProtein.length() > 3) {
-			proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA));
+			proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA, reverseDatabase));
 		}
 		return proteins;
 	}

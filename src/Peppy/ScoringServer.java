@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author Brian Risk
  *
  */
-public class ScoringThreadServer {
+public class ScoringServer {
 	
 	ArrayList<MatchesSpectrum> spectraMatches;
 	
@@ -29,7 +29,7 @@ public class ScoringThreadServer {
 	 * @param spectra
 	 * @param matches the ArrayList where we store the best matches
 	 */
-	public ScoringThreadServer(ArrayList<Peptide> peptides, ArrayList<MatchesSpectrum> spectraMatches) {
+	public ScoringServer(ArrayList<Peptide> peptides, ArrayList<MatchesSpectrum> spectraMatches) {
 		this.spectraMatches = spectraMatches;	
 		
 		//here we make sure we don't use more threads than we have spectra

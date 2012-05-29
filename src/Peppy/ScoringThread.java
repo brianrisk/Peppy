@@ -16,7 +16,7 @@ public class ScoringThread implements Runnable {
 	MatchesSpectrum matchesSpectrum;
 	
 	/* our commanding server; results get reported back to this and new spectra to search come from here */
-	ScoringThreadServer scoringThreadServer;
+	ScoringServer scoringServer;
 	
 	/* due to the imperfections of my binary search, we need this extra margin */
 //	private static int extraMargin = 8;
@@ -25,10 +25,10 @@ public class ScoringThread implements Runnable {
 	 * @param peptides
 	 * @param spectrum
 	 */
-	public ScoringThread(MatchesSpectrum matchesSpectrum, ArrayList<Peptide> peptides, ScoringThreadServer scoringThreadServer) {
+	public ScoringThread(MatchesSpectrum matchesSpectrum, ArrayList<Peptide> peptides, ScoringServer scoringServer) {
 		this.matchesSpectrum = matchesSpectrum;
 		this.peptides = peptides;
-		this.scoringThreadServer = scoringThreadServer;
+		this.scoringServer = scoringServer;
 	}
 	
 	
@@ -86,7 +86,7 @@ public class ScoringThread implements Runnable {
 			}
 
 			/* return results, get new task */
-			matchesSpectrum = scoringThreadServer.getNextSpectrumMatches();
+			matchesSpectrum = scoringServer.getNextSpectrumMatches();
 
 		}
 	}

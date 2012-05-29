@@ -29,11 +29,10 @@ public class FDR {
 	
 	ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
 	ArrayList<Match> allMatches;
-	File reportDirectory;
+	ArrayList<MatchesSpectrum> spectraMatches;
 
 	
-	public FDR(ArrayList<Spectrum> fullSetOfSpectra, File reportDirectory) {
-		this.reportDirectory = reportDirectory;
+	public FDR(ArrayList<Spectrum> fullSetOfSpectra) {
 		
 		/* Get references to our sequence files -- no nucleotide data is loaded at this point */
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
@@ -53,38 +52,21 @@ public class FDR {
 			spectra = fullSetOfSpectra;
 		} else {
 			Random random = new Random();
-			
-			/* create a list of indicies so we can get a subset of this
-			 * list to then use as a list to select spectra
-			 */
-			ArrayList<Integer> indicies = new ArrayList<Integer>();
-			for (int i = 0; i < fullSetOfSpectra.size(); i++) {
-				indicies.add(i);
-			}
-			
-			/* reducing this list by randomly taking out entries until
-			 * it is the desired size
-			 */
-			while (indicies.size() > setSize) {
-				indicies.remove(random.nextInt(indicies.size()));
-			}
-			
-			/* get the spectra dictated by our randomly selected indicies list */
-			spectra = new ArrayList<Spectrum>(setSize);
-			for (Integer index: indicies) {
-				spectra.add(fullSetOfSpectra.get(index));
+			spectra = new ArrayList<Spectrum>(fullSetOfSpectra);
+			while (spectra.size() > setSize) {
+				spectra.remove(random.nextInt(spectra.size()));
 			}
 		}
 		
 		/* set up where we will hold all of the matches for our spectra */
-		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
 		for (Spectrum spectrum: spectra) {
 			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
 			
 			/* keep only one best Match.
 			 * This saves memory and ensures the "competition" Elias and Gygi prescribed
 			 */
-			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_ONE_BEST_MATCH);
+			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_BEST_MATCHES);
 			
 			spectraMatches.add(matchesSpectrum);
 		}
@@ -97,13 +79,11 @@ public class FDR {
 		/* need to initialize sequences for second pass */
 		sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
 		
-		
 		//getting reverse matches -- need to reload the sequences
-		Peppy.getReverseMatches(sequences, spectraMatches);
+		Peppy.getDecoyMatches(sequences, spectraMatches);
 
 		
-		
-		/* combine the matches */
+		/* combine the matches, keeping only one top match per spectrum */
 		allMatches = new ArrayList<Match>(spectraMatches.size());
 		ArrayList<Match> matches;
 		for (MatchesSpectrum matchesSpectrum: spectraMatches) {
@@ -133,7 +113,8 @@ public class FDR {
 			recall = (double) truePositiveCount / setSize;
 			Point2D.Double point = new Point2D.Double(recall, precision);
 			points.add(point);
-		}	
+		}
+		
 		
 	}
 	
@@ -165,7 +146,7 @@ public class FDR {
 	
 	
 	
-	public void saveReport() {
+	public void saveReport(File reportDirectory) {
 		/* set a folder to store our reports */
 		String identifierString = Properties.precursorTolerance + "-" + Properties.fragmentTolerance;
 		File reportDir = new File(reportDirectory, "FDR/" + identifierString + " " + U.getDateString());

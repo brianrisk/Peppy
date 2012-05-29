@@ -16,7 +16,7 @@ import Math.HasValue;
 public class Peptide implements Comparable<Peptide>, HasValue {
 	
 	private byte [] acidSequence;
-	private double mass;
+	protected double mass;
 	private int startIndex;
 	private int stopIndex;
 	private int intronStartIndex;
@@ -26,12 +26,14 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private Protein protein;
 	private boolean isSpliced;
 	private int lengthMinusOne;
-	private int cleavageAcidCount;
 	private boolean inORF;
 	private int ORFSize;
 	
 	/* for tracking FDR */
 	private boolean isDecoy = false;
+	
+	/* for tracking which result set this peptide belongs to */
+	private int trackingIdentifier = 0;
 	
 
 	/**
@@ -60,13 +62,6 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.lengthMinusOne = this.acidSequence.length - 1;
 		this.inORF = inORF;
 		this.ORFSize = ORFSize;
-		
-		cleavageAcidCount = 0;
-		for (int i = 0; i < this.acidSequence.length; i++) {
-			if (this.acidSequence[i] == AminoAcids.K || this.acidSequence[i] == AminoAcids.R) {
-				cleavageAcidCount++;
-			}
-		}
 	}
 
 
@@ -205,9 +200,6 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	}
 
 
-	public int getCleavageAcidCount() {
-		return cleavageAcidCount;
-	}
 
 
 	/**
@@ -314,6 +306,13 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.isDecoy = isDecoy;
 	}
 
+	public int getTrackingIdentifier() {
+		return trackingIdentifier;
+	}
+
+	public void setTrackingIdentifier(int trackingIdentifier) {
+		this.trackingIdentifier = trackingIdentifier;
+	}
 	
 	
 

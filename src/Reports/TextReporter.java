@@ -27,8 +27,6 @@ import Peppy.U;
 public class TextReporter {
 	
 	ArrayList<Match> matches;
-	ArrayList<Spectrum> spectra;
-	ArrayList<Sequence> sequences;
 	File reportDir;
 	
 	
@@ -37,11 +35,8 @@ public class TextReporter {
 	 * @param spectra
 	 * @param sequence_DNAs
 	 */
-	public TextReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
+	public TextReporter(ArrayList<Match> matches, File reportDir) {
 		this.matches = matches;
-		this.spectra = spectra;
-		this.sequences = sequences;
 		this.reportDir = reportDir;
 	}
 
@@ -104,8 +99,6 @@ public class TextReporter {
 			sb.append("RankCount");
 			sb.append('\t');
 			sb.append("Charge");	
-			sb.append('\t');
-			sb.append("CleavageAcidCount");
 			sb.append('\t');
 			sb.append("inORF");
 			sb.append('\t');
