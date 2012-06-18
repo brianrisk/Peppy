@@ -7,6 +7,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public abstract class HTMLPage {
 	
 

@@ -1,16 +1,19 @@
 package Peppy;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import Math.MathFunctions;
 import Reports.HTMLPageRegions;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class Regions {
 	
 	private int maxLength = 1024;

@@ -10,6 +10,10 @@ import Peppy.U;
 
 /**
  * A quick little class to answer some questions for Karen Anderson and David Fenyo
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

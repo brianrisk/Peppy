@@ -6,6 +6,10 @@ import java.util.ArrayList;
  * A way of grouping matches by regions and scoring those regions
  * 
  * initially this is just for DNA, but it could be for proteins
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

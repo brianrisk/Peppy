@@ -5,6 +5,10 @@ package Peppy;
  * 
  * We already have a score, E value, etc for a match
  * and simply need to contain it in an object
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

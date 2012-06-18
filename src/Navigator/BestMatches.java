@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 
 import Database.Column;
 import Database.Table;
@@ -20,6 +19,13 @@ import Peppy.Properties;
 import Peppy.U;
 import Reports.UCSC;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class BestMatches {
 	
 	/* the sample from which all of the results have been derived */

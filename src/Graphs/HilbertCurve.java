@@ -17,6 +17,13 @@ import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.U;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class HilbertCurve {
 	
 	public static final int UP = 0;

@@ -2,6 +2,13 @@ package Peppy;
 
 import Math.MassError;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class Match_IMP_VariMod extends Match {
 	
 	//Peptide/Spectrum difference in mass

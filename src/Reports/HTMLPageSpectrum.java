@@ -14,6 +14,13 @@ import Peppy.Peak;
 import Peppy.Properties;
 import Peppy.Spectrum;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class HTMLPageSpectrum extends HTMLPage {
 
 	ArrayList<Match> theseMatches;

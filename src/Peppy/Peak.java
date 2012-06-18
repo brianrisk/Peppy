@@ -2,6 +2,10 @@ package Peppy;
 
 /**
  * A peak is a data point in a spectrum.
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

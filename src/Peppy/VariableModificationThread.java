@@ -2,12 +2,14 @@ package Peppy;
 
 import java.util.ArrayList;
 
-import Math.MassError;
-import Math.MathFunctions;
-
 /**
  * A thread that is given a peptide, and a list of variable modifications and, in return
  * produces a list of all potential modifications of that peptide
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * 
  * @author Brian Risk
  *
  */

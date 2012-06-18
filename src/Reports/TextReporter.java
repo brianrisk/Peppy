@@ -11,8 +11,6 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.Spectrum;
 import Peppy.U;
 
 
@@ -21,6 +19,10 @@ import Peppy.U;
  * I'll tell you now what.  You want to see them presented in
  * a nice, easy and intuitive manner.  That's what this
  * class does.
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

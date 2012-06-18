@@ -8,6 +8,9 @@ import java.util.Collections;
  * or spectrum or region or protein... This abstract class defines common functionality for all
  * of these.
  * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

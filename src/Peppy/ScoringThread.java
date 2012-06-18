@@ -1,12 +1,16 @@
 package Peppy;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 
 import Math.MassError;
 import Math.MathFunctions;
 
-
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class ScoringThread implements Runnable {
 	
 	/* this holds the full list of peptides (sorted by mass), though we will only be using a section for the given spectrum */

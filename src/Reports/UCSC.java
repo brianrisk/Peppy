@@ -10,6 +10,10 @@ import Peppy.U;
 
 
 /** an object to help construct UCSC links
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

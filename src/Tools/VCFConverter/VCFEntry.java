@@ -1,6 +1,5 @@
 package Tools.VCFConverter;
 
-import Peppy.U;
 
 public class VCFEntry {
 	//#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NORMAL	PRIMARY

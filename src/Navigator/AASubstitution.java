@@ -5,6 +5,13 @@ import java.util.Collections;
 
 import Peppy.AminoAcids;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class AASubstitution implements Comparable<AASubstitution>{
 	
 	/* the former and the present amino acids */

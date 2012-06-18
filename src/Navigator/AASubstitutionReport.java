@@ -12,6 +12,13 @@ import Math.MassError;
 import Peppy.Properties;
 import Peppy.U;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class AASubstitutionReport {
 	
 	public static void main(String args[]) {

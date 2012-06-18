@@ -12,6 +12,13 @@ import java.util.Hashtable;
 
 import Peppy.U;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class PeptideReport {
 	
 	private double matchScoreCutoff = 22.556025416890137;

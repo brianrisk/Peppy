@@ -2,10 +2,15 @@ package Navigator;
 
 import java.util.ArrayList;
 
-import Math.MassError;
 import Peppy.ModificationEntry;
-import Peppy.Properties;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class Modification implements Comparable<Modification> {
 	
 	double mass;

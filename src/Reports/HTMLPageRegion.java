@@ -6,7 +6,13 @@ import java.util.ArrayList;
 import Peppy.Match;
 import Peppy.Region;
 
-
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class HTMLPageRegion extends HTMLPageMatches {
 	
 	Region region;

@@ -16,8 +16,13 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import Peppy.U;
-
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class PRCurve {
 	
 	private double areaUnderCurve = 0;

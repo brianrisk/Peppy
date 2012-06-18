@@ -4,6 +4,9 @@ package Database;
  * This does not contain a column of data.  More, it is the
  * description of the column.
  * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

@@ -8,6 +8,10 @@ import java.util.ArrayList;
  * each ScoringThread holds one spectrum and a reference to the peptide list.
  * When that thread is done executing it asks ScoringEngine for another
  * spectrum that it may search for.
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

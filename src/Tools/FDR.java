@@ -17,7 +17,6 @@ import Peppy.MatchesSpectrum;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
 import Peppy.Spectrum;
 import Peppy.U;
 

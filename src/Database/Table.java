@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import Peppy.U;
-
 
 /**
  * A take on the Table database concept wherein multiple rows can be packed
@@ -22,6 +20,9 @@ import Peppy.U;
  * This allows "overriding" for the key value.  For example, the key value
  * could be "name"; if there happened to be two "Brian"s, both would be stored
  * for the key value of "Brian".
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
  * 
  * @author Brian Risk
  *

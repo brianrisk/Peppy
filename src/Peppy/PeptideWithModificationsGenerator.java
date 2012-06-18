@@ -1,12 +1,16 @@
 package Peppy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * For any given peptide there may exist a host of potentially modified form.
  * 
  * This class takes a peptide and a set of variable modifications
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * 
  * @author Brian Risk
  *
  */

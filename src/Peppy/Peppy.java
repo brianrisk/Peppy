@@ -20,6 +20,10 @@ import Reports.TextReporter;
  * 1) More simple code to promote open source development
  * 2) Easy proteogenomic mapping
  * 3) better multi-threading
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

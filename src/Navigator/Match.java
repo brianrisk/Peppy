@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import Database.Row;
 import Peppy.U;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public class Match extends Row implements Comparable<Match>{
 	
 

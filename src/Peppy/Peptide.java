@@ -10,6 +10,10 @@ import Math.HasValue;
  * 3) the begin index (end index can be calculated)
  * 4) boolean forward (false = reverse)
  * 5) the reading frame
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

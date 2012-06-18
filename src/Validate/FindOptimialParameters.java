@@ -1,7 +1,5 @@
 package Validate;
 
-import java.awt.geom.Point2D;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,11 +8,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Random;
 
-import Graphs.PRCurve;
 import Peppy.Match;
 import Peppy.MatchConstructor;
+import Peppy.MatchesSpectrum;
 import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
@@ -22,7 +19,6 @@ import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
-import Peppy.MatchesSpectrum;
 import Peppy.U;
 
 /**

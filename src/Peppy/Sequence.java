@@ -3,6 +3,13 @@ package Peppy;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * @author Brian Risk
+ *
+ */
 public abstract class Sequence {
 	
 	protected File sequenceFile;

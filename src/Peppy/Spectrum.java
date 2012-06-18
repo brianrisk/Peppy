@@ -16,6 +16,10 @@ import Math.MassError;
  * Holds peaks and meta-data for a MS/MS peak file.
  * Has many methods for importing peak files.  Has some analysis
  * methods like finding the average peak intensity, etc.
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
  * @author Brian Risk
  *
  */

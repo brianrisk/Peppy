@@ -12,6 +12,11 @@ import java.util.Collections;
  * A "sequence" is a DNA sequence, typically in a FASTA file
  * This farms out the digestion of the nucleotide sequences to
  * SequenceDigestionTread objects
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ * 
  * @author Brian Risk
  *
  */

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import Peppy.U;
-
 
 /**
  * Contains a hashtable where the elements are
  * ArrayList of matches.
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
  * 
  * @author Brian Risk
  *
