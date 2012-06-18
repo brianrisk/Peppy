@@ -21,7 +21,6 @@ public abstract class Matches implements Comparable<Matches> {
 	
 	private static int labelTracker = 0;
 	public static final int KEEP_ONLY_BEST_MATCHES = labelTracker++;
-//	public static final int KEEP_ONLY_ONE_BEST_MATCH = labelTracker++;
 	public static final int KEEP_MATCHES_AT_MINIMUM_SCORE = labelTracker++;
 	
 	private int whatToKeep = KEEP_ONLY_BEST_MATCHES;
@@ -39,7 +38,7 @@ public abstract class Matches implements Comparable<Matches> {
 	 * @param match
 	 */
 	public void addMatch(Match match) {
-		if (! ignoreLesserDecoys) {
+		if (ignoreLesserDecoys) {
 			if (match.getPeptide().isDecoy()) {
 				if (match.getScore() <= score) {
 					return;
@@ -60,20 +59,7 @@ public abstract class Matches implements Comparable<Matches> {
 			return;
 		}
 		
-//		if (whatToKeep == KEEP_ONLY_ONE_BEST_MATCH) {
-//			if (matches.size() == 0) {
-//				if (match.score >= score) {
-//					matches.add(match);
-//				}
-//			} else {
-//				if (match.getScore() > score) {
-//					matches.set(0, match);
-//					score = match.getScore();
-//				} 
-//			}
-//			return;
-//		}
-		
+
 		if (whatToKeep == KEEP_MATCHES_AT_MINIMUM_SCORE) {
 			if (match.getScore() >= Properties.minimumScore) {
 				matches.add(match);

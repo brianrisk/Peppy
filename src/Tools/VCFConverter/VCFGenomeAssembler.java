@@ -13,7 +13,7 @@ import Peppy.Sequence;
 import Peppy.Sequence_DNA;
 import Peppy.U;
 
-public class VCFConverter {
+public class VCFGenomeAssembler {
 
 	public static void main (String[] args) {
 		U.p("Starting...");
@@ -90,8 +90,8 @@ public class VCFConverter {
 				e.printStackTrace();
 			}	
 		}
-		
-		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong);
+		double percentWrong = numberOfTimesExpectedNucleotideWasWrong / entries.size();
+		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong + "(" + Properties.nfPercent.format(percentWrong) + ")");
 		U.p("the expected nucleotide equaled the new one: " + numberOfTimesExpectedEqualsNew);
 		U.p("... done.");
 	}

@@ -228,18 +228,18 @@ public class Match_IMP_VariMod extends Match {
 		}
 	}
 	
-	public String toString() {
-		String out = super.toString();
-		StringBuffer sb = new StringBuffer(out);
-		if (Properties.searchModifications) {
-			sb.append('\t');
-			sb.append(hasModification());
-			sb.append('\t');
-			sb.append(getMoificationdMass());
-			sb.append('\t');
-			sb.append(getModificationIndex() + 1);
-		}
-		return sb.toString();
-	}
+//	public String toString() {
+//		String out = super.toString();
+//		StringBuffer sb = new StringBuffer(out);
+//		if (Properties.searchModifications) {
+//			sb.append('\t');
+//			sb.append(hasModification());
+//			sb.append('\t');
+//			sb.append(getMoificationdMass());
+//			sb.append('\t');
+//			sb.append(getModificationIndex() + 1);
+//		}
+//		return sb.toString();
+//	}
 
 }

@@ -158,12 +158,14 @@ public class TestSet {
 		testedMatches = reducedTestedMatches;
 		
 		/* ensure the testedMatches are considering the correct peptide */
-		for (MatchContainer mc: testedMatches) {
-			if (mc.getMatch().getScore() < mc.getTrueMatch().getScore()) {
-				mc.getMatch().setPeptide(mc.getTrueMatch().getPeptide());
-				mc.getMatch().recalculateIMP();
-				mc.getMatch().calculateScore();
-				mc.validate();
+		if (Properties.scoringMethodName.equals("Peppy.Match_IMP")){
+			for (MatchContainer mc: testedMatches) {
+				if (mc.getMatch().getScore() < mc.getTrueMatch().getScore()) {
+					mc.getMatch().setPeptide(mc.getTrueMatch().getPeptide());
+					mc.getMatch().recalculateIMP();
+					mc.getMatch().calculateScore();
+					mc.validate();
+				}
 			}
 		}
 		

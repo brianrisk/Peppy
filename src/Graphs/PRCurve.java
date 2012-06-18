@@ -29,6 +29,9 @@ public class PRCurve {
 	public PRCurve(ArrayList<Point2D.Double> points) {
 		this.points = points;
 		
+		/* in case we were given no points */
+		if (points.size() == 0) return;
+		
 		/* adjust for non-monotonic decreasing PR curve */
 		ensureMonotonicity();
 		

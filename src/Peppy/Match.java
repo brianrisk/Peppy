@@ -464,7 +464,7 @@ public abstract class Match implements Comparable<Match>{
 		sb.append('\t');
 		sb.append(getScore());
 		sb.append('\t');
-		sb.append(getSpectrum().getPrecursorMZ());
+		sb.append(getPeptide().getMass());
 		sb.append('\t');
 		sb.append(getSpectrum().getMass());
 		sb.append('\t');
@@ -509,8 +509,6 @@ public abstract class Match implements Comparable<Match>{
 		sb.append(getModificationIndex());
 		sb.append('\t');
 		sb.append(isModificationLocationCertain());
-		sb.append('\t');
-		sb.append(getCScore());
 		return sb.toString();
 	}
 	

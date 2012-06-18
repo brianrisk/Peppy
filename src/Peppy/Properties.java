@@ -46,6 +46,8 @@ public class Properties {
 	public static int sequenceRegionStart = 0;
 	public static int sequenceRegionStop = 0;
 	
+	public static ArrayList<Character> cleavageAcidList = new ArrayList<Character>();
+	
 	//Segmenting up job for memory management
 	public static int digestionWindowSize = 10000000;
 	public static int desiredPeptideDatabaseSize = 10000000;
@@ -60,22 +62,22 @@ public class Properties {
 	public static double fragmentTolerance = 300;
 	
 	/* ion types */
-//	public static double rightIonDifference = 1.0072764668; //x, y, z ion
-//	public static double leftIonDifference = 1.0072764668;  //a, b, c ion
-	public static double rightIonDifference = 1.0; //x, y, z ion
-	public static double leftIonDifference = 1.0;  //a, b, c ion
+	public static double rightIonDifference = 1.0072764668; //x, y, z ion
+	public static double leftIonDifference = 1.0072764668;  //a, b, c ion
+//	public static double rightIonDifference = 1.0; //x, y, z ion
+//	public static double leftIonDifference = 1.0;  //a, b, c ion
 	
-	public static double minimumScore = 15;
+	public static double minimumScore = 12;
 	
 	//This could be a directory or a file
 	public static File sequenceDirectoryOrFile = new File("sequences");
 	
 	/* a list of peptide databases that will be iterated through in our search */
-	public static ArrayList<File> sequenceDirectoryOrFileList;
+	public static ArrayList<File> sequenceDirectoryOrFileList = new ArrayList<File>();
 	/* an ordered list of the database type (DNA, protein etc) for our peptide sources */
-	public static ArrayList<Boolean> isSequenceFileDNAList;
+	public static ArrayList<Boolean> isSequenceFileDNAList = new ArrayList<Boolean>();
 	/* a list of spectra sources that will be iterated through in our search */
-	public static ArrayList<File> spectraDirectoryOrFileList;
+	public static ArrayList<File> spectraDirectoryOrFileList = new ArrayList<File>();
 	
 	//This could be a directory or a file
 	public static File spectraDirectoryOrFile = new File("spectra");
@@ -100,6 +102,8 @@ public class Properties {
 	public static File reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
 	public static File reportWebFooterFile = new File("resources/reports/footer.txt");
 	public static File reportWebTableHeader = new File("resources/reports/index-table-header.txt");
+	
+	public static String UCSCdatabase = "clade=mammal&org=Human&db=hg19";
 	
 
 	/* for testing purposes */
@@ -148,9 +152,11 @@ public class Properties {
 	public static void loadProperties(File propertiesFile) {
 		
 		/* All arrays must be cleared for multiple jobs to work!  clearing out our arrays */
+		/* this means that spectra and sequences must be set in each job file; they cannot be blank */
 		sequenceDirectoryOrFileList = new ArrayList<File>();
 		isSequenceFileDNAList = new ArrayList<Boolean>();
 		spectraDirectoryOrFileList = new ArrayList<File>();
+		cleavageAcidList = new ArrayList<Character>();
 		
 		/* loading in the values from the properties file */
 		try {
@@ -171,6 +177,12 @@ public class Properties {
 		
 		/* for our formatting */
 		nfPercent.setMaximumFractionDigits(2);
+		
+		/* set default digestion */
+		if (cleavageAcidList.size() == 0) {
+			cleavageAcidList.add('R');
+			cleavageAcidList.add('K');
+		}
 		
 		
 		
@@ -216,6 +228,10 @@ public class Properties {
 			minPeptideLength =Integer.valueOf(propertyValue);
 		if (propertyName.equals("maxPeptideLength")) 
 			maxPeptideLength =Integer.valueOf(propertyValue);
+		if (propertyName.equals("cleavageAcid"))  {
+			cleavageAcidList.add(propertyValue.toUpperCase().charAt(0));
+		}
+		
 		
 		//job parsing for memory management
 		if (propertyName.equals("digestionWindowSize")) 
@@ -303,6 +319,11 @@ public class Properties {
 		if (propertyName.equals("VCFFileString")) 
 			VCFFileString = propertyValue;
 		
+		
+		if (propertyName.equals("UCSCdatabase")) 
+			UCSCdatabase = propertyValue;
+		
+		
 		/* custom jobs */
 		if (propertyName.equals("isYale")) 
 			isYale = Boolean.valueOf(propertyValue);
@@ -347,12 +368,23 @@ public class Properties {
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
 			
 			pw.println("##This could be a directory or a file ");
-			pw.println("sequenceDirectoryOrFile " + Properties.sequenceDirectoryOrFile);
-			pw.println("isSequenceFileDNA " + Properties.isSequenceFileDNA);
+			for (File file: sequenceDirectoryOrFileList) {
+				pw.println("sequenceDirectoryOrFile " + file.getAbsolutePath());
+			}
+			for (Boolean bool: isSequenceFileDNAList) {
+				pw.println("isSequenceFileDNA " + bool);
+			}
 			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
 			pw.println();
 			pw.println("##This could be a directory or a file ");
-			pw.println("spectraDirectoryOrFile " + Properties.spectraDirectoryOrFile);
+			for (File file: spectraDirectoryOrFileList) {
+				pw.println("spectraDirectoryOrFile " + file.getAbsolutePath());
+			}
+			pw.println();
+			pw.println("##Digestion rules");
+			for (Character acid: cleavageAcidList) {
+				pw.println("cleavageAcid " + acid);
+			}			
 			pw.println();
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
 			pw.println();
@@ -375,6 +407,7 @@ public class Properties {
 			pw.println();
 			pw.println("##Report variables ");
 			pw.println("createHTMLReport " + Properties.createHTMLReport);
+			pw.println("UCSCdatabase " + Properties.UCSCdatabase);
 			pw.println();
 			pw.println("##no fragments that weigh less than this will be admitted into the fragment list ");
 			pw.println("##units are daltons. ");
@@ -382,6 +415,9 @@ public class Properties {
 			pw.println("peptideMassMaximum " + Properties.peptideMassMaximum);
 			pw.println();
 			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
+			for (char cleavageAcid: cleavageAcidList) {
+				pw.println("cleavageAcid " + cleavageAcid);
+			}
 			pw.println();
 			pw.println("##splicing ");
 			pw.println("useSpliceVariants " + Properties.useSpliceVariants);

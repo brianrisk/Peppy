@@ -18,6 +18,16 @@ public class MassError {
 //		return 1000 * PPM / 1000000; 
 	}
 	
+	
+	/**
+	 * If we want to see how many PPM difference from a theoretical peptide (true) and
+	 * a spectrum (observed)
+	 * @return
+	 */
+	public static double getPPMDifference(double trueValue, double observedValue) {
+		return ((trueValue - observedValue) / trueValue) * 1000000;
+	}
+	
 
 
 }

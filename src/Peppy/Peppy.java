@@ -76,7 +76,7 @@ public class Peppy {
 			mainReportDir.mkdirs();
 			
 			/* this will maintain our list of score cutoffs */
-			PrintWriter fdrCutoffs = new PrintWriter(new FileWriter (new File(mainReportDir, "FDR cutoffs.txt")));
+			PrintWriter fdrCutoffs = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
 		
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
@@ -87,14 +87,11 @@ public class Peppy {
 				/* we are going to combine all returned match sets here */
 				ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
 				
-				/* each successive layer needs its score threshold to be >= previous threshold.
-				 * if not between result A and B, it could be said B could find results A would not
-				 * when, in fact, the result was in A, but the score cutoff was more stringent
-				 */
-				double minimumScore = 0;
-				
 				/* iterate through all of our peptide sources */
 				for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
+					
+					/* if we are out of spectra (not likely), get out of this loop */
+					if (spectraSize == 0) break;
 					
 					/* set up our sequence data.
 					 * Setting this property will also affect the FDR calculation */
@@ -102,29 +99,63 @@ public class Peppy {
 					Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
 					ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);			
 					
-					/* if we are out of spectra (not likely), get out of this loop */
-					if (spectraSize == 0) break;
-					
-					/* Calculate score threshold with FDR. */
-					/* if we will not find any matches with confidence, skip this round */
-					//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
-					U.p("performing FDR analysis");
+					U.p("performing FDR analysis with " + Properties.sequenceDirectoryOrFile.getName());
 					FDR fdr = new FDR(spectra);
-					double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
-					if (potentialMinimumScore < 0) continue;
-//					if (potentialMinimumScore > minimumScore) 
-						minimumScore = potentialMinimumScore;
-					Properties.minimumScore = minimumScore;
 					
-					/* create spectra-based containers for matches */
-					ArrayList<MatchesSpectrum> matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-					for (Spectrum spectrum: spectra) {
-						matchesSpectra.add(new MatchesSpectrum(spectrum));
+					/* perform precursor analysis if this is the first sequence */
+					if (sequenceIndex == 0) {
+						
+						/*
+						 * Determine ideal precursor tolerance.  We're asking, "what is the
+						 * precursor tolerance that lets us find 99% of the matches at the 1%FDR?"
+						 */
+						double potentialPrecursorTolerance = fdr.findPrecursorError(0.99, 0.01);
+						
+						/*
+						 * If potentialPrecursorTolerance is valid, reanalyze
+						 */
+						if (potentialPrecursorTolerance >= 0) {
+							Properties.precursorTolerance = potentialPrecursorTolerance;
+							U.p ("new precursor tolerance is: " + potentialPrecursorTolerance);
+							fdrCutoffs.println("calculated precursor is " + potentialPrecursorTolerance);
+							fdrCutoffs.println();
+							U.p("performing second FDR with new mass error tolerances...");
+							fdr = new FDR(spectra);
+						}
 					}
 					
-					/* get the matches */
-					U.p("getting the matches");
-					ArrayList<Match> matches = getMatches(sequences, matchesSpectra);
+					/* Calculate score threshold with FDR. 
+					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
+					if (Properties.maximumFDR > 0) {
+						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
+						
+						/* if we will not find any matches with confidence, skip this round */
+						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
+						if (potentialMinimumScore < 0) continue;
+						Properties.minimumScore = potentialMinimumScore;
+					}
+					
+					/* create spectra-based containers for matches */
+					ArrayList<MatchesSpectrum> matchesSpectra;
+					ArrayList<Match> matches = null;
+					
+					/* if we used all of our spectra to calculate FDR, we take advantage of that
+					 * and harvest those results for these results.  No need to do the work twice!
+					 */
+					if (fdr.usedFullSetOfSpectra) {
+						matchesSpectra = fdr.getSpectraMatches();
+						matches = getMatchesFromSpectraMatches(matchesSpectra);
+					} else {
+						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+						for (Spectrum spectrum: spectra) {
+							matchesSpectra.add(new MatchesSpectrum(spectrum));
+						}
+						U.p("getting the matches");
+						matches = getMatches(sequences, matchesSpectra);
+					}
+					
+					/* we found now matches */
+					if (matches == null) continue;
 					
 					/* label the identified peptides according to our sequence */
 					for (Match match: matches) {
@@ -149,52 +180,137 @@ public class Peppy {
 					
 					/* generate reports */
 					fdrCutoffs.println(reportDirName);
-					fdrCutoffs.println("score cutoff: " + minimumScore);
+					fdrCutoffs.println("score cutoff: " + Properties.minimumScore);
 					fdrCutoffs.println("spectra identified: " + spectrumIDs.size());
 					fdrCutoffs.println();
+					fdrCutoffs.flush();
 					fdr.saveReport(reportDir);
 					createReports(matches, reportDir);
 						
 					/* remove all spectra that appear in our matches */
-					Spectrum spectrum;
-					for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
-						spectrum = spectra.get(spectrumIndex);
-						if (spectrumIDs.get(spectrum.getId()) != null) {
-							spectra.remove(spectrumIndex);
-							spectrumIndex--;
+					if (Properties.maximumFDR > 0) {
+						Spectrum spectrum;
+						for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+							spectrum = spectra.get(spectrumIndex);
+							if (spectrumIDs.get(spectrum.getId()) != null) {
+								spectra.remove(spectrumIndex);
+								spectrumIndex--;
+							}
 						}
+						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
+						U.p("spectra reduced by " + Properties.nfPercent.format(precentReduction));
+						spectraSize = spectra.size();
 					}
-					double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
-					U.p("spectra reduced by " + Properties.nfPercent.format(precentReduction) + "%");
-					spectraSize = spectra.size();
 					
 				}
 				
-//				/* now that we have collected all of our matches from the first pass,
-//				 * we can collect all the found peptides and perform varible-mod searches on them
-//				 */
-//				
-//				/* first, we collect all of the peptides found */
-//				Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
-//				for (Match match: allMatchesForSpectralSet) {
-//					peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
-//				}
-//				ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
-//				Collections.shuffle(peptidesFound);
-//				
-//				/* create spectra-based containers for matches */
-//				ArrayList<MatchesSpectrum> matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-//				for (Spectrum spectrum: spectra) {
-//					matchesSpectra.add(new MatchesSpectrum(spectrum));
-//				}
-//				
-//				Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
-//				Properties.searchModifications = true;
-//
-//				ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
+				/* MODIFICATONS
+				 * 
+				 * Now that we have collected all of our matches from the first pass,
+				 * we can collect all the found peptides and perform varible-mod searches on them
+				 */
+				
+				/* first, we collect all of the peptides found */
+				Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
+				for (Match match: allMatchesForSpectralSet) {
+					peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
+				}
+				ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
+				
+				/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
+				if (peptidesFound.size() > 0) {
+					
+					Collections.sort(peptidesFound);
+					
+					/* set our scoring method to vari-mod */
+					Properties.scoringMethodName = "Peppy.Match_IMP_VariMod";
+					Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+					Properties.searchModifications = true;
+					
+					/* use this peptide database to perform FDR */
+					U.p("performing FDR analysis for modificaitons using found peptides");
+					FDR fdr = new FDR(spectra, peptidesFound);
+					
+					/* Calculate score threshold with FDR. 
+					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
+					if (Properties.maximumFDR > 0) {
+						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
+						
+						/* if we will not find any matches with confidence, skip this round */
+						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
+						if (potentialMinimumScore < 0) continue;
+						Properties.minimumScore = potentialMinimumScore;
+					}
+					
+					/* create spectra-based containers for matches */
+					ArrayList<MatchesSpectrum> matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+					for (Spectrum spectrum: spectra) {
+						matchesSpectra.add(new MatchesSpectrum(spectrum));
+					}
+					
+
+					
+					ArrayList<Match> matches = null;
+					if (fdr.usedFullSetOfSpectra) {
+						matchesSpectra = fdr.getSpectraMatches();
+						matches = getMatchesFromSpectraMatches(matchesSpectra);
+					} else {
+						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+						for (Spectrum spectrum: spectra) {
+							matchesSpectra.add(new MatchesSpectrum(spectrum));
+						}
+						U.p("getting the matches");
+						matches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
+					}
+					
+					/*
+					 * THIS WAS COPIED DIRECTLY FROM ABOVE
+					 */
+					
+					/* add these matches to our large pile of all matches for this spectral set */
+					allMatchesForSpectralSet.addAll(matches);
+					
+					/* group spectra that have been identified */
+					Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+					for (Match match: matches) {
+						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+					}
+					U.p(spectrumIDs.size() + " spectra identified at this step");
+					
+					/* create the directory where we will hold this report */
+					reportIndex++;
+					String reportDirName = reportIndex + " " + spectraDirectoryOrFile.getName() + " - " + Properties.sequenceDirectoryOrFile.getName() + " - varimod";
+					File reportDir = new File (mainReportDir, reportDirName);
+					reportDir.mkdirs();
+					
+					/* generate reports */
+					fdrCutoffs.println(reportDirName);
+					fdrCutoffs.println("score cutoff: " + Properties.minimumScore);
+					fdrCutoffs.println("spectra identified: " + spectrumIDs.size());
+					fdrCutoffs.println();
+					fdrCutoffs.flush();
+					fdr.saveReport(reportDir);
+					createReports(matches, reportDir);
+						
+					/* remove all spectra that appear in our matches */
+					if (Properties.maximumFDR > 0) {
+						Spectrum spectrum;
+						for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+							spectrum = spectra.get(spectrumIndex);
+							if (spectrumIDs.get(spectrum.getId()) != null) {
+								spectra.remove(spectrumIndex);
+								spectrumIndex--;
+							}
+						}
+						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
+						U.p("spectra reduced by " + Properties.nfPercent.format(precentReduction));
+						spectraSize = spectra.size();
+					}
+				
+				} /* end modifications if */
 				
 				
-			}
+			} /* end spectrum loop */
 			
 			fdrCutoffs.flush();
 			fdrCutoffs.close();
@@ -288,6 +404,7 @@ public class Peppy {
 	
 	
 	public static void runJobs(String [] args) {
+		/* see if we have jobs in the jobs folder */
 		File jobsDir = new File("jobs");
 		File[] potentialJobsFiles = jobsDir.listFiles();
 		ArrayList<File> jobFiles = new ArrayList<File>();
@@ -298,10 +415,13 @@ public class Peppy {
 				}	
 			}
 		}
+		
+		/* run the jobs */
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
 			runPeppy(null);
 		} else {
+			U.p();
 			U.p("running " + jobFiles.size() + " jobs");
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
@@ -459,18 +579,24 @@ public class Peppy {
 					}
 				}
 				
-				/* sort our peptide list by mass */
-				Collections.sort(peptides);
 				
-				/* report */
-				U.p("we are processing a chunk of peptides this size: " + peptides.size());
+				/* checks to see if we have any peptides in this chunk */
+				if (peptides.size() > 0) {
+					
+					/* sort our peptide list by mass */
+					Collections.sort(peptides);
+					
+					/* report */
+//					U.p("we are processing a chunk of peptides this size: " + peptides.size());
+					
+					/* find the matches for this chunk of peptides */
+					(new ScoringServer(peptides, spectraMatches)).findMatches();
+					
+					/* free up memory */
+					peptides.clear();
+					System.gc();
 				
-				/* find the matches for this chunk of peptides */
-				(new ScoringServer(peptides, spectraMatches)).findMatches();
-				
-				/* free up memory */
-				peptides.clear();
-				System.gc();
+				}
 					
 				/* break if we have covered our last sequence or if we are only using a region */
 				if (sequenceIndex == sequences.size() || Properties.useSequenceRegion) {
@@ -509,13 +635,30 @@ public class Peppy {
 		/* calculate size of combined matches */
 		int size = 0;
 		for (MatchesSpectrum spectrumMatches: spectraMatches) {
+			/* make sure there are matches for this spectrum */
+			if (spectrumMatches.getMatches().size() == 0) continue;
+			
+			/* don't add if score is less than minimum allowed. */
+			if (spectrumMatches.getMatches().get(0).getScore() < Properties.minimumScore) continue;
+			
 			size += spectrumMatches.getMatches().size();
 		}
 		
 		/* combine matches into result and return */
 		ArrayList<Match> out = new ArrayList<Match>(size);
 		for (MatchesSpectrum spectrumMatches: spectraMatches) {
-			out.addAll(spectrumMatches.getMatches());
+			/* make sure there are matches for this spectrum */
+			if (spectrumMatches.getMatches().size() == 0) continue;
+			
+			/* don't add if score is less than minimum allowed. */
+			if (spectrumMatches.getMatches().get(0).getScore() < Properties.minimumScore) continue;
+			
+			/* add only the target matches */
+			for (Match match: spectrumMatches.getMatches()) {
+				if (match.getPeptide().isDecoy()) continue;
+				out.add(match);
+			}
+			
 		}
 		return out;
 	}

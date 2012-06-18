@@ -121,7 +121,7 @@ public class Sequence_Protein extends Sequence {
 					buffy.append(line);
 				}
 				if (limitAmount) {
-					if (combinedLength > 100 * 500000) return proteins;
+					if (combinedLength > 100 * 50000) return proteins;
 				}
 				line = reader.readLine();
 			}

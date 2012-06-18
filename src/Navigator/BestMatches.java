@@ -39,11 +39,32 @@ public class BestMatches {
 	
 	public static void main(String args[]) {
 //		washu();
-		washuChr8();
+//		washuChr8();
+//		pandey();
 //		mayo();
 //		ucla();
-//		yale();
+		yale();
+//		yaleEnzymeless();
 		U.p("done");
+	}
+	
+	public static void pandey() {
+		/* Pandey */
+		BestMatches pandey = new BestMatches("Pandey");
+		
+		/* target protein */
+		ResultsCategory human = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
+		human.addFile(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/Pandey/1 uncompressed - protein/report.txt"));
+		pandey.addMatchType(human);
+		
+		/* reference genome */
+		ResultsCategory genome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
+		genome.addFile(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/Pandey/2 uncompressed - genome/report.txt"));
+		pandey.addMatchType(genome);
+		
+		/* find the best peptides */
+		pandey.process();
+		pandey.saveReports();
 	}
 	
 	public static void washuChr8() {
@@ -765,7 +786,7 @@ public static void washuWHIM2 () {
 		
 		
 		/* Yale 2011-06 */
-		BestMatches mouse1 = new BestMatches("1-mouse");
+		BestMatches mouse1 = new BestMatches("2011-06");
 		
 		/* contaminant protein */
 		ResultsCategory mouse1Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
@@ -785,7 +806,7 @@ public static void washuWHIM2 () {
 		
 		
 		/* Yale 2011-10 */
-		BestMatches mouse2 = new BestMatches("2-mouse");
+		BestMatches mouse2 = new BestMatches("2011-10");
 		
 		/* contaminant protein */
 		ResultsCategory mouse2Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
@@ -805,7 +826,7 @@ public static void washuWHIM2 () {
 		
 		
 		/* Yale 2011-11 */
-		BestMatches mouse3 = new BestMatches("3-mouse");
+		BestMatches mouse3 = new BestMatches("2011-11");
 		
 		/* contaminant protein */
 		ResultsCategory mouse3Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
@@ -826,59 +847,41 @@ public static void washuWHIM2 () {
 		
 		
 		
-		/* HUMAN */
-		
-		
-		/* Yale 2011-06 */
-		BestMatches human1 = new BestMatches("1-human");
+		/* Yale 2012-04 tryptic*/
+		BestMatches mouse4A = new BestMatches("04 tryptic");
 		
 		/* contaminant protein */
-		human1.addMatchType(mouse1Contaminant);
+		ResultsCategory mouse4AContaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
+		mouse4AContaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/1 trypsin - MOUSE.fasta/report.txt"));
+		mouse4A.addMatchType(mouse4AContaminant);
 
 		/* reference genome */
-		ResultsCategory human1Reference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		human1Reference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-HG19 2011-06/report.txt"));
-		human1.addMatchType(human1Reference);
+		ResultsCategory mouse4AReference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
+		mouse4AReference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/2 trypsin - mouse/report.txt"));
+		mouse4A.addMatchType(mouse4AReference);
 		
 		
 		/* find the best peptides */
-		human1.process();
-		human1.saveReports();
+		mouse4A.process();
+		mouse4A.saveReports();
 		
-		
-		/* Yale 2011-10 */
-		BestMatches human2 = new BestMatches("2-human");
+		/* Yale 2012-04 chymotryptic*/
+		BestMatches mouse4B = new BestMatches("04 chymo");
 		
 		/* contaminant protein */
-		human2.addMatchType(mouse2Contaminant);
+		ResultsCategory mouse4BContaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
+		mouse4BContaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/1 chymotrypsin - MOUSE.fasta/report.txt"));
+		mouse4B.addMatchType(mouse4BContaminant);
 
 		/* reference genome */
-		ResultsCategory human2Reference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		human2Reference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-HG19 2011-10/report.txt"));
-		human2.addMatchType(human2Reference);
+		ResultsCategory mouse4BReference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
+		mouse4BReference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/2 chymotrypsin - mouse/report.txt"));
+		mouse4B.addMatchType(mouse4BReference);
 		
 		
 		/* find the best peptides */
-		human2.process();
-		human2.saveReports();
-		
-		
-		
-		/* Yale 2011-11 */
-		BestMatches human3 = new BestMatches("3-human");
-		
-		/* contaminant protein */
-		human3.addMatchType(mouse3Contaminant);
-
-		/* reference genome */
-		ResultsCategory human3Reference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		human3Reference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-HG19 2011-11/report.txt"));
-		human3.addMatchType(human3Reference);
-		
-		
-		/* find the best peptides */
-		human3.process();
-		human3.saveReports();
+		mouse4B.process();
+		mouse4B.saveReports();
 		
 		
 
@@ -887,16 +890,49 @@ public static void washuWHIM2 () {
 		/* a list of our BestMatches */
 		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
 		bestMatches.add(mouse1);
-		bestMatches.add(human1);
 		bestMatches.add(mouse2);
-		bestMatches.add(human2);
 		bestMatches.add(mouse3);
-		bestMatches.add(human3);
+		bestMatches.add(mouse4A);
+		bestMatches.add(mouse4B);
+		
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+		
+	}
+	
+	
+	public static void yaleEnzymeless() {
+		Properties.isYale = true;
+		
+		
+		/* Yale 2011-06 */
+		BestMatches enzymeless = new BestMatches("2012-04 enzymeless");
 		
 		
 		
-		createUnifiedSamplesReport(bestMatches, "spectrumMD5");
+		/* tryp trypsin*/
+		ResultsCategory trypsinTrypsin = new ResultsCategory("trypsinTrypsin", ResultsCategory.PROTEIN);
+		trypsinTrypsin.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/1 trypsin - MOUSE.fasta/report.txt"));
+		enzymeless.addMatchType(trypsinTrypsin);
+
+		/* chymo chymo */
+		ResultsCategory chymoChymo = new ResultsCategory("chymoChymo", ResultsCategory.PROTEIN);
+		chymoChymo.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/2 chymotrypsin - mouse/report.txt"));
+		enzymeless.addMatchType(chymoChymo);
 		
+		
+		/* enzymeless */
+		ResultsCategory noEnzyeReulsts = new ResultsCategory("enzymeless", ResultsCategory.PROTEIN);
+		noEnzyeReulsts.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 a enzymeless/1 2012-04 - MOUSE.fasta/report.txt"));
+		enzymeless.addMatchType(noEnzyeReulsts);
+		
+		
+		
+		
+		
+		/* find the best peptides */
+		enzymeless.process();
+		enzymeless.saveReports();
 	}
 	
 	
@@ -1066,34 +1102,35 @@ public static void washuWHIM2 () {
 		Enumeration<Match> values = bestMatches.elements();
 		while (values.hasMoreElements()) {
 			Match match = values.nextElement();
-			Match bestMatch = bestPeptides.get(match.getString("peptideSequence"));
+			String peptideSequence = match.getString("peptideSequence");
+			Match bestMatch = bestPeptides.get(peptideSequence);
 			if (bestMatch == null) {
-				bestPeptides.put(match.getString("peptideSequence"), match);
+				bestPeptides.put(peptideSequence, match);
 			} else {
 				
 				/* always default to the unmodified form */
 				if (match.getBoolean("isModified") == false) {
 					if (bestMatch.getBoolean("isModified") == false) {
 						if (match.getScore() > bestMatch.getScore() ) {
-							bestPeptides.put(match.getString("peptideSequence"), match);
+							bestPeptides.put(peptideSequence, match);
 						}
 					}
 					
 				} else {
 					if (bestMatch.getBoolean("isModified")) {
 						if (match.getScore() > bestMatch.getScore() ) {
-							bestPeptides.put(match.getString("peptideSequence"), match);
+							bestPeptides.put(peptideSequence, match);
 						}
 					} else {
-						bestPeptides.put(match.getString("peptideSequence"), match);
+						bestPeptides.put(peptideSequence, match);
 					}
 				}
 				
 			}
 		}
 		
-		U.p("best results size: " + bestMatches.size());
-		U.p("best peptides size: " + bestPeptides.size());
+		U.p("Number of spectra identified: " + bestMatches.size());
+		U.p("Number of unique peptides: " + bestPeptides.size());
 			
 	}
 	
@@ -1123,6 +1160,7 @@ public static void washuWHIM2 () {
 		/* save individual match files */
 		try {
 			for (ResultsCategory resultsCategory: this.resultsCategories) {
+				
 				PrintWriter matchWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File(parentDirectory, resultsCategory.getName() + " matches.html"))));
 				matchWriter.println("<html>");
 				matchWriter.println("<head>");
@@ -1142,41 +1180,32 @@ public static void washuWHIM2 () {
 				matchWriter.println("<th>peptide</th>");
 				matchWriter.println("<th>score</th>");
 				matchWriter.println("<th>modified</th>");
-//				matchWriter.println("<th>amplifiation</th>");
-				matchWriter.println("<th>UCSC</th>");
+				if (resultsCategory.databaseType == ResultsCategory.DNA)
+					matchWriter.println("<th>UCSC</th>");
 				matchWriter.println("<th>NIST</th>");
 				matchWriter.println("<th>sequence</th>");
 				matchWriter.println("<th>start</th>");
 				matchWriter.println("</tr>");
 				for (Match match: bestArray) {
 					if (match.get("matchType").equals(resultsCategory)) {
-//						if (match.get("amplificationScore") != null) {
-//							if (match.getDouble("amplificationScore") != 0) {
-//								if (!match.getBoolean("isModified")) {
-									File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
-									matchWriter.println("<td><a href=\"" + spectrumPage.getAbsolutePath() + "\">" + match.getString("peptideSequence") + "</a></td>");
-									matchWriter.println("<td>" + Math.round(match.getScore()) + "</td>");
-									matchWriter.println("<td>" + match.getBoolean("isModified")+ "</td>");
-//									matchWriter.println("<td>" + match.getDouble("amplificationScore") + "</td>");
-									String ucsc = UCSC.getLink(match.getInt("start"), match.getInt("stop"), match.getString("SequenceName"));
-									matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
-									matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + match.getString("peptideSequence") + "\">NIST</a></td>");
-									matchWriter.println("<td>" + match.getString("SequenceName") + "</td>");
-									matchWriter.println("<td>" + match.getInt("start") + "</td>");
-									matchWriter.println("</tr>");
-									
-////									For Karen at yale
-//									File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
-//									matchWriter.println("<td><a href=\"" + spectrumPage.getAbsolutePath() + "\">" + match.getString("peptideSequence") + "</a></td>");
-//									matchWriter.println("<td>" + Math.round(match.getScore()) + "</td>");
-//									matchWriter.println("<td>" + match.getBoolean("isModified")+ "</td>");
-//									matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=mouse&pep_seq=" + match.getString("peptideSequence") + "\">NIST</a></td>");
-//									matchWriter.println("<td>" + match.getString("sequenceName") + "</td>");
-//									matchWriter.println("<td>" + match.getInt("start") + "</td>");
-//									matchWriter.println("</tr>");
-//								}
-//							}
-//						}
+						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
+						matchWriter.println("<td><a href=\"" + spectrumPage.getAbsolutePath() + "\">" + match.getString("peptideSequence") + "</a></td>");
+						matchWriter.println("<td>" + Math.round(match.getScore()) + "</td>");
+						matchWriter.println("<td>" + match.getBoolean("isModified")+ "</td>");
+						String ucsc = UCSC.getLink(match.getInt("start"), match.getInt("stop"), match.getString("SequenceName"));
+						if (resultsCategory.databaseType == ResultsCategory.DNA)
+							matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
+						matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + match.getString("peptideSequence") + "\">NIST</a></td>");
+						if (resultsCategory.databaseType == ResultsCategory.DNA) {
+							matchWriter.println("<td>" + match.getString("SequenceName") + "</td>");
+						} else {
+							String sequenceName = match.getString("SequenceName");
+							matchWriter.println("<td><a href=\"http://www.uniprot.org/uniprot/" + sequenceName + "\">" + sequenceName + "</a></td>");
+						}
+						
+						
+						matchWriter.println("<td>" + match.getInt("start") + "</td>");
+						matchWriter.println("</tr>");
 					}
 				}
 				matchWriter.println("</table></ul></body></html>");

@@ -49,43 +49,50 @@ public class SaveBedFile {
 		SaveBedFile track;
 		double threshold;
 		
-		/* Wash U */
-		threshold = 15.09;
-		track = new SaveBedFile("WHIM 2 - 33", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 hg19/report.txt");
+		/* Karen Anderson */
+		threshold = 15;
+		track = new SaveBedFile("2012-04", threshold);
+		track.addReferenceProteinMatches("/Users/risk2/Sites/research/karen-anderson/karen-anderson 2012-04/1 2012-04 - MOUSE.fasta/report.txt");
+		track.addReferenceGenomeMatches("/Users/risk2/Sites/research/karen-anderson/karen-anderson 2012-04/2 2012-04 - mouse/report.txt");
 		track.save();
 		
-		track = new SaveBedFile("WHIM 2 - 41", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 hg19/report.txt");
-		track.save();
-		
-		track = new SaveBedFile("WHIM 2 - 43", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 hg19/report.txt");
-		track.save();
-		
-		track = new SaveBedFile("WHIM 16 - 33", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 hg19/report.txt");
-		track.save();
-		
-		track = new SaveBedFile("WHIM 16 - 41", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 hg19/report.txt");
-		track.save();
-		
-		track = new SaveBedFile("WHIM 16 - 43", threshold);
-		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 mouse/report.txt");
-		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 human/report.txt");
-		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 hg19/report.txt");
-		track.save();
+//		/* Wash U */
+//		threshold = 15.09;
+//		track = new SaveBedFile("WHIM 2 - 33", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 33 WHIM2 hg19/report.txt");
+//		track.save();
+//		
+//		track = new SaveBedFile("WHIM 2 - 41", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 41 WHIM2 hg19/report.txt");
+//		track.save();
+//		
+//		track = new SaveBedFile("WHIM 2 - 43", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU 43 WHIM2 hg19/report.txt");
+//		track.save();
+//		
+//		track = new SaveBedFile("WHIM 16 - 33", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 33 WHIM16 hg19/report.txt");
+//		track.save();
+//		
+//		track = new SaveBedFile("WHIM 16 - 41", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 41 WHIM16 hg19/report.txt");
+//		track.save();
+//		
+//		track = new SaveBedFile("WHIM 16 - 43", threshold);
+//		track.addContaminantProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 mouse/report.txt");
+//		track.addReferenceProteinMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 human/report.txt");
+//		track.addReferenceGenomeMatches("/Users/risk2/PeppyData/WashU/reports/WHIM16/WashU 43 WHIM16 hg19/report.txt");
+//		track.save();
 		
 //		/* Vanderbilt */
 //		threshold = 13.2;

@@ -74,7 +74,7 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("score");
 			sb.append('\t');
-			sb.append("PrecursorM/Z");
+			sb.append("peptideMass");
 			sb.append('\t');
 			sb.append("PrecursorNeutralMass");
 			sb.append('\t');
@@ -115,8 +115,6 @@ public class TextReporter {
 			sb.append("modIndex");
 			sb.append('\t');
 			sb.append("modLocCertain");
-			sb.append('\t');
-			sb.append("cScore");
 			pw.println(sb);		
 			
 			//print rows

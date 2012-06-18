@@ -364,11 +364,10 @@ public class Protein {
 	}
 	
 	public static boolean isBreak(char aminoAcid) {
-		if (Properties.isYale) {
-			return ( aminoAcid == 'Y' || aminoAcid == 'W' || aminoAcid == 'F' || aminoAcid == 'X');
+		for (char cleavageAcid: Properties.cleavageAcidList) {
+			if (aminoAcid == cleavageAcid) return true;
 		}
-		return ( aminoAcid == 'K' || aminoAcid == 'R' || aminoAcid == 'X');
-		
+		return false;
 	}
 	
 	

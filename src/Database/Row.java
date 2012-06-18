@@ -24,6 +24,16 @@ public class Row {
 
 
 	public void set(String name, Object value) {
+		/* okay, special case for peptides */
+		if (name.equals("peptideSequence")) {
+			String peptideSequence = (String) value;
+			/* removing the stop so that it will match with peptides from protein sequences */
+			if (peptideSequence.endsWith(".")) {
+				peptideSequence = peptideSequence.substring(0, peptideSequence.length() - 1);
+			}
+			value = peptideSequence;
+		}
+		
 		name = name.toLowerCase();
 		Class<?> propertyType = columns.get(name);
 		if (propertyType == null) {

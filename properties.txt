@@ -1,49 +1,14 @@
-##Properties which define how a sequence is digested
-useOnlyForwardsFrames false
-
-//sequenceDirectoryOrFile /Users/risk2/PeppyData/akhilesh-pandey/sequences/protein/
-//sequenceDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/genome paternal/
-//sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
-
-
-sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
-isSequenceFileDNA false
-sequenceDirectoryOrFile /Users/risk2/PeppyData/public/sequences/dna/HG19/
-isSequenceFileDNA true
-sequenceDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/genome paternal/
-isSequenceFileDNA true
-
-
-##This could be a directory or a file 
-//spectraDirectoryOrFile /Users/risk2/PeppyData/ucla/spectra
-//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/TPD52/TPD52_WHIM16_dta/
-//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/41/Recalibrated-Ellis-041-WHIM16-dta
-//spectraDirectoryOrFile /Users/risk2/PeppyData/ucla/spectra/Chlamy nitrogen depletion
-//spectraDirectoryOrFile /Users/risk2/PeppyData/WashU/spectra/41/Recalibrated-Ellis-041-WHIM2-dta
-//spectraDirectoryOrFile /Users/risk2/PeppyData/vanderbilt/spectra/CompRef_VU_whim16_dta_zip/
-//spectraDirectoryOrFile /Users/risk2/PeppyData/johns-hopkins/spectra/WHIM2
-//spectraDirectoryOrFile /Users/risk2/PeppyData/UNC/spectra/CPTAC/WHIM2/
-//spectraDirectoryOrFile /Users/risk2/PeppyData/akhilesh-pandey/spectra/uncompressed/
-
-spectraDirectoryOrFile /Users/risk2/PeppyData/Risk/GM12878/spectra uncompressed/
-
-
-##digest only part of a sequence 
-useSequenceRegion false
-sequenceRegionStart 62098418
-sequenceRegionStop 62099285
-
-
-##a preference for digestion of large DNA windows 
-digestionWindowSize 5000000
-desiredPeptideDatabaseSize 10000000
+cleavageAcid K
+cleavageAcid R
 
 ##number of spectra to process at once 
-numberOfSpectraPerSegment 2000000
+numberOfSpectraPerSegment 4000000
 
 ##error thresholds in PPM
-precursorTolerance 20
+precursorTolerance 500
 fragmentTolerance 500
+
+maximumFDR 0.01
 
 ##Report variables 
 createHTMLReport false
@@ -54,35 +19,5 @@ peptideMassMinimum 400.0
 peptideMassMaximum 10000.0
 
 
-##splicing 
-useSpliceVariants false
-
-##This is per sequence file, so if this value is 5 and you use 7 FASTA files 
-##it will produce (at least) 35 matches per spectrum 
-##the final number of results also varies depending on the digestionWindowSize 
-maximumNumberOfMatchesForASpectrum 1
-
 ##False Discovery Rates
-numberOfSpectraToUseForFDR 10000
-
-##PTMs
-multipass false
-numberOfRegionsToKeep 1000
-searchModifications false
-modificationLowerBound -0.3
-modificationUpperBound 100.0
-
-## VCF
-//VCFFileString /Users/risk2/Desktop/WHIM16/WHIM16-Xenograft-hg19_2011-11-07.vcf
-VCFFileString /Users/risk2/Desktop/GM12878/CEU.trio.2010_03.genotypes.vcf
-//VCFFileString /Users/risk2/PeppyData/WASHU/WHIM2-Normal-hg19_2011-11-07.vcf
-
-
-## for test purposes
-testSequence /Users/risk2/PeppyData/public/sequences/protein/uniprot_sprot 2011_04.fasta
-//testSequence /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
-//testSequence /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
-testSequenceIsProtein true
-//testSequenceIsProtein false
-testDirectory /Users/risk2/PeppyData/tests/ 
-isYale false
+numberOfSpectraToUseForFDR -1

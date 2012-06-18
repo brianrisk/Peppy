@@ -30,10 +30,7 @@ public class UCSC {
 	
 	public static String getLink(int start, int stop, Sequence sequence) {
 		if (Properties.isSequenceFileDNA) {
-			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
-			if (Properties.isYale) {
-				link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
-			}
+			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&" + Properties.UCSCdatabase + "&position=";
 			link += U.getFileNameWithoutSuffix(sequence.getSequenceFile());
 			link += "%3A";
 			link += start - 100;
@@ -47,10 +44,7 @@ public class UCSC {
 	}
 	
 	public static String getLink(int start, int stop, String sequenceName) {
-		String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Human&db=hg19&position=";
-		if (Properties.isYale) {
-			link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&clade=mammal&org=Mouse&db=mm9&position=";
-		}
+		String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&" + Properties.UCSCdatabase + "&position=";
 		link += sequenceName;
 		link += "%3A";
 		link += start - 100;

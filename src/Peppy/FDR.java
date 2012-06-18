@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import Graphs.PRCurve;
+import Math.MassError;
 
 
 /**
@@ -28,24 +29,31 @@ import Graphs.PRCurve;
 public class FDR {
 	
 	ArrayList<Point2D.Double> points = new ArrayList<Point2D.Double>();
-	ArrayList<Match> allMatches;
 	ArrayList<MatchesSpectrum> spectraMatches;
-
+	boolean usedFullSetOfSpectra = false;
 	
+
+	/**
+	 * Constructor where we do not specify a set of peptides, therefore we will be
+	 * using the set of sequences from the Properties
+	 * @param fullSetOfSpectra
+	 */
 	public FDR(ArrayList<Spectrum> fullSetOfSpectra) {
+		this(fullSetOfSpectra, null);
+	}
+	
+	public FDR(ArrayList<Spectrum> fullSetOfSpectra, ArrayList<Peptide> peptides) {
 		
-		/* Get references to our sequence files -- no nucleotide data is loaded at this point */
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
-		
+		/* set the score cutoff to a reasonably low point.
+		 * This line should at least be before we make our MatchesSpectrum objects */
+		Properties.minimumScore = 7;
 		
 		//Loading a subset of our spectra
 		int setSize = Properties.numberOfSpectraToUseForFDR;
 		if (setSize < 100) setSize = fullSetOfSpectra.size();
 		if (setSize > fullSetOfSpectra.size()) setSize = fullSetOfSpectra.size();
+		if (setSize == fullSetOfSpectra.size()) usedFullSetOfSpectra = true;
 		ArrayList<Spectrum> spectra = null;
-		
-		/* set the score cutoff to a reasonably low point */
-		Properties.minimumScore = 7;
 		
 		
 		if (setSize == fullSetOfSpectra.size()) {
@@ -63,46 +71,57 @@ public class FDR {
 		for (Spectrum spectrum: spectra) {
 			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
 			
-			/* keep only one best Match.
-			 * This saves memory and ensures the "competition" Elias and Gygi prescribed
-			 */
+			/* keep only best matches */
 			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_BEST_MATCHES);
 			
 			spectraMatches.add(matchesSpectrum);
 		}
+		
+		/* if we do not have peptides, load in the sequences specified in properties */
+		if (peptides == null) {
+			
+			/* Get references to our sequence files -- no nucleotide data is loaded at this point */
+			ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 				
-		/* getting forwards matches */
-		Peppy.getMatches(sequences, spectraMatches);
-
-		
-		
-		/* need to initialize sequences for second pass */
-		sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
-		
-		//getting reverse matches -- need to reload the sequences
-		Peppy.getDecoyMatches(sequences, spectraMatches);
-
-		
-		/* combine the matches, keeping only one top match per spectrum */
-		allMatches = new ArrayList<Match>(spectraMatches.size());
-		ArrayList<Match> matches;
-		for (MatchesSpectrum matchesSpectrum: spectraMatches) {
-			matches = matchesSpectrum.getMatches();
-			if (matches.size() != 0) {
-				allMatches.add(matches.get(0));
-			}
+			/* getting forwards matches */
+			Peppy.getMatches(sequences, spectraMatches);
+	
+			/* need to initialize sequences for second pass */
+			sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
+			
+			/* getting reverse matches */
+			Peppy.getDecoyMatches(sequences, spectraMatches);
+			
+		/* we have a group of peptides.  Make a reverse database from them */
+		} else {
+			/* getting target matches */
+			Peppy.getMatchesWithPeptides(peptides, spectraMatches);
+			
+			/* create our decoy database */
+			ArrayList<Peptide> decoyPeptides = getDecoyPeptidesFromPeptides(peptides);
+			
+			/* getting decoy matches */
+			Peppy.getMatchesWithPeptides(decoyPeptides, spectraMatches);
+			
 		}
 		
-		/* sort the matches */
-		Collections.sort(allMatches);
+		/* sort the matches by score */
+		Collections.sort(spectraMatches);
 		
 		/* construct a list of points on the PR curve */
 		int truePositiveCount = 0;
 		int falsePositiveCount = 0;
 		int decoyAssignmentCount = 0;
 		double precision, recall;
-		for (int i = 0; i < allMatches.size(); i++) {
-			Match match = allMatches.get(i);
+		for (int i = 0; i < spectraMatches.size(); i++) {
+			
+			/* if there are no matches for a spectrum, then we've reached the end of useful matches */
+			if (spectraMatches.get(i).getMatches().size() == 0) break;
+			
+			/* get one match for a given set of spectrum matches */
+			Match match = spectraMatches.get(i).getMatches().get(0);
+			
+			/* Tally target / decoy */
 			if (match.getPeptide().isDecoy()) {
 				decoyAssignmentCount++;
 			}
@@ -125,8 +144,11 @@ public class FDR {
 		int falsePositiveCount = 0;
 		int decoyAssignmentCount = 0;
 		double precision;
-		for (int matchIndex = 0; matchIndex < allMatches.size(); matchIndex++) {
-			Match match = allMatches.get(matchIndex);
+		for (int matchIndex = 0; matchIndex < spectraMatches.size(); matchIndex++) {
+			/* if there are no matches for a spectrum, then we've reached the end of useful matches */
+			if (spectraMatches.get(matchIndex).getMatches().size() == 0) break;
+			
+			Match match = spectraMatches.get(matchIndex).getMatches().get(0);
 			if (match.getPeptide().isDecoy()) {
 				decoyAssignmentCount++;
 			}
@@ -140,8 +162,42 @@ public class FDR {
 		if (bestIndex == -1) {
 			return -1;
 		} else {
-			return allMatches.get(bestIndex).getScore();
+			return spectraMatches.get(bestIndex).getScore();
 		}
+	}
+	
+	
+	/**
+	 * This method helps us find, based on what matches we are conjecturing are true positives,
+	 * what a good precursor tolerance is.
+	 * 
+	 * @param percentOfMatchesToRetain
+	 * @param falseDiscoveryRate
+	 * @return
+	 */
+	public double findPrecursorError(double percentOfMatchesToRetain, double falseDiscoveryRate) {
+		double scoreThreshold = getScoreThreshold(falseDiscoveryRate);
+		
+		/* if no good confidence at given false discovery rate */
+		if (scoreThreshold < 0) return -1;
+		
+		ArrayList<Double> errors = new ArrayList<Double>();
+		for (MatchesSpectrum matchesSpectrum: spectraMatches) {
+			if (matchesSpectrum.getScore() < scoreThreshold) break;
+			if ( matchesSpectrum.getMatches().size() == 0) break;
+			Match match = matchesSpectrum.getMatches().get(0);
+			if (match.getPeptide().isDecoy()) continue;
+			double error = MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass());
+			error = Math.abs(error);
+			errors.add(error);
+		}
+		
+		Collections.sort(errors);
+		int cutoffIndex = (int) Math.round((double) errors.size() * percentOfMatchesToRetain);
+		if (cutoffIndex >= errors.size()) cutoffIndex = errors.size() - 1;
+		
+		
+		return errors.get(cutoffIndex);
 	}
 	
 	
@@ -186,19 +242,24 @@ public class FDR {
 				if (points.get(i).y < percent && points.get(i - 1).x != points.get(i).x) {
 					percent -= increment;
 					String percentFoundString = Properties.nfPercent.format((points.get(i - 1).y)) + "%";
-					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + allMatches.get(i - 1).getScore());
+					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + spectraMatches.get(i - 1).getScore());
 				}
 			}
 			/* to print out the final one */
 			String percentFoundString = Properties.nfPercent.format((points.get(points.size()  - 1).y)) + "%";
-			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + allMatches.get(points.size() - 1).getScore());
+			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + spectraMatches.get(points.size() - 1).getScore());
 			
 			pw.flush();
 			pw.close();
 			
 			/* FULL LIST OF MATCHES WITH TARGET/DECOY ASSIGNMENTS */
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(reportDir, "target-decoy-" + identifierString + ".txt"))));
-			for (Match match: allMatches) {
+			for (MatchesSpectrum spectrumMatch: spectraMatches) {
+				/* if there are no matches for a spectrum, then we've reached the end of useful matches */
+				if (spectrumMatch.getMatches().size() == 0) break;
+				
+				/* print the match */
+				Match match = spectrumMatch.getMatches().get(0);
 				pw.println(!match.getPeptide().isDecoy() + "\t" + match.toString());
 			}
 			pw.flush();
@@ -209,6 +270,43 @@ public class FDR {
 		}
 		
 		
+	}
+
+
+	public ArrayList<MatchesSpectrum> getSpectraMatches() {
+		return spectraMatches;
+	}
+
+
+	public boolean usedFullSetOfSpectra() {
+		return usedFullSetOfSpectra;
+	}
+	
+	/**
+	 * Takes a list of peptides and makes them decoys.  Decoys are formed thusly:
+	 * 
+	 * target:  ABCDEFGHIJK
+	 * Decoy:   JIHGFEDCBAK
+	 * 
+	 * @param peptides
+	 * @return
+	 */
+	public ArrayList<Peptide> getDecoyPeptidesFromPeptides(ArrayList<Peptide> peptides) {
+		ArrayList<Peptide> decoyPeptides = new ArrayList<Peptide>(peptides.size());
+		int lengthMinusOne;
+		for (Peptide peptide: peptides) {
+			String target = peptide.getAcidSequenceString();
+			StringBuffer decoy = new StringBuffer();
+			lengthMinusOne =  target.length() - 1;
+			decoy.append(target.subSequence(0,lengthMinusOne));
+			decoy.reverse();
+			decoy.append(target.charAt(lengthMinusOne));
+			Peptide decoyPeptide = new Peptide(decoy.toString());
+			decoyPeptide.setDecoy(true);
+			decoyPeptides.add(decoyPeptide);
+		}
+		
+		return decoyPeptides;
 	}
 	
 
