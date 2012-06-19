@@ -76,7 +76,7 @@ public class Peppy {
 				fileDoesNotExist = true;
 			}
 		}
-		if (fileDoesNotExist) System.exit(0);
+		if (fileDoesNotExist) throw new Error("Search file not found");
 		
 		try {
 			
