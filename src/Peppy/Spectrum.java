@@ -1,13 +1,16 @@
 package Peppy;
-import java.io.BufferedReader;
+
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
+
+
+
+
+
+
 
 import Math.HasValue;
 import Math.MassError;
@@ -17,10 +20,9 @@ import Math.MassError;
  * Has many methods for importing peak files.  Has some analysis
  * methods like finding the average peak intensity, etc.
  * 
- * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * Rework to add in additional features to use the jmzml library to upload .mzml files 
  * 
- * @author Brian Risk
+ * @author Brian Risk, David "Corvette" Thomas
  *
  */
 public class Spectrum implements Comparable<Spectrum>, HasValue {
@@ -32,6 +34,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private int id;
 	private int charge = 0;
 	private File file;
+	private String title = "";
+	//For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5  
+	//One of the two people who broke MD5 collision resistance (Tao Xie) taught me in college!  I dropped his class because I thought he was incompetent ;p
 	private String MD5 = null;
 	private boolean isValid = true;
 	
@@ -44,6 +49,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double intensity06Percent = -1;
 	private double minimumIntensity = -1; 
 	private double coverage = -1;
+
 	
 	
 	private static int sortTracker = 0;
@@ -53,168 +59,137 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	//default is that we sort matches by MASS
 	private static int sortParameter = SORT_BY_MASS;
 	
+	
+/*Constructors*/
+	/**
+	 * Empty Constructor.  Just initializes variables.
+	 */
 	public Spectrum() {
 		peaks = new ArrayList<Peak>();
 	}
-	
+
+	/**
+	 *
+	 * @param s Location of file on HDD
+	 */
 	public Spectrum (String s) {
 		this(new File(s));
-	}
+	}//constructor
 	
+	/**
+	 * 
+	 * @param file
+	 */
 	public Spectrum(File file) {
 		this();
 		this.file = file;
-		Spectrum spectrum = loadSpectra(file).get(0); 
+		Spectrum spectrum = SpectrumLoader.loadSpectra(file).get(0); 
 		peaks = spectrum.getPeaks();
 		mass = spectrum.getMass();
-	}
-	
-	public Spectrum(String line, File file) {
-		this();
-		this.file = file;
-		boolean success = addPrecursorFromString(line);
-		if (!success) isValid = false;
-	}
-	
-	public boolean isValid() {
-		return isValid;
-	}
+	}//constructor
 
-	private void addPeakFromString(String s) {
-		try {
-			Peak p = new Peak(s);
-			if (p.getMass() <= mass) peaks.add(new Peak(s));
-		} catch (Exception e) {
-			//don't add it if it's bad!
-		}	
-	}
-	
-	private boolean addPrecursorFromString(String s) {
-		String [] chunks;
-		chunks = s.split("\\s+"); //split on all white space
-		try {
-		precursorMZ = Double.parseDouble(chunks[0]);
-		} catch (NumberFormatException nfe) {
-			/* this is a bad file, return false meaning "don't add this spectrum" */
-			return false;
-		}
-		mass = precursorMZ - Definitions.HYDROGEN_MONO;
-		if (file.getName().endsWith(".dta")) {
-			charge = Integer.parseInt(chunks[1]);
-		}
-		//assumes txt files are really pkl
-		if (file.getName().endsWith(".pkl") || file.getName().endsWith(".txt")) {
-			charge = Integer.parseInt(chunks[2]);
-			mass *= charge;
-		}
-		return true;
-	}
-	
-	/* returns a double, but we're really interested in setting the max */
-	public double getMaxMass() {
-		if (maxMass < 0) {
-			for (Peak peak: peaks) {
-				if (peak.getMass() > maxMass) maxMass = peak.getMass();
-			}
-		}
-		return maxMass;
-	}
-	
-	
-	private void sortPeaksByIntensity() {
-		Peak p;
-		for (int i = 0; i < peaks.size(); i++) {
-			p = (Peak) peaks.get(i);
-			p.setCompareByIntensity();
-		}
-		Collections.sort(peaks);
-	}
-	
-	public void sortPeaksByMass() {
-		Peak p;
-		for (int i = 0; i < peaks.size(); i++) {
-			p = (Peak) peaks.get(i);
-			p.setCompareByMass();
-		}
-		Collections.sort(peaks);
-	}
 
-	
 	/**
-	 * If the average has not been calculated already, it calculates it
-	 * @return
+	 * calculateDistributions is a method that calculates statistics about the peaks of this Spectrum.
+	 * 
+	 * This method calculates: medianIntensity, 25 12 06 percent intensity
 	 */
-	public double getAverageIntensity() {
-		if (averageIntensity < 0) {
-			averageIntensity = 0.0;
-			for (Peak peak: peaks) {
-				averageIntensity += peak.getIntensity();
-			}
-			averageIntensity /= peaks.size();
-		}
-		return averageIntensity;
-	}
-	
-	/**
-	 * If the maximum has not been found already, it finds it
-	 * @return
-	 */
-	public double getMaxIntensity() {
-		if (maxIntensity < 0) {
-			for (Peak peak: peaks) {
-				if (peak.getIntensity() > maxIntensity) maxIntensity = peak.getIntensity();
-			}
-		}
-		return maxIntensity;
-	}
-	
-	/**
-	 * If the minimum has not been found already, it finds it
-	 * @return
-	 */
-	public double getMinimumIntensity() {
-		if (minimumIntensity < 0) {
-			double min = Double.MAX_VALUE;
-			for (Peak peak: peaks) {
-				if (peak.getIntensity() < min) min = peak.getIntensity();
-			}
-			minimumIntensity = min;
-		}
-		return minimumIntensity;
-	}
-	
-	/**
-	 * If the median has not been found already, it finds it
-	 * @return
-	 */
-	public double getMedianIntensity() {
-		if (medianIntensity < 0) calculateDistributions();
-		return medianIntensity;
-	}
-	
-	public double getIntensity25Percent() {
-		if (intensity25Percent < 0) calculateDistributions();
-		return intensity25Percent;
-	}
-	
-	public double getIntensity12Percent() {
-		if (intensity12Percent < 0) calculateDistributions();
-		return intensity12Percent;
-	}
-	
-	public double getIntensity06Percent() {
-		if (intensity06Percent < 0) calculateDistributions();
-		return intensity06Percent;
-	}
-	
 	private void calculateDistributions(){
-		sortPeaksByIntensity();
+		SpectrumLoader.sortPeaksByIntensity(this);
 		medianIntensity = getPeak(peaks.size() / 2).getIntensity();
 		intensity25Percent = getPeak((int) (peaks.size() * .75)).getIntensity();
 		intensity12Percent = getPeak((int) (peaks.size() * .875)).getIntensity();
 		intensity06Percent = getPeak((int) (peaks.size() * .9375)).getIntensity();
-		sortPeaksByMass();
-	}
+		SpectrumLoader.sortPeaksByMass(this);
+	}//calculateDistributions
+	
+	
+	
+
+	
+/*End Private methods for utility methods inside this file*/
+
+
+	
+	/**
+	 * EXTREME CAUTION
+	 * You'd better have a great reason to change this because
+	 * even the slightest change will totally alter all future
+	 * MD5 output
+	 * 
+	 * For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5
+	 * @return
+	 */
+	public String toStringForMD5() {
+		StringBuffer out = new StringBuffer();
+		for (Peak peak: peaks) {
+			out.append(peak.getMass());
+			out.append("\t");
+			out.append(peak.getIntensity());
+			out.append("\r");
+		}
+		return out.toString();
+	}//toStringForMD5
+
+	
+	
+	
+	
+	
+	
+	
+/*Getters and Setters*/
+	
+	public double getValue() {return getMass();}
+	public Peak getPeak(int i) {return (Peak) peaks.get(i);}
+	public ArrayList<Peak> getPeaks() {return peaks;}
+	public double getMass() {return mass;}
+	public double getPrecursorMZ() {return precursorMZ;}
+	public int getPeakCount() {return peaks.size();}
+	public int getCharge() {return charge;}
+	public File getFile() {return file;}
+	public int getId() {return id;}
+	public void setMD5(String md5){MD5 = md5;};
+	public void setPeaks(ArrayList<Peak> peaks){this.peaks = peaks;}
+	public void setFile(File file){this.file = file;}
+	public void setTitle(String title){this.title = title;}
+	public String getTitle(){return this.title;}
+	public void setPrecursorMZ(double m){precursorMZ = m;}
+	public void setMass(double m){mass = m;}
+	public void setCharge(int charge){ this.charge = charge;}
+	
+	
+	
+	/**
+	 * Gets the MD5 of this object.
+	 * For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5
+	 * @return
+	 */
+	public String getMD5() {
+		if (MD5 != null) {
+			return MD5;
+		} else {
+			String hashtext = null;
+			String spectrumString = toStringForMD5();
+			MessageDigest md5;
+			try {
+				md5 = MessageDigest.getInstance("MD5");
+				md5.reset();
+				md5.update(spectrumString.getBytes());
+				byte[] digest = md5.digest();
+				BigInteger bigInt = new BigInteger(1,digest);
+				hashtext = bigInt.toString(16);
+				// Now we need to zero pad it if you actually want the full 32 chars.
+				while(hashtext.length() < 32 ){
+					hashtext = "0"+hashtext;
+				}
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+			MD5 = hashtext;
+			return MD5;
+		}
+	}//getMD5
 	
 	/**
 	 * Given a mass window around each peak, the coverage is the percent of a spectrum
@@ -242,230 +217,65 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			coverage = covered;
 		}
 		return coverage;
-	}
-
-	public Peak getPeak(int i) {return (Peak) peaks.get(i);}
+	}//getCovereage
 	
-	public ArrayList<Peak> getPeaks() {return peaks;}
+	public void setId(int id) {this.id = id;}
+	public static void setSortParameter(int sortParameter) {Spectrum.sortParameter = sortParameter;}
 	
-	public double getMass() {return mass;}
-	public double getPrecursorMZ() {return precursorMZ;}
+	public boolean isValid() {return isValid;}
 	
-	public int getPeakCount() {return peaks.size();}
-
-
-	public int getCharge() {
-		return charge;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	private void cleanPeaks() {
-		//before we mess with the peak data, let's make sure we have the MD5
-		MD5 = getMD5();
-
-		keepStrongestPeakInRegions();
-		sortPeaksByMass();
-	}
-	
-
+	public double getMedianIntensity() {if (medianIntensity < 0) calculateDistributions();return medianIntensity;}
+	public double getIntensity25Percent() {if (intensity25Percent < 0) calculateDistributions();return intensity25Percent;}
+	public double getIntensity12Percent() {if (intensity12Percent < 0) calculateDistributions();return intensity12Percent;}
+	public double getIntensity06Percent() { if (intensity06Percent < 0) calculateDistributions(); return intensity06Percent;}
 	
 	
-	private void keepStrongestPeakInRegions() {
-		sortPeaksByIntensity();
-		int start = peaks.size() - 1;
-		int stop = 0;
-		double lowerBound, upperBound;
-		
-		//note: > stop as we save final one for inside loop
-		for (int i = start; i > stop; i--) {
-			lowerBound = peaks.get(i).getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			upperBound = peaks.get(i).getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			for (int j = i - 1; j >= stop; j--) {
-				if (peaks.get(j).getMass() > lowerBound) {
-					if (peaks.get(j).getMass() < upperBound) {
-						peaks.remove(j);
-						i--;
-						j--;
-					}
-				}
+	public double getMaxMass() {
+		if (maxMass < 0) {
+			for (Peak peak: peaks) {
+				if (peak.getMass() > maxMass) maxMass = peak.getMass();
 			}
 		}
-	}
-	
+		return maxMass;
+	}//getMaxMass
 
-	
-
-	
-
-	
-	public static ArrayList<Spectrum> loadSpectra() {
-		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
-		if (Properties.spectraDirectoryOrFile.isFile()) {
-			spectra =  loadSpectra(Properties.spectraDirectoryOrFile);
-		} else {
-			loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra );
+	public double getAverageIntensity() {
+		if (averageIntensity < 0) {
+			averageIntensity = 0.0;
+			for (Peak peak: peaks) {
+				averageIntensity += peak.getIntensity();
+			}
+			averageIntensity /= peaks.size();
 		}
-		
-		/* remove spectra with small amount of peaks */
-		int removeTally = 0;
-		for (int i = 0; i < spectra.size(); i++) {
-			if (spectra.get(i).getPeakCount() < Properties.minimumNumberOfPeaksForAValidSpectrum) {
-				spectra.remove(i);
-				i--;
-				removeTally++;
+		return averageIntensity;
+	}//getAverageIntensity
+	
+	public double getMaxIntensity() {
+		if (maxIntensity < 0) {
+			for (Peak peak: peaks) {
+				if (peak.getIntensity() > maxIntensity) maxIntensity = peak.getIntensity();
 			}
 		}
-		if (removeTally > 0) {
-			U.p("removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks");
-		}
-		
-		/* set spectra id */
-		for (int i = 0; i < spectra.size(); i++) {
-			spectra.get(i).setId(i);
-		}
-		return spectra;
-	}
+		return maxIntensity;
+	}//getMaxIntensity
 	
-	/**
-	 * a utility method to load in a DTA/PK file
-	 * @param fileName
-	 * @return A ArrayList of all the spectra
+
+	public double getMinimumIntensity() {
+		if (minimumIntensity < 0) {
+			double min = Double.MAX_VALUE;
+			for (Peak peak: peaks) {
+				if (peak.getIntensity() < min) min = peak.getIntensity();
+			}
+			minimumIntensity = min;
+		}
+		return minimumIntensity;
+	}//getMinimumIntensity
+	
+/*End Getters and Setters*/
+	
+/**
+	 * compareTo method for this spectrum.  It will sort by Mass or ID depending on which parameter has been set.
 	 */
-	public static ArrayList<Spectrum> loadSpectra(String fileName) {
-		File inFile = new File(fileName);
-		return loadSpectra(inFile);
-	}
-	
-	/**
-	 * a utility method to load in a DTA/PKL file.  There may be more than
-	 * one spectrum in a file, so this method returns and ArrayList
-	 * @param inFile
-	 * @return A ArrayList of all the spectra
-	 */
-	public static ArrayList<Spectrum> loadSpectra(File inFile) {
-		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
-		try {
-			BufferedReader inBR = new BufferedReader(new FileReader(inFile));
-			String line = inBR.readLine();
-			boolean fileOpen = false;
-			Spectrum spectrum = null;
-			while (line != null) {
-				if (line.trim().equals("")) {
-					if (fileOpen) {
-						fileOpen = false;
-						/* clean peaks also sorts the peaks by mass */
-						spectrum.cleanPeaks();
-						spectra.add(spectrum);
-					}
-				} else {
-					if (fileOpen) {
-						spectrum.addPeakFromString(line);
-					} 
-					//else this is the first line of a new spectrum
-					else {
-						fileOpen = true;
-						spectrum = new Spectrum(line, inFile);
-					}
-
-				}
-				line = inBR.readLine();
-			}
-			if (fileOpen) {
-				/* clean peaks also sorts the peaks by mass */
-				if (spectrum.isValid()) {
-					spectrum.cleanPeaks();
-					spectra.add(spectrum);
-				}
-			}
-			inBR.close();
-		}
-		catch (IOException fnfe) {fnfe.printStackTrace(); U.p(inFile.getAbsolutePath());}
-		catch (Exception e) {U.p(inFile.getName()); e.printStackTrace(); System.exit(1);}
-		return spectra;
-	}
-	
-
-	
-	/**
-	 * recursively goes through folder.
-	 * finds all files that end in .dta or .pkl
-	 * extracts the spectra from those files
-	 * adds all those spectra to one big ArrayList and returns that.
-	 * @param folder
-	 * @param spectra
-	 * @return
-	 */
-	public static void loadSpectraFromFolder(File folder, ArrayList<Spectrum> spectra) { 
-		File [] files = folder.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isHidden()) continue;
-			if (files[i].isDirectory()) {
-				loadSpectraFromFolder(files[i], spectra);
-				continue;
-			}
-			String fileName = files[i].getName().toLowerCase();
-			if (fileName.endsWith(".dta") || fileName.endsWith(".pkl") || fileName.endsWith(".txt")) {
-				spectra.addAll(loadSpectra(files[i]));
-			}
-		}
-		//giving all spectra an ID
-		for (int i = 0; i < spectra.size(); i++) {
-			spectra.get(i).setId(i);
-		}
-	}
-	
-	/**
-	 * This is slightly more general than the method it overloads.  It creates 
-	 * a spectrum ArrayList which it passes to the other loadSpectraFromFolder
-	 * @param fileName
-	 * @return
-	 */
-	public static ArrayList<Spectrum> loadSpectraFromFolder(String fileName) {
-		File inFile = new File(fileName);
-		return loadSpectraFromFolder(inFile);
-	}
-	
-	public static ArrayList<Spectrum> loadSpectraFromFolder(File inFile) {
-		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
-		loadSpectraFromFolder(inFile, spectra);
-		return spectra;
-	}
-	
-
-	/**
-	 * recursively goes through folder.
-	 * finds all files that end in .dta or .pkl
-	 * returns an array list of all of those files
-	 * @param folder
-	 * @param spectraFiles
-	 */
-	public static void loadSpectraFilesFromFolder(File folder, ArrayList<File> spectraFiles) { 
-		File [] files = folder.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isHidden()) continue;
-			if (files[i].isDirectory()) {
-				loadSpectraFilesFromFolder(files[i], spectraFiles);
-				continue;
-			}
-			String fileName = files[i].getName().toLowerCase();
-			if (fileName.endsWith(".dta") || fileName.endsWith(".pkl") || fileName.endsWith(".txt")) {
-				spectraFiles.add(files[i]);
-			}
-		}
-	}
-	
-
 	public int compareTo(Spectrum other) {
 		if (sortParameter == SORT_BY_MASS) {
 			if (mass > other.getMass()) return  1;
@@ -478,62 +288,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 			return  0;
 		}
 		return 0;
-	}
+	}//compareTo
 	
-	public static void setSortParameter(int sortParameter) {
-		Spectrum.sortParameter = sortParameter;
-	}
-
-	
-	public String getMD5() {
-		if (MD5 != null) {
-			return MD5;
-		} else {
-			String hashtext = null;
-			String spectrumString = toStringForMD5();
-			MessageDigest md5;
-			try {
-				md5 = MessageDigest.getInstance("MD5");
-				md5.reset();
-				md5.update(spectrumString.getBytes());
-				byte[] digest = md5.digest();
-				BigInteger bigInt = new BigInteger(1,digest);
-				hashtext = bigInt.toString(16);
-				// Now we need to zero pad it if you actually want the full 32 chars.
-				while(hashtext.length() < 32 ){
-					hashtext = "0"+hashtext;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			}
-			MD5 = hashtext;
-			return MD5;
-		}
-	}
-	
-	/**
-	 * EXTREME CAUTION
-	 * You'd better have a great reason to change this because
-	 * even the slightest change will totally alter all future
-	 * MD5 output
-	 * @return
-	 */
-	public String toStringForMD5() {
-		StringBuffer out = new StringBuffer();
-		for (Peak peak: peaks) {
-			out.append(peak.getMass());
-			out.append("\t");
-			out.append(peak.getIntensity());
-			out.append("\r");
-		}
-		return out.toString();
-	}
-
-	public double getValue() {
-		return getMass();
-	}
-	
-	
-
-}
+}//spectrum
 

@@ -12,6 +12,7 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 
 /**
@@ -54,7 +55,7 @@ public class TestSetReduce {
 			
 			
 			//load spectra
-			ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
 			U.p("original spectra size: " + spectra.size());
 			
 			//eliminate duplicate spectra

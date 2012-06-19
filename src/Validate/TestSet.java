@@ -17,6 +17,7 @@ import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.ScoringServer;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 
 public class TestSet {
@@ -58,7 +59,7 @@ public class TestSet {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + "/" + testName + "/spectra");
+		spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + "/" + testName + "/spectra");
 		
 		/* set up where we will hold all of the matches for our spectra */
 		spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());

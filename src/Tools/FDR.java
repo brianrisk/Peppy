@@ -18,6 +18,7 @@ import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 
 public class FDR {
@@ -109,7 +110,7 @@ public class FDR {
 		
 		//Loading a subset of our spectra
 		ArrayList<File> spectraFiles = new ArrayList<File>();
-		Spectrum.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
+		SpectrumLoader.loadSpectraFilesFromFolder(Properties.spectraDirectoryOrFile, spectraFiles);
 		int setSize = Properties.numberOfSpectraToUseForFDR;
 		if (setSize > spectraFiles.size()) setSize = spectraFiles.size();
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
@@ -117,7 +118,7 @@ public class FDR {
 		File spectrumFile;
 		while (spectra.size() < setSize) {
 			spectrumFile = spectraFiles.remove(random.nextInt(spectraFiles.size()));
-			spectra.addAll(Spectrum.loadSpectra(spectrumFile));
+			spectra.addAll(SpectrumLoader.loadSpectra(spectrumFile));
 		}
 		
 		/* set up where we will hold all of the matches for our spectra */

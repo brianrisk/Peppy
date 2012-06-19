@@ -14,6 +14,7 @@ import Peppy.Match_Blank;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 import Validate.TestSet;
 import Validate.ValidationReport;
@@ -63,7 +64,7 @@ public class MascotReader {
 		File matchesFile = new File(reportLocation);
 		
 		//the spectra of our tests
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(new File(testLocation + testName + "/" + "spectra/"));
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(new File(testLocation + testName + "/" + "spectra/"));
 		
 		//set spectra id according to mass
 		Collections.sort(spectra);

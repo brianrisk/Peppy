@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import Peppy.Peak;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 
 /**
@@ -38,7 +39,7 @@ public class SpectrumToMGF {
 		String testName = "human";
 		
 		
-		ArrayList<Spectrum> spectra = Spectrum.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
 		
 		//save properties
 		File saveFolder = new File ("MGF/" + testName);

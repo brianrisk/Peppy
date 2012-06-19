@@ -16,6 +16,7 @@ import Peppy.Peak;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
 
 /**
@@ -43,7 +44,7 @@ public class TestSetCharacteristics {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = Spectrum.loadSpectraFromFolder("/Users/risk2/PeppyData/tests/" + testName + "/spectra");
+		spectra = SpectrumLoader.loadSpectraFromFolder("/Users/risk2/PeppyData/tests/" + testName + "/spectra");
 		
 		//set up correct matches
 		correctMatches = loadCorrectMatches();

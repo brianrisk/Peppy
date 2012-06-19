@@ -62,6 +62,22 @@ public class Peppy {
 		U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
 		U.p("sequence set count: " + Properties.sequenceDirectoryOrFileList.size());
 		
+		/* check if our directories exist (no typos...) */
+		boolean fileDoesNotExist = false;
+		for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
+			if (!spectraDirectoryOrFile.exists()) {
+				U.p("ERROR!  This spectrum file does not exist: " + spectraDirectoryOrFile.getAbsolutePath());
+				fileDoesNotExist = true;
+			}
+		}
+		for (File sequenceDirectoryOrFile: Properties.sequenceDirectoryOrFileList) {
+			if (!sequenceDirectoryOrFile.exists()) {
+				U.p("ERROR!  This sequence file does not exist: " + sequenceDirectoryOrFile.getAbsolutePath());
+				fileDoesNotExist = true;
+			}
+		}
+		if (fileDoesNotExist) System.exit(0);
+		
 		try {
 			
 			/* we shall use this variable to track how many searches we performed.
@@ -84,7 +100,7 @@ public class Peppy {
 		
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
-				ArrayList<Spectrum> spectra = Spectrum.loadSpectra();
+				ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
 				int spectraSize = spectra.size();
 				U.p("loaded " + spectraSize + " spectra.");
 				
