@@ -36,6 +36,7 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 	}
 	
 	public Match get() {
+		if (matches.size() == 0) return null;
 		return matches.elements().nextElement();
 	}
 	

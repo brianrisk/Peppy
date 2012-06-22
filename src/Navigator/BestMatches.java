@@ -49,7 +49,8 @@ public class BestMatches {
 //		pandey();
 //		mayo();
 //		ucla();
-		yale();
+//		yale();
+		washUPaperOne();
 //		yaleEnzymeless();
 		U.p("done");
 	}
@@ -588,6 +589,73 @@ public static void washuWHIM2 () {
 		
 		
 	}
+	
+	private static BestMatches loadFromResultsFolder(File resultsFolder) {
+		BestMatches bestMatches = new BestMatches(resultsFolder.getName());
+		
+		/* list all the directories in this folder */
+		File [] reportFolders = resultsFolder.listFiles();
+		
+		for (File reportFolder: reportFolders) {
+			if (!reportFolder.isDirectory()) continue;
+			
+			/* the text report file */
+			File textReportFile = new File (reportFolder, "report.txt");
+			
+			if (!textReportFile.exists()) continue;
+			
+			String folderName = reportFolder.getName();
+
+			/* extract the database name from the directory name */
+			String [] nameComponents = folderName.split("-");
+			
+			/* database name is the last index */
+			String databaseName = nameComponents[nameComponents.length - 1];
+			databaseName = databaseName.trim();
+			
+			/* find out if this is dna or protein */
+			BufferedReader br;
+			int resultsType = -1;
+			try {
+				br = new BufferedReader(new FileReader(textReportFile));
+				/* skip the first line */
+				br.readLine();
+				
+				/* > analysis-type: nucleotide */
+				String line = br.readLine();
+				
+				if (line.endsWith("nucleotide")) {resultsType = ResultsCategory.DNA;}
+				if (line.endsWith("protein")) {resultsType = ResultsCategory.PROTEIN;}
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			/* add these results to the bestMatches */
+			ResultsCategory results = new ResultsCategory(databaseName, resultsType);
+			results.addFile(textReportFile);
+			bestMatches.addMatchType(results);
+			
+		}
+		
+		bestMatches.process();
+		bestMatches.saveReports();
+		
+		return bestMatches;
+	}
+	
+	public static void washUPaperOne() {
+		BestMatches whim16 = loadFromResultsFolder(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/"));
+		BestMatches whim2 = loadFromResultsFolder(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/"));
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		bestMatches.add(whim2);
+		bestMatches.add(whim16);
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+	}
 
 	
 
@@ -597,7 +665,15 @@ public static void washuWHIM2 () {
 		BestMatches whim2 = new BestMatches("WHIM2");
 		U.p("\rloading WHIM2");
 		
+		/* reference protein */
+		/* subject protein */
+		/* xeno protein */
 		/* contaminant protein */
+		/* reference genome */
+		/* subject genome */
+		/* tumor genome */
+		// /Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/
+		
 		ResultsCategory whim2ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
 		whim2ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 mouse/report.txt"));
 		whim2.addMatchType(whim2ContaminantProtein);
@@ -1021,7 +1097,6 @@ public static void washuWHIM2 () {
 			for (BestMatches bm: bestMatches) {
 				matchWriter.println("<th>" + bm.getSampleName() + "</th>");
 			}
-			matchWriter.println("<th>modified</th>");
 			matchWriter.println("<th>UCSC</th>");
 			matchWriter.println("<th>NIST</th>");
 			matchWriter.println("</tr>");
@@ -1030,9 +1105,8 @@ public static void washuWHIM2 () {
 			for (MergeMatchHolder holder: pmmhs) {
 				Match anyMatch;
 				anyMatch = holder.get();
+				if (anyMatch == null) continue;
 				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.DNA) {
-//				if (holder.get("ucla loo deprived") != null ) {
-//					if(holder.get("ucla loo deprived").getBoolean("isModified")) {
 					
 					counter++;
 					
@@ -1041,7 +1115,7 @@ public static void washuWHIM2 () {
 					
 					/* acid sequence */
 					matchWriter.println("<td>" + anyMatch.getString("peptideSequence") + "</td>");
-					
+										
 					/* links */
 					for (BestMatches bm: bestMatches) {
 						Match match = holder.get(bm.getSampleName());
@@ -1058,12 +1132,6 @@ public static void washuWHIM2 () {
 						}
 					}
 					
-					
-
-					
-					
-					/* if modified*/
-					matchWriter.println("<td>" + holder.isModified() + "</td>");
 					
 					/* sample UCSC link */
 					String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
@@ -1184,8 +1252,8 @@ public static void washuWHIM2 () {
 				matchWriter.println("<table class=\"sortable\" id=\"box-table-a\" >");
 				matchWriter.println("<tr>");
 				matchWriter.println("<th>peptide</th>");
+				matchWriter.println("<th>notes</th>");
 				matchWriter.println("<th>score</th>");
-				matchWriter.println("<th>modified</th>");
 				if (resultsCategory.databaseType == ResultsCategory.DNA)
 					matchWriter.println("<th>UCSC</th>");
 				matchWriter.println("<th>NIST</th>");
@@ -1196,8 +1264,8 @@ public static void washuWHIM2 () {
 					if (match.get("matchType").equals(resultsCategory)) {
 						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
 						matchWriter.println("<td><a href=\"" + spectrumPage.getAbsolutePath() + "\">" + match.getString("peptideSequence") + "</a></td>");
+						matchWriter.println("<td></td>");
 						matchWriter.println("<td>" + Math.round(match.getScore()) + "</td>");
-						matchWriter.println("<td>" + match.getBoolean("isModified")+ "</td>");
 						String ucsc = UCSC.getLink(match.getInt("start"), match.getInt("stop"), match.getString("SequenceName"));
 						if (resultsCategory.databaseType == ResultsCategory.DNA)
 							matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
@@ -1206,7 +1274,12 @@ public static void washuWHIM2 () {
 							matchWriter.println("<td>" + match.getString("SequenceName") + "</td>");
 						} else {
 							String sequenceName = match.getString("SequenceName");
-							matchWriter.println("<td><a href=\"http://www.uniprot.org/uniprot/" + sequenceName + "\">" + sequenceName + "</a></td>");
+							if (sequenceName.indexOf('-') != -1) {
+								sequenceName = sequenceName.substring(0, sequenceName.indexOf('-'));
+							}
+//							matchWriter.println("<td><a href=\"http://www.uniprot.org/uniprot/" + sequenceName + "\">" + sequenceName + "</a></td>");
+							matchWriter.println("<td><a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + sequenceName + "\">" + sequenceName + "</a></td>");
+							
 						}
 						
 						

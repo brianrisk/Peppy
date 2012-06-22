@@ -299,7 +299,7 @@ public class Peppy {
 					
 					/* create the directory where we will hold this report */
 					reportIndex++;
-					String reportDirName = reportIndex + " " + spectraDirectoryOrFile.getName() + " - " + Properties.sequenceDirectoryOrFile.getName() + " - varimod";
+					String reportDirName = reportIndex + " " + spectraDirectoryOrFile.getName() + " - varimod";
 					File reportDir = new File (mainReportDir, reportDirName);
 					reportDir.mkdirs();
 					
@@ -790,7 +790,7 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy");
 		U.p("Protein identification / proteogenomic software.");
-		U.p("Developed 2010 by Brian Risk");
+		U.p("Copyright 2010 by Brian Risk");
 		U.p();
 		
 		/* print some system statistics */
