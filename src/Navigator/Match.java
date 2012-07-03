@@ -42,6 +42,7 @@ public class Match extends Row implements Comparable<Match>{
 		columns.put("modMass", Double.class);
 		columns.put("modificationCount", Integer.class);
 		columns.put("modificationMassArray", String.class);
+		columns.put("modLocCertain", Boolean.class);
 		columns.put("inORF", Boolean.class);
 		columns.put("sizeOfORF", Integer.class);
 		columns.put("PrecursorNeutralMass", Double.class);

@@ -599,6 +599,9 @@ public static void washuWHIM2 () {
 		for (File reportFolder: reportFolders) {
 			if (!reportFolder.isDirectory()) continue;
 			
+			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
+			if (reportFolder.getName().indexOf("varimod") != -1) continue;
+			
 			/* the text report file */
 			File textReportFile = new File (reportFolder, "report.txt");
 			
@@ -647,12 +650,23 @@ public static void washuWHIM2 () {
 	}
 	
 	public static void washUPaperOne() {
-		BestMatches whim16 = loadFromResultsFolder(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/"));
-		BestMatches whim2 = loadFromResultsFolder(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/"));
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis041/"));
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis043/"));
+		
+		
 		/* a list of our BestMatches */
 		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		bestMatches.add(whim2);
-		bestMatches.add(whim16);
+		for (File folder: reportFolders) {
+			BestMatches matches = loadFromResultsFolder(folder);
+			bestMatches.add(matches);
+		}
 		
 		createUnifiedSamplesReport(bestMatches, "peptideSequence");
 	}

@@ -26,8 +26,88 @@ public class ModificationReport {
 	
 	
 	public static void main(String args[]) {
-		new ModificationReport();
+//		new ModificationReport();
+		createModSpreadsheet();
 		U.p("done");
+	}
+	
+	public static void createModSpreadsheet() {
+		Sample sample = new Sample("WHIM16 - 033", Sample.SUBJECT_GENOME);
+//		sample.loadResults(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/6 WHIM16 - varimod/report.txt"));
+		sample.loadResults(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt"));
+		try {
+			
+			for (int targetModMass = 0; targetModMass < 101; targetModMass++) {
+				Hashtable<Integer, Integer> modifications = new Hashtable<Integer, Integer>();
+	//			Hashtable<Integer, Hashtable<Character, Integer>> modificationsAcidCounts = new Hashtable<Integer, Hashtable<Character, Integer>>();
+				Hashtable<Character, Integer> deamidations = new Hashtable<Character, Integer>();
+				
+				
+				
+				for (Match match: sample.getMatches()) {
+					if (match.getBoolean("isModified")) {
+						int modMass = (int) Math.round(match.getDouble("modMass"));
+						if (modMass == targetModMass) {
+							String peptideSequence = match.getString("peptideSequence");
+							int modIndex = match.getInt("modIndex");
+							char acid = peptideSequence.charAt(modIndex);
+							
+							Integer acidTally = deamidations.get(acid);
+							if (acidTally == null) {
+								deamidations.put(acid, 1);
+							} else {
+								deamidations.put(acid, acidTally + 1);
+							}
+						}
+						
+//						/* add to tally */
+//						Integer tally = modifications.get(modMass);
+//						if (tally == null) {
+//							modifications.put(modMass, 1);
+//						} else {
+//							modifications.put(modMass, tally + 1);
+//						}
+					}
+				}
+				
+	//			ArrayList<Integer> keys = new ArrayList<Integer>(modifications.keySet());
+	//			Collections.sort(keys);
+	//			for (Integer key: keys) {
+	//				pw.println(key + "\t" + modifications.get(key));
+	//			}
+				
+				/* find if there is a prevailing residue location */
+				ArrayList<Integer> values = new ArrayList<Integer>(deamidations.values());
+				
+				int sum = 0; 
+				for (Integer value: values) {
+					sum += value;
+				}
+				if (sum < 25) continue;
+				int max = Collections.max(values);
+				double maxRatio = (double) max / sum ;
+				
+				U.p(targetModMass + " " + maxRatio);
+				
+				if (maxRatio > 0.25) {
+					PrintWriter pw = new PrintWriter(new FileWriter(sum + " " + targetModMass + " modAcids.txt"));
+					
+					ArrayList<Character> keys = new ArrayList<Character>(deamidations.keySet());
+					Collections.sort(keys);
+					for (Character key: keys) {
+						pw.println(key + "\t" + deamidations.get(key));
+					}
+					
+					pw.flush();
+					pw.close();
+				}
+				
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public ModificationReport() {
