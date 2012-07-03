@@ -91,7 +91,7 @@ public class VCFGenomeAssembler {
 			}	
 		}
 		double percentWrong = numberOfTimesExpectedNucleotideWasWrong / entries.size();
-		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong + "(" + Properties.nfPercent.format(percentWrong) + ")");
+		U.p("the expected nucleotide was wrong this many times: " + numberOfTimesExpectedNucleotideWasWrong + "(" + Properties.percentFormat.format(percentWrong) + ")");
 		U.p("the expected nucleotide equaled the new one: " + numberOfTimesExpectedEqualsNew);
 		U.p("... done.");
 	}

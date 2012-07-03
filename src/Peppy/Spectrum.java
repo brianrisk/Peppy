@@ -6,12 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-
-
-
-
-
-
 import Math.HasValue;
 import Math.MassError;
 
@@ -21,6 +15,9 @@ import Math.MassError;
  * methods like finding the average peak intensity, etc.
  * 
  * Rework to add in additional features to use the jmzml library to upload .mzml files 
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
  * 
  * @author Brian Risk, David "Corvette" Thomas
  *

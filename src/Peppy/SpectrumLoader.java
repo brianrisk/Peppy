@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-import Math.MassError;
-
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArray;
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArrayList;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
@@ -21,18 +19,22 @@ import uk.ac.ebi.jmzml.model.mzml.PrecursorList;
 import uk.ac.ebi.jmzml.model.mzml.SelectedIonList;
 import uk.ac.ebi.jmzml.xml.io.MzMLObjectIterator;
 import uk.ac.ebi.jmzml.xml.io.MzMLUnmarshaller;
+import Math.MassError;
 
 public class SpectrumLoader {
 
-	/*Public Static methods for loading spectra*/
-	/**
-	 * loadSpectra loads in spectra from the established value in the Properties file.  It returns an ArrayList of Spectrum that is the same size (minus removed peaks)
-	 * as the number of spectrum in the properties file.  It removes any spectra below the properties file established value of minimumNumberOfPeaksForAValidSpectrum.
-	 * 
-	 * This methods defaults to the spectra File set by properties
-	 * 
-	 * @return 
-	 */
+
+/**
+ * loadSpectra loads in spectra from the established value in the Properties file.  It returns an ArrayList of Spectrum that is the same size (minus removed peaks)
+ * as the number of spectrum in the properties file.  It removes any spectra below the properties file established value of minimumNumberOfPeaksForAValidSpectrum.
+ * 
+ * This methods defaults to the spectra File set by properties
+ * 
+ * Copyright 2012, Brian Risk
+ * Released under the Netscape Public License
+ * 
+ */
+	
 	public static ArrayList<Spectrum> loadSpectra() {
 
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();

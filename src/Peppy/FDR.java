@@ -243,12 +243,12 @@ public class FDR {
 			for (int i = 1; i < points.size(); i++) {
 				if (points.get(i).y < percent && points.get(i - 1).x != points.get(i).x) {
 					percent -= increment;
-					String percentFoundString = Properties.nfPercent.format((points.get(i - 1).y)) + "%";
+					String percentFoundString = Properties.percentFormat.format((points.get(i - 1).y)) + "%";
 					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + spectraMatches.get(i - 1).getScore());
 				}
 			}
 			/* to print out the final one */
-			String percentFoundString = Properties.nfPercent.format((points.get(points.size()  - 1).y)) + "%";
+			String percentFoundString = Properties.percentFormat.format((points.get(points.size()  - 1).y)) + "%";
 			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + spectraMatches.get(points.size() - 1).getScore());
 			
 			pw.flush();

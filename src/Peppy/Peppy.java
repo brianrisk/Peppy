@@ -97,6 +97,14 @@ public class Peppy {
 			
 			/* this will maintain our list of score cutoffs */
 			PrintWriter fdrCutoffs = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
+			
+			/* if there re multiple jobs, the latter varimod settings will persist.
+			 * we reset those to normal, modification-less parameters
+			 */
+			/* set our scoring method to vari-mod */
+			Properties.scoringMethodName = "Peppy.Match_IMP";
+			Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+			Properties.searchModifications = false;
 		
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
@@ -218,7 +226,7 @@ public class Peppy {
 							}
 						}
 						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
-						U.p("spectra reduced by " + Properties.nfPercent.format(precentReduction));
+						U.p("spectra reduced by " + Properties.percentFormat.format(precentReduction));
 						spectraSize = spectra.size();
 					}
 					
@@ -323,7 +331,7 @@ public class Peppy {
 							}
 						}
 						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
-						U.p("spectra reduced by " + Properties.nfPercent.format(precentReduction));
+						U.p("spectra reduced by " + Properties.percentFormat.format(precentReduction));
 						spectraSize = spectra.size();
 					}
 				

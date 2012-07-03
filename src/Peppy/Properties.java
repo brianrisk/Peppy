@@ -140,7 +140,120 @@ public class Properties {
 	
 	
 	/* how we format our percents */
-	public static NumberFormat nfPercent = NumberFormat.getPercentInstance();
+	public static NumberFormat percentFormat = NumberFormat.getPercentInstance();
+	
+	public static void init() {
+		allProperties = new Hashtable<String, Property>();
+		
+		//how many processors does your computer have?  This number should be that number.
+		numberOfThreads = Runtime.getRuntime().availableProcessors();
+		
+		//Define our scoring method
+		scoringMethodName = "Peppy.Match_IMP";
+		matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+
+		//properties for spectral cleaning
+		minimumNumberOfPeaksForAValidSpectrum = 10;
+		
+		//when it comes to calculating theoretical peptide mass, we can use mono or average
+		useMonoMass = true;
+		
+		//Sequence digestion
+		numberOfMissedCleavages = 1;
+		peptideMassMinimum = 500.0;
+		peptideMassMaximum = 10000.0;
+		minPeptideLength = 5;
+		maxPeptideLength = 80;
+		useSequenceRegion = false;
+		sequenceRegionStart = 0;
+		sequenceRegionStop = 0;
+		
+		cleavageAcidList = new ArrayList<Character>();
+		
+		//Segmenting up job for memory management
+		digestionWindowSize = 10000000;
+		desiredPeptideDatabaseSize = 10000000;
+		maxNumberOfProteinsToLoadAtOnce = 50000;
+		
+		//Splicing?
+		useSpliceVariants = false;
+		
+		
+		//mass error tolerances in PPM
+		precursorTolerance = 100;
+		fragmentTolerance = 300;
+		
+		/* ion types */
+		rightIonDifference = 1.0072764668; //x, y, z ion
+		leftIonDifference = 1.0072764668;  //a, b, c ion
+		
+		minimumScore = 12;
+		
+		//This could be a directory or a file
+		sequenceDirectoryOrFile = new File("sequences");
+		
+		/* a list of peptide databases that will be iterated through in our search */
+		sequenceDirectoryOrFileList = new ArrayList<File>();
+		/* an ordered list of the database type (DNA, protein etc) for our peptide sources */
+		isSequenceFileDNAList = new ArrayList<Boolean>();
+		/* a list of spectra sources that will be iterated through in our search */
+		spectraDirectoryOrFileList = new ArrayList<File>();
+		
+		//This could be a directory or a file
+		spectraDirectoryOrFile = new File("spectra");
+		
+		//FASTA files can be either DNA or amino acid sequences
+		isSequenceFileDNA = true;
+		
+		//Is the sequence file supposed to be read only in the first frame?
+		useOnlyForwardsFrames = false;
+		
+		//where we store our reports
+		reportDirectory = new File("reports");
+		
+		//where we put our validation report
+		validationDirectory = new File("validation");
+		
+		//Report related
+		createHTMLReport = true;
+		
+		reportWebSuffix = ".html";
+		reportWebHeaderFile = new File("resources/reports/header.txt");
+		reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
+		reportWebFooterFile = new File("resources/reports/footer.txt");
+		reportWebTableHeader = new File("resources/reports/index-table-header.txt");
+		
+		UCSCdatabase = "clade=mammal&org=Human&db=hg19";
+		
+
+		/* for testing purposes */
+		thisIsATest = false;
+//		testSequence;
+		testSequenceIsProtein = true;
+//		testDirectory; 
+		
+		/* for custom jobs... */
+		isYale = false;
+		
+		/* for VCF Files*/
+//		VCFFileString;
+		
+		/* FDR false discovery rate */
+		numberOfSpectraToUseForFDR = 10000;
+		maximumFDR = 0.01;
+		
+		/* PTMs */
+		multipass = false;
+		numberOfRegionsToKeep = 1000;
+		searchModifications = false;
+		modificationLowerBound = -0.3;
+		modificationUpperBound = 100;
+		
+		/* custom PTMs*/
+		cysteineCarbamylation = false;
+		methionineOxidation = false;
+		iodoacetamideDerivative = true;
+	}
 	
 	
 	public static void loadProperties(String fileName) {
@@ -180,7 +293,7 @@ public class Properties {
 		}
 		
 		/* for our formatting */
-		nfPercent.setMaximumFractionDigits(2);
+		percentFormat.setMaximumFractionDigits(2);
 		
 		/* set default digestion */
 		if (cleavageAcidList.size() == 0) {

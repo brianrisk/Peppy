@@ -21,3 +21,6 @@ peptideMassMaximum 10000.0
 
 ##False Discovery Rates
 numberOfSpectraToUseForFDR -1
+
+
+searchModifications false
