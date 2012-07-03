@@ -14,7 +14,7 @@ import java.util.Collections;
  * SequenceDigestionTread objects
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * 
  * @author Brian Risk

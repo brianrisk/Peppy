@@ -17,7 +17,7 @@ package Peppy;
  * spectrum will have 
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

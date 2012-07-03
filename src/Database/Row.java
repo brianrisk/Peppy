@@ -15,7 +15,7 @@ import Peppy.U;
  * a row with any key value can potentially be added.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

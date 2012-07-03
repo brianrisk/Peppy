@@ -6,7 +6,7 @@ import java.util.Hashtable;
  * Allows us to hold the best matches for all samples
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

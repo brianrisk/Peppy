@@ -17,7 +17,7 @@ import Math.MassError;
  * Rework to add in additional features to use the jmzml library to upload .mzml files 
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk, David "Corvette" Thomas
  *

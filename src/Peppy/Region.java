@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * initially this is just for DNA, but it could be for proteins
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

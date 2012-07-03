@@ -8,7 +8,7 @@ import java.util.Hashtable;
  * derive from the same gene.  This will show how much overlap is between the two.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

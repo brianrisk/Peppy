@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * all for a given region or protein or so on and so on.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

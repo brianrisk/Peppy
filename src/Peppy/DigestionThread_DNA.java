@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * an array list of proteins which are then further digested.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

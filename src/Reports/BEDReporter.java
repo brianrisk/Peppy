@@ -23,7 +23,7 @@ import Peppy.U;
  * class does.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

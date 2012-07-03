@@ -22,7 +22,7 @@ import Reports.TextReporter;
  * 3) better multi-threading
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

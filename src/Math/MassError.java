@@ -5,7 +5,7 @@ package Math;
  * or in PPM (parts per million).  PPM is based on the mass being measured.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

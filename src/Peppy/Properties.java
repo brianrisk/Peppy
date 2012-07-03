@@ -18,7 +18,7 @@ import java.util.Hashtable;
  * If we were to import a property file, this is where the code would be.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

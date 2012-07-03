@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * spectrum that it may search for.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *

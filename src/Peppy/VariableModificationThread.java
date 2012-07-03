@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * produces a list of all potential modifications of that peptide
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * 
  * @author Brian Risk

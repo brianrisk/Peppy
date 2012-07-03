@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * sorted by mass, from least to greatest.
  * 
  * Copyright 2012, Brian Risk
- * Released under the Netscape Public License
+ * 
  * 
  * @author Brian Risk
  *
