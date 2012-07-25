@@ -602,6 +602,14 @@ public static void washuWHIM2 () {
 			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
 			if (reportFolder.getName().indexOf("varimod") != -1) continue;
 			
+			/* ignore personal proteome */
+			if (reportFolder.getName().indexOf("personal") != -1) continue;
+			
+			if (reportFolder.getName().indexOf("xeno") != -1) continue;
+			
+			/* ignore mouse */
+			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
+			
 			/* the text report file */
 			File textReportFile = new File (reportFolder, "report.txt");
 			
@@ -653,12 +661,15 @@ public static void washuWHIM2 () {
 		
 		ArrayList<File> reportFolders = new ArrayList<File>();
 		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
 		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis041/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
 		
 		
 		/* a list of our BestMatches */
@@ -1113,6 +1124,10 @@ public static void washuWHIM2 () {
 			}
 			matchWriter.println("<th>UCSC</th>");
 			matchWriter.println("<th>NIST</th>");
+			matchWriter.println("<th>unique</th>");
+			matchWriter.println("<th>locus</th>");
+			matchWriter.println("<th>strand</th>");
+			
 			matchWriter.println("</tr>");
 			
 			int counter = 0;
@@ -1120,43 +1135,57 @@ public static void washuWHIM2 () {
 				Match anyMatch;
 				anyMatch = holder.get();
 				if (anyMatch == null) continue;
-				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.DNA) {
+//				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.PROTEIN) continue;
+				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.DNA) continue;
 					
-					counter++;
-					
-					/* counter */
-					matchWriter.println("<td>" + counter + "</td>");
-					
-					/* acid sequence */
-					matchWriter.println("<td>" + anyMatch.getString("peptideSequence") + "</td>");
-										
-					/* links */
-					for (BestMatches bm: bestMatches) {
-						Match match = holder.get(bm.getSampleName());
-						if (match != null) {
-							File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
-							int score = (int) Math.round(match.getDouble("score"));
-							matchWriter.print("<td>");
-							matchWriter.print("<a href=\"" + spectrumPage.getAbsolutePath());
-							matchWriter.print("\">" + score + "</a>");
-							if (match.getBoolean("isModified")) matchWriter.print(" (M)");
-							matchWriter.print("</td>");
-						} else {
-							matchWriter.println("<td></td>");
-						}
+				counter++;
+				
+				/* counter */
+				matchWriter.println("<td>" + counter + "</td>");
+				
+				/* acid sequence */
+				matchWriter.println("<td>" + anyMatch.getString("peptideSequence") + "</td>");
+									
+				/* links */
+				for (BestMatches bm: bestMatches) {
+					Match match = holder.get(bm.getSampleName());
+					if (match != null) {
+						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
+						int score = (int) Math.round(match.getDouble("score"));
+						matchWriter.print("<td>");
+						matchWriter.print("<a href=\"" + spectrumPage.getAbsolutePath());
+						matchWriter.print("\">" + score + "</a>");
+						if (match.getBoolean("isModified")) matchWriter.print(" (M)");
+						matchWriter.print("</td>");
+					} else {
+						matchWriter.println("<td></td>");
 					}
-					
-					
-					/* sample UCSC link */
-					String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
-					matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
-					
-					/* NIST link */
-					matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + anyMatch.getString("peptideSequence") + "\">NIST</a></td>");
-					
-					matchWriter.println("</tr>");
-					
 				}
+				
+				
+				/* sample UCSC link */
+				String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
+				matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
+				
+				/* NIST link */
+				matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + anyMatch.getString("peptideSequence") + "\">NIST</a></td>");
+				
+				/* unique */
+				boolean unique = anyMatch.getBoolean("uniqueGlobally");
+				matchWriter.println("<td>" + unique + "</td>");
+				
+				if (unique) {
+					/* locus */
+					matchWriter.println("<td>" + anyMatch.getString("sequenceName") + " " + anyMatch.getInt("start") + "</td>");
+				} else {
+					matchWriter.println("<td><i>" + anyMatch.getString("sequenceName") + " " + anyMatch.getInt("start") + "</i></td>");
+				}
+				
+				/* strand */
+				matchWriter.println("<td>" + anyMatch.getString("strand") + "</td>");
+				
+				matchWriter.println("</tr>");
+				
 			}
 			
 			U.p("in common for this report: " + counter);
@@ -1374,8 +1403,6 @@ public static void washuWHIM2 () {
 				match.set("matchType", resultsCategory);
 				match.set("reportFile", file);
 				
-				if (match.getString("peptideSequence").equals("GQQALIASSGLTVEVDAPK")) U.p(match);
-				
 				if (match.getString("spectrumMD5") == null) U.p(file);
 				Match matchToSpectrum = oneMatchPerSpectrum.get(match.getString("spectrumMD5"));
 				
@@ -1421,9 +1448,11 @@ public static void washuWHIM2 () {
 			Match bestMatch = bestMatches.get(match.getString("spectrumMD5"));
 			if (bestMatch == null) {
 				bestMatches.put(match.getString("spectrumMD5"), match);
+				match.set("uniqueGlobally",true);
 			} else {
 				if (match.getScore() > bestMatch.getScore()) {
 					bestMatches.put(match.getString("spectrumMD5"), match);
+					match.set("uniqueGlobally",true);
 				} else {
 					if (match.getScore() == bestMatch.getScore()) {
 						if (match.get("amplificationScore") != null) {

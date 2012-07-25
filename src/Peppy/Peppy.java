@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import Math.MassError;
 import Reports.HTMLReporter;
 import Reports.TextReporter;
 
@@ -34,7 +35,9 @@ public class Peppy {
 	static long maxMemoryUsed = 0;
 	static String propertyFileString = null;
 	
-	private static final long expiration = 1328292741160L + (1000 * 60 * 60 * 24 * 30);
+	private static final long presentMiliseconds = 1342709158586L;
+	private static final long fourMonthsOfMiliseconds = 1000L * 60L * 60L * 24L * 30L * 4L;
+	private static final long expiration = presentMiliseconds + fourMonthsOfMiliseconds;
 	
 	
 	public static void main(String [] args) {
@@ -96,12 +99,11 @@ public class Peppy {
 			mainReportDir.mkdirs();
 			
 			/* this will maintain our list of score cutoffs */
-			PrintWriter fdrCutoffs = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
+			PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
 			
 			/* if there re multiple jobs, the latter varimod settings will persist.
 			 * we reset those to normal, modification-less parameters
 			 */
-			/* set our scoring method to vari-mod */
 			Properties.scoringMethodName = "Peppy.Match_IMP";
 			Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			Properties.searchModifications = false;
@@ -109,8 +111,10 @@ public class Peppy {
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
 				ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
-				int spectraSize = spectra.size();
-				U.p("loaded " + spectraSize + " spectra.");
+				int originalSpectraSize = spectra.size();
+				U.p("loaded " + originalSpectraSize + " spectra.");
+				metricsReport.println("spectral count: " + originalSpectraSize);
+				metricsReport.println();
 				
 				/* we are going to combine all returned match sets here */
 				ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
@@ -119,7 +123,7 @@ public class Peppy {
 				for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
 					
 					/* if we are out of spectra (not likely), get out of this loop */
-					if (spectraSize == 0) break;
+					if (spectra.size() == 0) break;
 					
 					/* set up our sequence data.
 					 * Setting this property will also affect the FDR calculation */
@@ -131,7 +135,7 @@ public class Peppy {
 					FDR fdr = new FDR(spectra);
 					
 					/* perform precursor analysis if this is the first sequence */
-					if (sequenceIndex == 0) {
+					if (sequenceIndex == 0 && Properties.smartTolerances) {
 						
 						/*
 						 * Determine ideal precursor tolerance.  We're asking, "what is the
@@ -145,11 +149,17 @@ public class Peppy {
 						if (potentialPrecursorTolerance >= 0) {
 							Properties.precursorTolerance = potentialPrecursorTolerance;
 							U.p ("new precursor tolerance is: " + potentialPrecursorTolerance);
-							fdrCutoffs.println("calculated precursor is " + potentialPrecursorTolerance);
-							fdrCutoffs.println();
+							metricsReport.println("calculated precursor is " + potentialPrecursorTolerance);
+							metricsReport.println();
 							U.p("performing second FDR with new mass error tolerances...");
 							fdr = new FDR(spectra);
 						}
+						
+						/*
+						 * Now we have to load in the spectra again because new fragment tolerances mean
+						 * that the spectra are going to be cleaned differently
+						 */
+//						spectra = SpectrumLoader.loadSpectra();
 					}
 					
 					/* Calculate score threshold with FDR. 
@@ -206,14 +216,7 @@ public class Peppy {
 					File reportDir = new File (mainReportDir, reportDirName);
 					reportDir.mkdirs();
 					
-					/* generate reports */
-					fdrCutoffs.println(reportDirName);
-					fdrCutoffs.println("score cutoff: " + Properties.minimumScore);
-					fdrCutoffs.println("spectra identified: " + spectrumIDs.size());
-					fdrCutoffs.println();
-					fdrCutoffs.flush();
-					fdr.saveReport(reportDir);
-					createReports(matches, reportDir);
+					
 						
 					/* remove all spectra that appear in our matches */
 					if (Properties.maximumFDR > 0) {
@@ -225,10 +228,18 @@ public class Peppy {
 								spectrumIndex--;
 							}
 						}
-						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
-						U.p("spectra reduced by " + Properties.percentFormat.format(precentReduction));
-						spectraSize = spectra.size();
 					}
+					
+					/* generate reports */
+					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
+					U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
+					metricsReport.println(reportDirName);
+					metricsReport.println("score cutoff: " + Properties.minimumScore);
+					metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
+					metricsReport.println();
+					metricsReport.flush();
+					fdr.saveReport(reportDir);
+					createReports(matches, reportDir);
 					
 				}
 				
@@ -312,11 +323,13 @@ public class Peppy {
 					reportDir.mkdirs();
 					
 					/* generate reports */
-					fdrCutoffs.println(reportDirName);
-					fdrCutoffs.println("score cutoff: " + Properties.minimumScore);
-					fdrCutoffs.println("spectra identified: " + spectrumIDs.size());
-					fdrCutoffs.println();
-					fdrCutoffs.flush();
+					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
+					U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
+					metricsReport.println(reportDirName);
+					metricsReport.println("score cutoff: " + Properties.minimumScore);
+					metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
+					metricsReport.println();
+					metricsReport.flush();
 					fdr.saveReport(reportDir);
 					createReports(matches, reportDir);
 						
@@ -330,9 +343,6 @@ public class Peppy {
 								spectrumIndex--;
 							}
 						}
-						double precentReduction =  (1.0 - ((double)spectra.size() / spectraSize));
-						U.p("spectra reduced by " + Properties.percentFormat.format(precentReduction));
-						spectraSize = spectra.size();
 					}
 				
 				} /* end modifications if */
@@ -340,8 +350,8 @@ public class Peppy {
 				
 			} /* end spectrum loop */
 			
-			fdrCutoffs.flush();
-			fdrCutoffs.close();
+			metricsReport.flush();
+			metricsReport.close();
 		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -683,7 +693,18 @@ public class Peppy {
 			
 			/* add only the target matches */
 			for (Match match: spectrumMatches.getMatches()) {
+				
+				/* skip decoy matches */
 				if (match.getPeptide().isDecoy()) continue;
+				
+				/* skip matches that are outside designate PPM */
+				if (Properties.searchModifications == false) {
+					if (Properties.precursorTolerance < Math.abs(MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass()))) {
+						continue;
+					}	
+				}
+					
+					
 				out.add(match);
 			}
 			
@@ -796,17 +817,21 @@ public class Peppy {
 	}
 	
 	protected static void printGreeting() {
-		U.p("Welcome to Peppy");
+		U.p("Welcome to Peppy(TM)");
 		U.p("Protein identification / proteogenomic software.");
-		U.p("Copyright 2010 by Brian Risk");
+		U.p("Copyright 2012 by Brian Risk");
 		U.p();
+		
+		if (System.currentTimeMillis() > expiration) {
+			U.p("This version of Peppy is out of date.");
+			System.exit(0);
+		}
 		
 		/* print some system statistics */
 		U.p("number of processors available: " + Runtime.getRuntime().availableProcessors());
 		U.p("max available memory: " + (double) memoryUsage.getMax() / (1024 * 1024 * 1024) + " gigabytes");
 		U.p();
 		
-//		U.p("Peppy Copyright (C) 2011 Brian Risk");
 //		U.p("This program comes with ABSOLUTELY NO WARRANTY;");
 
 	}

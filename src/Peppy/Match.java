@@ -332,6 +332,102 @@ public abstract class Match implements Comparable<Match>{
 		
 		return bIonMatchesWithHighestIntensity;
 	}
+	
+	/**
+	 * the method name is self explanatory, but why do this?  This metric
+	 * could give us insight into what level of fragment error to expect.
+	 * @return
+	 */
+	public double findMassErrorOfMostIntenseMatchedPeak() {
+		
+		byte [] acidSequence = peptide.getAcidSequence();
+		
+		//we want -1 because most of these spectra will have a match with 
+		//the last theoretical peak
+		int peptideLengthMinusOne = acidSequence.length - 1;
+		if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
+		
+		//will hold our peak boundaries
+		double [] theoreticalPeaksLeft = new double[peptideLengthMinusOne];
+		double [] theoreticalPeaksRight = new double[peptideLengthMinusOne];
+		double [] theoreticalPeaksExact = new double[peptideLengthMinusOne];
+		
+		/* this is the value of most intense matching peak we have seen so far */
+		double greatestIntensity = 0;
+		double error = 0;
+		
+		
+		//find y ions
+		double theoreticalPeakMass, peakMass, peakIntensity;
+		int peakIndex, seqIndex;
+	
+		
+		/* y-ion  */
+		//computing the left and right boundaries for the ranges where our peaks should land
+		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+		for (int i = 0; i < peptideLengthMinusOne; i++) {
+			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksExact[i] = theoreticalPeakMass;
+		}
+		
+		peakIndex = matchesSpectrum.getSpectrum().getPeakCount() - 1;
+		seqIndex = 0;
+		while (peakIndex >= 0) {
+			peakMass = matchesSpectrum.getSpectrum().getPeak(peakIndex).getMass();
+			matchesSpectrum.getSpectrum().getPeak(peakIndex).used = false;
+			while (peakMass < theoreticalPeaksLeft[seqIndex]) {
+				seqIndex++;
+				if (seqIndex == peptideLengthMinusOne) break;
+			}
+			if (seqIndex == peptideLengthMinusOne) break;
+			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+				peakIntensity = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
+				if (greatestIntensity < peakIntensity) {
+					greatestIntensity = peakIntensity;
+					error = peakMass - theoreticalPeaksExact[seqIndex];
+				}
+			}
+			
+			peakIndex--;
+		}
+		
+		
+		/* b-ion */
+		theoreticalPeakMass = Properties.leftIonDifference;
+		for (int i = 0; i < peptideLengthMinusOne; i++) {
+			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			theoreticalPeaksExact[i] = theoreticalPeakMass;
+		}
+		
+		peakIndex = 0;
+		seqIndex = 0;
+		while (peakIndex < matchesSpectrum.getSpectrum().getPeakCount()) {
+			if (!matchesSpectrum.getSpectrum().getPeak(peakIndex).used) {
+				peakMass = matchesSpectrum.getSpectrum().getPeak(peakIndex).getMass();
+				while (peakMass > theoreticalPeaksRight[seqIndex]) {
+					seqIndex++;
+					if (seqIndex == peptideLengthMinusOne) break;
+				}
+				if (seqIndex == peptideLengthMinusOne) break;
+				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+					peakIntensity = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
+					if (greatestIntensity < peakIntensity) {
+						greatestIntensity = peakIntensity;
+						error = peakMass - theoreticalPeaksExact[seqIndex];
+					}
+				}
+			}
+			peakIndex++;
+		}
+		
+		return error;
+	}
+	
+	
 
 	public int compareTo(Match match) {
 			if (sortParameter == SORT_BY_SCORE) {
@@ -473,6 +569,8 @@ public abstract class Match implements Comparable<Match>{
 		sb.append(getSpectrum().getMass());
 		sb.append('\t');
 		sb.append(getPeptide().getAcidSequenceString());
+		sb.append('\t');
+		sb.append(peptide.getPreviousAminoAcid());
 		sb.append('\t');
 		sb.append(getPeptide().getStartIndex());
 		sb.append('\t');

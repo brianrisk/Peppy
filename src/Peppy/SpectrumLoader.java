@@ -557,6 +557,9 @@ public class SpectrumLoader {
 		//before we mess with the peak data, let's make sure we have the MD5
 		s.setMD5(s.getMD5());
 	
+		if (Properties.maximumNumberOfPeaksforASpectrum > 0) {
+			s.setPeaks(keepMostIntensePeaks(s));
+		}
 
 		s.setPeaks(keepStrongestPeakInRegions(s));
 		sortPeaksByMass(s);
@@ -593,6 +596,17 @@ public class SpectrumLoader {
 		
 		return peaks;
 	}//keepStrongestPeakInRegions
+	
+	
+	private static ArrayList<Peak> keepMostIntensePeaks(Spectrum s) {
+		ArrayList<Peak> peaks = s.getPeaks();
+		if (peaks.size() <= Properties.maximumNumberOfPeaksforASpectrum) return peaks;
+		sortPeaksByIntensity(s);
+		while (peaks.size() > Properties.maximumNumberOfPeaksforASpectrum) {
+			peaks.remove(0);
+		}
+		return peaks;
+	}
 	
 	
 /*Sorting methods*/

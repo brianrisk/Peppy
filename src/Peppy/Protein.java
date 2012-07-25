@@ -72,7 +72,7 @@ public class Protein {
 		int ORFSize = 0;
 		
 		char aminoAcid = acidString.charAt(0);
-		char previousAminoAcid = aminoAcid;
+		char previousAminoAcid = '.';
 		if (aminoAcid == 'M') {
 			inORF = true;
 			ORFSize = acidString.length();
@@ -123,7 +123,7 @@ public class Protein {
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
 		
 		//start the first amino acid as peptide
-		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF, ORFSize));
+		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF, ORFSize, previousAminoAcid));
 		
 		/* special cases happen at the end of the sequence. 
 		 * Don't worry, the final amino acid will eventually be added!
@@ -154,7 +154,7 @@ public class Protein {
 					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
 					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
 				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
 				}
 
 				
@@ -163,11 +163,11 @@ public class Protein {
 			} else {
 				// Create new peptides after a break
 				if (isBreak(previousAminoAcid)) {		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
 				} else {
 					/* this is for when, in proteins, sometimes the first M is dropped */
 					if (i == 1 && isStart(previousAminoAcid)) {
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize));
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
 					}
 				}
 			}
@@ -333,7 +333,8 @@ public class Protein {
 					this,
 					isSpliced,
 					puc.isInORF(),
-					puc.getORFSize()
+					puc.getORFSize(),
+					puc.getPreviousAminoAcid()
 					);
 			
 			//add peptide if it meets certain criteria

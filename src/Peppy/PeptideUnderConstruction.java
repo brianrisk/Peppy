@@ -18,12 +18,14 @@ public class PeptideUnderConstruction {
 	private StringBuffer buffer = new StringBuffer();
 	private boolean inORF;
 	private int ORFSize;
+	private char previousAminoAcid;
 	
-	public PeptideUnderConstruction(int startIndex, char aminoAcid, boolean inORF, int ORFSize) {
+	public PeptideUnderConstruction(int startIndex, char aminoAcid, boolean inORF, int ORFSize, char previousAminoAcid) {
 		this.startIndex = startIndex;
 		addAminoAcid(aminoAcid);
 		this.inORF = inORF;
 		this.ORFSize = ORFSize;
+		this.previousAminoAcid = previousAminoAcid;
 	}
 	
 	public PeptideUnderConstruction(int sequenceIndex) {
@@ -53,6 +55,10 @@ public class PeptideUnderConstruction {
 	
 	public int getORFSize() {
 		return ORFSize;
+	}
+	
+	public char getPreviousAminoAcid() {
+		return previousAminoAcid;
 	}
 
 }

@@ -34,8 +34,9 @@ public class Properties {
 	public static String scoringMethodName = "Peppy.Match_IMP";
 	public static MatchConstructor matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 
-	//properties for spectral cleaning
-	public static int minimumNumberOfPeaksForAValidSpectrum = 10;
+	/* properties for spectral cleaning */
+	public static int minimumNumberOfPeaksForAValidSpectrum = 2;
+	public static int maximumNumberOfPeaksforASpectrum = -1; /* set to -1 if not to be used */
 	
 	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
@@ -137,6 +138,8 @@ public class Properties {
 	public static boolean cysteineCarbamylation = false;
 	public static boolean methionineOxidation = false;
 	public static boolean iodoacetamideDerivative = true;
+	
+	public static boolean smartTolerances = true;
 	
 	
 	/* how we format our percents */
@@ -372,6 +375,9 @@ public class Properties {
 		//spectrum cleaning		
 		if (propertyName.equals("minimumNumberOfPeaksForAValidSpectrum")) 
 			minimumNumberOfPeaksForAValidSpectrum =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maximumNumberOfPeaksforASpectrum")) 
+			maximumNumberOfPeaksforASpectrum =Integer.valueOf(propertyValue);
+		
 		
 		
 	
@@ -473,6 +479,11 @@ public class Properties {
 		if (propertyName.equals("iodoacetamideDerivative")) 
 			iodoacetamideDerivative = Boolean.valueOf(propertyValue);
 		
+		/* smart tolerances */
+		if (propertyName.equals("smartTolerances")) 
+			smartTolerances = Boolean.valueOf(propertyValue);
+		
+		
 	}
 
 
@@ -503,7 +514,9 @@ public class Properties {
 				pw.println("cleavageAcid " + acid);
 			}			
 			pw.println();
+			pw.println("##Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
+			pw.println("maximumNumberOfPeaksforASpectrum " + Properties.maximumNumberOfPeaksforASpectrum);
 			pw.println();
 			pw.println("##Scoring Method ");
 			pw.println("scoringMethodName " + Properties.scoringMethodName);
@@ -565,6 +578,8 @@ public class Properties {
 
 			
 			pw.println();
+			pw.println("smartTolerances " + smartTolerances);
+			
 			
 			
 	

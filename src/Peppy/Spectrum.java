@@ -33,7 +33,6 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private File file;
 	private String title = "";
 	//For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5  
-	//One of the two people who broke MD5 collision resistance (Tao Xie) taught me in college!  I dropped his class because I thought he was incompetent ;p
 	private String MD5 = null;
 	private boolean isValid = true;
 	

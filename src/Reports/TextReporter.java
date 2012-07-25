@@ -51,7 +51,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
-			pw.println("format version 17");
+			pw.println("format version 18");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -81,6 +81,8 @@ public class TextReporter {
 			sb.append("PrecursorNeutralMass");
 			sb.append('\t');
 			sb.append("peptideSequence");
+			sb.append('\t');
+			sb.append("previousAminoAcid");
 			sb.append('\t');
 			sb.append("start");
 			sb.append('\t');

@@ -143,6 +143,7 @@ public class U {
 	public static void p(Object o) {System.out.println(o);}
 	public static void p(double o) {System.out.println(o);}
 	public static void p(int o) {System.out.println(o);}
+	public static void p(long o) {System.out.println(o);}
 	public static void p(char o) {System.out.println(o);}
 	public static void p() {System.out.println();}
 	

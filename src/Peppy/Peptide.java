@@ -32,6 +32,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	private int lengthMinusOne;
 	private boolean inORF;
 	private int ORFSize;
+	private char previousAminoAcid;
 	
 	/* for tracking FDR */
 	private boolean isDecoy = false;
@@ -45,14 +46,14 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	 * @param sequence
 	 */
 	public Peptide(String sequence) {
-		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false, -1);
+		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false, -1, '.');
 	}
 	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
-		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false, -1);
+		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false, -1, '.');
 	}
 	
-	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced, boolean inORF, int ORFSize) {
+	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, Protein protein, boolean isSpliced, boolean inORF, int ORFSize, char previousAminoAcid) {
 		this.acidSequence = AminoAcids.getByteArrayForString(acidSequence);
 		this.mass = calculateMass();
 		this.startIndex = startIndex;
@@ -66,6 +67,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this.lengthMinusOne = this.acidSequence.length - 1;
 		this.inORF = inORF;
 		this.ORFSize = ORFSize;
+		this.previousAminoAcid = previousAminoAcid;
 	}
 
 
@@ -224,6 +226,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	
 	public int getORFSize() {
 		return ORFSize;
+	}
+	
+	public char getPreviousAminoAcid() {
+		return previousAminoAcid;
 	}
 
 	/**
