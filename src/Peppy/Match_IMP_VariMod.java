@@ -83,9 +83,10 @@ public class Match_IMP_VariMod extends Match {
 						bestIMP = tempIMP;
 						modificationIndex = i;
 						modificationLocationCertain = true;
-					}
-					if (tempIMP == bestIMP) {
-						modificationLocationCertain = false;
+					} else {
+						if (tempIMP == bestIMP) {
+							modificationLocationCertain = false;
+						}
 					}
 				}
 				if (impValue2 < bestIMP) {
