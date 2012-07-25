@@ -94,7 +94,13 @@ public class DigestionThread_DNA implements Runnable {
 				buildingProtein.append(aminoAcid);
 				if (aminoAcid == '.') {
 					if (buildingProtein.length() > 3) {
-						if (reverseDatabase) buildingProtein.reverse();
+						if (reverseDatabase) {
+							/* remove the '.' that was just added above */
+							buildingProtein.deleteCharAt(buildingProtein.length() - 1);
+							
+							/* reverse the string! */
+							buildingProtein.reverse();
+						}
 						proteins.add(new Protein(name, proteinStart, buildingProtein.toString(), false, -1, -1, isForwardsStrand, sequence_DNA, reverseDatabase));
 					}
 					buildingProtein = new StringBuffer();
