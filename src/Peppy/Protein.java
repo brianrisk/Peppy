@@ -129,6 +129,9 @@ public class Protein {
 		 * Don't worry, the final amino acid will eventually be added!
 		 */
 		int finalIndex = acidString.length() - 1;
+		
+		/* set our previous amino acid */
+		previousAminoAcid = acidString.charAt(0);
 	
 		//advance along each amino acid
 		//start 1 out so we have a previous amino acid
