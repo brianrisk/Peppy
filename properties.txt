@@ -5,7 +5,7 @@ cleavageAcid R
 numberOfSpectraPerSegment 4000000
 
 ##error thresholds in PPM
-precursorTolerance 5
+precursorTolerance 25
 fragmentTolerance 25
 
 maximumFDR 0.01
@@ -18,9 +18,9 @@ createHTMLReport false
 peptideMassMinimum 400.0
 peptideMassMaximum 10000.0
 
-numberOfMissedCleavages 2
+numberOfMissedCleavages 1
 
-smartTolerances false
+smartTolerances true
 
 ##False Discovery Rates
 numberOfSpectraToUseForFDR -1

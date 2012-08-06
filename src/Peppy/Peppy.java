@@ -98,8 +98,7 @@ public class Peppy {
 			File mainReportDir = new File(Properties.reportDirectory, reportDirString);
 			mainReportDir.mkdirs();
 			
-			/* this will maintain our list of score cutoffs */
-			PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
+			
 			
 			/* if there re multiple jobs, the latter varimod settings will persist.
 			 * we reset those to normal, modification-less parameters
@@ -113,6 +112,9 @@ public class Peppy {
 				ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
 				int originalSpectraSize = spectra.size();
 				U.p("loaded " + originalSpectraSize + " spectra.");
+				
+				/* this will maintain our list of score cutoffs */
+				PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
 				metricsReport.println("spectral count: " + originalSpectraSize);
 				metricsReport.println();
 				
@@ -347,11 +349,18 @@ public class Peppy {
 				
 				} /* end modifications if */
 				
+				/* final report on how many spectra were identified */
+				double totalProportionIdentified =  ((double)spectra.size() / originalSpectraSize);
+				metricsReport.println();
+				metricsReport.println("total spectra identified: " + spectra.size() + " (" +  Properties.percentFormat.format(totalProportionIdentified) + ")");
+				
+				metricsReport.flush();
+				metricsReport.close();
+				
 				
 			} /* end spectrum loop */
 			
-			metricsReport.flush();
-			metricsReport.close();
+			
 		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -700,7 +709,7 @@ public class Peppy {
 				/* skip matches that are outside designate PPM */
 				if (Properties.searchModifications == false) {
 					if (Properties.precursorTolerance < Math.abs(MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass()))) {
-						continue;
+						//continue;
 					}	
 				}
 					
