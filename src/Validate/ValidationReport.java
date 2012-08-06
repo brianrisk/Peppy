@@ -1,4 +1,4 @@
-	package Validate;
+package Validate;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
