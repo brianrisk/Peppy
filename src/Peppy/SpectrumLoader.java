@@ -609,8 +609,93 @@ public class SpectrumLoader {
 	}
 	
 	
-/*Sorting methods*/
+	/**
+	 * cleanPeaks ensures a spectrum has a MD5, and then keeps the strongest number of peaks in each bucket, and sort the peaks by mass.
+	 */
+	public static void cleanPeaksBucketCleaning(Spectrum s, int bucketSize, int peaksPerBucket) {
+		
+		//before we mess with the peak data, let's make sure we have the MD5
+		s.setMD5(s.getMD5());
+
+		s.setPeaks(getTopPeaksPerBucket(s, bucketSize, peaksPerBucket));
+		
+		sortPeaksByMass(s);
+		
+	}//cleanPeaks
 	
+	/**
+	 * Get top peaks per bucket attempts to get the specified number of peaks in each bucket within a spectrum.
+	 * @param s Spectrum to clean
+	 * @param bucketSize Size of buckets to create within the spectrum
+	 * @param peaksPerBucket Number of peaks to get per bucket
+	 * @return Freshly cleaned peaks from this spectrum.
+	 */
+	private static ArrayList<Peak> getTopPeaksPerBucket(Spectrum s, int bucketSize, int peaksPerBucket){
+		ArrayList<Peak> topPeaks = new ArrayList<Peak>();
+		
+		
+		int bucketStart = 0;
+		int bucketStop = bucketStart + bucketSize;
+		
+		//Ensure the top scoring ION is always used for the loop stop variable
+		double topScore = s.getMass();
+
+		
+		while(bucketStart < topScore){
+			topPeaks.addAll(getTopPeaks(peaksPerBucket, bucketStart, bucketStop, s.getPeaks()));
+			U.p("Top peaks size: " + topPeaks.size());
+			bucketStart += bucketSize;
+			bucketStop += bucketSize;
+		}//while
+		
+		
+		return topPeaks;
+	}//getTopPeaksPerBucket
+	
+	/**
+	 * getTopPeaks gets the defined # of top peaks based on intensity in a specified range, and returns the masses of these top peaks.
+	 * @param numTopPeaksToGet # of peaks to get in the specified range
+	 * @param start inclusive lower bound of mass to search.
+	 * @param stop exclusive upper bound of mass to search.
+	 * @param peaks List of real peaks from a spectra to search.
+	 * @return ArrayList of Double objects containing the masses of the # of top peaks specified by the input.
+	 */
+	private static ArrayList<Peak> getTopPeaks(int numTopPeaksToGet, int start, int stop, ArrayList<Peak> peaks){
+		ArrayList<Peak> allPeaksList = new ArrayList<Peak>();
+		
+		for(Peak p: peaks){
+			p.setCompareByIntensity();
+			if(p.getMass() >= start && p.getMass() < stop){
+				allPeaksList.add(p);
+			}//if
+		}//for
+	
+		
+		Collections.sort(allPeaksList);
+		//Sorted by intensity 
+		
+		ArrayList<Peak> topPeaks = new ArrayList<Peak>();
+		
+		
+		//Since there are not enough peaks to cull, just return all of them
+		if(allPeaksList.size() < numTopPeaksToGet){
+			for(Peak p: allPeaksList){
+				topPeaks.add(p);
+			}//for
+			return topPeaks;
+		}//if
+		
+		//Select just the desired number of top peaks;
+		for(int i = allPeaksList.size() - numTopPeaksToGet; i < allPeaksList.size(); i++){
+			topPeaks.add(allPeaksList.get(i));
+		}//for
+		
+		return topPeaks;
+	}//getTopPeaks
+	
+	
+	
+	/*Sorting methods*/
 	public static void sortPeaksByIntensity(Spectrum s) {
 		ArrayList<Peak> peaks = s.getPeaks();
 		Peak p;
