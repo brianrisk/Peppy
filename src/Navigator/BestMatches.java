@@ -15,8 +15,13 @@ import java.util.Hashtable;
 
 import Database.Column;
 import Database.Table;
+import Peppy.Match_Blank;
+import Peppy.Peptide;
 import Peppy.Properties;
+import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
 import Peppy.U;
+import Reports.HTMLPageSpectrum;
 import Reports.UCSC;
 
 /**
@@ -50,7 +55,9 @@ public class BestMatches {
 //		mayo();
 //		ucla();
 //		yale();
-		washUPaperOne();
+//		washUPaperOne();
+//		gm12878();
+		washUPaperOneRegionAnalysis();
 //		yaleEnzymeless();
 		U.p("done");
 	}
@@ -599,16 +606,7 @@ public static void washuWHIM2 () {
 		for (File reportFolder: reportFolders) {
 			if (!reportFolder.isDirectory()) continue;
 			
-			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
-			if (reportFolder.getName().indexOf("varimod") != -1) continue;
 			
-			/* ignore personal proteome */
-			if (reportFolder.getName().indexOf("personal") != -1) continue;
-			
-			if (reportFolder.getName().indexOf("xeno") != -1) continue;
-			
-			/* ignore mouse */
-			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
 			
 			/* the text report file */
 			File textReportFile = new File (reportFolder, "report.txt");
@@ -643,6 +641,25 @@ public static void washuWHIM2 () {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			if (!(reportFolder.getName().indexOf("novel") != -1)) continue;
+			
+			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
+			if (reportFolder.getName().indexOf("varimod") != -1) continue;
+			
+			/* ignore personal proteome */
+			if (reportFolder.getName().indexOf("personal") != -1) continue;
+			
+			/* ignore personal subject */
+//			if (reportFolder.getName().indexOf("subject") != -1) continue;
+			
+			/* ignore xenograft */
+			if (reportFolder.getName().indexOf("xeno") != -1) continue;
+			
+			/* ignore mouse */
+			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
+			
+//			if (resultsType == ResultsCategory.PROTEIN) continue;
 			
 			/* add these results to the bestMatches */
 			ResultsCategory results = new ResultsCategory(databaseName, resultsType);
@@ -681,6 +698,49 @@ public static void washuWHIM2 () {
 		
 		createUnifiedSamplesReport(bestMatches, "peptideSequence");
 	}
+	
+	public static void washUPaperOneRegionAnalysis() {
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-WHIM2 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-WHIM16 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis043 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis041 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis043 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis041 CPTAC new proteins"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033 CPTAC new proteins"));
+			
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		for (File folder: reportFolders) {
+			BestMatches matches = loadFromResultsFolder(folder);
+			bestMatches.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+	}
+	
+public static void gm12878() {
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		for (File folder: reportFolders) {
+			BestMatches matches = loadFromResultsFolder(folder);
+			bestMatches.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+	}
+	
+	
 
 	
 
@@ -1136,7 +1196,7 @@ public static void washuWHIM2 () {
 				anyMatch = holder.get();
 				if (anyMatch == null) continue;
 //				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.PROTEIN) continue;
-				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.DNA) continue;
+//				if (((ResultsCategory) anyMatch.get("matchType")).databaseType == ResultsCategory.DNA) continue;
 					
 				counter++;
 				
@@ -1150,13 +1210,30 @@ public static void washuWHIM2 () {
 				for (BestMatches bm: bestMatches) {
 					Match match = holder.get(bm.getSampleName());
 					if (match != null) {
-						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
+//						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
 						int score = (int) Math.round(match.getDouble("score"));
+						
+						/* make the spectrum page */
+						File spectrumFile = match.getFile("FilePath");
+						Spectrum spectrum = SpectrumLoader.loadSpectra(spectrumFile).get(0);
+						Peptide peptide = new Peptide(match.getString("peptideSequence"));
+						Match_Blank matchForReport = new Match_Blank(spectrum, peptide, score);
+						ArrayList<Peppy.Match> matchesForReport = new ArrayList<Peppy.Match>();
+						matchesForReport.add(matchForReport);
+						
+						File spectrumReportFolder = new File("spectrumReportFolder");
+						spectrumReportFolder.mkdir();
+						File spectrumReportFile = new File(spectrumReportFolder, match.getString("spectrumMD5") + ".html");
+						HTMLPageSpectrum spectrumReport = new HTMLPageSpectrum(spectrum, matchesForReport, spectrumReportFile);
+						spectrumReport.makePage();
+						
+						
 						matchWriter.print("<td>");
-						matchWriter.print("<a href=\"" + spectrumPage.getAbsolutePath());
+						matchWriter.print("<a href=\"spectrumReportFolder/" + spectrumReportFile.getName());
 						matchWriter.print("\">" + score + "</a>");
 						if (match.getBoolean("isModified")) matchWriter.print(" (M)");
 						matchWriter.print("</td>");
+						
 					} else {
 						matchWriter.println("<td></td>");
 					}
