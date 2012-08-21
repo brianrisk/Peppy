@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 
 import Graphs.PRCurve;
 import Peppy.Match;
@@ -35,6 +36,8 @@ public class TestSet {
 	private int trueTally = 0;
 	private int trueTallyAtFivePercentError = -1;
 	private double percentAtFivePercentError = -1;
+	private int trueTallyAtOnePercentError = -1;
+	private double percentAtOnePercentError = -1;
 	
 	//PR curve
 	private double areaUnderPRCurve = 0;
@@ -115,6 +118,34 @@ public class TestSet {
 	 * This should be called only after our set of matches has been found
 	 */
 	public void calculateStastics() {		
+		
+		/* remove verboten spectra */
+		ArrayList<String> verbotenSpectra = new ArrayList<String>();
+		verbotenSpectra.add("USP_std_run1_100504135936.7436.7436.2.dta");
+		verbotenSpectra.add("USP_std_run1_100504135936.5161.5161.2.dta");
+		verbotenSpectra.add("USP_std_run1_100504135936.4294.4294.2.dta");
+		verbotenSpectra.add("USP_std_run1_100504135936.4199.4199.2.dta");
+		verbotenSpectra.add("USP_std_run1_100504135936.5085.5085.2.dta");
+		verbotenSpectra.add("USP_std_run1_100504135936.4129.4129.2.dta");
+		for (int i = 0; i < positiveMatches.size(); i++) {
+			Match match = positiveMatches.get(i);
+			for (String name: verbotenSpectra) {
+				if (name.equals(match.getSpectrum().getFile().getName())) {
+					positiveMatches.remove(i);
+					i--;
+				}
+			}
+		}
+		for (int i = 0; i < spectra.size(); i++) {
+			Spectrum spectrum = spectra.get(i);
+			for (String name: verbotenSpectra) {
+				if (name.equals(spectrum.getFile().getName())) {
+					spectra.remove(i);
+					i--;
+				}
+			}
+		}
+		
 		/* finding how much time per spectrum */
 		milisecondsPerSpectrum = (double) timeElapsed / spectra.size();
 
@@ -132,6 +163,45 @@ public class TestSet {
 		
 		/* sort the tested matches */
 		Collections.sort(testedMatches);
+		
+		
+		
+		
+		
+		
+		
+
+		/*account for the fact that these results might have the wrong spectrum ID due to
+		 * Mascot having sorted the spectra by mass
+		 */
+		if (Properties.scoringMethodName.equals("Mascot")){
+			
+			/* hash of true peptides */
+			Hashtable<String, Peptide> truePeptides = new Hashtable<String, Peptide>();
+			for (MatchContainer mc: testedMatches) {
+				String truePeptide = mc.getCorrectAcidSequence();
+				truePeptides.put(truePeptide, mc.getTrueMatch().getPeptide());
+			}
+			
+			/* making a hash of the best matches */
+			Hashtable<Integer, MatchContainer> bestMascotMatches = new Hashtable<Integer, MatchContainer>(); 
+			for (MatchContainer mc: testedMatches) {
+				MatchContainer best = bestMascotMatches.get(mc.getMatch().getSpectrum().getId());
+				if (best == null) {
+					bestMascotMatches.put(mc.getMatch().getSpectrum().getId(), mc);
+				} else {
+					if (truePeptides.get(mc.getMatch().getPeptide().getAcidSequenceString()) != null) {
+						bestMascotMatches.put(mc.getMatch().getSpectrum().getId(), mc);
+						
+						/* need to set the peptide, because though it may have found a correct peptide, it might not be the right peptide for this particular spectrum */
+						mc.getMatch().setPeptide(mc.getTrueMatch().getPeptide());
+						mc.validate();
+					}
+				}
+			}
+			testedMatches = new ArrayList<MatchContainer>(bestMascotMatches.values());
+		}
+		
 		
 		
 		/* reduce the tested matches to one per spectrum, keeping the one that is correct if there is a correct one 
@@ -171,6 +241,8 @@ public class TestSet {
 		}
 		
 		
+		
+		
 		/* again sort the tested matches */
 		Collections.sort(testedMatches);
 	
@@ -183,6 +255,10 @@ public class TestSet {
 				if (match.getMatch().getIMP() > highestIMP) highestIMP = match.getMatch().getIMP();
 			} else {
 				falseTally++;
+			}
+			if ((double) falseTally / (trueTally + falseTally) <= 0.01) {
+				trueTallyAtOnePercentError =  trueTally;
+				percentAtOnePercentError = (double) trueTallyAtOnePercentError / spectra.size();
 			}
 			if ((double) falseTally / (trueTally + falseTally) <= 0.05) {
 				trueTallyAtFivePercentError =  trueTally;
@@ -364,6 +440,14 @@ public class TestSet {
 
 	public int getTrueTally() {
 		return trueTally;
+	}
+	
+	public int getTrueTallyAtOnePercentError() {
+		return trueTallyAtOnePercentError;
+	}
+
+	public double getPercentAtOnePercentError() {
+		return percentAtOnePercentError;
 	}
 
 

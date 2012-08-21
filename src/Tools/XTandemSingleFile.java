@@ -38,22 +38,22 @@ public class XTandemSingleFile {
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		
 		testSets.add(getTestSet(
-			"/Users/risk2/PeppyData/reports - saved/X!Tandem John/output_USP-top-10.2012_05_09_14_46_03.t.xml",
-			"/Users/risk2/PeppyData/tests/",
-			"USP top 10"
-		));
-		
-		testSets.add(getTestSet(
-			"/Users/risk2/PeppyData/reports - saved/X!Tandem John/output_human.2012_05_09_13_25_02.t.xml",
+			"/Users/risk2/PeppyData/reports - saved/x-tandem-reports/output_human.2012_05_09_13_25_02.t.xml",
 			"/Users/risk2/PeppyData/tests/",
 			"human"
 		));
 		
 		testSets.add(getTestSet(
-			"/Users/risk2/PeppyData/reports - saved/X!Tandem John/output_aurum.2012_05_09_14_36_22.t.xml",
+			"/Users/risk2/PeppyData/reports - saved/x-tandem-reports/output_aurum.2012_05_09_14_36_22.t.xml",
 			"/Users/risk2/PeppyData/tests/",
 			"aurum"
 		));
+		
+		testSets.add(getTestSet(
+				"/Users/risk2/PeppyData/reports - saved/x-tandem-reports/output_USP-top-10.2012_05_09_14_46_03.t.xml",
+				"/Users/risk2/PeppyData/tests/",
+				"USP top 10"
+			));
 		
 		
 		
@@ -105,7 +105,7 @@ public class XTandemSingleFile {
             	spectrumNumber = Integer.parseInt(spectrum.split("\\.")[0]) - 1;
             	
             	/* do we have to take the neg log of the e value here? */
-            	match = new Match_Blank(spectra.get(spectrumNumber), new Peptide(peptide), Double.parseDouble(eValue));
+            	match = new Match_Blank(spectra.get(spectrumNumber), new Peptide(peptide), -Double.parseDouble(eValue));
             	matches.add(match);
             }
 

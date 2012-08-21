@@ -93,8 +93,8 @@ public class ValidationReport {
 		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
 		
 		/* What scoring mechanism? */
-		Properties.scoringMethodName = "Peppy.Match_IMP";
-		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+//		Properties.scoringMethodName = "Peppy.Match_IMP";
+//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			
 		
 		/* save our properties */
@@ -301,24 +301,19 @@ public class ValidationReport {
 			
 			//# found at 1% FPR
 			pw.println("<tr>");
+			pw.println("<td># found at 1% FPR</td>");
+			for (TestSet testSet: tests) {
+				pw.println("<td>" + testSet.getTrueTallyAtOnePercentError() + 
+						" (" + nfPercent.format(testSet.getPercentAtOnePercentError()) + ")</td>");
+			}
+			
+			//# found at 5% FPR
+			pw.println("<tr>");
 			pw.println("<td># found at 5% FPR</td>");
 			for (TestSet testSet: tests) {
 				pw.println("<td>" + testSet.getTrueTallyAtFivePercentError() + 
 						" (" + nfPercent.format(testSet.getPercentAtFivePercentError()) + ")</td>");
 			}
-			
-//			//% of total found at 1% FPR
-//			pw.println("<tr>");
-//			pw.println("<td>% of total found at 1% FPR</td>");
-//			for (TestSet testSet: tests) {
-//				pw.println("<td>" + nfPercent.format(testSet.getPercentAtFivePercentError()) + "</td>");
-//			}
-//			//E value at 1% FPR
-//			pw.println("<tr>");
-//			pw.println("<td>E value at 1% FPR</td>");
-//			for (TestSet testSet: tests) {
-//				pw.println("<td>" + testSet.getEValueAtFivePercentError() + "</td>");
-//			}
 			
 			//PR Curve
 			pw.println("<tr>");
@@ -371,9 +366,10 @@ public class ValidationReport {
 				pw.println("id\tveracity\tscore\tsequence\ttrueScore\ttrueSequence");
 				for (MatchContainer match: topForwardsTestedMatches) {
 					StringBuffer sb = new StringBuffer();
-					sb.append(match.getMatch().getSpectrum().getId());
-					sb.append('\t');
+					
 					sb.append(match.isTrue());
+					sb.append('\t');
+					sb.append(match.getMatch().getSpectrum().getId());
 					sb.append('\t');
 					sb.append(match.getMatch().getScore());
 					sb.append('\t');
@@ -382,6 +378,8 @@ public class ValidationReport {
 					sb.append(match.getTrueMatch().getScore());
 					sb.append('\t');
 					sb.append(match.getTrueMatch().getPeptide().getAcidSequenceString());
+					sb.append('\t');
+					sb.append(match.getTrueMatch().getSpectrum().getFile().getName());
 					pw.println(sb.toString());
 				}
 				pw.flush();

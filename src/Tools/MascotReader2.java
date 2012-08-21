@@ -50,19 +50,19 @@ public class MascotReader2 {
 		ArrayList<TestSet> testSets = new ArrayList<TestSet>();
 		
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyData/reports - saved/Mascot 2/kapp-unassigned.csv",
+				"/Users/risk2/PeppyData/reports - saved/mascot-reports/kapp-unassigned2.csv",
 				"/Users/risk2/PeppyData/tests/",
 				"human"
 		));
 		
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyData/reports - saved/Mascot 2/aurum-unassigned.csv",
+				"/Users/risk2/PeppyData/reports - saved/mascot-reports/aurum-unassigned2.csv",
 				"/Users/risk2/PeppyData/tests/",
 				"aurum"
 		));
 		
 		testSets.add(getTestSet(
-				"/Users/risk2/PeppyData/reports - saved/Mascot 2/ups-unassigned.csv",
+				"/Users/risk2/PeppyData/reports - saved/mascot-reports/ups-unassigned2.csv",
 				"/Users/risk2/PeppyData/tests/",
 				"USP top 10"
 		));
@@ -100,7 +100,9 @@ public class MascotReader2 {
 					continue;
 				}
 				int spectrumNumber = Integer.parseInt(chunks[0]) - 1;
-				double score = Double.parseDouble(chunks[1]);
+//				double score = Double.parseDouble(chunks[1]);
+				double score = Double.parseDouble(chunks[3]);
+				score *= -1;
 				Peptide peptide = new Peptide(chunks[2]);
 				match = new Match_Blank(spectra.get(spectrumNumber),peptide, score);
 		    	matches.add(match);
