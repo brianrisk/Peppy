@@ -709,7 +709,7 @@ public class Peppy {
 				/* skip matches that are outside designate PPM */
 				if (Properties.searchModifications == false) {
 					if (Properties.precursorTolerance < Math.abs(MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass()))) {
-						//continue;
+//						continue;
 					}	
 				}
 					

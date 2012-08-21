@@ -7,6 +7,7 @@ import java.util.Collections;
 import Math.MassError;
 import Peppy.Definitions;
 import Peppy.Match;
+import Peppy.Match_Blank;
 import Peppy.Match_IMP_VariMod;
 import Peppy.Matches;
 import Peppy.ModificationEntry;
@@ -79,10 +80,10 @@ public class HTMLPageSpectrum extends HTMLPage {
 
 		
 		spectrumScript.append("</script>");
-//		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.1.0.js\"></script>");
-		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/js/processing.js\"></script>");
-//		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/psv-control.js\"></script>");
-		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/psv-control.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.1.0.js\"></script>");
+//		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/js/processing.js\"></script>");
+		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/psv-control.js\"></script>");
+//		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/psv-control.js\"></script>");
 
 		
 		//print header
@@ -91,8 +92,8 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printP("<ul><li>mass: " + spectrum.getMass() + "<li>charge: " + spectrum.getCharge() + "<li>m/z: " + spectrum.getPrecursorMZ() + "</ul>");
 		
 		//spectrum
-//		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
-		printP("<canvas data-processing-sources=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+//		printP("<canvas data-processing-sources=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
@@ -135,7 +136,9 @@ public class HTMLPageSpectrum extends HTMLPage {
 		
 		/* print all the rows */
 		for(Match match: theseMatches) {
-			printTableRow(match);
+			if (!(match instanceof Match_Blank)) {
+				printTableRow(match);
+			}
 		}
 		print("</table>");
 		
@@ -147,7 +150,8 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTR();
 		
 		/* UCSC link */
-		String link = UCSC.getLink(match);
+		String link = "";
+		link = UCSC.getLink(match);
 		printTD("(<a href=\"" +link + "\">UCSC</a>)");
 		
 		/* google link */

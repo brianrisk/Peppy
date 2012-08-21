@@ -27,3 +27,14 @@ numberOfSpectraToUseForFDR -1
 
 
 searchModifications false
+
+isSequenceFileDNA true
+
+
+## for test purposes
+testSequence /Users/risk2/PeppyData/public/sequences/protein/uniprot_sprot 2011_04.fasta
+//testSequence /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
+//testSequence /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
+testSequenceIsProtein true
+//testSequenceIsProtein false
+testDirectory /Users/risk2/PeppyData/tests/ 
