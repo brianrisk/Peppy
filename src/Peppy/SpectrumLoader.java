@@ -93,6 +93,11 @@ public class SpectrumLoader {
 	 * @return A ArrayList of all the spectra
 	 */
 	public static ArrayList<Spectrum> loadSpectra(File inFile) {
+		if (!inFile.exists()) {
+			U.p("this file does not exist: " + inFile.getAbsolutePath());
+			System.exit(1);
+		}
+		
 		//if the spectra are in a .mzml file, then use a different method and return;
 		if(inFile.getAbsolutePath().toLowerCase().endsWith(".mzml") ){
 			return loadMZMLSpectra(inFile);
@@ -560,6 +565,8 @@ public class SpectrumLoader {
 		if (Properties.maximumNumberOfPeaksforASpectrum > 0) {
 			s.setPeaks(keepMostIntensePeaks(s));
 		}
+		
+		s.setPeaks(getTopPeaksPerBucket(s, 100, 10));
 
 		s.setPeaks(keepStrongestPeakInRegions(s));
 		sortPeaksByMass(s);
@@ -608,20 +615,7 @@ public class SpectrumLoader {
 		return peaks;
 	}
 	
-	
-	/**
-	 * cleanPeaks ensures a spectrum has a MD5, and then keeps the strongest number of peaks in each bucket, and sort the peaks by mass.
-	 */
-	public static void cleanPeaksBucketCleaning(Spectrum s, int bucketSize, int peaksPerBucket) {
-		
-		//before we mess with the peak data, let's make sure we have the MD5
-		s.setMD5(s.getMD5());
 
-		s.setPeaks(getTopPeaksPerBucket(s, bucketSize, peaksPerBucket));
-		
-		sortPeaksByMass(s);
-		
-	}//cleanPeaks
 	
 	/**
 	 * Get top peaks per bucket attempts to get the specified number of peaks in each bucket within a spectrum.
@@ -643,7 +637,6 @@ public class SpectrumLoader {
 		
 		while(bucketStart < topScore){
 			topPeaks.addAll(getTopPeaks(peaksPerBucket, bucketStart, bucketStop, s.getPeaks()));
-			U.p("Top peaks size: " + topPeaks.size());
 			bucketStart += bucketSize;
 			bucketStop += bucketSize;
 		}//while
@@ -671,19 +664,15 @@ public class SpectrumLoader {
 		}//for
 	
 		
-		Collections.sort(allPeaksList);
-		//Sorted by intensity 
+		//Since there are not enough peaks to cull, just return all of them
+		if(allPeaksList.size() < numTopPeaksToGet){
+			return allPeaksList;
+		}//if
 		
 		ArrayList<Peak> topPeaks = new ArrayList<Peak>();
 		
-		
-		//Since there are not enough peaks to cull, just return all of them
-		if(allPeaksList.size() < numTopPeaksToGet){
-			for(Peak p: allPeaksList){
-				topPeaks.add(p);
-			}//for
-			return topPeaks;
-		}//if
+		Collections.sort(allPeaksList);
+		//Sorted by intensity 
 		
 		//Select just the desired number of top peaks;
 		for(int i = allPeaksList.size() - numTopPeaksToGet; i < allPeaksList.size(); i++){
