@@ -13,6 +13,7 @@ import java.util.Hashtable;
 
 import Math.MassError;
 import Reports.HTMLReporter;
+import Reports.SpectrumReport;
 import Reports.TextReporter;
 
 /**
@@ -113,6 +114,9 @@ public class Peppy {
 				int originalSpectraSize = spectra.size();
 				U.p("loaded " + originalSpectraSize + " spectra.");
 				
+				/* create a spectrum report */
+				SpectrumReport.spectrumReport(spectra, mainReportDir);
+				
 				/* this will maintain our list of score cutoffs */
 				PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
 				metricsReport.println("spectral count: " + originalSpectraSize);
@@ -140,20 +144,50 @@ public class Peppy {
 					if (sequenceIndex == 0 && Properties.smartTolerances) {
 						
 						/*
-						 * Determine ideal precursor tolerance.  We're asking, "what is the
-						 * precursor tolerance that lets us find 99% of the matches at the 1%FDR?"
+						 * If we found a valid FDR, then reanalyze
 						 */
-						double potentialPrecursorTolerance = fdr.findPrecursorError(0.99, 0.01);
-						
-						/*
-						 * If potentialPrecursorTolerance is valid, reanalyze
-						 */
-						if (potentialPrecursorTolerance >= 0) {
-							Properties.precursorTolerance = potentialPrecursorTolerance;
-							U.p ("new precursor tolerance is: " + potentialPrecursorTolerance);
-							metricsReport.println("calculated precursor is " + potentialPrecursorTolerance);
+						if (fdr.findOptimalTolerances(0.99, 0.01) >= 0) {
+							
+							Properties.precursorTolerance = fdr.getMaximumPrecursorError();
+							U.p ("optimal precursor tolerance is: " + fdr.getMaximumPrecursorError());
+							metricsReport.println("optimal precursor is: " + fdr.getMaximumPrecursorError());
+							
+							Properties.peptideMassMinimum = fdr.getMinimumMass();
+							U.p ("optimal minimum mass is: " + fdr.getMinimumMass());
+							metricsReport.println("optimal minimum mass is: " + fdr.getMinimumMass());
+							
+							Properties.peptideMassMaximum = fdr.getMaximumMass();
+							U.p ("optimal maximum mass is: " + fdr.getMaximumMass());
+							metricsReport.println("optimal maximum mass is: " + fdr.getMaximumMass());
+							
+							Properties.minimumNumberOfPeaksForAValidSpectrum = fdr.getMinimumNumberOfPeaks();
+							U.p ("optimal minimum number of peaks is: " + fdr.getMinimumNumberOfPeaks());
+							metricsReport.println("optimal minimum number of peaks is: " + fdr.getMinimumNumberOfPeaks());
+							
+							
+							/* remove spectra that don't conform to optimal parameters */
+							boolean remove;
+							Spectrum spectrum;
+							for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+								spectrum = spectra.get(spectrumIndex);
+								remove = false;
+								if (spectrum.getMass() < Properties.peptideMassMinimum) remove = true;
+								if (spectrum.getMass() > Properties.peptideMassMaximum) remove = true;
+								if (spectrum.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
+								if (remove) {
+									spectra.remove(spectrumIndex);
+									spectrumIndex--;
+								}
+							}
+							
+							U.p ("new spectral set size: " + spectra.size());
+							metricsReport.println("new spectral set size: " + spectra.size());
+							
 							metricsReport.println();
-							U.p("performing second FDR with new mass error tolerances...");
+							
+							
+							/* second-pass FDR analysis */
+							U.p("performing second FDR with new tolerances...");
 							fdr = new FDR(spectra);
 						}
 						
@@ -350,9 +384,11 @@ public class Peppy {
 				} /* end modifications if */
 				
 				/* final report on how many spectra were identified */
-				double totalProportionIdentified =  ((double)spectra.size() / originalSpectraSize);
-				metricsReport.println();
-				metricsReport.println("total spectra identified: " + spectra.size() + " (" +  Properties.percentFormat.format(totalProportionIdentified) + ")");
+//				need to tally.  Since we remove spectra that are not up to snuff this method of subtracting prexent spectra size won't work
+//				int totalSpectraIdentified = originalSpectraSize - spectra.size();
+//				double totalProportionIdentified =  ((double)totalSpectraIdentified / originalSpectraSize);
+//				metricsReport.println();
+//				metricsReport.println("total spectra identified: " + totalSpectraIdentified + " (" +  Properties.percentFormat.format(totalProportionIdentified) + ")");
 				
 				metricsReport.flush();
 				metricsReport.close();
