@@ -2,7 +2,7 @@ cleavageAcid K
 cleavageAcid R
 
 ##number of spectra to process at once 
-numberOfSpectraPerSegment 4000000
+numberOfSpectraPerSegment 5000000
 
 ##error thresholds in PPM
 precursorTolerance 25
@@ -28,12 +28,13 @@ numberOfSpectraToUseForFDR -1
 
 searchModifications false
 
-isSequenceFileDNA true
+spectraDirectoryOrFile /Users/risk2/PeppyData/akhilesh-pandey/spectra/set2
+minimumNumberOfPeaksForAValidSpectrum 0
 
 
 ## for test purposes
-testSequence /Users/risk2/PeppyData/public/sequences/protein/uniprot_sprot 2011_04.fasta
-//testSequence /Users/risk2/PeppyData/public/sequences/protein/HUMAN.fasta
+//testSequence /Users/risk2/PeppyData/public/sequences/protein/uniprot_sprot 2011_04.fasta
+testSequence /Users/risk2/PeppyData/public/sequences/protein/UniProt_Human_2012_03.fasta
 //testSequence /Users/risk2/PeppyData/public/sequences/dna/ecoli.fasta
 testSequenceIsProtein true
 //testSequenceIsProtein false

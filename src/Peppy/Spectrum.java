@@ -16,9 +16,6 @@ import Math.MassError;
  * 
  * Rework to add in additional features to use the jmzml library to upload .mzml files 
  * 
- * Copyright 2012, Brian Risk
- * 
- * 
  * @author Brian Risk, David "Corvette" Thomas
  *
  */
@@ -26,8 +23,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 
 	private ArrayList<Peak> peaks;
 	private double maxMass;
-	private double mass;
-	private double precursorMZ;
+	private double mass = -1;
+	private double precursorMZ = -1;
 	private int id;
 	private int charge = 0;
 	private File file;
@@ -45,7 +42,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double intensity06Percent = -1;
 	private double minimumIntensity = -1; 
 	private double coverage = -1;
-
+	
+	private int scanCount = -1;
+	private double retentTime = -1;
+	private double scanStartTime = -1;
+	private double scanStopTime = -1;
 	
 	
 	private static int sortTracker = 0;
@@ -153,9 +154,14 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public void setPrecursorMZ(double m){precursorMZ = m;}
 	public void setMass(double m){mass = m;}
 	public void setCharge(int charge){ this.charge = charge;}
-	
-	
-	
+	public int getScanCount(){return this.scanCount;}
+	public double getRetentTime(){return this.retentTime;}
+	public void setScanCount(int scanCount){this.scanCount = scanCount;}
+	public void setRetentTime(double retentTime){this.retentTime = retentTime;}
+	public double getScanStartTime(){return this.scanStartTime;}
+	public double getScanStopTime(){return this.scanStopTime;}
+	public void setScanStartTime(double scanStartTime){this.scanStartTime = scanStartTime;}
+	public void setScanStopTime(double scanStopTime){this.scanStopTime = scanStopTime;}
 	/**
 	 * Gets the MD5 of this object.
 	 * For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5

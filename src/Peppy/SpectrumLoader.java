@@ -1,14 +1,26 @@
 package Peppy;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
+import Math.MassError;
 
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArray;
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArrayList;
@@ -16,25 +28,38 @@ import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
 import uk.ac.ebi.jmzml.model.mzml.Precursor;
 import uk.ac.ebi.jmzml.model.mzml.PrecursorList;
+import uk.ac.ebi.jmzml.model.mzml.ScanList;
 import uk.ac.ebi.jmzml.model.mzml.SelectedIonList;
 import uk.ac.ebi.jmzml.xml.io.MzMLObjectIterator;
 import uk.ac.ebi.jmzml.xml.io.MzMLUnmarshaller;
-import Math.MassError;
-
-public class SpectrumLoader {
+import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
+import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
+import uk.ac.ebi.pride.tools.ms2_parser.Ms2File;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLFile;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 
 /**
- * loadSpectra loads in spectra from the established value in the Properties file.  It returns an ArrayList of Spectrum that is the same size (minus removed peaks)
- * as the number of spectrum in the properties file.  It removes any spectra below the properties file established value of minimumNumberOfPeaksForAValidSpectrum.
  * 
- * This methods defaults to the spectra File set by properties
- * 
- * Copyright 2012, Brian Risk
- * 
- * 
+ * @author Brian Risk 
+ * @author David "Corvette" Thomas
+ *
  */
+public class SpectrumLoader {
+
 	
+	//A list of accepted file extensions peppy takes in.  When this is updated don't forget to update loadSpectra
+	private static String[] fileExten = {".dta", ".pkl", ".mzml.xml", ".mzml", ".mgf", ".mz.xml", ".mzxml", ".mzxml.xml", ".ms2", ".zip"};
+	
+	/*Public Static methods for loading spectra*/
+	/**
+	 * loadSpectra loads in spectra from the established value in the Properties file.  It returns an ArrayList of Spectrum that is the same size (minus removed peaks)
+	 * as the number of spectrum in the properties file.  It removes any spectra below the properties file established value of minimumNumberOfPeaksForAValidSpectrum.
+	 * 
+	 * This methods defaults to the spectra File set by properties
+	 * 
+	 * @return An ArrayList of Spectrum objects to loadSpectra
+	 */
 	public static ArrayList<Spectrum> loadSpectra() {
 
 		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
@@ -43,7 +68,7 @@ public class SpectrumLoader {
 		if (Properties.spectraDirectoryOrFile.isFile()) {
 			spectra =  loadSpectra(Properties.spectraDirectoryOrFile);
 		} else {
-			loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra );
+			U.p("loaded this many spectra: " + loadSpectraFromFolder(Properties.spectraDirectoryOrFile, spectra ));
 		}//else
 		
 		/* remove spectra with small amount of peaks */
@@ -85,21 +110,16 @@ public class SpectrumLoader {
 	}//loadSpectra
 	
 	/**
-	 * A utility method to load in a DTA/PKL file.  There may be more than
+	 * There may be more than
 	 * one spectrum in a file, so this method returns an ArrayList.
 	 * 
-	 *This is the workhorse method for loading spectra.  In the end every spectra is loaded using this method
+	 *This is the workhorse method for loading spectra.  In the end every spectrum is loaded using this method
 	 * @param inFile
-	 * @return A ArrayList of all the spectra
+	 * @return An ArrayList of all the spectra
 	 */
 	public static ArrayList<Spectrum> loadSpectra(File inFile) {
-		if (!inFile.exists()) {
-			U.p("this file does not exist: " + inFile.getAbsolutePath());
-			System.exit(1);
-		}
-		
 		//if the spectra are in a .mzml file, then use a different method and return;
-		if(inFile.getAbsolutePath().toLowerCase().endsWith(".mzml") ){
+		if(inFile.getAbsolutePath().toLowerCase().endsWith(".mzml") || inFile.getAbsolutePath().toLowerCase().endsWith(".mzml.xml") ){
 			return loadMZMLSpectra(inFile);
 		}//if
 		
@@ -111,14 +131,113 @@ public class SpectrumLoader {
 			return loadDTASpectra(inFile);
 		}
 		
-		if(inFile.getAbsolutePath().toLowerCase().endsWith(".pkl") || inFile.getAbsolutePath().toLowerCase().endsWith(".txt")){
+		if(inFile.getAbsolutePath().toLowerCase().endsWith(".pkl")){
 			return loadPKLSpectra(inFile);
 		}
+		if(inFile.getAbsolutePath().toLowerCase().endsWith(".mz.xml") || inFile.getAbsolutePath().toLowerCase().endsWith(".mzxml")
+					|| inFile.getAbsolutePath().toLowerCase().endsWith(".mzxml.xml")){
+			return loadMzXMLSpectra(inFile);
+		}
 		
+		if(inFile.getAbsolutePath().toLowerCase().endsWith(".ms2")){
+			return loadMS2Spectra(inFile);
+		}
+		
+//		if(inFile.getAbsolutePath().toLowerCase().endsWith(".zip")){
+//	
+//			String tempPrefix = "tempStorage/";
+//			//Name files dynamically to ensure that two zips in the same directory do not write over one another when extracted
+//			String tempLoc;
+//			if(inFile.getPath().contains(tempPrefix)){
+//				tempLoc = inFile.getPath() +"_" + tempPrefix; //+ U.getFileNameWithoutSuffix(inFile) + "/";
+//			}else{
+//				tempLoc = tempPrefix + U.getFileNameWithoutSuffix(inFile) + "/";
+//			}
+//			
+//			
+//			//Uncompress and extract all files form the zip file
+//			try {
+//				File f = new File("ERROR");
+//				File outDir = new File(tempLoc);
+//				outDir.mkdirs();
+//				ZipFile zipFile = new ZipFile(inFile);
+//				Enumeration entries = zipFile.entries();
+//				while(entries.hasMoreElements()) {
+//					ZipEntry entry = (ZipEntry)entries.nextElement();
+//					if(entry.isDirectory()) {
+//						
+//						(new File(tempLoc + entry.getName())).mkdirs();
+//						continue;
+//					}
+//					
+//					
+//					String entryDirectory = "";
+//					if(entry.getName().lastIndexOf('/') != -1){
+//					entryDirectory = entry.getName().substring(0, entry.getName().lastIndexOf('/') + 1);
+//					}
+//					f = new File(tempLoc + entryDirectory);
+//					f.mkdirs();
+//					copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream( tempLoc + entry.getName())));
+//				}//while
+//				zipFile.close();
+//			
+//				//Delete this zipFile if it was in the original zip file, since it will no longer need to be accessed
+//				
+//				//Upload all of the spectra from the newly decompressed zip file
+//				ArrayList<Spectrum> out = loadSpectraFromFolder(new File(tempLoc));
+//				
+//
+//				
+//				if(inFile.getAbsolutePath().contains(tempPrefix)){
+//					return out;
+//				}
+//
+//				
+//				deleteDir(new File(tempPrefix));
+//				
+//				//Return the results
+//				return out;
+//			} catch (ZipException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 		
 		return null;
 	}//loadSpectra
+	
+	
+	/* Code to delete a directory.  Copied from: http://www.roseindia.net/tutorialhelp/comment/81393 */
+	public static boolean deleteDir(File dir) {
+		if (dir.isDirectory()) {
+			String[] children = dir.list();
+			for (int i=0; i<children.length; i++) {
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+
+		// The directory is now empty so delete it
+		return dir.delete();
+	} 
+	
+	public static final void copyInputStream(InputStream in, OutputStream out)
+	throws IOException
+	{
+	byte[] buffer = new byte[1024];
+	int len;
+	while((len = in.read(buffer)) >= 0)
+	out.write(buffer, 0, len);
+	in.close();
+	out.close();
+	}
+
 	
 	private static ArrayList<Spectrum> loadPKLSpectra(File inFile){
 		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
@@ -190,6 +309,7 @@ public class SpectrumLoader {
 						spectrum.setPeaks(peaks);
 						cleanPeaks(spectrum);
 						spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+						spectrum.setFile(inFile);
 						out.add(spectrum);
 					}//if
 					
@@ -231,6 +351,7 @@ public class SpectrumLoader {
 							spectrum.setPeaks(peaks);
 							cleanPeaks(spectrum);
 							spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+							spectrum.setFile(inFile);
 							out.add(spectrum);
 						}
 						//An end of a line has not been reached
@@ -289,8 +410,13 @@ public class SpectrumLoader {
 		return out;
 	}//loadDTASpectra
 	
+	/**
+	 * 
+	 * Uses jmzml http://code.google.com/p/jmzml/
+	 * @param inFile
+	 * @return
+	 */
 	private static ArrayList<Spectrum> loadMZMLSpectra(File inFile){
-//		U.p("Loading up mzml spectra!");
 		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
 		
 		MzMLUnmarshaller unmarshaller = new MzMLUnmarshaller(inFile);
@@ -319,8 +445,39 @@ public class SpectrumLoader {
 			  //Add in precursor
 				PrecursorList pcl = spectrum.getPrecursorList();
 				
+				String scanStartTime = "-1";
+				String scanStopTime = "-1";
+				ScanList sl = spectrum.getScanList();
+				if(sl != null){
+					if(sl.getCvParam() != null){
+						if(sl.getCvParam().iterator() != null){
+							Iterator<CVParam> iter = sl.getCvParam().iterator();
+							while(iter.hasNext()){
+								CVParam cvp = iter.next();
+								if(cvp.getUnitName() != null){
+									if(cvp.getUnitName().equals("scan start time")){
+										scanStartTime = cvp.getValue();
+										if(cvp.getUnitName().equals("minute")){
+											scanStartTime = Double.toString(Double.parseDouble(cvp.getValue()) * 60);
+										}//if
+									}else if(cvp.getUnitName().equals("scan stop time")){
+										scanStopTime = cvp.getValue();
+										if(cvp.getUnitName().equals("minute")){
+											scanStopTime = Double.toString(Double.parseDouble(cvp.getValue()) * 60);
+										}//if
+									}//if
+								}//if unName is not null
+								
+							}//while
+						}//iterator != null
+					}//cvParam != null
+				}//sl != null
+				
+				
+				temp.setScanStopTime(Double.parseDouble(scanStopTime));
+				temp.setScanStartTime(Double.parseDouble(scanStartTime));
 				//Get the precursor information if this spectrum has it
-				//Should this be modified to require precursor information in a spectrum.  right now a spectra cannot have it and wills till be created.
+				//Should this be modified to require precursor information in a spectrum.  right now a spectra cannot have it and it will still be created.
 				if(pcl != null){
 					List<Precursor> lpc = pcl.getPrecursor();
 					SelectedIonList sil = lpc.get(0).getSelectedIonList();
@@ -330,12 +487,24 @@ public class SpectrumLoader {
 					//0: This grabs selected ion m/z
 					//1: This grabs peak intensity
 					//2: This grabs charge state
-					temp.setPrecursorMZ(Double.parseDouble(lcv.get(0).getValue()));
+					
+					for(int i = 0; i < lcv.size(); i++){
+						if(lcv.get(i).getName().equals("selected ion m/z")){
+							temp.setPrecursorMZ(Double.parseDouble(lcv.get(i).getValue()));
+						}
+						if(lcv.get(i).getName().equals("charge state")){
+							temp.setCharge(Integer.parseInt(lcv.get(i).getValue()));
+						}
+					}
+					
 					temp.setMass(temp.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
-					temp.setCharge(Integer.parseInt(lcv.get(2).getValue()));
+					//Try mutliplyng by charge
+					temp.setMass(temp.getMass() * temp.getCharge());
 					
 				}//if pcl is not null(The spectra has precursor information
 			
+				
+				//scan and retention times
 				ArrayList<Peak> peaks = new ArrayList<Peak>();
 			  //Add in mass and Intensity
 			  for(int j = 0; j < mass.getBinaryDataAsNumberArray().length;j++){
@@ -357,6 +526,8 @@ public class SpectrumLoader {
 			  //Save the peaks read int from the file
 			  temp.setPeaks(peaks);
 			  
+			  temp.setFile(inFile);
+			  
 			  //Store the spectrum into output
 			  out.add(temp);
 			  
@@ -366,14 +537,13 @@ public class SpectrumLoader {
 		
 		return out;
 	}//loadMZML Spectra
-	
+
 	private static ArrayList<Spectrum> loadMGFSpectra(File inFile){
 		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
-//		U.p("Uploading a mgf file");
 		Spectrum temp = new Spectrum();
 		
 		
-		//Prase the file and create a series of spectrumt o add to the output
+		//Parse the file and create a series of spectrum to add to the output
 		try {
 			Scanner s = new Scanner(inFile);
 			
@@ -393,56 +563,124 @@ public class SpectrumLoader {
 					line = s.nextLine();
 					//Loop through and load up a spectra
 					
-					String[] titleLine = line.split("=");
-					String[] brokenTitleLine = titleLine[1].split(" ");
-					
+					String[] chunks = line.split("\\s");
 					
 					/*Parse the header lines from this spectra*/
-					String title = brokenTitleLine[0].substring(brokenTitleLine[0].indexOf(':')  + 1, brokenTitleLine[0].length());
+					String title = "";
 
-					String scans = s.nextLine().split("=")[1];
-					String RTINSECONDS = s.nextLine().split("=")[1];
+					String scans = "";
+					String RTINSECONDS = "";
 					
 					
-					String charge = s.nextLine().split("=")[1];
-					String pepmass = s.nextLine().split("=")[1];
+					String charge = "";
+					String pepmass = "";
+
+					while(chunks.length == 1){
+						//Its the title line
+						chunks = line.split("=");
+	
+						if(chunks[0].toUpperCase().startsWith("TITLE")){
+
+							String[] brokenTitleLine = chunks[1].split("\\s");
+							 title = brokenTitleLine[0].substring(brokenTitleLine[0].indexOf(':')  + 1, brokenTitleLine[0].length());
+						}
+						
+						if(chunks[0].toUpperCase().startsWith("SCANS")){
+
+							scans = line.split("=")[1];
+						}
+						
+						if(chunks[0].toUpperCase().startsWith("RTINSECONDS")){
+
+							RTINSECONDS = line.split("=")[1];
+						}
+						
+						if(chunks[0].toUpperCase().startsWith("CHARGE")){
+
+							charge = line.split("=")[1];
+						}
+						
+						if(chunks[0].toUpperCase().startsWith("PEPMASS")){
+							pepmass = line.split("=")[1];
+						}
+						
+						line = s.nextLine();
+						chunks = line.split("\\s");
+						
+					}//while
 					
 					temp.setTitle(title);
 					temp.setFile(inFile);
 					
-					//Create a string based on the mass of this peptide
-
-					charge = charge.substring(0, charge.length() - 1);
+			
+					if(!charge.equals("")){
+						charge = charge.substring(0, charge.length() - 1);
+					}
 					//Add in precursor
 					
-					temp.setPrecursorMZ(Double.parseDouble(pepmass));
-					temp.setMass(temp.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
-					temp.setCharge(Integer.parseInt(charge));
+					try{
+						temp.setPrecursorMZ(Double.parseDouble(pepmass));
+					}catch(NumberFormatException e){
+						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
+					}
+					try{
+						temp.setCharge(Integer.parseInt(charge));
+					}catch(NumberFormatException e){
+						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
+					}
+					try{
+						temp.setMass(temp.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
+						temp.setMass(temp.getMass() * temp.getCharge());
+					}catch(NumberFormatException e){
+						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
+					}
+
+					try{
+						temp.setScanCount(Integer.parseInt(scans));
+					}catch(NumberFormatException e){
+						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
+					}
+					try{
+						temp.setRetentTime(Double.parseDouble(RTINSECONDS));
+					}catch(NumberFormatException e){
+						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
+					}
+		
+					
+					
 					
 
 					
 					ArrayList<Peak> peaks = new ArrayList<Peak>();
 					while(s.hasNextLine()){
-						line = s.nextLine();
+						
 						if(line.equals("END IONS")){
 							break;
 						}
-						String [] chunks = line.split(" |\t");
 						
 						//Only add value peaks that have a positive mass
 				
 						try {
+							
+							chunks = line.split("\\s");
+							line = chunks[0] + " " + chunks[1];
 							Peak p = new Peak(line);
 							peaks.add(p);
 						} catch (Exception e) {
 							//don't add it if it's bad!
 						}	
-
+						line = s.nextLine();
 						
 					}//while
 					
+					
 					//Set the peaks to this spectrum object
 					temp.setPeaks(peaks);
+					
+					cleanPeaks(temp);
+					
+					temp.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+					temp.setFile(inFile);
 					
 					//Add this spectrum to the output
 					out.add(temp);
@@ -467,7 +705,172 @@ public class SpectrumLoader {
 		return out;
 	}//loadMGFSpectaInFile
 	
+	
+	/**
+	 * Uses jmzReader from: http://code.google.com/p/jmzreader/wiki/Welcome
+	 * @param inFile
+	 * @return
+	 */
+	private static ArrayList<Spectrum> loadMzXMLSpectra(File inFile){
+		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
+		
+		//Upload the MzXML fil using the jmzReader library
+		try {
+			JMzReader mzxmlFile = new MzXMLFile(inFile);
+			
+			
+			Iterator<uk.ac.ebi.pride.tools.jmzreader.model.Spectrum> iter = mzxmlFile.getSpectrumIterator();
+			
+			
+			//Iterate through the spectra information in a file and create Spectrum objects from them.
+			while(iter.hasNext()){
+			
+				Spectrum peppySpectrum = new Spectrum();
+				
+				uk.ac.ebi.pride.tools.jmzreader.model.Spectrum jmzSpec = iter.next();
+				
+				
+				//Get the precursor charge and m/z
+				if(jmzSpec.getPrecursorCharge() != null){
+					peppySpectrum.setCharge(jmzSpec.getPrecursorCharge());
+				}
+				
+				if(jmzSpec.getPrecursorMZ() != null){
+					peppySpectrum.setPrecursorMZ(jmzSpec.getPrecursorMZ());
+				}
+				
+				
+				
 
+				if(jmzSpec.getPrecursorMZ() != null && jmzSpec.getPrecursorCharge() != null){
+					peppySpectrum.setMass((jmzSpec.getPrecursorMZ() - Definitions.HYDROGEN_MONO) * jmzSpec.getPrecursorCharge());
+				}
+				
+
+				
+				ArrayList<Peak> peaks = new ArrayList<Peak>();
+				Map<Double, Double> peakList = jmzSpec.getPeakList();
+			
+				for(Double mz: peakList.keySet()){
+					Double intensity = peakList.get(mz);
+					
+					try {
+						Peak p = new Peak( mz.doubleValue() + " " +  intensity.doubleValue());
+						peaks.add(p);
+					} catch (Exception e) {
+						// Ignore bad peaks
+					}//catch
+					
+				}//Iterate through the peaks and add them to the spectrum object
+			
+				
+				//Set meta data
+				peppySpectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+				
+				peppySpectrum.setPeaks(peaks);
+				
+				peppySpectrum.setFile(inFile);
+				
+				cleanPeaks(peppySpectrum);
+				
+				out.add(peppySpectrum);
+				
+			}//While going through peaks
+			
+			
+		} catch (MzXMLParsingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Upload the needed information from the mzXML
+		
+		
+		
+		return out;
+	}//loadMzXMLSpectra
+	
+
+	/**
+	 * 
+	 * Uses jmzreader http://code.google.com/p/jmzreader/
+	 * @param inFile
+	 * @return
+	 */
+	private static ArrayList<Spectrum> loadMS2Spectra(File inFile){
+		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
+		
+		try {
+			JMzReader ms2File = new Ms2File(inFile);
+			
+			Iterator<uk.ac.ebi.pride.tools.jmzreader.model.Spectrum> iter = ms2File.getSpectrumIterator();
+			
+			
+			//Iterate through the spectra information in a file and create Spectrum objects from them.
+			while(iter.hasNext()){
+				
+				Spectrum peppySpectrum = new Spectrum();
+				
+				uk.ac.ebi.pride.tools.jmzreader.model.Spectrum jmzSpec = iter.next();
+			
+				//Get the precursor charge and m/z
+				if(jmzSpec.getPrecursorCharge() != null){
+					peppySpectrum.setCharge(jmzSpec.getPrecursorCharge());
+				}
+				
+				if(jmzSpec.getPrecursorMZ() != null){
+					peppySpectrum.setPrecursorMZ(jmzSpec.getPrecursorMZ());
+				}
+				
+				
+				
+				//I am not sure which of these two methods are correct.  It seems that each file needs its mass calculated in a different way.
+				if(jmzSpec.getPrecursorMZ() != null  && jmzSpec.getPrecursorCharge() != null ){
+					peppySpectrum.setMass((jmzSpec.getPrecursorMZ()  - Definitions.HYDROGEN_MONO ) * jmzSpec.getPrecursorCharge());
+				}
+				
+
+				
+				ArrayList<Peak> peaks = new ArrayList<Peak>();
+				Map<Double, Double> peakList = jmzSpec.getPeakList();
+			
+				for(Double mz: peakList.keySet()){
+					Double intensity = peakList.get(mz);
+					
+					try {
+						Peak p = new Peak( mz.doubleValue() + " " +  intensity.doubleValue());
+						peaks.add(p);
+					} catch (Exception e) {
+						// Ignore bad peaks
+					}//catch
+					
+				}//Iterate through the peaks and add them to the spectrum object
+			
+				
+				//Set meta data
+				peppySpectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+				
+				peppySpectrum.setPeaks(peaks);
+				
+				peppySpectrum.setFile(inFile);
+				
+				cleanPeaks(peppySpectrum);
+				
+				out.add(peppySpectrum);
+			
+			
+			
+			
+			}//while
+			
+		} catch (JMzReaderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return out;
+		
+	}//loadMS2Spectra
 	/**
 	 * loadSpectraFromFolder takes the following steps:
 	 * 1) Recursively goes through folder.
@@ -477,26 +880,31 @@ public class SpectrumLoader {
 	 * @param folder  A file object that represents the folder containing spectra for this method to use
 	 * @param spectra  The ArrayList to add spectra to
 	 */
-	public static void loadSpectraFromFolder(File folder, ArrayList<Spectrum> spectra) { 
+	public static int loadSpectraFromFolder(File folder, ArrayList<Spectrum> spectra) { 
 		File [] files = folder.listFiles();
+		int spectrumTotal = 0;
 		
 		//Loop through and grab all spectra from the folder
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isHidden()) continue;
 			if (files[i].isDirectory()) {
-				loadSpectraFromFolder(files[i], spectra);
+				spectrumTotal += loadSpectraFromFolder(files[i], spectra);
 				continue;
 			}
-			String fileName = files[i].getName().toLowerCase();
-			if (fileName.toLowerCase().endsWith(".dta") || fileName.toLowerCase().endsWith(".pkl") || fileName.toLowerCase().endsWith(".txt") || 
-					fileName.toLowerCase().endsWith(".mzml") || fileName.toLowerCase().endsWith(".mgf")) {
-				spectra.addAll(loadSpectra(files[i]));
+			if (isValidFile(files[i].getName())) {
+				ArrayList<Spectrum> loadedSpectra = loadSpectra(files[i]);
+				spectrumTotal += loadedSpectra.size();
+				spectra.addAll(loadedSpectra);
 			}
 		}
 		//giving all spectra an ID
+		/*
+		 * what the fuck is this?  why are we, inside of a recursive function, setting the ID?
+		 */
 		for (int i = 0; i < spectra.size(); i++) {
 			spectra.get(i).setId(i);
 		}
+		return spectrumTotal;
 	}//loadSpectraFromFOlder
 	
 	/**
@@ -542,18 +950,36 @@ public class SpectrumLoader {
 				loadSpectraFilesFromFolder(files[i], spectraFiles);
 				continue;
 			}
-			String fileName = files[i].getName().toLowerCase();
-			if (fileName.toLowerCase().endsWith(".dta") || fileName.toLowerCase().endsWith(".pkl") || fileName.toLowerCase().endsWith(".txt") || 
-					fileName.toLowerCase().endsWith(".mzml") || fileName.toLowerCase().endsWith(".mgf")) {
+			String fileName = files[i].getName();
+			if (isValidFile(fileName)) {
 				spectraFiles.add(files[i]);
 			}
 		}
 	}
 	
 	
+	private static boolean isValidFile(String fileName){
+		
+		File f = new File(fileName);
+		if(f.isDirectory()){
+			return false;
+		}
+		for(int i = 0; i < fileExten.length; i++){
+			if(fileName.toLowerCase().endsWith(fileExten[i])){
+				
+					return true;
+		
+			}//if
+		}//for
+		
+		return false;
+	}//isValidFile
+	
+	
 /*End Public Static methods for loading spectra*/
 	
 	
+	/*Methods for cleaning peaks*/
 	/**
 	 * cleanPeaks ensures a spectrum has a MD5, and then keeps the strongest peak in each region and sort the peaks by mass.
 	 */
@@ -574,36 +1000,6 @@ public class SpectrumLoader {
 	}//cleanPeaks
 	
 
-	
-	/**
-	 * keepStrongestPeakInRegions sorts the peaks by intensity, and then ensures that know two peaks are within each other by a factor of the fragmentTolerence
-	 * variable from the Properties file.  
-	 */
-	private static ArrayList<Peak> keepStrongestPeakInRegions(Spectrum s) {
-		ArrayList<Peak> peaks = s.getPeaks();
-		sortPeaksByIntensity(s);
-		int start = s.getPeaks().size() - 1;
-		int stop = 0;
-		double lowerBound, upperBound;
-		
-		//note: > stop as we save final one for inside loop
-		for (int i = start; i > stop; i--) {
-			lowerBound = peaks.get(i).getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			upperBound = peaks.get(i).getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			for (int j = i - 1; j >= stop; j--) {
-				if (peaks.get(j).getMass() > lowerBound) {
-					if (peaks.get(j).getMass() < upperBound) {
-						peaks.remove(j);
-						i--;
-						j--;
-					}//mass < upperBound
-				}//mass > lower bound
-			}//for start to stop
-		}//for start ot stop
-		
-		return peaks;
-	}//keepStrongestPeakInRegions
-	
 	
 	private static ArrayList<Peak> keepMostIntensePeaks(Spectrum s) {
 		ArrayList<Peak> peaks = s.getPeaks();
@@ -664,15 +1060,19 @@ public class SpectrumLoader {
 		}//for
 	
 		
-		//Since there are not enough peaks to cull, just return all of them
-		if(allPeaksList.size() < numTopPeaksToGet){
-			return allPeaksList;
-		}//if
+		Collections.sort(allPeaksList);
+		//Sorted by intensity 
 		
 		ArrayList<Peak> topPeaks = new ArrayList<Peak>();
 		
-		Collections.sort(allPeaksList);
-		//Sorted by intensity 
+		
+		//Since there are not enough peaks to cull, just return all of them
+		if(allPeaksList.size() < numTopPeaksToGet){
+			for(Peak p: allPeaksList){
+				topPeaks.add(p);
+			}//for
+			return topPeaks;
+		}//if
 		
 		//Select just the desired number of top peaks;
 		for(int i = allPeaksList.size() - numTopPeaksToGet; i < allPeaksList.size(); i++){
@@ -682,9 +1082,39 @@ public class SpectrumLoader {
 		return topPeaks;
 	}//getTopPeaks
 	
+
+	/**
+	 * keepStrongestPeakInRegions sorts the peaks by intensity, and then ensures that know two peaks are within each other by a factor of the fragmentTolerence
+	 * variable from the Properties file.  
+	 */
+	private static ArrayList<Peak> keepStrongestPeakInRegions(Spectrum s) {
+		ArrayList<Peak> peaks = s.getPeaks();
+		sortPeaksByIntensity(s);
+		int start = s.getPeaks().size() - 1;
+		int stop = 0;
+		double lowerBound, upperBound;
+		
+		//note: > stop as we save final one for inside loop
+		for (int i = start; i > stop; i--) {
+			lowerBound = peaks.get(i).getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
+			upperBound = peaks.get(i).getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
+			for (int j = i - 1; j >= stop; j--) {
+				if (peaks.get(j).getMass() > lowerBound) {
+					if (peaks.get(j).getMass() < upperBound) {
+						peaks.remove(j);
+						i--;
+						j--;
+					}//mass < upperBound
+				}//mass > lower bound
+			}//for start to stop
+		}//for start ot stop
+		
+		return peaks;
+	}//keepStrongestPeakInRegions
+/*End methods for cleaning peaks*/
 	
+/*Sorting methods*/
 	
-	/*Sorting methods*/
 	public static void sortPeaksByIntensity(Spectrum s) {
 		ArrayList<Peak> peaks = s.getPeaks();
 		Peak p;
@@ -706,7 +1136,9 @@ public class SpectrumLoader {
 		Collections.sort(s.getPeaks());
 		s.setPeaks(peaks);
 	}//sortPeaksByMass
+	
+
 
 /*End Sorting methods*/
 	
-}
+}//SpectrumLoader
