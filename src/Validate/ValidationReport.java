@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 
 import Math.MathFunctions;
 import Peppy.Match;
-import Peppy.MatchConstructor;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
@@ -35,18 +34,42 @@ public class ValidationReport {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {	
-		Peppy.Peppy.init(args);
-		setUp();
-		addTests();
-		U.startStopwatch();
-//		createListOfPeptidesNotFoundInTheDatabase();
-		searchTestSets();
-		createReport();
-		createResultsFiles();
-//		createWrongReport();
-		U.stopStopwatch();
-		U.p("done.");
+	public static void main(String[] args) {
+		try {
+			PrintWriter timeLog = new PrintWriter(new FileWriter("timeLog.txt"));
+//			addTests();
+//			timeLog.println("numberOfThreads" + "\t" + tests.get(0).getName() + "\t" + tests.get(1).getName() + "\t" + tests.get(2).getName());
+//			timeLog.flush();
+		
+			for (int numberOfThreads = 1; numberOfThreads <= 24; numberOfThreads++) {
+				Peppy.Peppy.init(args);
+				setUp();
+				
+				Properties.numberOfThreads = numberOfThreads;
+				
+				addTests();
+				U.startStopwatch();
+				searchTestSets();
+				createReport();
+				createResultsFiles();
+				
+				timeLog.println(numberOfThreads + "\t" + tests.get(0).getTimeElapsed() + "\t" + tests.get(1).getTimeElapsed() + "\t" + tests.get(2).getTimeElapsed());
+				timeLog.flush();
+				
+				for (TestSet test: tests) {
+					test.resetTest();
+				}
+				
+				U.stopStopwatch();
+				U.p("done.");
+			}
+			
+			
+			timeLog.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -67,7 +90,7 @@ public class ValidationReport {
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
 		
 		/* set up where we will save these reports */
-		reportFolder =  new File(Properties.validationDirectory, "" + System.currentTimeMillis() + "/");
+		reportFolder =  new File(Properties.validationDirectory, "" + Properties.numberOfThreads + " " + System.currentTimeMillis() + "/");
 		reportFolder.mkdirs();
 		File indexFile = new File(reportFolder, "index.html");
 		try {
@@ -91,6 +114,7 @@ public class ValidationReport {
 		
 		/* this needs to happen or the text reports at the end crash */
 		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
+		
 		
 		/* What scoring mechanism? */
 //		Properties.scoringMethodName = "Peppy.Match_IMP";

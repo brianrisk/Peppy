@@ -51,34 +51,30 @@ public class BestMatches {
 	public static void main(String args[]) {
 //		washu();
 //		washuChr8();
-//		pandey();
+		pandey();
 //		mayo();
 //		ucla();
 //		yale();
 //		washUPaperOne();
 //		gm12878();
-		washUPaperOneRegionAnalysis();
+//		washUPaperOneRegionAnalysis();
 //		yaleEnzymeless();
 		U.p("done");
 	}
 	
 	public static void pandey() {
-		/* Pandey */
-		BestMatches pandey = new BestMatches("Pandey");
+		ArrayList<File> reportFolders = new ArrayList<File>();
 		
-		/* target protein */
-		ResultsCategory human = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		human.addFile(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/Pandey/1 uncompressed - protein/report.txt"));
-		pandey.addMatchType(human);
+		reportFolders.add(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/2 pandey2 smart tolerances"));
 		
-		/* reference genome */
-		ResultsCategory genome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		genome.addFile(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/Pandey/2 uncompressed - genome/report.txt"));
-		pandey.addMatchType(genome);
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		for (File folder: reportFolders) {
+			BestMatches matches = loadFromResultsFolder(folder);
+			bestMatches.add(matches);
+		}
 		
-		/* find the best peptides */
-		pandey.process();
-		pandey.saveReports();
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
 	}
 	
 	public static void washuChr8() {
@@ -642,22 +638,22 @@ public static void washuWHIM2 () {
 				e.printStackTrace();
 			}
 			
-			if (!(reportFolder.getName().indexOf("novel") != -1)) continue;
+//			if (!(reportFolder.getName().indexOf("novel") != -1)) continue;
 			
 			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
-			if (reportFolder.getName().indexOf("varimod") != -1) continue;
+//			if (reportFolder.getName().indexOf("varimod") != -1) continue;
 			
 			/* ignore personal proteome */
-			if (reportFolder.getName().indexOf("personal") != -1) continue;
+//			if (reportFolder.getName().indexOf("personal") != -1) continue;
 			
 			/* ignore personal subject */
 //			if (reportFolder.getName().indexOf("subject") != -1) continue;
 			
 			/* ignore xenograft */
-			if (reportFolder.getName().indexOf("xeno") != -1) continue;
+//			if (reportFolder.getName().indexOf("xeno") != -1) continue;
 			
 			/* ignore mouse */
-			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
+//			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
 			
 //			if (resultsType == ResultsCategory.PROTEIN) continue;
 			

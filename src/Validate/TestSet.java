@@ -112,6 +112,7 @@ public class TestSet {
 		trueTallyAtFivePercentError = 0;
 		percentAtFivePercentError = 0;
 		areaUnderPRCurve = 0;
+		timeElapsed = 0;
 	}
 	
 	/**
