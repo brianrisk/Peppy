@@ -36,9 +36,6 @@ public class BestMatches {
 	/* the sample from which all of the results have been derived */
 	private String sampleName;
 	
-	/* places on chromosomes that we want to pay attention to */
-	ArrayList<Region> regionsOfInterest = new ArrayList<Region>();
-	
 	/* where we keep the best results */
 	Hashtable<String, Match> bestMatches = new Hashtable<String, Match>();
 	
@@ -51,550 +48,21 @@ public class BestMatches {
 	public static void main(String args[]) {
 //		washu();
 //		washuChr8();
-		pandey();
+//		pandey();
 //		mayo();
 //		ucla();
 //		yale();
 //		washUPaperOne();
+		washURegionsOfInterest();
 //		gm12878();
 //		washUPaperOneRegionAnalysis();
 //		yaleEnzymeless();
 		U.p("done");
 	}
 	
-	public static void pandey() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
-		
-		reportFolders.add(new File("/Users/risk2/PeppyData/akhilesh-pandey/reports/2 pandey2 smart tolerances"));
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		for (File folder: reportFolders) {
-			BestMatches matches = loadFromResultsFolder(folder);
-			bestMatches.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-	}
-	
-	public static void washuChr8() {
-		
-		/* WHIM 16 */
-		BestMatches whim16 = new BestMatches("WHIM16");
-		U.p("\rloading WHIM16");
-		
-		/* contaminant protein */
-		ResultsCategory whim16ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim16ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM16/WHIM16 nomod mouse/report.txt"));
-		whim16.addMatchType(whim16ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim16ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim16ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM16/WHIM16 nomod human/report.txt"));
-		whim16.addMatchType(whim16ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim16ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim16ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM16/WHIM16 chr8 hg19/report.txt"));
-		whim16.addMatchType(whim16ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim16SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim16SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM16/WHIM16 chr8 germline/report.txt"));
-		whim16.addMatchType(whim16SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim16DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim16DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM16/WHIM16 chr8 xeno/report.txt"));
-		whim16.addMatchType(whim16DiseaseGenome);
-		
-		/* find the best peptides */
-		whim16.process();
-		whim16.saveReports();
-		
-		
-		
-		
-		/* WHIM 2 */
-		BestMatches whim2 = new BestMatches("WHIM2");
-		U.p("\rloading WHIM2");
-		
-		/* contaminant protein */
-		ResultsCategory whim2ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim2ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM2/WHIM2 nomod mouse/report.txt"));
-		whim2.addMatchType(whim2ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim2ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim2ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM2/WHIM2 nomod human/report.txt"));
-		whim2.addMatchType(whim2ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim2ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim2ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM2/WHIM2 chr8 hg19/report.txt"));
-		whim2.addMatchType(whim2ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim2SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim2SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM2/WHIM2 chr8 germline/report.txt"));
-		whim2.addMatchType(whim2SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim2DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim2DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/chr8/WHIM2/WHIM2 chr8 xeno/report.txt"));
-		whim2.addMatchType(whim2DiseaseGenome);
-		
-		/* find the best peptides */
-		whim2.process();
-		whim2.saveReports();
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		bestMatches.add(whim2);
-		bestMatches.add(whim16);
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-		
-	}
 
-	
-public static void washuWHIM2 () {
-		
-//		/* WHIM 2 - 33 */
-//		BestMatches whim2_33 = new BestMatches("WHIM2 - 33");
-//		U.p("\rloading WHIM2 - 33");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim2_33ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim2_33ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 mouse/report.txt"));
-//		whim2_33.addMatchType(whim2_33ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim2_33ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim2_33ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 human/report.txt"));
-//		whim2_33.addMatchType(whim2_33ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim2_33ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim2_33ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 hg19/report.txt"));
-//		whim2_33.addMatchType(whim2_33ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim2_33SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim2_33SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 germline/report.txt"));
-//		whim2_33.addMatchType(whim2_33SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim2_33DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim2_33DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 xeno/report.txt"));
-//		whim2_33.addMatchType(whim2_33DiseaseGenome);
-//		
-//		/* find the best peptides */
-//		whim2_33.process();
-//		whim2_33.saveReports();
-		
-		
-		
-		
-		/* WHIM 2 - 41 */
-		BestMatches whim2_41 = new BestMatches("WHIM2 - 41");
-		U.p("\rloading WHIM2 - 41");
-		
-		/* contaminant protein */
-		ResultsCategory whim2_41ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim2_41ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM2/WashU WHIM2 mouse/report.txt"));
-		whim2_41.addMatchType(whim2_41ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim2_41ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim2_41ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM2/WashU WHIM2 human/report.txt"));
-		whim2_41.addMatchType(whim2_41ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim2_41ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim2_41ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM2/WashU WHIM2 hg19/report.txt"));
-		whim2_41.addMatchType(whim2_41ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim2_41SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim2_41SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM2/WashU WHIM2 germline/report.txt"));
-		whim2_41.addMatchType(whim2_41SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim2_41DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim2_41DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM2/WashU WHIM2 xeno/report.txt"));
-		whim2_41.addMatchType(whim2_41DiseaseGenome);
-		
-		/* find the best peptides */
-		whim2_41.process();
-		whim2_41.saveReports();
-		
-		U.p(whim2_41.getBestMatches().get("9952a1f942ff6310afc5ff95772682fc"));
-		
-		
-		
-		
-		
-//		/* WHIM 2 - 43 */
-//		BestMatches whim2_43 = new BestMatches("WHIM2 - 43");
-//		U.p("\rloading WHIM2 - 43");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim2_43ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim2_43ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM2/WashU WHIM2 mouse/report.txt"));
-//		whim2_43.addMatchType(whim2_43ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim2_43ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim2_43ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM2/WashU WHIM2 human/report.txt"));
-//		whim2_43.addMatchType(whim2_43ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim2_43ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim2_43ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM2/WashU WHIM2 hg19/report.txt"));
-//		whim2_43.addMatchType(whim2_43ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim2_43SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim2_43SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM2/WashU WHIM2 germline/report.txt"));
-//		whim2_43.addMatchType(whim2_43SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim2_43DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim2_43DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM2/WashU WHIM2 xeno/report.txt"));
-//		whim2_43.addMatchType(whim2_43DiseaseGenome);
-//		
-//		/* find the best peptides */
-//		whim2_43.process();
-//		whim2_43.saveReports();
-//		
-//		
-//		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-//		bestMatches.add(whim2_33);
-		bestMatches.add(whim2_41);
-//		bestMatches.add(whim2_43);
-//		
-//		/* WHIM 16 - 33 */
-//		BestMatches whim16_33 = new BestMatches("WHIM16 - 33");
-//		U.p("\rloading WHIM16 - 33");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim16_33ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim16_33ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 mouse/report.txt"));
-//		whim16_33.addMatchType(whim16_33ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim16_33ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim16_33ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 human/report.txt"));
-//		whim16_33.addMatchType(whim16_33ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim16_33ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim16_33ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 hg19/report.txt"));
-//		whim16_33.addMatchType(whim16_33ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim16_33SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim16_33SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 germline/report.txt"));
-//		whim16_33.addMatchType(whim16_33SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim16_33DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim16_33DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 xeno/report.txt"));
-//		whim16_33.addMatchType(whim16_33DiseaseGenome);
-//		
-//		/* find the best peptides */
-//		whim16_33.process();
-//		whim16_33.saveReports();
-//		
-//		
-//		
-//		
-//		/* WHIM 16 - 41 */
-//		BestMatches whim16_41 = new BestMatches("WHIM16 - 41");
-//		U.p("\rloading WHIM16 - 41");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim16_41ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim16_41ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 mouse/report.txt"));
-//		whim16_41.addMatchType(whim16_41ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim16_41ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim16_41ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 human/report.txt"));
-//		whim16_41.addMatchType(whim16_41ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim16_41ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim16_41ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 hg19/report.txt"));
-//		whim16_41.addMatchType(whim16_41ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim16_41SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim16_41SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 germline/report.txt"));
-//		whim16_41.addMatchType(whim16_41SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim16_41DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim16_41DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 xeno/report.txt"));
-//		whim16_41.addMatchType(whim16_41DiseaseGenome);
-//		
-//		/* find the best peptides */
-//		whim16_41.process();
-//		whim16_41.saveReports();
-//		
-//		
-//		
-//		
-//		/* WHIM 16 - 43 */
-//		BestMatches whim16_43 = new BestMatches("WHIM16 - 43");
-//		U.p("\rloading WHIM16 - 43");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim16_43ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim16_43ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 mouse/report.txt"));
-//		whim16_43.addMatchType(whim16_43ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim16_43ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim16_43ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 human/report.txt"));
-//		whim16_43.addMatchType(whim16_43ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim16_43ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim16_43ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 hg19/report.txt"));
-//		whim16_43.addMatchType(whim16_43ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim16_43SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim16_43SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 germline/report.txt"));
-//		whim16_43.addMatchType(whim16_43SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim16_43DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim16_43DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt"));
-//		whim16_43.addMatchType(whim16_43DiseaseGenome);
-//		
-//		/* find the best peptides */
-//		whim16_43.process();
-//		whim16_43.saveReports();
-//		
-//		
-//		/* a list of our BestMatches */
-//		bestMatches.add(whim16_33);
-//		bestMatches.add(whim16_41);
-//		bestMatches.add(whim16_43);
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-		
-		
-	}
-	
-	public static void washuWHIM16 () {
-		
-		/* WHIM 16 - 33 */
-		BestMatches whim16_33 = new BestMatches("WHIM16 - 33");
-		U.p("\rloading WHIM16 - 33");
-		
-		/* contaminant protein */
-		ResultsCategory whim16_33ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim16_33ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 mouse/report.txt"));
-		whim16_33.addMatchType(whim16_33ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim16_33ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim16_33ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 human/report.txt"));
-		whim16_33.addMatchType(whim16_33ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim16_33ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim16_33ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 hg19/report.txt"));
-		whim16_33.addMatchType(whim16_33ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim16_33SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim16_33SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 germline/report.txt"));
-		whim16_33.addMatchType(whim16_33SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim16_33DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim16_33DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/33/WHIM16/WashU WHIM16 xeno/report.txt"));
-		whim16_33.addMatchType(whim16_33DiseaseGenome);
-		
-		/* find the best peptides */
-		whim16_33.process();
-		whim16_33.saveReports();
-		
-		
-		
-		
-		/* WHIM 16 - 41 */
-		BestMatches whim16_41 = new BestMatches("WHIM16 - 41");
-		U.p("\rloading WHIM16 - 41");
-		
-		/* contaminant protein */
-		ResultsCategory whim16_41ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim16_41ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 mouse/report.txt"));
-		whim16_41.addMatchType(whim16_41ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim16_41ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim16_41ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 human/report.txt"));
-		whim16_41.addMatchType(whim16_41ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim16_41ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim16_41ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 hg19/report.txt"));
-		whim16_41.addMatchType(whim16_41ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim16_41SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim16_41SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 germline/report.txt"));
-		whim16_41.addMatchType(whim16_41SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim16_41DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim16_41DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 xeno/report.txt"));
-		whim16_41.addMatchType(whim16_41DiseaseGenome);
-		
-		/* find the best peptides */
-		whim16_41.process();
-		whim16_41.saveReports();
-		
-		
-		
-		
-		/* WHIM 16 - 43 */
-		BestMatches whim16_43 = new BestMatches("WHIM16 - 43");
-		U.p("\rloading WHIM16 - 43");
-		
-		/* contaminant protein */
-		ResultsCategory whim16_43ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim16_43ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 mouse/report.txt"));
-		whim16_43.addMatchType(whim16_43ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim16_43ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim16_43ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 human/report.txt"));
-		whim16_43.addMatchType(whim16_43ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim16_43ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim16_43ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 hg19/report.txt"));
-		whim16_43.addMatchType(whim16_43ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim16_43SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim16_43SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 germline/report.txt"));
-		whim16_43.addMatchType(whim16_43SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim16_43DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim16_43DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt"));
-		whim16_43.addMatchType(whim16_43DiseaseGenome);
-		
-		/* find the best peptides */
-		whim16_43.process();
-		whim16_43.saveReports();
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		bestMatches.add(whim16_33);
-		bestMatches.add(whim16_41);
-		bestMatches.add(whim16_43);
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-		
-		
-	}
-	
-	public static void washu41() {
-//		/* WHIM 2 */
-//		BestMatches whim2 = new BestMatches("WHIM2");
-//		U.p("\rloading WHIM2");
-//		
-//		/* contaminant protein */
-//		ResultsCategory whim2ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-//		whim2ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 mouse/report.txt"));
-//		whim2.addMatchType(whim2ContaminantProtein);
-//		
-//		/* target protein */
-//		ResultsCategory whim2ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-//		whim2ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 human/report.txt"));
-//		whim2.addMatchType(whim2ReferenceProtein);
-//		
-//		/* reference genome */
-//		ResultsCategory whim2ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-//		whim2ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 hg19/report.txt"));
-//		whim2.addMatchType(whim2ReferenceGenome);
-//		
-//		/* subject genome */
-//		ResultsCategory whim2SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-//		whim2SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 germline/report.txt"));
-//		whim2.addMatchType(whim2SubjectGenome);
-//		
-//		/* disease genome */
-//		ResultsCategory whim2DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-//		whim2DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/WHIM2/WashU WHIM2 xeno/report.txt"));
-//		whim2.addMatchType(whim2DiseaseGenome);
-//		
-//		
-//		/* find the best peptides */
-//		whim2.process();
-//		whim2.saveReports();
-		
-		
-		/* this list should be ordered by hierarchy of importance; least important first */
-		
-		/* WHIM 16 */
-		BestMatches whim16 = new BestMatches("WHIM16");
-		U.p("\rloading WHIM16");
-		
-		/* contaminant protein */
-		ResultsCategory whim16ContaminantProtein = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		whim16ContaminantProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 mouse/report.txt"));
-		whim16.addMatchType(whim16ContaminantProtein);
-		
-		/* target protein */
-		ResultsCategory whim16ReferenceProtein = new ResultsCategory("ReferenceProtein", ResultsCategory.PROTEIN);
-		whim16ReferenceProtein.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 human/report.txt"));
-		whim16.addMatchType(whim16ReferenceProtein);
-		
-		/* reference genome */
-		ResultsCategory whim16ReferenceGenome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		whim16ReferenceGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 hg19/report.txt"));
-		whim16.addMatchType(whim16ReferenceGenome);
-		
-		/* subject genome */
-		ResultsCategory whim16SubjectGenome = new ResultsCategory("SubjectGenome", ResultsCategory.DNA);
-		whim16SubjectGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 germline/report.txt"));
-		whim16.addMatchType(whim16SubjectGenome);
-		
-		/* disease genome */
-		ResultsCategory whim16DiseaseGenome = new ResultsCategory("DiseaseGenome", ResultsCategory.DNA);
-		whim16DiseaseGenome.addFile(new File("/Users/risk2/PeppyData/WashU/reports/41/WHIM16/WashU WHIM16 xeno/report.txt"));
-		whim16.addMatchType(whim16DiseaseGenome);
-		
-		/* find the best peptides */
-		whim16.process();
-		whim16.saveReports();
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-//		bestMatches.add(whim2);
-		bestMatches.add(whim16);
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-		
-		
-	}
-	
-	private static BestMatches loadFromResultsFolder(File resultsFolder) {
-		BestMatches bestMatches = new BestMatches(resultsFolder.getName());
+	public BestMatches(File resultsFolder, int resultsTypeToAccept, ArrayList<String> direcotryTitlesToIgnore) {
+		sampleName = resultsFolder.getName();
 		
 		/* list all the directories in this folder */
 		File [] reportFolders = resultsFolder.listFiles();
@@ -603,14 +71,21 @@ public static void washuWHIM2 () {
 			if (!reportFolder.isDirectory()) continue;
 			
 			
+			/* get out if the report folder is one we are ignoring */
+			boolean ignoreDirectory = false;
+			for (String directoryTitleToIgnore: direcotryTitlesToIgnore) {
+				if (reportFolder.getName().toLowerCase().indexOf(directoryTitleToIgnore.toLowerCase()) != -1) ignoreDirectory = true;
+			}
+			if (ignoreDirectory) continue;
 			
-			/* the text report file */
+			/* the file where the text report file should be*/
 			File textReportFile = new File (reportFolder, "report.txt");
 			
+			/* get out if there is no report file */
 			if (!textReportFile.exists()) continue;
 			
 			String folderName = reportFolder.getName();
-
+	
 			/* extract the database name from the directory name */
 			String [] nameComponents = folderName.split("-");
 			
@@ -618,7 +93,7 @@ public static void washuWHIM2 () {
 			String databaseName = nameComponents[nameComponents.length - 1];
 			databaseName = databaseName.trim();
 			
-			/* find out if this is dna or protein */
+			/* find out results type (i.e., if this is GENOME or protein) */
 			BufferedReader br;
 			int resultsType = -1;
 			try {
@@ -638,37 +113,23 @@ public static void washuWHIM2 () {
 				e.printStackTrace();
 			}
 			
-//			if (!(reportFolder.getName().indexOf("novel") != -1)) continue;
-			
-			/* ignore the varimod as it is mixed protein and DNA an adds no new peptides */
-//			if (reportFolder.getName().indexOf("varimod") != -1) continue;
-			
-			/* ignore personal proteome */
-//			if (reportFolder.getName().indexOf("personal") != -1) continue;
-			
-			/* ignore personal subject */
-//			if (reportFolder.getName().indexOf("subject") != -1) continue;
-			
-			/* ignore xenograft */
-//			if (reportFolder.getName().indexOf("xeno") != -1) continue;
-			
-			/* ignore mouse */
-//			if (reportFolder.getName().toLowerCase().indexOf("mouse") != -1) continue;
-			
-//			if (resultsType == ResultsCategory.PROTEIN) continue;
-			
+			/* get out if we find this is not the correct results type */
+			if (resultsTypeToAccept != -1) {
+				if (resultsType != resultsTypeToAccept) continue;
+			}
+	
 			/* add these results to the bestMatches */
 			ResultsCategory results = new ResultsCategory(databaseName, resultsType);
 			results.addFile(textReportFile);
-			bestMatches.addMatchType(results);
+			addMatchType(results);
 			
-		}
+		}	
+		process();
 		
-		bestMatches.process();
-		bestMatches.saveReports();
-		
-		return bestMatches;
 	}
+
+
+	
 	
 	public static void washUPaperOne() {
 		
@@ -687,54 +148,88 @@ public static void washuWHIM2 () {
 		
 		/* a list of our BestMatches */
 		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+		
 		for (File folder: reportFolders) {
-			BestMatches matches = loadFromResultsFolder(folder);
+			BestMatches matches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
 			bestMatches.add(matches);
 		}
 		
 		createUnifiedSamplesReport(bestMatches, "peptideSequence");
 	}
 	
-	public static void washUPaperOneRegionAnalysis() {
+	
+public static void washURegionsOfInterest() {
 		
-		ArrayList<File> reportFolders = new ArrayList<File>();
 		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-WHIM2 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-WHIM16 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis043 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis041 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis043 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis041 CPTAC new proteins"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033 CPTAC new proteins"));
-			
 		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		for (File folder: reportFolders) {
-			BestMatches matches = loadFromResultsFolder(folder);
-			bestMatches.add(matches);
+		ArrayList<File> subtractReportFolders = new ArrayList<File>();
+		
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
+		
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
+		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
+		
+		ArrayList<String> subtractDirecotryTitlesToIgnore = new ArrayList<String>();
+		subtractDirecotryTitlesToIgnore.add("varimod");
+		subtractDirecotryTitlesToIgnore.add("mouse");
+		
+		ArrayList<BestMatches> subtractBestMatchesArray = new ArrayList<BestMatches>();
+		for (File folder: subtractReportFolders) {
+			BestMatches matches = new BestMatches(folder, -1, subtractDirecotryTitlesToIgnore);
+			subtractBestMatchesArray.add(matches);
 		}
 		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+		
+		
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-UNC-WHIM2-Ellis043/"));
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-UNC-WHIM16-Ellis043/"));
+		
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+		direcotryTitlesToIgnore.add("gencode");
+		direcotryTitlesToIgnore.add("subject");
+		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("mouse");
+		
+		for (File folder: reportFolders) {
+			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
+			bestMatchesArray.add(matches);
+		}
+		
+		for (BestMatches bmKeep: bestMatchesArray) {
+			for (BestMatches bmSubtract: subtractBestMatchesArray) {
+				bmKeep.subtractBestMatchesPeptide(bmSubtract);
+			}
+		}
+		
+		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
 	}
 	
-public static void gm12878() {
-		
-		ArrayList<File> reportFolders = new ArrayList<File>();
-		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		for (File folder: reportFolders) {
-			BestMatches matches = loadFromResultsFolder(folder);
-			bestMatches.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-	}
+
 	
 	
 
@@ -1181,7 +676,9 @@ public static void gm12878() {
 			matchWriter.println("<th>UCSC</th>");
 			matchWriter.println("<th>NIST</th>");
 			matchWriter.println("<th>unique</th>");
-			matchWriter.println("<th>locus</th>");
+			matchWriter.println("<th>chr</th>");
+			matchWriter.println("<th>start</th>");
+			matchWriter.println("<th>stop</th>");
 			matchWriter.println("<th>strand</th>");
 			
 			matchWriter.println("</tr>");
@@ -1247,13 +744,11 @@ public static void gm12878() {
 				boolean unique = anyMatch.getBoolean("uniqueGlobally");
 				matchWriter.println("<td>" + unique + "</td>");
 				
-				if (unique) {
-					/* locus */
-					matchWriter.println("<td>" + anyMatch.getString("sequenceName") + " " + anyMatch.getInt("start") + "</td>");
-				} else {
-					matchWriter.println("<td><i>" + anyMatch.getString("sequenceName") + " " + anyMatch.getInt("start") + "</i></td>");
-				}
-				
+				/* locus */
+				matchWriter.println("<td>" + anyMatch.getString("sequenceName")  + "</td>");
+				matchWriter.println("<td>" + anyMatch.getInt("start") + "</td>");
+				matchWriter.println("<td>" + anyMatch.getInt("stop") + "</td>");
+
 				/* strand */
 				matchWriter.println("<td>" + anyMatch.getString("strand") + "</td>");
 				
@@ -1276,18 +771,25 @@ public static void gm12878() {
 		this.resultsCategories.add(resultsCategory);
 	}
 	
-	public void process() {
-		/* load the regions of interest */
-//		loadRegionsOfInterest(new File("/Users/risk2/Documents/WashU/aCGH_whim2_hg19_all.txt"));
-
-		
+	public void process() {		
 		
 		/* load all the matches */
 		for (ResultsCategory resultsCategory: this.resultsCategories) {
 			loadResults(resultsCategory);
 		}
-				
 		
+		populateBestPeptides();
+		
+		U.p("Number of spectra identified: " + bestMatches.size());
+		U.p("Number of unique peptides: " + bestPeptides.size());
+			
+	}
+	
+	/**
+	 * reduce best matches to best peptides
+	 */
+	public void populateBestPeptides() {
+		bestPeptides = new Hashtable<String, Match>();
 		/* reduce the best results down to the best one match for any given peptide */
 		Enumeration<Match> values = bestMatches.elements();
 		while (values.hasMoreElements()) {
@@ -1318,14 +820,274 @@ public static void gm12878() {
 				
 			}
 		}
-		
-		U.p("Number of spectra identified: " + bestMatches.size());
-		U.p("Number of unique peptides: " + bestPeptides.size());
+	}
+	
+	public static ArrayList<Match> loadMatches(File file) {
+		ArrayList<Match> out = new ArrayList<Match>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
 			
+			/* read the header lines */
+			br.readLine();
+			br.readLine();
+			br.readLine();
+			
+			/* find out what property each column represents */
+			String line = br.readLine();
+			String [] propertyNames = line.split("\t");
+			
+			/* read in the first line */
+			line = br.readLine();
+			
+			while (line != null) {
+				String [] chunks = line.split("\t");
+				Match match = new Match();
+				for (int i = 0; i < propertyNames.length; i++) {
+					Class<?> propertyType = match.getColumns().get(propertyNames[i]);
+					if (propertyType == null  || propertyType.equals(String.class)) {
+						match.set(propertyNames[i], chunks[i]);
+					} else {
+						try {
+							if (propertyType.equals(File.class)) {
+								match.set(propertyNames[i], new File(chunks[i]));
+							}
+							if (propertyType.equals(Integer.class)) {
+								match.set(propertyNames[i], Integer.parseInt(chunks[i]));
+							}
+							if (propertyType.equals(Double.class)) {
+								match.set(propertyNames[i], Double.parseDouble(chunks[i]));
+							}
+							if (propertyType.equals(Boolean.class)) {
+								match.set(propertyNames[i], Boolean.parseBoolean(chunks[i]));
+							}
+						}
+						catch (Exception e) {
+							U.p("error with property " + propertyNames[i] + " in file " + file.getAbsolutePath());
+						}
+					}
+				}
+				line = br.readLine();
+				
+				/* we now have our match */
+				
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return out;
 	}
 	
 	
 	
+	private void loadResults2(ResultsCategory resultsCategory) {
+		U.p("loading " + resultsCategory.getName());
+		
+		/* load all the matches */
+		ArrayList<Match> newMatches = new ArrayList<Match>();
+		
+		/* this hashtable will help us determine if a match is ambiguous, 
+		 * that is, the peptide (or peptide with same score)
+		 * can be found elsewhere in this data set
+		 */
+		Hashtable<String, Match> oneMatchPerSpectrum = new Hashtable<String, Match>();
+		
+		for (File file: resultsCategory.getFiles()) {
+			ArrayList<Match> fileMatches = Match.loadMatches(file);
+			
+			for (Match match: fileMatches) {
+				
+				/* first associate the match with this match type */
+				match.set("matchType", resultsCategory);
+				match.set("reportFile", file);
+				
+				if (match.getString("spectrumMD5") == null) U.p(file);
+				Match matchToSpectrum = oneMatchPerSpectrum.get(match.getString("spectrumMD5"));
+				
+				
+				/* all this is to determine ambiguity */
+				if (matchToSpectrum == null) {
+					oneMatchPerSpectrum.put(match.getString("spectrumMD5"), match);
+				} else {
+					if (match.getScore() > matchToSpectrum.getScore()) {
+						oneMatchPerSpectrum.put(match.getString("spectrumMD5"), match);
+					} else {
+						if (match.getScore() == matchToSpectrum.getScore()) {
+							matchToSpectrum.set("uniqueInSet",false);
+							match.set("uniqueInSet",false);
+						}
+					}
+				}
+				
+			}
+			
+			newMatches.addAll(fileMatches);
+		}
+		
+		/* add the new results in.  This was separated out from above
+		 * so that the "ambiguous" property could be accurately set
+		 */
+		
+		for (Match match: newMatches) {
+			/* Get the reigning match, if better, add */
+			Match bestMatch = bestMatches.get(match.getString("spectrumMD5"));
+			if (bestMatch == null) {
+				bestMatches.put(match.getString("spectrumMD5"), match);
+				match.set("uniqueGlobally",true);
+			} else {
+				if (match.getScore() > bestMatch.getScore()) {
+					bestMatches.put(match.getString("spectrumMD5"), match);
+					match.set("uniqueGlobally",true);
+				} else {
+					if (match.getScore() == bestMatch.getScore()) {
+						if (match.get("amplificationScore") != null) {
+							bestMatch.set("amplificationScore", match.getDouble("amplificationScore"));
+						}
+						bestMatch.set("uniqueGlobally", false);
+						match.set("uniqueGlobally",false);
+					} 
+					
+				}
+			}
+		}
+	
+	}
+
+	
+	
+	private void loadResults(ResultsCategory resultsCategory) {
+		U.p("loading " + resultsCategory.getName());
+		
+		for (File file: resultsCategory.getFiles()) {
+			/* load one match at a time from the file */
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				
+				/* read the header lines */
+				br.readLine();
+				br.readLine();
+				br.readLine();
+				
+				/* find out what property each column represents */
+				String line = br.readLine();
+				String [] propertyNames = line.split("\t");
+				
+				/* read in the first line */
+				line = br.readLine();
+				
+				while (line != null) {
+					String [] chunks = line.split("\t");
+					Match match = new Match();
+					for (int i = 0; i < propertyNames.length; i++) {
+						Class<?> propertyType = match.getColumns().get(propertyNames[i]);
+						if (propertyType == null  || propertyType.equals(String.class)) {
+							match.set(propertyNames[i], chunks[i]);
+						} else {
+							try {
+								if (propertyType.equals(File.class)) {
+									match.set(propertyNames[i], new File(chunks[i]));
+								}
+								if (propertyType.equals(Integer.class)) {
+									match.set(propertyNames[i], Integer.parseInt(chunks[i]));
+								}
+								if (propertyType.equals(Double.class)) {
+									match.set(propertyNames[i], Double.parseDouble(chunks[i]));
+								}
+								if (propertyType.equals(Boolean.class)) {
+									match.set(propertyNames[i], Boolean.parseBoolean(chunks[i]));
+								}
+							}
+							catch (Exception e) {
+								U.p("error with property " + propertyNames[i] + " in file " + file.getAbsolutePath());
+							}
+						}
+					}
+					line = br.readLine();
+					
+					/* we now have our match */
+					
+					/* first associate the match with this match type */
+					match.set("matchType", resultsCategory);
+					match.set("reportFile", file);
+					
+					/* Get the reigning match, if better, add */
+					Match bestMatch = bestMatches.get(match.getString("spectrumMD5"));
+					if (bestMatch == null) {
+						bestMatches.put(match.getString("spectrumMD5"), match);
+						match.set("uniqueGlobally",true);
+					} else {
+						if (match.getScore() > bestMatch.getScore()) {
+							bestMatches.put(match.getString("spectrumMD5"), match);
+							match.set("uniqueGlobally",true);
+						} else {
+							if (match.getScore() == bestMatch.getScore()) {
+								if (match.get("amplificationScore") != null) {
+									bestMatch.set("amplificationScore", match.getDouble("amplificationScore"));
+								}
+								bestMatch.set("uniqueGlobally", false);
+								match.set("uniqueGlobally",false);
+							} 
+							
+						}
+					}	
+					
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	
+	}
+
+	/**
+	 * subtracts the identified spectra from one best match set from this one
+	 * @param otherBM
+	 */
+	public void subtractBestMatchesSpectrum(BestMatches otherBM) {
+		Hashtable<String, Match> otherBestMatchesHash = otherBM.getBestMatches();
+		ArrayList<String> ourBestMatchKeys = new ArrayList<String>(getBestMatches().keySet());
+		Hashtable<String, Match> reducedBestMatches = new Hashtable<String, Match>();
+		
+		/* go through all of the keys of our best matches
+		 * if the other matches don't have a key, then that means
+		 * we don't lose it from the subtraction
+		 */
+		for (String key: ourBestMatchKeys) {
+			Match otherMatch = otherBestMatchesHash.get(key);
+			if (otherMatch == null) {
+				reducedBestMatches.put(key, bestMatches.get(key));
+			}
+		}
+		bestMatches = reducedBestMatches;
+		populateBestPeptides();
+	}
+	
+	/**
+	 * subtracts our matches that have peptides from the set of peptides found in the other best matches
+	 * @param otherBM
+	 */
+	public void subtractBestMatchesPeptide(BestMatches otherBM) {
+		
+		Hashtable<String, Match> reducedBestMatches = new Hashtable<String, Match>();
+		Hashtable<String, Match> otherBestPaptides = otherBM.getBestPeptideMatches();
+		ArrayList<Match> ourBestMatches = new ArrayList<Match>(getBestMatches().values());
+		
+
+		for (Match match: ourBestMatches) {
+			String peptide = match.getString("peptideSequence");
+			if (otherBestPaptides.get(peptide) == null) {
+				reducedBestMatches.put(match.getString("spectrumMD5"), match);
+			}
+		}
+		bestMatches = reducedBestMatches;
+		populateBestPeptides();
+	}
+
+
 	public void saveReports() {
 		ArrayList<Match> bestArray = new ArrayList<Match>(bestPeptides.values());
 		Collections.sort(bestArray);
@@ -1423,124 +1185,8 @@ public static void gm12878() {
 	public Hashtable<String, Match> getBestMatches() {
 		return bestMatches;
 	}
-	
-	
-	
-	private void loadRegionsOfInterest(File regionsFile) {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(regionsFile));
-			
-			String line = br.readLine();
-			
-			while (line != null) {
-				String [] chunks = line.split("\t");
-				regionsOfInterest.add(
-						new Region(
-							chunks[0],
-							Integer.parseInt(chunks[1]),
-							Integer.parseInt(chunks[2]),
-							Double.parseDouble(chunks[3])
-						)
-					);
-				/* don't forget to load in that next line! */
-				line = br.readLine();
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 
-
-	
-	private void loadResults(ResultsCategory resultsCategory) {
-		U.p("loading " + resultsCategory.getName());
-		
-		/* load all the matches */
-		ArrayList<Match> newMatches = new ArrayList<Match>();
-		
-		/* this hashtable will help us determine if a match is ambiguous, 
-		 * that is, the peptide (or peptide with same score)
-		 * can be found elsewhere in this data set
-		 */
-		Hashtable<String, Match> oneMatchPerSpectrum = new Hashtable<String, Match>();
-		
-		for (File file: resultsCategory.getFiles()) {
-			ArrayList<Match> fileMatches = Match.loadMatches(file);
-			
-			for (Match match: fileMatches) {
-				
-				/* first associate the match with this match type */
-				match.set("matchType", resultsCategory);
-				match.set("reportFile", file);
-				
-				if (match.getString("spectrumMD5") == null) U.p(file);
-				Match matchToSpectrum = oneMatchPerSpectrum.get(match.getString("spectrumMD5"));
-				
-				
-				/* all this is to determine ambiguity */
-				if (matchToSpectrum == null) {
-					oneMatchPerSpectrum.put(match.getString("spectrumMD5"), match);
-				} else {
-					if (match.getScore() > matchToSpectrum.getScore()) {
-						oneMatchPerSpectrum.put(match.getString("spectrumMD5"), match);
-					} else {
-						if (match.getScore() == matchToSpectrum.getScore()) {
-							matchToSpectrum.set("uniqueInSet",false);
-							match.set("uniqueInSet",false);
-						}
-					}
-				}
-				
-				/* determine if match is in a region of interest and set that property */
-				if (resultsCategory.getDatabaseType() == resultsCategory.DNA) {
-					for (Region region: regionsOfInterest) {
-						if (region.getStart() <= match.getInt("start")) {
-							if (region.getStop() >= match.getInt("stop")) {
-								if (region.getSequenceName().equalsIgnoreCase(match.getString("sequenceName"))) {
-									match.set("amplificationScore", region.getScore());
-								}
-							}
-						}
-					}
-				}
-				
-			}
-			
-			newMatches.addAll(fileMatches);
-		}
-		
-		/* add the new results in.  This was separated out from above
-		 * so that the "ambiguous" property could be accurately set
-		 */
-		
-		for (Match match: newMatches) {
-			/* Get the reigning match, if better, add */
-			Match bestMatch = bestMatches.get(match.getString("spectrumMD5"));
-			if (bestMatch == null) {
-				bestMatches.put(match.getString("spectrumMD5"), match);
-				match.set("uniqueGlobally",true);
-			} else {
-				if (match.getScore() > bestMatch.getScore()) {
-					bestMatches.put(match.getString("spectrumMD5"), match);
-					match.set("uniqueGlobally",true);
-				} else {
-					if (match.getScore() == bestMatch.getScore()) {
-						if (match.get("amplificationScore") != null) {
-							bestMatch.set("amplificationScore", match.getDouble("amplificationScore"));
-						}
-						bestMatch.set("uniqueGlobally", false);
-						match.set("uniqueGlobally",false);
-					} 
-					
-				}
-			}
-		}
-
-	}
-	
 	
 	public String getSampleName() {
 		return sampleName;
