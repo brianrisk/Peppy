@@ -1,6 +1,10 @@
 package Tools;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +26,8 @@ import Peppy.U;
  */
 public class SixFrameRegion {
 	
-	private static String sequenceDNA;
+	private static int minimumProteinLength = 8;
+	
 	
 	public static void main(String args[]) {
 		U.p("Starting six frame region translation...");
@@ -30,30 +35,125 @@ public class SixFrameRegion {
 		/* initializing */
 		Peppy.init(args);
 		
-		/* loading in the nucleotide sequence */
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		/* sequence will always be DNA */
+		Properties.isSequenceFileDNA = true;
+ 		
+//		createDatabase(Properties.sequenceDirectoryOrFile, Properties.sequenceRegionStart, Properties.sequenceRegionStop);
+		
+//		File interestLocations = new File("regions-of-interest.csv");
+//		createDatabasesFromFile(interestLocations, "/Users/risk2/PeppyData/public/sequences/dna/HG19/");
+		
+		createDatabaseOfGenome("/Users/risk2/PeppyData/public/sequences/dna/HG19/", "hg19");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/germline/", "w16-germline");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/tumor/", "w16-tumor");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/xeno/", "w16-xeno");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/germline/", "w2-germline");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/tumor/", "w2-tumor");
+		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/xeno/", "w2-xeno");
+		
+		U.p("done");
+	}
+	
+	
+	/**
+	 * This takes the chromosome and start position and creates databases with 100,000 nt diameter windows
+	 * 
+	 * file format:  CSV
+	 * column 1: peptide sequence
+	 * column 2: chromosome
+	 * column 3: location
+	 * 
+	 * assumes:
+	 * suffix is ".fa"
+	 * 
+	 * @param interestLocations
+	 */
+	public static void createDatabasesFromFile(File interestLocations, String sequenceDirectoryString, String destinationFolderName) {
+		
+		File sequenceDirectory = new File(sequenceDirectoryString);
+		int windowRadius = 50000;
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(interestLocations));
+			String line = br.readLine();
+			while (line != null) {
+				String [] chunks = line.split(",");
+				String acidSequence = chunks[0];
+				String chrName = chunks[1];
+				int locus = Integer.parseInt(chunks[2]);
+				File sequenceFile = new File(sequenceDirectory, chrName + ".fa");
+				int startPosition = locus - windowRadius;
+				int stopPosition = locus + windowRadius;
+				createDatabase(sequenceFile, startPosition, stopPosition, destinationFolderName);
+				/* read the next line */
+				line = br.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public static void createDatabaseOfGenome(String sequenceDirectoryString, String destinationFolderName) {
+		/* let the user see which one we're on */
+		U.p(destinationFolderName);
+		
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(sequenceDirectoryString);	
+		for (Sequence sequence: sequences) {
+			U.p(sequence.getSequenceFile().getName());
+			createDatabase(sequence.getSequenceFile(), -1, -1, destinationFolderName);
+		}
+	}
+	
+		
+	/**
+	 * setting startPosition to -1 will make it do the whole sequence
+	 * @param sequence
+	 * @param startPosition
+	 * @param stopPosition
+	 */
+	public static void createDatabase(File sequence, int startPosition, int stopPosition, String destinationFolderName) {
+		
+		boolean wholeSequence = false;
+		if (startPosition == -1) {
+			wholeSequence = true;
+		}
+		
+		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(sequence);
 		Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
-		sequenceDNA = sequenceFile.getNucleotideSequences().get(0).getSequence();
-		
-		
-		int startPosition = Properties.sequenceRegionStart;
-		int stopPosition = Properties.sequenceRegionStop;
-		
-//		U.p(sequenceDNA.subSequence(startPosition, stopPosition));
 		
 		String chrName = U.getFileNameWithoutSuffix(sequenceFile.getSequenceFile());
 		
 		/* where we store the fasta header info */
 		String proteinHeader;
 		
+		/* the actual nucleotide sequence */
+		String sequenceDNA = sequenceFile.getNucleotideSequences().get(0).getSequence();
+		
+		/* if whole sequence, reset start and stop now that we have the sequence loaded */
+		if (wholeSequence) {
+			startPosition = 0;
+			stopPosition = sequenceDNA.length() - 1;
+		}
+		
 		/* produce and write the frames */
 		try {
-			String fileName = chrName + " " + startPosition + "-" + stopPosition +".fasta";
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+			File destinationFolder = new File("sixFrameSequences/" + destinationFolderName);
+			destinationFolder.mkdirs();
+			String fileName;
+			if (wholeSequence) {
+				fileName = chrName +".fasta";
+			} else {
+				fileName = chrName + " " + startPosition + "-" + stopPosition +".fasta";
+			}
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(destinationFolder, fileName))));
 			
 			/* do the forwards frames */
 			for (int i = 0; i < 3; i++) {
-				String frame = getFrame (startPosition + i, stopPosition, true);
+				String frame = getFrame (startPosition + i, stopPosition, true, sequenceDNA);
 				
 				/* string buffer and string to hold the protein */
 				StringBuffer sb = new StringBuffer();
@@ -69,12 +169,12 @@ public class SixFrameRegion {
 						protein = sb.toString();
 						
 						/* print if protein */
-						if (protein.length() > 4) {
+						if (protein.length() > minimumProteinLength) {
 							proteinStart =  (startPosition + i + (j * 3));
 							proteinStop = (startPosition + i + (j * 3) + (protein.length() * 3));
 							
-							proteinHeader =  chrName + "_fwd_" + proteinStart + "_" + proteinStop;
-							pw.println(">" + proteinHeader + " " + proteinHeader );
+							proteinHeader = ">" + chrName + "; strand:fwd; frame:" + i +"; start:" + proteinStart + "; stop:" + proteinStop;
+							pw.println(proteinHeader );
 							StringBuffer lineBuffer = new StringBuffer();
 							for (int aaIndex = 0; aaIndex < protein.length(); aaIndex++) {
 								lineBuffer.append(protein.charAt(aaIndex));
@@ -86,7 +186,7 @@ public class SixFrameRegion {
 							if (lineBuffer.length() > 0) {
 								pw.println(lineBuffer.toString());
 							}
-							pw.println(protein);
+							pw.println();
 						}
 						
 						/* clear out the string buffer */
@@ -97,15 +197,12 @@ public class SixFrameRegion {
 					}
 				}
 				
-				/* print extra spacer */
-				pw.println();
-				pw.println();
 				
 			}
 			
 			/* do the reverse frames */
 			for (int i = 0; i < 3; i++) {
-				String frame = getFrame (stopPosition - i, startPosition, false);
+				String frame = getFrame (stopPosition - i, startPosition, false, sequenceDNA);
 				
 				/* string buffer and string to hold the protein */
 				StringBuffer sb = new StringBuffer();
@@ -121,12 +218,22 @@ public class SixFrameRegion {
 						protein = sb.toString();
 						
 						/* print if protein */
-						if (protein.length() > 4) {
+						if (protein.length() > minimumProteinLength) {
 							proteinStart =  stopPosition - ( i + (j * 3));
 							proteinStop = stopPosition - ( i + (j * 3) + (protein.length() * 3));
-							proteinHeader = ">" + chrName + "_rev_" + proteinStop + "_" + proteinStart;
+							proteinHeader = ">" + chrName + "; strand:rev; frame:" + i +"; start:" + proteinStart + "; stop:" + proteinStop;
 							pw.println(proteinHeader);
-							pw.println(protein);
+							StringBuffer lineBuffer = new StringBuffer();
+							for (int aaIndex = 0; aaIndex < protein.length(); aaIndex++) {
+								lineBuffer.append(protein.charAt(aaIndex));
+								if (aaIndex % 80 == 79) {
+									pw.println(lineBuffer.toString());
+									lineBuffer = new StringBuffer();
+								}
+							}
+							if (lineBuffer.length() > 0) {
+								pw.println(lineBuffer.toString());
+							}
 							pw.println();
 						}
 						
@@ -138,10 +245,6 @@ public class SixFrameRegion {
 					}
 				}
 				
-				/* print extra spacer */
-				pw.println();
-				pw.println();
-				
 			}
 			
 			pw.flush();
@@ -150,11 +253,10 @@ public class SixFrameRegion {
 			e.printStackTrace();
 		}
 		
-		U.p("done");
-		
 	}
 	
-	private static String getFrame (int startPosition, int stopPosition, boolean isForwardsStrand) {
+	
+	private static String getFrame (int startPosition, int stopPosition, boolean isForwardsStrand, String sequenceDNA) {
 
 		/* translating */
 		char [] codon = new char[3];
@@ -177,10 +279,7 @@ public class SixFrameRegion {
 				mod++;
 			}
 		}
-		
 		return buildingProtein.toString();
-		
-		
 	}
 
 }

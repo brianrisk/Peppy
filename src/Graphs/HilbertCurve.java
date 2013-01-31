@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import Peppy.Definitions;
 import Peppy.DigestionThread_DNA;
-import Peppy.Nucleotides;
+import Peppy.NucleotideSequence;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
@@ -75,7 +75,7 @@ public class HilbertCurve {
 		//get our sequence
 		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		Sequence_DNA sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
-		Nucleotides dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
+		NucleotideSequence dnaSequence = sequence_DNA.getNucleotideSequences().get(0);
 		String dna = dnaSequence.getSequence();		
 		int sequenceIndexStart = 0;
 		int sequenceIndexStop = dna.length();

@@ -96,6 +96,11 @@ public class PRCurve {
 		g.setColor(Color.white);
 		g.fillRect(0,0,width,width);
 		
+		/*
+		 * In case there are no points
+		 */
+		if (points.size() == 0) return bufferedImage;
+		
 		/* construct the polygon */
 		Polygon polygon = new Polygon();
 		for (Point2D.Double point: points) {

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import Peppy.Nucleotides;
+import Peppy.NucleotideSequence;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.Sequence_DNA;
@@ -22,7 +22,7 @@ public class VCFGenomeAssembler {
 		U.p("we are working with " + sequences.size() + " sequence files");
 				
 		Sequence_DNA sequenceFile;
-		Nucleotides nucleotides;
+		NucleotideSequence nucleotideSequence;
 		String nucleotideSequenceString;
 		char[] bases;
 		
@@ -52,10 +52,10 @@ public class VCFGenomeAssembler {
 		
 		for(Sequence s : sequences) {
 			sequenceFile = (Sequence_DNA) s;
-			nucleotides = sequenceFile.getNucleotideSequences().get(0);
-			nucleotideSequenceString = nucleotides.getSequence();
+			nucleotideSequence = sequenceFile.getNucleotideSequences().get(0);
+			nucleotideSequenceString = nucleotideSequence.getSequence();
 			bases = nucleotideSequenceString.toCharArray();
-			chromosomeNumberString = nucleotides.getChromosomeNumberString();
+			chromosomeNumberString = nucleotideSequence.getChromosomeNumberString();
 			U.p("Working on sequence file " + s.getSequenceFile().getName() );
 			for (VCFEntry entry : entries) {
 				int startIndex = entry.getPos()-1;
@@ -77,7 +77,7 @@ public class VCFGenomeAssembler {
 			PrintWriter pw;
 			try {
 				pw = new PrintWriter(new BufferedWriter (new FileWriter(new File(parentDir, "chr"+chromosomeNumberString+".fa"))));
-				pw.println(nucleotides.getSequenceDescription());
+				pw.println(nucleotideSequence.getSequenceDescription());
 				for (int i = 0; i < bases.length; i++) {
 					pw.print(bases[i]);
 					if (i % 50 == 0 && i > 0) {
