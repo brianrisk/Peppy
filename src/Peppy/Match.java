@@ -165,6 +165,13 @@ public abstract class Match implements Comparable<Match>{
 				}
 			}
 		}
+		/*
+		 * If no ions matched, that's a bad match
+		 */
+		if (ionMatchTally == 0) {
+			impValue = 1;
+			return 1;
+		}
 		
 		//Variables for binomial probabilities
 		int n;
@@ -173,18 +180,17 @@ public abstract class Match implements Comparable<Match>{
 		
 		/* peak match probability is the binomial distribution */
 		p = matchesSpectrum.getSpectrum().getCoverage();
-		double targetMass = matchesSpectrum.getSpectrum().getMass() - AminoAcids.getWeightMono(peptide.getAcidSequence()[0]) - AminoAcids.getWeightMono(peptide.getAcidSequence()[peptideLengthMinusOne]);
+//		double targetMass = matchesSpectrum.getSpectrum().getMass() - AminoAcids.getWeightMono(peptide.getAcidSequence()[0]) - AminoAcids.getWeightMono(peptide.getAcidSequence()[peptideLengthMinusOne]);
 //		p /= targetMass;
 		p /= matchesSpectrum.getSpectrum().getMass();
 		
 		/* sometimes p will be unrealistically small due to high accuracy fragment masses */
-//		double minimumP = Definitions.PROTON_MONO / targetMass;
+//		double minimumP = peptideLengthMinusOne / (matchesSpectrum.getSpectrum().getMass() * 8);
 //		if (p < minimumP) p = minimumP;
 		
 		n = peptideLengthMinusOne * 2;
 		k = ionMatchTally;
 		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
-//		double peakMatchProbability = Math.pow(p, k);
 		
 		/* setting our "coverage" score */
 		if (k > numberOfIonsMatched) numberOfIonsMatched = k;
@@ -204,24 +210,24 @@ public abstract class Match implements Comparable<Match>{
 		
 		//probability of ions being above thresholds
 		double intensityProbability = 1;
-		if (ionMatchTally > 0) {
+		if (ionMatchTally > 0 && totalIonsAbove50 > 0) {
 			n = ionMatchTally;
 			k = totalIonsAbove50;
 			intensityProbability = MathFunctions.getCachedBinomialProbability50(n, k);
-			if (totalIonsAbove50 > 0) {
+			if (totalIonsAbove25 > 0) {
 				n = totalIonsAbove50;
 				k = totalIonsAbove25;
 				intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-				if (totalIonsAbove25 > 0) {
-					n = totalIonsAbove25;
-					k = totalIonsAbove12;
-					intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-					if (totalIonsAbove12 > 0) {
-						n = totalIonsAbove12;
-						k = totalIonsAbove06;
-						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-					}
-				}
+//				if (totalIonsAbove12 > 0) {
+//					n = totalIonsAbove25;
+//					k = totalIonsAbove12;
+//					intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
+//					if (totalIonsAbove06 > 0) {
+//						n = totalIonsAbove12;
+//						k = totalIonsAbove06;
+//						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
+//					}
+//				}
 			}
 		}
 
@@ -330,6 +336,9 @@ public abstract class Match implements Comparable<Match>{
 			peakIndex++;
 		}
 		
+		/* as we marked peaks, we must now unmark them */
+		matchesSpectrum.getSpectrum().setAllPeaksToUnused();
+		
 		return bIonMatchesWithHighestIntensity;
 	}
 	
@@ -366,7 +375,7 @@ public abstract class Match implements Comparable<Match>{
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass -= peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksExact[i] = theoreticalPeakMass;
@@ -397,7 +406,7 @@ public abstract class Match implements Comparable<Match>{
 		/* b-ion */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass += peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksExact[i] = theoreticalPeakMass;
@@ -578,7 +587,11 @@ public abstract class Match implements Comparable<Match>{
 		sb.append('\t');
 		if (Properties.isSequenceFileDNA) {
 			if (getPeptide().getParentSequence() != null) {
-				sb.append(U.getFileNameWithoutSuffix(getPeptide().getParentSequence().getSequenceFile()));
+				if (getPeptide().getProtein() != null) {
+					sb.append(getPeptide().getProtein().getName());
+				} else {
+					sb.append(U.getFileNameWithoutSuffix(getPeptide().getParentSequence().getSequenceFile()));
+				}
 			} else {
 				sb.append("null");
 			}

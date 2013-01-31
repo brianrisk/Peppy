@@ -1,6 +1,7 @@
 package Peppy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * For any given peptide there may exist a host of potentially modified form.
@@ -16,12 +17,10 @@ import java.util.ArrayList;
  */
 public class PeptideWithModificationsGenerator {
 	
-	Peptide peptide;
-	ArrayList<ModificationVariable> modificaitons;
-	
+
 	
 	/**
-	 * see if it works
+	 * testing to see if it works
 	 * @param args
 	 */
 	public static void main(String args[]) {
@@ -31,9 +30,8 @@ public class PeptideWithModificationsGenerator {
 		mods.add(new ModificationVariable(AminoAcids.M, 7));
 		mods.add(new ModificationVariable(AminoAcids.K, 5));
 		
-		PeptideWithModificationsGenerator pmg = new PeptideWithModificationsGenerator(peptide, mods);
-		ArrayList<PeptideWithModifications> peptides = pmg.getModificaitonVariaitons();
-//		Collections.sort(peptides);
+		ArrayList<PeptideWithModifications> peptides = PeptideWithModificationsGenerator.getModificaitonVariaitons(peptide, mods);
+		Collections.sort(peptides);
 		for (PeptideWithModifications modPep: peptides) {
 			double [] modArray = modPep.getModifications();
 			StringBuffer toPrint = new StringBuffer();
@@ -46,13 +44,33 @@ public class PeptideWithModificationsGenerator {
 	}
 	
 	
-	public PeptideWithModificationsGenerator(Peptide peptide,
-			ArrayList<ModificationVariable> modificaitons) {
-		this.peptide = peptide;
-		this.modificaitons = modificaitons;
+	
+	/**
+	 * Takes and array of peptides, and an array of modifications and returns a list of all 
+	 * modified possibles of all of the peptides
+	 * 
+	 * @param peptides
+	 * @param modifications
+	 * @return
+	 */
+	public static ArrayList<PeptideWithModifications> getModificaitonVariaitons(ArrayList<Peptide> peptides, ArrayList<ModificationVariable> modifications) {
+		ArrayList<PeptideWithModifications> out = new ArrayList<PeptideWithModifications>(peptides.size() * modifications.size());
+		for (Peptide peptide: peptides) {
+			out.addAll(getModificaitonVariaitons(peptide, modifications));
+		}
+		return out;
 	}
 	
-	public ArrayList<PeptideWithModifications> getModificaitonVariaitons() {
+	
+	/**
+	 * Takes one peptide and the mods that might take place and returns all possible 
+	 * modified versions of that peptide
+	 * 
+	 * @param peptide
+	 * @param modifications
+	 * @return
+	 */
+	public static ArrayList<PeptideWithModifications> getModificaitonVariaitons(Peptide peptide, ArrayList<ModificationVariable> modifications) {
 		ArrayList<PeptideWithModifications> out = new ArrayList<PeptideWithModifications> ();
 		byte [] sequence = peptide.getAcidSequence();
 		String peptideString = peptide.getAcidSequenceString();
@@ -61,7 +79,7 @@ public class PeptideWithModificationsGenerator {
 		for (int index = 0; index < modificationIndices.length; index++) {
 			modificationIndices[index] = -1;
 		}
-		int residueIndex = getNextRadixArray(sequence, 0, modificationIndices);
+		int residueIndex = getNextRadixArray(sequence, 0, modificationIndices, modifications);
 		
 		while (residueIndex != -1) {
 			double [] modificaitonArray = new double [sequence.length];
@@ -69,15 +87,15 @@ public class PeptideWithModificationsGenerator {
 				if (modificationIndices[index] == -1 ) {
 					modificaitonArray[index] = 0;
 				} else {
-					if (sequence[index] == modificaitons.get(modificationIndices[index]).getAminoAcid()) {
-						modificaitonArray[index] = modificaitons.get(modificationIndices[index]).getMass();
+					if (sequence[index] == modifications.get(modificationIndices[index]).getAminoAcid()) {
+						modificaitonArray[index] = modifications.get(modificationIndices[index]).getMass();
 					}
 				}
 			}
 			out.add(new PeptideWithModifications(peptideString, modificaitonArray));
 			
 
-			residueIndex = getNextRadixArray(sequence, 0, modificationIndices);
+			residueIndex = getNextRadixArray(sequence, 0, modificationIndices, modifications);
 		}
 		
 
@@ -86,7 +104,7 @@ public class PeptideWithModificationsGenerator {
 	
 	
 	
-	private int getNextRadixArray(byte [] sequence, int residueIndex, int [] modificationIndices) {
+	private static int getNextRadixArray(byte [] sequence, int residueIndex, int [] modificationIndices,  ArrayList<ModificationVariable> modifications) {
 		
 		/* keep going until we find mod configuration that actually applies to the amino acids*/
 		boolean keepGoing = true;
@@ -99,7 +117,7 @@ public class PeptideWithModificationsGenerator {
 			modificationIndices[residueIndex]++;
 			
 			/* e.g. 9999 to 10000 loop would repeat 4 times */
-			while (modificationIndices[residueIndex] == modificaitons.size()) {
+			while (modificationIndices[residueIndex] == modifications.size()) {
 				modificationIndices[residueIndex] = -1;
 				residueIndex++;
 				carryTheZero = true;
@@ -116,7 +134,7 @@ public class PeptideWithModificationsGenerator {
 			}
 			
 			/* we have reached the end */
-			if (modificationIndices[residueIndex] == modificaitons.size()) {
+			if (modificationIndices[residueIndex] == modifications.size()) {
 				return -1;
 			}
 			
@@ -125,7 +143,7 @@ public class PeptideWithModificationsGenerator {
 				keepGoing = true;
 			} else {
 				/* keep going if this mod has nothing to do with this amino acid */
-				keepGoing = (sequence[residueIndex] != modificaitons.get(modificationIndices[residueIndex]).getAminoAcid());
+				keepGoing = (sequence[residueIndex] != modifications.get(modificationIndices[residueIndex]).getAminoAcid());
 			}
 			
 

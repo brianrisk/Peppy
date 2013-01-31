@@ -27,80 +27,131 @@ public class ModificationReport {
 	
 	public static void main(String args[]) {
 //		new ModificationReport();
-		createModSpreadsheet();
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/6 WHIM2 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/5 WHIM2 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/5 WHIM2 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/6 WHIM16 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/6 WHIM16 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/5 WHIM16 - varimod/report.txt");
+//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/6 WHIM16 - varimod/report.txt");
+		
+		/*
+		 * gm12878
+		 */
+//		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/4 spectra uncompressed - varimod/report.txt");
+		
+		/*
+		 * Carthene
+		 */
+//		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/CartheneBW-enzymeless/2 carthene-bazemore-walker - varimod/report.txt");
+		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/CartheneBW-enzymeless/");
+		
+		
+		
 		U.p("done");
 	}
 	
-	public static void createModSpreadsheet() {
-		Sample sample = new Sample("WHIM16 - 033", Sample.SUBJECT_GENOME);
-//		sample.loadResults(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM16-Ellis033/6 WHIM16 - varimod/report.txt"));
-		sample.loadResults(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt"));
+	public static void createModSpreadsheet(String fileName) {
+		File reportFile = new File(fileName);
+		ArrayList<Match> matches;
+			
+		BestMatches bestMatches = new BestMatches(reportFile, -1, null);
+		matches = new ArrayList<Match>(bestMatches.getBestMatches().values());
+		
+
+
+		
 		try {
 			
 			for (int targetModMass = 0; targetModMass < 101; targetModMass++) {
-				Hashtable<Integer, Integer> modifications = new Hashtable<Integer, Integer>();
-	//			Hashtable<Integer, Hashtable<Character, Integer>> modificationsAcidCounts = new Hashtable<Integer, Hashtable<Character, Integer>>();
-				Hashtable<Character, Integer> deamidations = new Hashtable<Character, Integer>();
+				Hashtable<Character, Integer> acidModificationTallies = new Hashtable<Character, Integer>();
+				int nTerminalCount = 0;
+				int cTerminalCount = 0;
 				
 				
 				
-				for (Match match: sample.getMatches()) {
-					if (match.getBoolean("isModified")) {
+				for (Match match: matches) {
+					if (match.getBoolean("isModified") ) {
 						int modMass = (int) Math.round(match.getDouble("modMass"));
 						if (modMass == targetModMass) {
 							String peptideSequence = match.getString("peptideSequence");
 							int modIndex = match.getInt("modIndex");
+							
+							/*
+							 * skip if n-terminal
+							 */
+							if (modIndex == 0) continue;
+							
 							char acid = peptideSequence.charAt(modIndex);
 							
-							Integer acidTally = deamidations.get(acid);
+							Integer acidTally = acidModificationTallies.get(acid);
 							if (acidTally == null) {
-								deamidations.put(acid, 1);
+								acidModificationTallies.put(acid, 1);
 							} else {
-								deamidations.put(acid, acidTally + 1);
+								acidModificationTallies.put(acid, acidTally + 1);
 							}
+							
+//							if(peptideSequence.equals("GVVDSEEIPLNLSR")) {
+//								U.p(modIndex + " (" + acid + ")\t" + modMass + "\t" + reportFile.getParentFile().getParentFile().getName() + "\t" + match.getBoolean("modLocCertain"));
+//							}
+							
+							if (modIndex == 0) nTerminalCount++;
+							if (modIndex == peptideSequence.length() - 1) cTerminalCount++;
 						}
 						
-//						/* add to tally */
-//						Integer tally = modifications.get(modMass);
-//						if (tally == null) {
-//							modifications.put(modMass, 1);
-//						} else {
-//							modifications.put(modMass, tally + 1);
-//						}
 					}
 				}
 				
-	//			ArrayList<Integer> keys = new ArrayList<Integer>(modifications.keySet());
-	//			Collections.sort(keys);
-	//			for (Integer key: keys) {
-	//				pw.println(key + "\t" + modifications.get(key));
-	//			}
 				
 				/* find if there is a prevailing residue location */
-				ArrayList<Integer> values = new ArrayList<Integer>(deamidations.values());
+				ArrayList<Integer> values = new ArrayList<Integer>(acidModificationTallies.values());
 				
 				int sum = 0; 
 				for (Integer value: values) {
 					sum += value;
 				}
-				if (sum < 25) continue;
+				if (sum < 1) continue;
 				int max = Collections.max(values);
 				double maxRatio = (double) max / sum ;
 				
-				U.p(targetModMass + " " + maxRatio);
+//				if (maxRatio < .2) continue;
 				
-				if (maxRatio > 0.25) {
-					PrintWriter pw = new PrintWriter(new FileWriter(sum + " " + targetModMass + " modAcids.txt"));
-					
-					ArrayList<Character> keys = new ArrayList<Character>(deamidations.keySet());
-					Collections.sort(keys);
-					for (Character key: keys) {
-						pw.println(key + "\t" + deamidations.get(key));
-					}
-					
-					pw.flush();
-					pw.close();
+				File saveFolder = new File(reportFile.getParentFile().getParentFile().getName() + " mods");
+				saveFolder.mkdir();
+//				PrintWriter pw = new PrintWriter(new FileWriter(new File(saveFolder, targetModMass  + " (" + sum + ") modAcids.txt")));
+				PrintWriter pw = new PrintWriter(new FileWriter(new File(saveFolder, sum  + " (" + targetModMass + ") modAcids.txt")));
+				
+				/*
+				 * Print the amino acids with their modification counts
+				 */
+				ArrayList<Character> keys = new ArrayList<Character>(acidModificationTallies.keySet());
+				Collections.sort(keys);
+				for (Character key: keys) {
+					int tally =  acidModificationTallies.get(key);
+					double ratio = (double) tally / sum;
+					pw.println(key + "\t" + tally  + "\t" + ratio);
 				}
+				
+				/*
+				 * print the N and C terminal counts
+				 */
+				pw.println();
+				pw.println("n-terminal count: " + nTerminalCount + "(" + ((double) nTerminalCount / sum) + ")");
+				pw.println("c-terminal count: " + cTerminalCount + "(" + ((double) cTerminalCount / sum) + ")");
+				
+				/*
+				 * print the modifications this might be
+				 */
+				pw.println();
+				for (ModificationEntry mod: Definitions.modificationEntries) {
+					if (Math.round(mod.getMonoMass()) == targetModMass) {
+						pw.println(mod.getDescription());
+					}
+				}
+				
+				pw.flush();
+				pw.close();
 				
 				
 			}

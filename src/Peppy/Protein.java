@@ -72,6 +72,7 @@ public class Protein {
 		int ORFSize = 0;
 		
 		char aminoAcid = acidString.charAt(0);
+		char nextAminoAcid = acidString.charAt(1);
 		char previousAminoAcid = '.';
 		if (aminoAcid == 'M') {
 			inORF = true;
@@ -123,7 +124,7 @@ public class Protein {
 		ArrayList<PeptideUnderConstruction> peptidesUnderConstruction = new ArrayList<PeptideUnderConstruction>();
 		
 		//start the first amino acid as peptide
-		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, inORF, ORFSize, previousAminoAcid));
+		peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[0], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
 		
 		/* special cases happen at the end of the sequence. 
 		 * Don't worry, the final amino acid will eventually be added!
@@ -139,6 +140,8 @@ public class Protein {
 
 			//getting the present amino acid
 			aminoAcid = acidString.charAt(i);
+			nextAminoAcid = acidString.charAt(i + 1);
+			
 			
 			/* see if we are in ORF */
 			if (aminoAcid == 'M') {
@@ -148,16 +151,16 @@ public class Protein {
 			
 			//add the present amino acid to all forming peptides
 			for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-				puc.addAminoAcid(aminoAcid);
+				puc.addAminoAcid(aminoAcid, nextAminoAcid);
 			}
 			
 			//create new forming peptides if necessary
 			if (Properties.isSequenceFileDNA) {
 				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
 					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-					 (isBreak(previousAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+					 (isBreak(previousAminoAcid, nextAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
 				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
 				}
 
 				
@@ -165,18 +168,18 @@ public class Protein {
 			 * Also, we don't need to explicitly say start with 'M' because in the lines above we have that the beginning of every protein begins a new peptide */
 			} else {
 				// Create new peptides after a break
-				if (isBreak(previousAminoAcid)) {		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
+				if (isBreak(previousAminoAcid, nextAminoAcid)) {		
+					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
 				} else {
 					/* this is for when, in proteins, sometimes the first M is dropped */
 					if (i == 1 && isStart(previousAminoAcid)) {
-						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, inORF, ORFSize, previousAminoAcid));
+						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
 					}
 				}
 			}
 			
 			//if we are at a break, 
-			if (isBreak(aminoAcid)) {
+			if (isBreak(aminoAcid, nextAminoAcid)) {
 				//remove those which have exceeded the max break count
 				int size = peptidesUnderConstruction.size();
 				for (int pucIndex = 0; pucIndex < size; pucIndex++) {
@@ -220,10 +223,10 @@ public class Protein {
 		aminoAcid = acidString.charAt(finalIndex);
 		boolean addPeptide;
 		for (PeptideUnderConstruction puc: peptidesUnderConstruction) {
-			puc.addAminoAcid(aminoAcid);
+			puc.addAminoAcid(aminoAcid, '.');
 			addPeptide = false;
 			if (isStop(aminoAcid)) {
-				if (isBreak(previousAminoAcid)) {
+				if (isBreak(previousAminoAcid, aminoAcid)) {
 					//do nothing
 				} else {
 					if (puc.getBreakCount() < maxCleavages ) {
@@ -231,7 +234,7 @@ public class Protein {
 					}
 				}
 			} else {
-				if (isBreak(aminoAcid)) {
+				if (isBreak(aminoAcid, '.')) {
 					if (puc.getBreakCount() <= maxCleavages ) {
 						addPeptide = true;
 					}
@@ -341,13 +344,14 @@ public class Protein {
 					);
 			
 			//add peptide if it meets certain criteria
-			if (peptide.getMass() >= Properties.peptideMassMinimum) {
+			if (peptide.getMass() >= Properties.peptideMassMinimum && peptide.getMass() <= Properties.peptideMassMaximum) {
 				peptides.add(peptide);
 			}
 		}
 	}
 	
 	public String getAcidString() {
+		if (acidString != null) return acidString;
 		return AminoAcids.getStringForByteArray(acidByteArray);
 	}
 
@@ -370,9 +374,11 @@ public class Protein {
 		return start;
 	}
 	
-	public static boolean isBreak(char aminoAcid) {
-		for (char cleavageAcid: Properties.cleavageAcidList) {
-			if (aminoAcid == cleavageAcid) return true;
+	public static boolean isBreak(char aminoAcid, char nextAminoAcid) {
+		if (Properties.cleavageAtCarboxylSide) {
+			for (char cleavageAcid: Properties.cleavageAcidList) {
+				if (aminoAcid == cleavageAcid) return true;
+			}
 		}
 		return false;
 	}

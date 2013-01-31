@@ -24,5 +24,9 @@ public class PeptideWithModifications extends Peptide {
 	public double[] getModifications() {
 		return modifications;
 	}
+	
+	public double getResidueMass(int index) {
+		 return AminoAcids.getWeightMono(acidSequence[index]) + modifications[index];
+	}
 
 }
