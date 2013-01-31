@@ -24,7 +24,6 @@ import Peppy.U;
 public class ValidationReport {
 	
 	public static ArrayList<TestSet> tests;
-	public static File databaseFile = new File("");
 	public static File reportFolder;
 	public static PrintWriter indexWriter;
 
@@ -35,43 +34,17 @@ public class ValidationReport {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		try {
-			PrintWriter timeLog = new PrintWriter(new FileWriter("timeLog.txt"));
-//			addTests();
-//			timeLog.println("numberOfThreads" + "\t" + tests.get(0).getName() + "\t" + tests.get(1).getName() + "\t" + tests.get(2).getName());
-//			timeLog.flush();
-		
-			for (int numberOfThreads = 1; numberOfThreads <= 24; numberOfThreads++) {
-				Peppy.Peppy.init(args);
-				setUp();
-				
-				Properties.numberOfThreads = numberOfThreads;
-				
-				addTests();
-				U.startStopwatch();
-				searchTestSets();
-				createReport();
-				createResultsFiles();
-				
-				timeLog.println(numberOfThreads + "\t" + tests.get(0).getTimeElapsed() + "\t" + tests.get(1).getTimeElapsed() + "\t" + tests.get(2).getTimeElapsed());
-				timeLog.flush();
-				
-				for (TestSet test: tests) {
-					test.resetTest();
-				}
-				
-				U.stopStopwatch();
-				U.p("done.");
-			}
-			
-			
-			timeLog.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		U.startStopwatch();
+		Peppy.Peppy.init(args);
+		setUp();
+		addTests();
+		searchTestSets();
+		createReport();
+		createResultsFiles();	
+		U.stopStopwatch();
+		U.p("done");
 	}
+	
 	
 	/**
 	 * If a test set has been previously generated and loaded
@@ -90,7 +63,7 @@ public class ValidationReport {
 		U.p("Are you ready for the food ball?  I mean: football.  I mean:  validation report");
 		
 		/* set up where we will save these reports */
-		reportFolder =  new File(Properties.validationDirectory, "" + Properties.numberOfThreads + " " + System.currentTimeMillis() + "/");
+		reportFolder =  new File(Properties.validationDirectory, "" + System.currentTimeMillis() + "/");
 		reportFolder.mkdirs();
 		File indexFile = new File(reportFolder, "index.html");
 		try {
@@ -106,6 +79,10 @@ public class ValidationReport {
 		
 		/* keep all matches, even bad ones */
 		Properties.minimumScore = 1;
+		Properties.minimumNumberOfPeaksForAValidSpectrum = 0;
+		Properties.peptideMassMinimum = 200.0;
+		Properties.peptideMassMaximum = 10000.0;
+		Properties.minPeptideLength = 4;
 		
 		/* these properties are fixed for our text sets */
 		Properties.numberOfMissedCleavages = 2;
@@ -114,6 +91,8 @@ public class ValidationReport {
 		
 		/* this needs to happen or the text reports at the end crash */
 		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
+		
+		Properties.iodoacetamideDerivative = false;
 		
 		
 		/* What scoring mechanism? */
@@ -152,8 +131,6 @@ public class ValidationReport {
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);
 		
-		/* find total peptides */
-		int totalPeptides = 0;
 			
 		/* repeat extracting peptides until end of sequence has been reached */
 		while (peptides != null) {
@@ -165,7 +142,6 @@ public class ValidationReport {
 			
 			/* report on peptides size */
 			U.p("peptide count for this batch is: " + peptides.size());
-			totalPeptides += peptides.size();
 			
 			/* get matches for each of our sets for each of these peptides */
 			for (TestSet test: tests) {
@@ -177,7 +153,7 @@ public class ValidationReport {
 			
 		}
 		
-		U.p("found this many total peptides: " + totalPeptides);
+		U.p("found this many total peptides: " + forwardsDatabaseSize);
 		
 		for (TestSet test: tests) {
 			test.calculateStastics();
@@ -274,7 +250,10 @@ public class ValidationReport {
 			pw.println("Scoring method: " + scoringMethod);
 			
 			pw.println("<br>");
-			pw.println("Database: " + databaseFile.getName());
+			pw.println("Database: " + Properties.testSequence);
+			
+			pw.println("<br>Peptides from database:");
+			pw.println(forwardsDatabaseSize);
 			
 			pw.println("<h2>Basic performance metrics</h2>");
 			pw.println("<table border=1>");
