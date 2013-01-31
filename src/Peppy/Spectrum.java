@@ -91,9 +91,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	 * 
 	 * This method calculates: medianIntensity, 25 12 06 percent intensity
 	 */
-	private void calculateDistributions(){
+	public void calculateDistributions(){
 		SpectrumLoader.sortPeaksByIntensity(this);
-		medianIntensity = getPeak(peaks.size() / 2).getIntensity();
+		medianIntensity = getPeak((int) (peaks.size() * 0.5)).getIntensity();
 		intensity25Percent = getPeak((int) (peaks.size() * .75)).getIntensity();
 		intensity12Percent = getPeak((int) (peaks.size() * .875)).getIntensity();
 		intensity06Percent = getPeak((int) (peaks.size() * .9375)).getIntensity();
@@ -130,6 +130,15 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 
 	
 	
+	/**
+	 * for some operations, setting a peak to "used" is handy.  This method
+	 * quickly sets them all back so that used is false
+	 */
+	public void setAllPeaksToUnused() {
+		for (Peak peak: peaks) {
+			peak.used = false;
+		}
+	}
 	
 	
 	

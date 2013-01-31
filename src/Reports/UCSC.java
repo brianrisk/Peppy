@@ -48,6 +48,12 @@ public class UCSC {
 	}
 	
 	public static String getLink(int start, int stop, String sequenceName) {
+		/* Trim ">" of sequence name */
+		if (sequenceName.startsWith(">")) {
+			sequenceName = sequenceName.substring(1);
+		}
+			
+		
 		String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&" + Properties.UCSCdatabase + "&position=";
 		link += sequenceName;
 		link += "%3A";

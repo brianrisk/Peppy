@@ -235,6 +235,9 @@ public class FDR {
 	
 	
 	public void saveReport(File reportDirectory) {
+		/* do nothing if no data */
+		if (points.size() == 0) return;
+		
 		/* set a folder to store our reports */
 		String identifierString = Properties.precursorTolerance + "-" + Properties.fragmentTolerance;
 		File reportDir = new File(reportDirectory, "FDR/" + identifierString + " " + U.getDateString());

@@ -36,7 +36,8 @@ public class Properties {
 
 	/* properties for spectral cleaning */
 	public static int minimumNumberOfPeaksForAValidSpectrum = 2;
-	public static int maximumNumberOfPeaksforASpectrum = -1; /* set to -1 if not to be used */
+	public static double spectrumBucketSize = 100;
+	public static int spectrumBucketCount = 10;
 	
 	//when it comes to calculating theoretical peptide mass, we can use mono or average
 	public static boolean useMonoMass = true;
@@ -51,12 +52,17 @@ public class Properties {
 	public static int sequenceRegionStart = 0;
 	public static int sequenceRegionStop = 0;
 	
+	/*
+	 * Cleavage rules
+	 */
 	public static ArrayList<Character> cleavageAcidList = new ArrayList<Character>();
+	public static boolean cleavageAtCarboxylSide = true;
+	
 	
 	//Segmenting up job for memory management
 	public static int digestionWindowSize = 10000000;
 	public static int desiredPeptideDatabaseSize = 10000000;
-	public static int maxNumberOfProteinsToLoadAtOnce = 50000;
+	public static int maxCombinedProteinLength = 5000000;
 	
 	//Splicing?
 	public static boolean useSpliceVariants = false;
@@ -141,9 +147,12 @@ public class Properties {
 	
 	public static boolean smartTolerances = true;
 	
-	
 	/* how we format our percents */
 	public static NumberFormat percentFormat = NumberFormat.getPercentInstance();
+	
+	/* Tailoring operation */
+	public static boolean simpleSearch = false;
+	public static boolean expires = true;
 	
 	public static void init() {
 		allProperties = new Hashtable<String, Property>();
@@ -172,11 +181,12 @@ public class Properties {
 		sequenceRegionStop = 0;
 		
 		cleavageAcidList = new ArrayList<Character>();
+		cleavageAtCarboxylSide = true;
 		
 		//Segmenting up job for memory management
 		digestionWindowSize = 10000000;
 		desiredPeptideDatabaseSize = 10000000;
-		maxNumberOfProteinsToLoadAtOnce = 50000;
+		maxCombinedProteinLength = 50000;
 		
 		//Splicing?
 		useSpliceVariants = false;
@@ -329,6 +339,16 @@ public class Properties {
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
 		
+		/* threads */
+		if (propertyName.equals("numberOfThreads")) 
+			numberOfThreads = Integer.valueOf(propertyValue);
+		
+		/* for straight-forward searches (no FDR, no auto parameters, no mod search, etc.) */
+		if (propertyName.equals("simpleSearch"))
+			simpleSearch = Boolean.valueOf(propertyValue);
+		
+		
+		
 		//sequence digestion
 		if (propertyName.equals("numberOfMissedCleavages")) 
 			numberOfMissedCleavages =Integer.valueOf(propertyValue);
@@ -351,6 +371,8 @@ public class Properties {
 		if (propertyName.equals("cleavageAcid"))  {
 			cleavageAcidList.add(propertyValue.toUpperCase().charAt(0));
 		}
+		if (propertyName.equals("cleavageAtCarboxylSide"))
+			cleavageAtCarboxylSide = Boolean.valueOf(propertyValue);
 		
 		
 		//job parsing for memory management
@@ -358,8 +380,8 @@ public class Properties {
 			digestionWindowSize =Integer.valueOf(propertyValue);
 		if (propertyName.equals("desiredPeptideDatabaseSize")) 
 			desiredPeptideDatabaseSize =Integer.valueOf(propertyValue);
-		if (propertyName.equals("maxNumberOfProteinsToLoadAtOnce")) 
-			maxNumberOfProteinsToLoadAtOnce =Integer.valueOf(propertyValue);
+		if (propertyName.equals("maxCombinedProteinLength")) 
+			maxCombinedProteinLength =Integer.valueOf(propertyValue);
 		
 		
 		if (propertyName.equals("minimumScore")) 
@@ -375,10 +397,6 @@ public class Properties {
 		//spectrum cleaning		
 		if (propertyName.equals("minimumNumberOfPeaksForAValidSpectrum")) 
 			minimumNumberOfPeaksForAValidSpectrum =Integer.valueOf(propertyValue);
-		if (propertyName.equals("maximumNumberOfPeaksforASpectrum")) 
-			maximumNumberOfPeaksforASpectrum =Integer.valueOf(propertyValue);
-		
-		
 		
 	
 		if (propertyName.equals("sequenceDirectoryOrFile")) {
@@ -512,11 +530,11 @@ public class Properties {
 			pw.println("##Digestion rules");
 			for (Character acid: cleavageAcidList) {
 				pw.println("cleavageAcid " + acid);
-			}			
+			}	
+			pw.println("cleavageAtCarboxylSide " + Properties.cleavageAtCarboxylSide);
 			pw.println();
 			pw.println("##Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
-			pw.println("maximumNumberOfPeaksforASpectrum " + Properties.maximumNumberOfPeaksforASpectrum);
 			pw.println();
 			pw.println("##Scoring Method ");
 			pw.println("scoringMethodName " + Properties.scoringMethodName);
@@ -545,9 +563,6 @@ public class Properties {
 			pw.println("peptideMassMaximum " + Properties.peptideMassMaximum);
 			pw.println();
 			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
-			for (char cleavageAcid: cleavageAcidList) {
-				pw.println("cleavageAcid " + cleavageAcid);
-			}
 			pw.println();
 			pw.println("##splicing ");
 			pw.println("useSpliceVariants " + Properties.useSpliceVariants);

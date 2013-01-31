@@ -19,7 +19,7 @@ import Math.HasValue;
  */
 public class Peptide implements Comparable<Peptide>, HasValue {
 	
-	private byte [] acidSequence;
+	protected byte [] acidSequence;
 	protected double mass;
 	private int startIndex;
 	private int stopIndex;
@@ -151,6 +151,10 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 	
 	public String getAcidSequenceString() {
 		return AminoAcids.getStringForByteArray(acidSequence);
+	}
+	
+	public double getResidueMass(int index) {
+		 return AminoAcids.getWeightMono(acidSequence[index]);
 	}
 	
 	public int getLength() {

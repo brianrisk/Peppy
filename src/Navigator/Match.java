@@ -21,7 +21,7 @@ public class Match extends Row implements Comparable<Match>{
 	
 
 	
-	static {
+	 static {
 		columns.put("peptideSequence", String.class);
 		columns.put("spectrumFile", File.class);
 		columns.put("FilePath", File.class);

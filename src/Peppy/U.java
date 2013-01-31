@@ -37,6 +37,9 @@ public class U {
 	public static final long YEAR = DAY * 365;
 	
 
+	public static void main (String args[]) {
+		U.p(System.currentTimeMillis());
+	}
 	private static Stack<Long> stopwatchClicks = new Stack<Long>();
 	
 	public static void startStopwatch() {

@@ -36,7 +36,7 @@ public class Peppy {
 	static long maxMemoryUsed = 0;
 	static String propertyFileString = null;
 	
-	private static final long presentMiliseconds = 1342709158586L;
+	private static final long presentMiliseconds = 1352829336626L;
 	private static final long fourMonthsOfMiliseconds = 1000L * 60L * 60L * 24L * 30L * 4L;
 	private static final long expiration = presentMiliseconds + fourMonthsOfMiliseconds;
 	
@@ -55,12 +55,45 @@ public class Peppy {
 		printFarewell();
 	}
 	
+	public static void runPeppy(String [] args) {
+		if (Properties.simpleSearch) {
+			runSimplePeppy(args);
+		} else {
+			runFunnelPeppy(args);
+		}
+	}
+	
+	
+	/**
+	 * A straight-forward search.  Developed initial for PepArML use.
+	 * @param args
+	 */
+	public static void runSimplePeppy(String [] args) {
+			U.startStopwatch();
+			
+			/* where we store the report */
+			File mainReportDir = createReportDirectory();
+			
+			/* Get references to our sequence files -- no nucleotide data is loaded at this point */
+			ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+			
+			/* load spectra */
+			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
+			int originalSpectraSize = spectra.size();
+			U.p("loaded " + originalSpectraSize + " spectra");
+			
+			runSearch(spectra, sequences, mainReportDir);
+			
+			U.stopStopwatch();
+	}
+	
+	
 	/**
 	 * There may be a multiplicity of sequence and spectral directories.
 	 * This iterates through them in every combination.
 	 * @param args
 	 */
-	public static void runPeppy(String [] args) {
+	public static void runFunnelPeppy(String [] args) {
 		U.startStopwatch();
 		
 		U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
@@ -89,24 +122,15 @@ public class Peppy {
 			 */
 			int reportIndex = 0;
 			
-			/* create new report directory */
-			String reportDirString;
-			if (propertyFileString != null) {
-				reportDirString = U.getFileNameWithoutSuffix(new File(propertyFileString));
-			} else {
-				reportDirString = Properties.spectraDirectoryOrFile.getName() + "_" + System.currentTimeMillis();
-			}
-			File mainReportDir = new File(Properties.reportDirectory, reportDirString);
-			mainReportDir.mkdirs();
-			
-			
-			
+			File mainReportDir = createReportDirectory();
+
 			/* if there re multiple jobs, the latter varimod settings will persist.
 			 * we reset those to normal, modification-less parameters
 			 */
 			Properties.scoringMethodName = "Peppy.Match_IMP";
 			Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			Properties.searchModifications = false;
+			
 		
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
@@ -420,7 +444,12 @@ public class Peppy {
 		/* set up where we will hold all of the matches for our spectra */
 		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
 		for (Spectrum spectrum: spectra) {
-			spectraMatches.add(new MatchesSpectrum(spectrum));
+			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
+			
+			/* keep only best matches */
+			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_BEST_MATCHES);
+			
+			spectraMatches.add(matchesSpectrum);
 		}
 		
 		//initialize our ArrayList of matches
@@ -453,31 +482,7 @@ public class Peppy {
 
 		}
 		
-	
-//		/* regions (only work with DNA) */
-//		if (Properties.isSequenceFileDNA) {	
-//			
-//			/* rerun the regions analysis */
-//			Regions regions = new Regions(matches, sequences);
-//			
-//			/* creating regions report */
-//			regions.createReport(reportDir);
-//			
-//			/* clear memory */
-//			regions.clearRegions();
-//		}
-		
-		U.p("creating text reports");
-		TextReporter textReport = new TextReporter(matches, reportDir);
-		textReport.generateFullReport();
-		
-		if (Properties.createHTMLReport) {
-			U.p("creating HTML reports");
-			HTMLReporter report = new HTMLReporter(matches, reportDir);
-			report.generateFullReport();
-		}	
-		
-		
+		createReports(matches, reportDir);
 			
 		return matches;
 	
@@ -527,11 +532,15 @@ public class Peppy {
 
 	public static void init(String propertiesFile) {
 		/* check to see if this version is too old */
-//		if (System.currentTimeMillis() > expiration) {
-//			U.p("Welcome to Peppy");
-//			U.p("This is an out of date version.  Please access PeppyResearch.com for the current version.");
-//			System.exit(0);
-//		}
+		if (Properties.expires && System.currentTimeMillis() > expiration) {
+			try {
+				throw (new Exception("unsynchronized resource"));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.exit(0);
+		}
 		
 		/* this allows us to do our graphics */
 		System.setProperty("java.awt.headless", "true");
@@ -668,9 +677,6 @@ public class Peppy {
 					
 					/* sort our peptide list by mass */
 					Collections.sort(peptides);
-					
-					/* report */
-//					U.p("we are processing a chunk of peptides this size: " + peptides.size());
 					
 					/* find the matches for this chunk of peptides */
 					(new ScoringServer(peptides, spectraMatches)).findMatches();
@@ -851,14 +857,31 @@ public class Peppy {
 		return out;
 	}
 	
+	private static File createReportDirectory() {
+		/* create new report directory */
+		String reportDirString;
+		if (propertyFileString != null) {
+			reportDirString = U.getFileNameWithoutSuffix(new File(propertyFileString));
+		} else {
+			reportDirString = Properties.spectraDirectoryOrFile.getName() + "_" + System.currentTimeMillis();
+		}
+		File mainReportDir = new File(Properties.reportDirectory, reportDirString);
+		mainReportDir.mkdirs();
+		return mainReportDir;
+	}
+	
+	
 	private static void createReports(ArrayList<Match> matches, File reportDir) {
 		Properties.generatePropertiesFile(reportDir);
+		U.p("creating text reports");
 		TextReporter textReport = new TextReporter(matches, reportDir);
 		textReport.generateFullReport();
+		
 		if (Properties.createHTMLReport) {
+			U.p("creating HTML reports");
 			HTMLReporter report = new HTMLReporter(matches, reportDir);
 			report.generateFullReport();
-		}
+		}	
 	}
 	
 	protected static void printGreeting() {
@@ -874,6 +897,7 @@ public class Peppy {
 		
 		/* print some system statistics */
 		U.p("number of processors available: " + Runtime.getRuntime().availableProcessors());
+		U.p("number of threads allowed: " + Properties.numberOfThreads);
 		U.p("max available memory: " + (double) memoryUsage.getMax() / (1024 * 1024 * 1024) + " gigabytes");
 		U.p();
 		

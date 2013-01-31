@@ -49,7 +49,8 @@ public class SpectrumLoader {
 
 	
 	//A list of accepted file extensions peppy takes in.  When this is updated don't forget to update loadSpectra
-	private static String[] fileExten = {".dta", ".pkl", ".mzml.xml", ".mzml", ".mgf", ".mz.xml", ".mzxml", ".mzxml.xml", ".ms2", ".zip"};
+	private static String[] fileExten = {".dta", ".pkl", ".mzml.xml", ".mzml", ".mgf", ".mz.xml", ".mzxml", ".mzxml.xml", ".ms2", ".txt"};
+	
 	
 	/*Public Static methods for loading spectra*/
 	/**
@@ -130,6 +131,10 @@ public class SpectrumLoader {
 		if(inFile.getAbsolutePath().toLowerCase().endsWith(".dta")){
 			return loadDTASpectra(inFile);
 		}
+		
+//		if(inFile.getAbsolutePath().toLowerCase().endsWith(".txt")){
+//			return loadPKLSpectra(inFile);
+//		}
 		
 		if(inFile.getAbsolutePath().toLowerCase().endsWith(".pkl")){
 			return loadPKLSpectra(inFile);
@@ -227,16 +232,18 @@ public class SpectrumLoader {
 		return dir.delete();
 	} 
 	
-	public static final void copyInputStream(InputStream in, OutputStream out)
-	throws IOException
-	{
-	byte[] buffer = new byte[1024];
-	int len;
-	while((len = in.read(buffer)) >= 0)
-	out.write(buffer, 0, len);
-	in.close();
-	out.close();
-	}
+	
+	/* used for the zip code */
+//	public static final void copyInputStream(InputStream in, OutputStream out)
+//	throws IOException
+//	{
+//	byte[] buffer = new byte[1024];
+//	int len;
+//	while((len = in.read(buffer)) >= 0)
+//	out.write(buffer, 0, len);
+//	in.close();
+//	out.close();
+//	}
 
 	
 	private static ArrayList<Spectrum> loadPKLSpectra(File inFile){
@@ -547,6 +554,8 @@ public class SpectrumLoader {
 		try {
 			Scanner s = new Scanner(inFile);
 			
+			
+			
 			while(s.hasNextLine()){
 				String line = s.nextLine();
 				
@@ -559,64 +568,83 @@ public class SpectrumLoader {
 					continue;
 				}
 				
+				/* begin new spectrum */
 				if(line.equals("BEGIN IONS")){
 					line = s.nextLine();
-					//Loop through and load up a spectra
 					
-					String[] chunks = line.split("\\s");
-					
-					/*Parse the header lines from this spectra*/
+					/* header variables */
 					String title = "";
-
 					String scans = "";
-					String RTINSECONDS = "";
-					
-					
+					String rtInSeconds = "";
 					String charge = "";
 					String pepmass = "";
-
-					while(chunks.length == 1){
-						//Its the title line
-						chunks = line.split("=");
-	
-						if(chunks[0].toUpperCase().startsWith("TITLE")){
-
-							String[] brokenTitleLine = chunks[1].split("\\s");
-							 title = brokenTitleLine[0].substring(brokenTitleLine[0].indexOf(':')  + 1, brokenTitleLine[0].length());
+					
+					/* peak list */
+					ArrayList<Peak> peaks = new ArrayList<Peak>();
+					
+					while (!line.equals("END IONS")) {
+						/* skip comments */
+						if(line.startsWith("#")){
+							line = s.nextLine();
+							continue;
 						}
 						
-						if(chunks[0].toUpperCase().startsWith("SCANS")){
-
-							scans = line.split("=")[1];
+						/* if the first character is a number then it is peak data */
+						if (Character.isDigit(line.charAt(0))) {
+							String[] chunks = line.split("\\s");
+							try {
+								chunks = line.split("\\s");
+								line = chunks[0] + " " + chunks[1];
+								Peak p = new Peak(line);
+								peaks.add(p);
+							} catch (Exception e) {
+								//don't add it if it's bad!
+							}	
 						}
 						
-						if(chunks[0].toUpperCase().startsWith("RTINSECONDS")){
+						/* else it is header data */
+						else {
+							String[] chunks = line.split("=");
+							
+							if(chunks[0].toUpperCase().startsWith("TITLE")){
 
-							RTINSECONDS = line.split("=")[1];
-						}
-						
-						if(chunks[0].toUpperCase().startsWith("CHARGE")){
-
-							charge = line.split("=")[1];
-						}
-						
-						if(chunks[0].toUpperCase().startsWith("PEPMASS")){
-							pepmass = line.split("=")[1];
+								String[] brokenTitleLine = chunks[1].split("\\s");
+								 title = brokenTitleLine[0].substring(brokenTitleLine[0].indexOf(':')  + 1, brokenTitleLine[0].length());
+							}
+							
+							if(chunks[0].toUpperCase().startsWith("SCANS")){
+								scans = chunks[1];
+							}
+							
+							if(chunks[0].toUpperCase().startsWith("RTINSECONDS")){
+								rtInSeconds = chunks[1];
+							}
+							
+							if(chunks[0].toUpperCase().startsWith("CHARGE")){
+								charge = chunks[1];
+								if(!charge.equals("")){
+									charge = charge.substring(0, charge.length() - 1);
+								}
+							}
+							
+							if(chunks[0].toUpperCase().startsWith("PEPMASS")){
+								pepmass = chunks[1];
+								String [] massValues = pepmass.split("\\s");
+								if (massValues.length > 1) {
+									pepmass = massValues[0];
+								}
+							}
 						}
 						
 						line = s.nextLine();
-						chunks = line.split("\\s");
-						
-					}//while
+					}
+					//Loop through and load up a spectra
 					
 					temp.setTitle(title);
 					temp.setFile(inFile);
-					
 			
-					if(!charge.equals("")){
-						charge = charge.substring(0, charge.length() - 1);
-					}
-					//Add in precursor
+					
+					/* set headers */
 					
 					try{
 						temp.setPrecursorMZ(Double.parseDouble(pepmass));
@@ -641,37 +669,11 @@ public class SpectrumLoader {
 						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
 					}
 					try{
-						temp.setRetentTime(Double.parseDouble(RTINSECONDS));
+						temp.setRetentTime(Double.parseDouble(rtInSeconds));
 					}catch(NumberFormatException e){
 						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
 					}
 		
-					
-					
-					
-
-					
-					ArrayList<Peak> peaks = new ArrayList<Peak>();
-					while(s.hasNextLine()){
-						
-						if(line.equals("END IONS")){
-							break;
-						}
-						
-						//Only add value peaks that have a positive mass
-				
-						try {
-							
-							chunks = line.split("\\s");
-							line = chunks[0] + " " + chunks[1];
-							Peak p = new Peak(line);
-							peaks.add(p);
-						} catch (Exception e) {
-							//don't add it if it's bad!
-						}	
-						line = s.nextLine();
-						
-					}//while
 					
 					
 					//Set the peaks to this spectrum object
@@ -713,6 +715,7 @@ public class SpectrumLoader {
 	 */
 	private static ArrayList<Spectrum> loadMzXMLSpectra(File inFile){
 		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
+		
 		
 		//Upload the MzXML fil using the jmzReader library
 		try {
@@ -987,29 +990,20 @@ public class SpectrumLoader {
 		
 		//before we mess with the peak data, let's make sure we have the MD5
 		s.setMD5(s.getMD5());
-	
-		if (Properties.maximumNumberOfPeaksforASpectrum > 0) {
-			s.setPeaks(keepMostIntensePeaks(s));
-		}
 		
-		s.setPeaks(getTopPeaksPerBucket(s, 100, 10));
+		/* also before we mess with the peak data, get the peak intensity distributions */
+//		s.calculateDistributions();
+	
+		
+		s.setPeaks(getTopPeaksPerBucket(s, (int) Properties.spectrumBucketSize, Properties.spectrumBucketCount));
 
-		s.setPeaks(keepStrongestPeakInRegions(s));
+//		s.setPeaks(keepStrongestPeakInRegions(s));
+		
+		
 		sortPeaksByMass(s);
 		
 	}//cleanPeaks
 	
-
-	
-	private static ArrayList<Peak> keepMostIntensePeaks(Spectrum s) {
-		ArrayList<Peak> peaks = s.getPeaks();
-		if (peaks.size() <= Properties.maximumNumberOfPeaksforASpectrum) return peaks;
-		sortPeaksByIntensity(s);
-		while (peaks.size() > Properties.maximumNumberOfPeaksforASpectrum) {
-			peaks.remove(0);
-		}
-		return peaks;
-	}
 	
 
 	
@@ -1041,6 +1035,8 @@ public class SpectrumLoader {
 		return topPeaks;
 	}//getTopPeaksPerBucket
 	
+	
+	
 	/**
 	 * getTopPeaks gets the defined # of top peaks based on intensity in a specified range, and returns the masses of these top peaks.
 	 * @param numTopPeaksToGet # of peaks to get in the specified range
@@ -1052,10 +1048,10 @@ public class SpectrumLoader {
 	private static ArrayList<Peak> getTopPeaks(int numTopPeaksToGet, int start, int stop, ArrayList<Peak> peaks){
 		ArrayList<Peak> allPeaksList = new ArrayList<Peak>();
 		
-		for(Peak p: peaks){
-			p.setCompareByIntensity();
-			if(p.getMass() >= start && p.getMass() < stop){
-				allPeaksList.add(p);
+		for(Peak peak: peaks){
+			peak.setCompareByIntensity();
+			if(peak.getMass() >= start && peak.getMass() < stop){
+				allPeaksList.add(peak);
 			}//if
 		}//for
 	
@@ -1068,8 +1064,8 @@ public class SpectrumLoader {
 		
 		//Since there are not enough peaks to cull, just return all of them
 		if(allPeaksList.size() < numTopPeaksToGet){
-			for(Peak p: allPeaksList){
-				topPeaks.add(p);
+			for(Peak peak: allPeaksList){
+				topPeaks.add(peak);
 			}//for
 			return topPeaks;
 		}//if
@@ -1087,10 +1083,10 @@ public class SpectrumLoader {
 	 * keepStrongestPeakInRegions sorts the peaks by intensity, and then ensures that know two peaks are within each other by a factor of the fragmentTolerence
 	 * variable from the Properties file.  
 	 */
-	private static ArrayList<Peak> keepStrongestPeakInRegions(Spectrum s) {
-		ArrayList<Peak> peaks = s.getPeaks();
-		sortPeaksByIntensity(s);
-		int start = s.getPeaks().size() - 1;
+	private static ArrayList<Peak> keepStrongestPeakInRegions(Spectrum spectrum) {
+		ArrayList<Peak> peaks = spectrum.getPeaks();
+		sortPeaksByIntensity(spectrum);
+		int start = spectrum.getPeaks().size() - 1;
 		int stop = 0;
 		double lowerBound, upperBound;
 		
