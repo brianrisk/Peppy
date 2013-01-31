@@ -23,7 +23,7 @@ public class ScoringThread implements Runnable {
 	ScoringServer scoringServer;
 	
 	/* due to the imperfections of my binary search, we need this extra margin */
-//	private static int extraMargin = 8;
+	private static int extraMargin = 8;
 	
 	/**
 	 * @param peptides
@@ -67,7 +67,7 @@ public class ScoringThread implements Runnable {
 				lowestPeptideMassToConsider -= Properties.modificationUpperBound;
 			}
 			int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
-//			firstPeptideIndex -= extraMargin;
+			firstPeptideIndex -= extraMargin;
 			if (firstPeptideIndex < 0) firstPeptideIndex = 0;
 			
 			
@@ -78,7 +78,7 @@ public class ScoringThread implements Runnable {
 				highestPeptideMassToConsider -= Properties.modificationLowerBound;
 			}
 			int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
-//			lastPeptideIndex += extraMargin;
+			lastPeptideIndex += extraMargin;
 			if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
 						
 			/* examine only peptides in our designated mass range */

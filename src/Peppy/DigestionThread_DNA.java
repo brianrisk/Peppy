@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class DigestionThread_DNA implements Runnable {
 	
 	ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-	Nucleotides nucleotideSequence;
+	NucleotideSequence nucleotideSequence;
 	int frame;
 	boolean isForwardsStrand;
 	int startIndex;
@@ -28,7 +28,7 @@ public class DigestionThread_DNA implements Runnable {
 	 * @param frame
 	 * @param forwardsStrand
 	 */
-	public DigestionThread_DNA(Nucleotides nucleotideSequence,
+	public DigestionThread_DNA(NucleotideSequence nucleotideSequence,
 			int frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
 		
 		/* because of the digestion window overlap, sometimes this will be < 0 */

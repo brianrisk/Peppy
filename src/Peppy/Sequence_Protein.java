@@ -125,7 +125,7 @@ public class Sequence_Protein extends Sequence {
 					buffy.append(line);
 				}
 				if (limitAmount) {
-					if (combinedLength > 100 * 50000) return proteins;
+					if (combinedLength > Properties.maxCombinedProteinLength) return proteins;
 				}
 				line = reader.readLine();
 			}
@@ -212,7 +212,7 @@ public class Sequence_Protein extends Sequence {
 					proteins.add(new Protein(proteinName, buffy.toString(), isDecoy));
 				}
 				if (limitAmount) {
-					if (proteins.size() > Properties.maxNumberOfProteinsToLoadAtOnce) return proteins;
+					if (proteins.size() > 5000) return proteins;
 				}
 				//read a new line
 				line = reader.readLine();
