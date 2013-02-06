@@ -1,5 +1,7 @@
 package Peppy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 import Math.MassError;
 import Math.MathFunctions;
@@ -23,7 +25,7 @@ public class ScoringThread implements Runnable {
 	ScoringServer scoringServer;
 	
 	/* due to the imperfections of my binary search, we need this extra margin */
-	private static int extraMargin = 8;
+	private static int extraMargin = 0;
 	
 	/**
 	 * @param peptides
@@ -36,22 +38,23 @@ public class ScoringThread implements Runnable {
 	}
 	
 	
-//	public static void main(String args[] ) {
-//		Random random = new Random();
-//		ArrayList<Double> numbers = new ArrayList<Double>();
-//		for (int i = 0; i < 100; i++) {
-//			numbers.add(random.nextDouble());
-//		}
-//		Collections.sort(numbers);
-//		int location = Collections.binarySearch(numbers, 0.5);
-//		if (location < 0) {
-//			location++;
-//			location = Math.abs(location);
-//		}
-//		U.p(numbers.get(location - 1));
-//		U.p(numbers.get(location));
-//		U.p(numbers.get(location + 1));
-//	}
+	public static void main(String args[] ) {
+		Random random = new Random();
+		ArrayList<Double> numbers = new ArrayList<Double>();
+		for (int i = 0; i < 100; i++) {
+			numbers.add(random.nextDouble());
+		}
+		numbers.add(0.5);
+		Collections.sort(numbers);
+		int location = Collections.binarySearch(numbers, 0.5);
+		if (location < 0) {
+			location++;
+			location = Math.abs(location);
+		}
+		U.p(numbers.get(location - 1));
+		U.p(numbers.get(location));
+		U.p(numbers.get(location + 1));
+	}
 	
 
 	public void run() {

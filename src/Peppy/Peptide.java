@@ -260,6 +260,12 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 				}
 			}
 			mass += Definitions.WATER_MONO;
+			
+			/* add reporter ion masses */
+			if (Properties.isITRAQ) {
+				mass += Definitions.ITRAQ_REAGENT ;
+			}
+			
 		} else {
 			for (int i = 0; i < acidSequence.length; i++) {
 				if (AminoAcids.isValid(acidSequence[i])) {
@@ -270,6 +276,11 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 				}
 			}
 			mass += Definitions.WATER_AVERAGE;
+			
+			/* add reporter ion masses */
+			if (Properties.isITRAQ) {
+				mass += Definitions.ITRAQ_REAGENT ;
+			}
 		}
 		return mass;
 	}

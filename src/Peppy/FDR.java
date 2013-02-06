@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -166,7 +167,7 @@ public class FDR {
 			truePositiveCount = (matchIndex + 1) - falsePositiveCount;
 			
 			precision = (double) truePositiveCount / (truePositiveCount + falsePositiveCount);
-			if ((1.0 - precision) < falseDiscoveryRate) bestIndex = matchIndex;
+			if ((1.0 - precision) <= falseDiscoveryRate) bestIndex = matchIndex;
 		}	
 		
 		if (bestIndex == -1) {
@@ -268,21 +269,38 @@ public class FDR {
 			pw.println();
 			
 			/*print first line*/
-			pw.println("Precision\tPercent Found\tIMP value");
+			pw.println("Precision\tPercentFound\tNumberFound\tIMP value");
 			
 			/* print the rest of the lines */
-			double percent = 1;
-			double increment = 0.01;
-			for (int i = 1; i < points.size(); i++) {
-				if (points.get(i).y < percent && points.get(i - 1).x != points.get(i).x) {
-					percent -= increment;
-					String percentFoundString = Properties.percentFormat.format((points.get(i - 1).y)) + "%";
-					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + spectraMatches.get(i - 1).getScore());
+//			double percent = 1;
+//			double increment = 0.01;
+//			for (int i = 1; i < points.size(); i++) {
+//				if (points.get(i).y < percent && points.get(i - 1).x != points.get(i).x) {
+//					percent -= increment;
+//					String percentFoundString = Properties.percentFormat.format((points.get(i - 1).y)) + "%";
+//					pw.println(percentFoundString + "\t" + points.get(i - 1).x + "\t" + spectraMatches.get(i - 1).getScore());
+//				}
+//			}
+//			/* to print out the final one */
+//			String percentFoundString = Properties.percentFormat.format((points.get(points.size()  - 1).y)) + "%";
+//			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + spectraMatches.get(points.size() - 1).getScore());
+			
+			double fdrLevel = 0;
+			double fdrIncrement = 0.01;
+			for (int i = 0; i < 20; i++) {
+				double scoreThreshold = getScoreThreshold(fdrLevel);
+				double numberFound = 0;
+				for (MatchesSpectrum spectrumMatches: spectraMatches) {
+					if (spectrumMatches.getScore() >= scoreThreshold) {numberFound++;}
+					else {break;}
 				}
+				double percentFound = numberFound / spectraMatches.size();
+				NumberFormat round = NumberFormat.getInstance();
+				round.setMaximumFractionDigits(2);
+				String percentFoundString = Properties.percentFormat.format(percentFound);
+				pw.println(round.format(fdrLevel) + "\t" + percentFoundString + "\t" + (int) numberFound + "\t" + scoreThreshold);
+				fdrLevel += fdrIncrement;
 			}
-			/* to print out the final one */
-			String percentFoundString = Properties.percentFormat.format((points.get(points.size()  - 1).y)) + "%";
-			pw.println(percentFoundString + "\t" + points.get(points.size() - 1).x + "\t" + spectraMatches.get(points.size() - 1).getScore());
 			
 			pw.flush();
 			pw.close();

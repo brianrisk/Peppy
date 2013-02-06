@@ -280,14 +280,13 @@ public class Peppy {
 						
 					/* remove all spectra that appear in our matches */
 					if (Properties.maximumFDR > 0) {
-						Spectrum spectrum;
-						for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
-							spectrum = spectra.get(spectrumIndex);
-							if (spectrumIDs.get(spectrum.getId()) != null) {
-								spectra.remove(spectrumIndex);
-								spectrumIndex--;
+						ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>(spectra.size() - spectrumIDs.size());
+						for (Spectrum spectrum: spectra) {
+							if (spectrumIDs.get(spectrum.getId()) == null) {
+								reducedSpectra.add(spectrum);
 							}
 						}
+						spectra = reducedSpectra;
 					}
 					
 					/* generate reports */
@@ -564,38 +563,6 @@ public class Peppy {
 	}
 	
 	
-	public static ArrayList<Match> getDecoyMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
-		
-		/* performing our normal search specifying "true" for isReverse */
-		ArrayList<Match> matches = getMatches(sequences, spectraMatches, true);
-		
-		/* performing the multipass search */
-		if (Properties.multipass && Properties.isSequenceFileDNA) {
-			matches = multipass(matches, sequences, spectraMatches);
-		}
-		
-		return matches;
-	}
-	
-	
-	/**
-	 * Does a normal search, then does multipass
-	 * @param sequences
-	 * @param spectra
-	 * @return
-	 */
-	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
-			
-			/* performing our normal search */
-			ArrayList<Match> matches = getMatches(sequences, spectraMatches, false);
-			
-			/* performing the multipass search */
-			if (Properties.multipass && Properties.isSequenceFileDNA) {
-				matches = multipass(matches, sequences, spectraMatches);
-			}
-			return matches;
-	}
-
 	/**
 	 * This is the heart of Peppy where the grand symphony takes place.
 	 * 
@@ -691,15 +658,31 @@ public class Peppy {
 				if (sequenceIndex == sequences.size() || Properties.useSequenceRegion) {
 					break;
 				}
-
+	
 			}
 			
-
+	
 		return getMatchesFromSpectraMatches(spectraMatches);
 	}
-	
-	
-	
+
+	/**
+	 * Does a normal search, then does multipass
+	 * @param sequences
+	 * @param spectra
+	 * @return
+	 */
+	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
+			
+			/* performing our normal search */
+			ArrayList<Match> matches = getMatches(sequences, spectraMatches, false);
+			
+			/* performing the multipass search */
+			if (Properties.multipass && Properties.isSequenceFileDNA) {
+				matches = multipass(matches, sequences, spectraMatches);
+			}
+			return matches;
+	}
+
 	/**
 	 * Gets matches where a list of peptides is already derived
 	 * @param peptides
@@ -713,6 +696,12 @@ public class Peppy {
 		
 		//This is where the bulk of the processing in long jobs takes
 		(new ScoringServer(peptides, spectraMatches)).findMatches();
+		
+		/* set e values */
+//		for (MatchesSpectrum spectrumMatches: spectraMatches) {
+//			spectrumMatches.calculateEValues();
+//		}
+		
 		ArrayList<Match> matches = getMatchesFromSpectraMatches(spectraMatches);
 		
 		return matches;
@@ -765,6 +754,19 @@ public class Peppy {
 	
 	
 	
+	public static ArrayList<Match> getDecoyMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
+		
+		/* performing our normal search specifying "true" for isReverse */
+		ArrayList<Match> matches = getMatches(sequences, spectraMatches, true);
+		
+		/* performing the multipass search */
+		if (Properties.multipass && Properties.isSequenceFileDNA) {
+			matches = multipass(matches, sequences, spectraMatches);
+		}
+		
+		return matches;
+	}
+
 	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
 		Hashtable<String, Match> oneMatchPerSpectrum = new Hashtable<String, Match>(matches.size());
 		for (Match match: matches) {

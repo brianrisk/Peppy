@@ -59,6 +59,7 @@ public class BestMatches {
 //		washURegionsOfInterest();
 //		gm12878();
 		compRefUNC();
+		pccCompRefA();
 //		carthene();
 //		nonsenseSearch();
 //		compRefUNCRegionsOfInterest();
@@ -674,6 +675,38 @@ public class BestMatches {
 		
 		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
 	}
+	
+	public static void pccCompRefA() {
+		ArrayList<File> reportFolders = new ArrayList<File>();
+
+		reportFolders.add(new File("reports/BI-P5"));
+		reportFolders.add(new File("reports/JHU-P5"));
+		reportFolders.add(new File("reports/VAND-P5"));
+		reportFolders.add(new File("reports/JHU-P6"));
+		reportFolders.add(new File("reports/VAND-P6"));
+		
+		
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+		direcotryTitlesToIgnore.add("HG19");
+		direcotryTitlesToIgnore.add("mouse");
+		direcotryTitlesToIgnore.add("germline");
+//		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("gencode");
+		
+		for (File folder: reportFolders) {
+			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
+			bestMatchesArray.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
+	}
+	
 	
 	public static void compRefUNC() {
 		ArrayList<File> reportFolders = new ArrayList<File>();
