@@ -5,15 +5,15 @@ import java.util.ArrayList;
 
 public class LeastSquares {
 	
-	public static double calculateM(double [] xValues, double [] yValues, int start, int stop) {
-		return calculateM(xValues, yValues, null, start, stop);
+	public static double calculateM( double [] yValues, int start, int stop) {
+		return calculateM( yValues, null, start, stop);
 	}
 	
-	public static double calculateB(double [] xValues, double [] yValues, int start, int stop, double m) {
-		return calculateB(xValues, yValues, null, start, stop, m);
+	public static double calculateB(double [] yValues, int start, int stop, double m) {
+		return calculateB( yValues, null, start, stop, m);
 	}
 	
-	public static double calculateM(double [] xValues, double [] yValues, int [] histogram, int start, int stop) {
+	public static double calculateM( double [] yValues, int [] histogram, int start, int stop) {
 		double numerator1, numerator2, denomenator1, denomenator2;
 		double numerator = 0.0, denomenator = 0.0;
 		double temp1 = 0.0, temp2 = 0.0, temp = 0.0;
@@ -21,12 +21,12 @@ public class LeastSquares {
 		int i;
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0)
-				temp += (xValues[i] * yValues[i]);
+				temp += (i * yValues[i]);
 		}
 		numerator1 = (stop - start) * (temp);
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0)
-				temp1 += xValues[i];
+				temp1 += i;
 		}
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0)
@@ -37,7 +37,7 @@ public class LeastSquares {
 		temp1 = temp2 = 0.0;
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0) {
-				temp1 = xValues[i];
+				temp1 = i;
 				temp2 += (temp1 * temp1);
 			}
 		}
@@ -46,7 +46,7 @@ public class LeastSquares {
 		temp1 = 0.0; 
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0)
-				temp1 += xValues[i];
+				temp1 += i;
 		}
 		denomenator2 = (temp1 * temp1);
 		denomenator = denomenator1 - denomenator2;
@@ -54,7 +54,7 @@ public class LeastSquares {
 		return parameterM;
 	}
 	
-	public static double calculateB(double [] xValues, double [] yValues, int [] histogram, int start, int stop, double m) {
+	public static double calculateB( double [] yValues, int [] histogram, int start, int stop, double m) {
 		double parameterB;
 		double temp1, temp2;
 		int i;
@@ -62,7 +62,7 @@ public class LeastSquares {
 		temp1 = temp2 = 0.0;
 		for (i = start; i < stop; i++) {
 			if (histogram[i] > 0)
-				temp1 += xValues[i];
+				temp1 += i;
 		}
 
 		for (i = start; i < stop; i++) {

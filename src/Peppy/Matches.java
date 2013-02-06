@@ -1,7 +1,12 @@
 package Peppy;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import Graphs.HistogramVisualizer;
+import Math.LeastSquares;
 
 /**
  * We want to hold collections of matches for various things.  All matches for a given peptide,
@@ -32,6 +37,16 @@ public abstract class Matches implements Comparable<Matches> {
 	 * For FDR we only need to know when the decoy trumps the target hits */
 	private boolean ignoreLesserDecoys = true;
 	
+	/* properties for calculating e values */
+	private final int numberOfHistogramBars = 1;
+	private int [] histogram = new int[numberOfHistogramBars];
+	private int [] smoothedHistogram  = new int[numberOfHistogramBars];
+	private double [] scoreProbabilities = new double[numberOfHistogramBars];
+	private double [] survivability = new double[numberOfHistogramBars];
+	private double m;
+	private double b;
+	private int numberOfMatches = 0;
+	
 	/**
 	 * Add a match only if it's score is greater than or equal to the reigning score.
 	 * If it is greater than, then the existing matches are cleared out.
@@ -41,6 +56,15 @@ public abstract class Matches implements Comparable<Matches> {
 	 * @param match
 	 */
 	public void addMatch(Match match) {
+		/* tracking for eValues */
+//		numberOfMatches++;
+//		int histogramIndex = (int) Math.round(match.getScore() * 2);
+//		if (histogramIndex >= numberOfHistogramBars) histogramIndex = numberOfHistogramBars -1;
+//		U.p(histogramIndex);
+//		histogram[histogramIndex]++;
+		
+		
+		/* selecting which matches should be added */
 		if (ignoreLesserDecoys) {
 			if (match.getPeptide().isDecoy()) {
 				if (match.getScore() <= score) {
@@ -56,6 +80,7 @@ public abstract class Matches implements Comparable<Matches> {
 				score = match.getScore();
 			} else {
 				if (match.getScore() == score) {
+					if (Properties.isSequenceFileDNA && matches.size() >= 4) return;
 					matches.add(match);
 				}
 			}
@@ -150,6 +175,118 @@ public abstract class Matches implements Comparable<Matches> {
 
 	public void setIgnoreLesserDecoys(boolean ignoreLesserDecoys) {
 		this.ignoreLesserDecoys = ignoreLesserDecoys;
+	}
+	
+	
+	private void calculateHistogramProperties() {
+		smoothedHistogram = smoothHistogram(histogram, 1);
+//		smoothedHistogram = histogram;
+		
+		//find score probabilities
+		for (int i = 0; i < numberOfHistogramBars; i++) {
+			scoreProbabilities[i] = (double) smoothedHistogram[i] / numberOfMatches;
+		}
+		
+		//find survivability values
+		survivability[numberOfHistogramBars - 1] = scoreProbabilities[numberOfHistogramBars - 1];
+		for (int i = numberOfHistogramBars - 2; i >= 0; i--) {
+			survivability[i] = survivability[i + 1] + scoreProbabilities[i];
+		}
+		
+		//find index survivability values at 0.1 or less
+		int chopIndex;
+		for (chopIndex = 0; chopIndex < numberOfHistogramBars; chopIndex++) {
+			if (survivability[chopIndex] <= 0.1) break;
+		}
+		
+		//find first 0 above chopIndex
+		int topIndex;
+		for (topIndex = chopIndex + 1; topIndex < numberOfHistogramBars; topIndex++) {
+			if (smoothedHistogram[topIndex] == 0) break;
+		}
+		if (topIndex >= numberOfHistogramBars) topIndex = numberOfHistogramBars;
+		
+		//if width is only one bar wide, make it 2
+		if (topIndex - chopIndex == 1) chopIndex--;
+		if (chopIndex < 0) chopIndex = 0;
+		
+		//taking the log of each of the survivability.  Only concerned
+		//about values at and above chopIndex
+		for (int i = chopIndex; i < topIndex; i++) {
+			survivability[i] = Math.log(survivability[i]);
+		}
+		
+		//finding the least squares fit for that region
+		// y = m * x + b
+		m = LeastSquares.calculateM(survivability, smoothedHistogram, chopIndex, topIndex);
+		b = LeastSquares.calculateB( survivability, smoothedHistogram, chopIndex, topIndex, m);
+		
+		
+//		try {
+//			U.p(m + ", " + b);
+//			U.p("drawing...");
+//			HistogramVisualizer.drawHistogram(histogram, 500, 1500, new File("histogram.jpg"));
+//		} catch (IOException e) {
+//			U.p("problem happened");
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
+	
+	
+	public int[] smoothHistogram(int [] histogram, int radius) {
+		int [] out = new int[histogram.length];
+		double sigma = radius / 3.0;
+		double coefficient = 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma);
+		double denominator = -2 * sigma * sigma;
+		int gaussianSize = radius * 2 + 1;
+		double [] gaussianY = new double[gaussianSize];
+		int [] gaussianX = new int[gaussianSize];
+		for (int i = 0; i < gaussianSize; i++) {
+			gaussianX[i] = i - radius;
+			gaussianY[i] = coefficient * Math.exp(gaussianX[i] * gaussianX[i] / denominator);
+		}
+		double smoothedValue;
+		int index;
+		for (int i = 0; i < histogram.length; i++) {
+			smoothedValue = 0;
+			for (int j = 0; j < gaussianSize; j++) {
+				index = gaussianX[j] + i;
+				if (index < 0) continue;
+				if (index >= histogram.length) break;
+				smoothedValue += gaussianY[j] * histogram[index];
+			}
+			out[i] = (int) Math.round(smoothedValue);
+		}
+		return out;
+	}
+
+	/**
+	 * find the e value for just one given score.
+	 * Returns largest double value if result is NaN
+	 * @param score
+	 * @return
+	 */
+	private double calculateEValueOfScore(double score) {
+		double eValue = m * score + b;
+		eValue = Math.exp(eValue);
+		eValue *= numberOfMatches;
+		//setting to Double.MAX_VALUE if eValue is Nan
+		if (eValue <= 1 == eValue >= 1) eValue = Double.MAX_VALUE;
+		return eValue;
+	}
+	
+	public void calculateEValues() {
+		calculateHistogramProperties();
+		score = Double.MIN_VALUE;
+		double eValue;
+		for (Match match: matches) {
+			eValue = calculateEValueOfScore(match.getScore());
+			eValue = -1.0 * Math.log10(eValue);
+//			if(!match.getPeptide().isDecoy()) U.p(eValue);
+			match.setScore(eValue);
+			if (score < eValue) score = eValue;
+		}
 	}
 
 }
