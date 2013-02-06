@@ -44,7 +44,7 @@ public class Properties {
 	
 	//Sequence digestion
 	public static int numberOfMissedCleavages = 1;
-	public static double peptideMassMinimum = 500.0;
+	public static double peptideMassMinimum = 400.0;
 	public static double peptideMassMaximum = 10000.0;
 	public static int minPeptideLength = 5;
 	public static int maxPeptideLength = 80;
@@ -57,6 +57,9 @@ public class Properties {
 	 */
 	public static ArrayList<Character> cleavageAcidList = new ArrayList<Character>();
 	public static boolean cleavageAtCarboxylSide = true;
+	
+	/* mass spectrometer settings */
+	public static boolean isITRAQ = false;
 	
 	
 	//Segmenting up job for memory management
@@ -172,7 +175,7 @@ public class Properties {
 		
 		//Sequence digestion
 		numberOfMissedCleavages = 1;
-		peptideMassMinimum = 500.0;
+		peptideMassMinimum = 400.0;
 		peptideMassMaximum = 10000.0;
 		minPeptideLength = 5;
 		maxPeptideLength = 80;
@@ -266,6 +269,8 @@ public class Properties {
 		cysteineCarbamylation = false;
 		methionineOxidation = false;
 		iodoacetamideDerivative = true;
+		
+		isITRAQ = false;
 	}
 	
 	
@@ -373,6 +378,11 @@ public class Properties {
 		}
 		if (propertyName.equals("cleavageAtCarboxylSide"))
 			cleavageAtCarboxylSide = Boolean.valueOf(propertyValue);
+		
+		
+		/* mass spectrometer parameters */
+		if (propertyName.equals("isITRAQ"))
+			isITRAQ = Boolean.valueOf(propertyValue);
 		
 		
 		//job parsing for memory management

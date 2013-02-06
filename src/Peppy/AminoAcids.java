@@ -106,6 +106,7 @@ public class AminoAcids {
 		if (Properties.cysteineCarbamylation) weightsMono[C] += 43.005814;
 		if (Properties.methionineOxidation) weightsMono[M] += 15.994915;
 		if (Properties.iodoacetamideDerivative) weightsMono[C] += 57.021464;
+		if (Properties.isITRAQ) {weightsMono[K] += Definitions.ITRAQ_REAGENT;}
 		
 	}
 	

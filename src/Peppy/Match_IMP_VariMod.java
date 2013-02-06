@@ -142,8 +142,11 @@ public class Match_IMP_VariMod extends Match {
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = modificationMass + peptide.getMass() + Properties.rightIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT;
+		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass -= peptide.getResidueMass(i);
 			if (i == modifiedIndex) theoreticalPeakMass -= modificationMass;
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);	
@@ -177,8 +180,11 @@ public class Match_IMP_VariMod extends Match {
 		
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
+		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass += peptide.getResidueMass(i);
 			if (i == modifiedIndex) theoreticalPeakMass += modificationMass;
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);

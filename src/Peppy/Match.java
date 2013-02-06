@@ -265,8 +265,11 @@ public abstract class Match implements Comparable<Match>{
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT ;
+		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass -= peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
@@ -311,8 +314,11 @@ public abstract class Match implements Comparable<Match>{
 		
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
+		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += AminoAcids.getWeightMono(acidSequence[i]);
+			theoreticalPeakMass += peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
 		}
@@ -374,6 +380,9 @@ public abstract class Match implements Comparable<Match>{
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT;
+		}
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
@@ -405,6 +414,9 @@ public abstract class Match implements Comparable<Match>{
 		
 		/* b-ion */
 		theoreticalPeakMass = Properties.leftIonDifference;
+		if (Properties.isITRAQ) {
+			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
+		}
 		for (int i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += peptide.getResidueMass(i);
 			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
@@ -559,6 +571,8 @@ public abstract class Match implements Comparable<Match>{
 	public void setScore(double score) {
 		this.score = score;
 	}
+	
+	
 	public static void setSortParameter(int sortParameter) {
 		Match.sortParameter = sortParameter;
 	}
