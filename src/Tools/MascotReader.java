@@ -64,7 +64,7 @@ public class MascotReader {
 		File matchesFile = new File(reportLocation);
 		
 		//the spectra of our tests
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(new File(testLocation + testName + "/" + "spectra/"));
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(new File(testLocation + testName + "/" + "spectra/"));
 		
 		//set spectra id according to mass
 		Collections.sort(spectra);

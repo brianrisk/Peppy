@@ -39,7 +39,7 @@ public class SpectrumToMGF {
 		String testName = "human";
 		
 		
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(testDirectoryName + testName + "/spectra");
 		
 		//save properties
 		File saveFolder = new File ("MGF/" + testName);

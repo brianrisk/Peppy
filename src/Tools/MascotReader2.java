@@ -84,7 +84,7 @@ public class MascotReader2 {
 		Match match;
 		
 		/* load the spectra from test set so we can get their spectrum IDs */
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testLocation + testName + "/spectra");
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(testLocation + testName + "/spectra");
 		
 		/* sorting by mass as that's how they are sorted in the mascot results (thus giving them new IDs...) */
 		Collections.sort(spectra);

@@ -21,24 +21,27 @@ import Peppy.U;
 public class GetRandomSubsetOfSpectra {
 	
 	public static void main(String args[]) {
-		/* setting up parameters */
-//		File spectraFolder = new File("/Users/risk2/PeppyData/ENCODE/GM12878/spectra uncompressed/wcl/");
-//		File destinationFolder = new File("UNC-ENCODE-WCL");
 		
-//		File spectraFolder = new File("/Users/risk2/PeppyData/UNC/spectra/CPTAC/UNC QExactive compRef/WHIM2");
-//		File destinationFolder = new File("UNC-CPTAC-QEXATIVE");
+		int numberOfSpectraForSubset = Integer.parseInt(args[0]);
+		getSubset(numberOfSpectraForSubset, args[1]);
+			
 		
-		File spectraFolder = new File("/Users/risk2/PeppyData/WashU/spectra/43/WHIM2");
-		File destinationFolder = new File("WASHU-CPTAC-TRIPLETOF");
+	}
+	
+	public static void getSubset(int numberOfSpectraForSubset, String spectrumDirectoryString) {
 		
+		File spectraFolder = new File(spectrumDirectoryString);
 		
+		if (!spectraFolder.exists()) {
+			U.p("invalid spectrum directory path");
+			return;
+		}
+		File destinationFolder = new File(spectraFolder.getName() + " subset");
 		
-		
-		int numberOfSpectraForSubset = 2000;
 		
 		/* loading the spectra */
 		U.p("loading spectra");
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(spectraFolder);
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(spectraFolder);
 		
 		/* get out if we don't have enough for a proper subset */
 		if (spectra.size() <= numberOfSpectraForSubset) {

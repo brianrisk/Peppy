@@ -78,7 +78,7 @@ public class XTandemSingleFile {
 		Match match;
 		
 		/* load the spectra from test set so we can get their spectrum IDs */
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testLocation + testName + "/spectra");
+		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(testLocation + testName + "/spectra");
 		
 		/* load and parse the XML */
 		try {

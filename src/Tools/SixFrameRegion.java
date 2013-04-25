@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import Peppy.Definitions;
+import Peppy.AminoAcids;
 import Peppy.DigestionThread_DNA;
 import Peppy.Peppy;
 import Peppy.Properties;
@@ -43,13 +43,21 @@ public class SixFrameRegion {
 //		File interestLocations = new File("regions-of-interest.csv");
 //		createDatabasesFromFile(interestLocations, "/Users/risk2/PeppyData/public/sequences/dna/HG19/");
 		
-		createDatabaseOfGenome("/Users/risk2/PeppyData/public/sequences/dna/HG19/", "hg19");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/germline/", "w16-germline");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/tumor/", "w16-tumor");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/xeno/", "w16-xeno");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/germline/", "w2-germline");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/tumor/", "w2-tumor");
-		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/xeno/", "w2-xeno");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/public/sequences/dna/HG19/", "hg19");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/germline/", "w16-germline");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/tumor/", "w16-tumor");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim16/dna/xeno/", "w16-xeno");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/germline/", "w2-germline");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/tumor/", "w2-tumor");
+//		createDatabaseOfGenome("/Users/risk2/PeppyData/WashU/sequences/whim2/dna/xeno/", "w2-xeno");
+		
+//		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr17.fa"), 26671724, 26675221, "seleno-regions");
+//		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr3.fa"), 142657639, 142671525, "seleno-regions");
+//		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr2.fa"), 178495137, 178528740, "seleno-regions");
+//		
+		
+		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr7.fa"), 48000000, 49000000, "GM-chr7-region");
+		
 		
 		U.p("done");
 	}
@@ -270,7 +278,7 @@ public class SixFrameRegion {
 		for (index = startPosition; index != stopPosition; index += increment) {
 			codon[mod] = sequenceDNA.charAt(index);
 			if (mod == 2) {
-				aminoAcid = Definitions.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, isForwardsStrand)];
+				aminoAcid = AminoAcids.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, isForwardsStrand)];
 				buildingProtein.append(aminoAcid);
 				
 				/* reset mod */
