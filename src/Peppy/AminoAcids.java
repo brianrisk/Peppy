@@ -8,6 +8,9 @@ package Peppy;
  * Statically defined amino acids as bytes
  * amino acid masses
  * 
+ * Selenocysteine masses from:
+ * http://www.chemspider.com/Chemical-Structure.23436.html
+ * 
  * Copyright 2012, Brian Risk
  * 
  * 
@@ -16,7 +19,15 @@ package Peppy;
  */
 public class AminoAcids {
 	
-	private static char [] acids = {'.', 'A', 'C',	'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y'};
+	private static char [] acids = {'.', 'A', 'C',	'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', 'U'};
+	public static char[] aminoAcidList = {
+		'K','N','K','N','T','T','T','T','R','S',
+		'R','S','I','I','M','I','Q','H','Q','H',
+		'P','P','P','P','R','R','R','R','L','L',
+		'L','L','E','D','E','D','A','A','A','A',
+		'G','G','G','G','V','V','V','V','.','Y',
+		'.','Y','S','S','S','S','.','C','W','C',
+		'L','F','L','F'};
 	
 	private static byte tracker = 0;
 	public static final byte STOP = tracker++;
@@ -40,6 +51,9 @@ public class AminoAcids {
 	public static final byte V = tracker++;
 	public static final byte W = tracker++;
 	public static final byte Y = tracker++;
+	public static final byte U = tracker++;
+	
+	
 	
 	
 	private static double [] weightsMono = new double[acids.length];
@@ -72,6 +86,20 @@ public class AminoAcids {
 		weightsMono[V] = 99.06841;
 		weightsMono[W] = 186.07931;
 		weightsMono[Y] = 163.06333;
+		weightsMono[U] = 168.964203;
+		
+		weightsMono[U] -= Definitions.WATER_MONO;
+		
+
+//		/* dehydroalanine */
+//		weightsMono[U] = 87.032028;
+//		weightsMono[U] -= Definitions.WATER_MONO;
+		
+		/* cysteine */
+//		weightsMono[U]  = 103.00919;
+		if (Properties.iodoacetamideDerivative) weightsMono[U] += 57.021464;
+		
+
 		
 		weightsAverage[STOP] = 0.0;
 		weightsAverage[A] = 71.0788;
@@ -94,6 +122,7 @@ public class AminoAcids {
 		weightsAverage[V] = 99.1326;
 		weightsAverage[W] = 186.2133;
 		weightsAverage[Y] = 163.176;
+		weightsAverage[U] = 168.053207;
 		
 //		if(Properties.useIsotopeLabeling) {
 //			U.p("amino acid weights adjusted for labeling");
@@ -107,6 +136,16 @@ public class AminoAcids {
 		if (Properties.methionineOxidation) weightsMono[M] += 15.994915;
 		if (Properties.iodoacetamideDerivative) weightsMono[C] += 57.021464;
 		if (Properties.isITRAQ) {weightsMono[K] += Definitions.ITRAQ_REAGENT;}
+		
+		/*
+		 * If we're accounting for selenocysteine, we set the "TGA" codon
+		 * with 'U' instead of '.' (the stop character)
+		 */
+		if (Properties.useSelenocysteine) {
+			aminoAcidList[56] = 'U';
+		} else {
+			aminoAcidList[56] = '.';
+		}
 		
 	}
 	
@@ -157,6 +196,7 @@ public class AminoAcids {
 		if (acid == 'V') return V;
 		if (acid == 'W') return W;
 		if (acid == 'Y') return Y;
+		if (acid == 'U') return U;
 		return STOP;
 //		throw new Error("Invalid amino acid character: " + acid);
 	}
@@ -183,6 +223,7 @@ public class AminoAcids {
 		if (acid == V) return true;
 		if (acid == W) return true;
 		if (acid == Y) return true;
+		if (acid == U) return true;
 		return false;
 	}
 	

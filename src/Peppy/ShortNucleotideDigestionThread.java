@@ -63,7 +63,7 @@ public class ShortNucleotideDigestionThread  implements Runnable {
 				for (index = startIndex; index != stopIndex; index += increment) {
 					codon[mod] = nucleotideSequence.getSequence().charAt(index);
 					if (mod == 2) {
-						aminoAcid = Definitions.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, isForwardsStrand)];
+						aminoAcid = AminoAcids.aminoAcidList[DigestionThread_DNA.indexForCodonArray(codon, isForwardsStrand)];
 						buildingProtein.append(aminoAcid);
 						if (aminoAcid == '.') {
 							if (buildingProtein.length() > 3) {

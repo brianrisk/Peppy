@@ -14,7 +14,7 @@ import java.util.ArrayList;
  *
  */
 public class Definitions {	
-	public final static char[] aminoAcidList = {'K','N','K','N','T','T','T','T','R','S','R','S','I','I','M','I','Q','H','Q','H','P','P','P','P','R','R','R','R','L','L','L','L','E','D','E','D','A','A','A','A','G','G','G','G','V','V','V','V','.','Y','.','Y','S','S','S','S','.','C','W','C','L','F','L','F'};
+	
 	public final static double OXYGEN_MONO = 15.99491463;
 	public final static double OXYGEN_AVERAGE = 15.99940494;
 	public final static double NITROGEN_MONO = 14.00307400;

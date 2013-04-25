@@ -298,6 +298,15 @@ public class Protein {
 		Peptide peptide;
 		String sequenceString = puc.getSequence();
 		
+		/*
+		 * If we are searching for selenocysteine, we are only
+		 * allowing peptides with those peptide for the
+		 * DNA searches
+		 */
+		if (Properties.useSelenocysteine && Properties.isSequenceFileDNA) {
+			if (sequenceString.indexOf('U') == -1) return;
+		}
+		
 		//splice related
 		isSpliced =  (puc.getStartIndex() < intronStartIndex && acidIndex > intronStopIndex);
 		if (isSpliced) {

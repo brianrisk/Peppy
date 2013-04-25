@@ -90,7 +90,7 @@ public class DigestionThread_DNA implements Runnable {
 		for (index = startPosition; index != stopPosition; index += increment) {
 			codon[mod] = nucleotideSequence.getSequence().charAt(index);
 			if (mod == 2) {
-				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, isForwardsStrand)];
+				aminoAcid = AminoAcids.aminoAcidList[indexForCodonArray(codon, isForwardsStrand)];
 				buildingProtein.append(aminoAcid);
 				if (aminoAcid == '.') {
 					if (buildingProtein.length() > 3) {
@@ -123,17 +123,17 @@ public class DigestionThread_DNA implements Runnable {
 
 	public static int indexForCodonArray(char [] codon, boolean forwards) {
 		int out = indexForCodonArray(codon);
-		if (out == -1) return 56; //if unknown, return STOP
+		if (out == -1) return 48; //if unknown, return STOP
 		if (forwards) {
-			return indexForCodonArray(codon);
+			return out;
 		} else {
-			return 63 - indexForCodonArray(codon);
+			return 63 - out;
 		}
 	}
 	
 	/*
 	 * TODO this method needs to make sure that if any unknown characters are found then 
-	 * STOP (56) is returned.  Right now that only happens with the last character.
+	 * STOP (48) is returned.  Right now that only happens with the last character.
 	 */
 	/**
 	 * Same as other, but assumes that the direction is "forwards"

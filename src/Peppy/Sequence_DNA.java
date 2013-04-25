@@ -59,7 +59,8 @@ public class Sequence_DNA extends Sequence{
 		/* we may be dealing with a set of small nucleotide sequences (in the case of RNA, cDNA)
 		 * these are digested in a different way to be more efficient
 		 */
-		if (nucleotideSequences.get(0).getSequence().length() <= Properties.digestionWindowSize) {
+		if (nucleotideSequences.get(0).getSequence().length() <= 1000) {
+			U.p("short digesting segment");
 			if (nucleotideSequenceIndex != -1) {
 				ShortNucleotideDigestionServer snds = new ShortNucleotideDigestionServer(nucleotideSequences, isReverse);
 				ProteinDigestionServer pds = new ProteinDigestionServer(snds.getResults());
