@@ -51,7 +51,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
-			pw.println("format version 18");
+			pw.println("format version 19");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -69,6 +69,8 @@ public class TextReporter {
 			//print header
 			sb = new StringBuffer();
 			sb.append("spectrumID");
+			sb.append('\t');
+			sb.append("fileLocus");
 			sb.append('\t');
 			sb.append("spectrumMD5");
 			sb.append('\t');
