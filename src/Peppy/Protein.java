@@ -155,18 +155,18 @@ public class Protein {
 			}
 			
 			//create new forming peptides if necessary
-			if (Properties.isSequenceFileDNA) {
-				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
-					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
-					 (isBreak(previousAminoAcid, nextAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
-				{		
-					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
-				}
-
-				
-			/* 'M' Does not mean a new peptide should form in proteins 
-			 * Also, we don't need to explicitly say start with 'M' because in the lines above we have that the beginning of every protein begins a new peptide */
-			} else {
+//			if (Properties.isSequenceFileDNA) {
+//				if ( (isStart(aminoAcid)) ||  // start a new peptide at M
+//					 (isStart(previousAminoAcid) && !isStart(aminoAcid)) || // handle possible N-terminal methionine truncation products
+//					 (isBreak(previousAminoAcid, nextAminoAcid) && !isStart(aminoAcid))  )  // Create new peptides after a break, but only if we wouldn't have created a new one with M already
+//				{		
+//					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
+//				}
+//
+//				
+//			/* 'M' Does not mean a new peptide should form in proteins 
+//			 * Also, we don't need to explicitly say start with 'M' because in the lines above we have that the beginning of every protein begins a new peptide */
+//			} else {
 				// Create new peptides after a break
 				if (isBreak(previousAminoAcid, nextAminoAcid)) {		
 					peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
@@ -176,7 +176,7 @@ public class Protein {
 						peptidesUnderConstruction.add(new PeptideUnderConstruction(acidIndicies[i], aminoAcid, nextAminoAcid, inORF, ORFSize, previousAminoAcid));
 					}
 				}
-			}
+//			}
 			
 			//if we are at a break, 
 			if (isBreak(aminoAcid, nextAminoAcid)) {
