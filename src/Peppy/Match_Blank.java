@@ -25,9 +25,5 @@ public class Match_Blank extends Match{
 		//do nothing
 	}
 
-	@Override
-	public String getScoringMethodName() {
-		return "blank";
-	}
 
 }

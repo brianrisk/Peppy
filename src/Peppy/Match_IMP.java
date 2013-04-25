@@ -16,7 +16,6 @@ public class Match_IMP extends Match {
 		score = -Math.log10(calculateIMP());	
 	}
 	
-	public String getScoringMethodName() {return "IMP";}
 
 
 }

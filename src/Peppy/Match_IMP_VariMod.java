@@ -64,9 +64,6 @@ public class Match_IMP_VariMod extends Match {
 	}
 	
 	
-	@Override
-	public String getScoringMethodName() {return "IMP VariMod";}
-	
 	public double calculateIMP() {
 		if (impValue < 0) {
 			double impValue1 = calculateIMP(modificationMass, 0);
@@ -118,17 +115,15 @@ public class Match_IMP_VariMod extends Match {
 	 * @return
 	 */
 	protected double calculateIMP(double modificationMass, int modifiedIndex) {
-		byte [] acidSequence = peptide.getAcidSequence();
 
 		int i;
 		boolean atLeastOneMatch = false;
 		double theoreticalPeakMass, peakMass;
 		int peakIndex, seqIndex;
-		int ionMatchTally = 0;
 		
 		//we want -1 because most of these spectra will have a match with 
 		//the last theoretical peak
-		int peptideLengthMinusOne = acidSequence.length - 1;
+		int peptideLengthMinusOne = peptide.getLengthMinusOne();
 		
 		double [] bIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
 		double [] yIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];

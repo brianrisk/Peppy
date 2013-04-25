@@ -17,7 +17,7 @@ public class MatchConstructor {
 		try {
 			match = (Class<? extends Match>) Class.forName(className);
 		} catch (ClassNotFoundException e) {
-			U.p("A match classname was not recognized, yo");
+			U.p("A match classname was not recognized");
 			e.printStackTrace();
 			System.exit(1);
 		}
