@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * 
  * Important note:  all begin indicies are inclusive, all ends are exclusive
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

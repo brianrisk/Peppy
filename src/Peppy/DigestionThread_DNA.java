@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * of possible translation on DNA.  The digestion thread returns
  * an array list of proteins which are then further digested.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

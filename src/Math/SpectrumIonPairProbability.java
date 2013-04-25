@@ -13,6 +13,12 @@ import Peppy.SpectrumLoader;
 import Peppy.U;
 import Tools.SpectrumSequenceProbability;
 
+/**
+ * Copyright 2013, Brian Risk
+ * 
+ * @author Brian Risk
+ *
+ */
 public class SpectrumIonPairProbability {
 	double fragmentToleranceInDaltons = 0.1;
 	Spectrum spectrum;

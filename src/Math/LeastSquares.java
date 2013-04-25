@@ -3,6 +3,13 @@ package Math;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+/**
+ * Copyright 2013, Brian Risk
+ * 
+ * 
+ * @author Brian Risk
+ *
+ */
 public class LeastSquares {
 	
 	public static double calculateM( double [] yValues, int start, int stop) {

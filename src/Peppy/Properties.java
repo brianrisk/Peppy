@@ -17,7 +17,7 @@ import java.util.Hashtable;
  * Also property values are managed here.
  * If we were to import a property file, this is where the code would be.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

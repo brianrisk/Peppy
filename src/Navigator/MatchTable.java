@@ -9,7 +9,7 @@ import java.util.Hashtable;
  * Contains a hashtable where the elements are
  * ArrayList of matches.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

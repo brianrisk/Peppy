@@ -18,7 +18,7 @@ import Peppy.U;
  * what is the distribution of N-terminal AAs?
  * how do those differ from random distributions?
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * @author Brian Risk
  *

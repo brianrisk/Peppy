@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * A data structure to hold a string of DNA nucleotides
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

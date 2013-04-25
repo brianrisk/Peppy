@@ -23,7 +23,7 @@ import Reports.TextReporter;
  * 2) Easy proteogenomic mapping
  * 3) better multi-threading
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk
@@ -940,7 +940,7 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy(TM)");
 		U.p("Protein identification / proteogenomic software.");
-		U.p("Copyright 2012 by Brian Risk");
+		U.p("Copyright 2013 by Brian Risk");
 		U.p();
 		
 		if (System.currentTimeMillis() > expiration) {

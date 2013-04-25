@@ -14,7 +14,7 @@ import java.util.Hashtable;
  * This farms out the digestion of the nucleotide sequences to
  * SequenceDigestionTread objects
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * 

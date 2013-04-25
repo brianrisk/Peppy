@@ -11,7 +11,7 @@ package Peppy;
  * Selenocysteine masses from:
  * http://www.chemspider.com/Chemical-Structure.23436.html
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

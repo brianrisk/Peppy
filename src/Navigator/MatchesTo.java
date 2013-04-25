@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * A "set" is a collection of matches.  These could be all matches to a particular peptide or 
  * all for a given region or protein or so on and so on.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

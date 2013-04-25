@@ -23,7 +23,7 @@ import Math.MassError;
  * It will also save a report containing a PR curve, the list of thresholds and the properties
  * used.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

@@ -3,7 +3,7 @@ package Peppy;
 import Math.MassError;
 
 /**
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

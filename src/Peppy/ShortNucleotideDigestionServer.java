@@ -2,6 +2,11 @@ package Peppy;
 
 import java.util.ArrayList;
 
+/**
+ * Copyright 2013, Brian Risk
+ * @author Brian Risk
+ *
+ */
 public class ShortNucleotideDigestionServer {
 	
 	ArrayList<NucleotideSequence> nucleotideSequences;

@@ -21,7 +21,7 @@ import java.util.Hashtable;
  * could be "name"; if there happened to be two "Brian"s, both would be stored
  * for the key value of "Brian".
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

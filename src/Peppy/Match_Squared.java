@@ -1,7 +1,9 @@
 package Peppy;
 
 
-/* I'm setting up "squared" to be a way to help sort out the situation where 
+/**
+ * 
+ * I'm setting up "squared" to be a way to help sort out the situation where 
  * matching 20 out of 50 AAs in a peptide produces a better score than matching
  * 10 out of 10 AAs in a shorter peptide.
  * 
@@ -12,7 +14,12 @@ package Peppy;
  * This could, potentially, be a method to eliminate the false positives produced
  * by modified matches outscoring the modified that have equal quality of match
  * 
- * */
+ * Copyright 2013, Brian Risk
+ * 
+ * 
+ * @author Brian Risk
+ *
+ */
 
 public class Match_Squared extends Match {
 	

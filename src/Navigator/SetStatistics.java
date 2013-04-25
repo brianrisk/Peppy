@@ -11,7 +11,7 @@ import Peppy.U;
 /**
  * A quick little class to answer some questions for Karen Anderson and David Fenyo
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

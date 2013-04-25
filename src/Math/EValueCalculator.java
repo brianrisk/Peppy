@@ -10,6 +10,8 @@ import Peppy.Match;
  * This will do all of the housekeeping things like
  * keep track of histograms, find least squares fit, etc.
  * 
+ * Copyright 2013, Brian Risk
+ * 
  * @author Brian Risk
  *
  */

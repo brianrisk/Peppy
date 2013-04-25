@@ -5,7 +5,7 @@ import java.util.Hashtable;
 /**
  * Allows us to hold the best matches for all samples
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

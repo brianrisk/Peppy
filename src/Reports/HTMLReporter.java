@@ -16,7 +16,7 @@ import Peppy.Spectrum;
  * a nice, easy and intuitive manner.  That's what this
  * class does.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

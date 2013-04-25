@@ -6,7 +6,7 @@ package Peppy;
  * We already have a score, E value, etc for a match
  * and simply need to contain it in an object
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

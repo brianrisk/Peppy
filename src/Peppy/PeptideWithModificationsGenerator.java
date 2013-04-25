@@ -8,7 +8,7 @@ import java.util.Collections;
  * 
  * This class takes a peptide and a set of variable modifications
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * 

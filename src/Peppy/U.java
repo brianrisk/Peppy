@@ -23,7 +23,7 @@ import java.util.Stack;
  * A basic utility class.
  * Saves a lot of time not writing out "System.out.println"
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

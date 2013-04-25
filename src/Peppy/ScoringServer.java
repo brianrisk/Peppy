@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * When that thread is done executing it asks ScoringEngine for another
  * spectrum that it may search for.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

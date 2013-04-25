@@ -11,7 +11,7 @@ import Math.HasValue;
  * 4) boolean forward (false = reverse)
  * 5) the reading frame
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

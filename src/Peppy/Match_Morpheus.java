@@ -1,5 +1,15 @@
 package Peppy;
 
+/**
+ * Implementation of the Morpheus PSM score
+ * 
+ * 
+ * 
+ * Copyright 2013, Brian Risk
+ * 
+ * @author Brian Risk
+ *
+ */
 public class Match_Morpheus extends Match {
 
 	@Override

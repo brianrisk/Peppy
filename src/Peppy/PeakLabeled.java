@@ -1,5 +1,12 @@
 package Peppy;
 
+/**
+ * Copyright 2013, Brian Risk
+ * 
+ * 
+ * @author Brian Risk
+ *
+ */
 public class PeakLabeled extends Peak {
 	
 	String color = "#000000";

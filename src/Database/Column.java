@@ -4,7 +4,7 @@ package Database;
  * This does not contain a column of data.  More, it is the
  * description of the column.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

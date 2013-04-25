@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * A class where we store all of our constants. All variables
  * should be declared "final".  All methods should be static
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

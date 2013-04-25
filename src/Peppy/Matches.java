@@ -13,7 +13,7 @@ import Math.LeastSquares;
  * or spectrum or region or protein... This abstract class defines common functionality for all
  * of these.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

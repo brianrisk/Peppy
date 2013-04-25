@@ -16,7 +16,9 @@ import Math.MassError;
  * 
  * Rework to add in additional features to use the jmzml library to upload .mzml files 
  * 
- * @author Brian Risk, David "Corvette" Thomas
+ * Copyright 2013, Brian Risk
+ * 
+ * @author Brian Risk
  *
  */
 public class Spectrum implements Comparable<Spectrum>, HasValue {

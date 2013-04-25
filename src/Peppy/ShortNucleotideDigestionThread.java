@@ -2,6 +2,12 @@ package Peppy;
 
 import java.util.ArrayList;
 
+/**
+ * Copyright 2013, Brian Risk
+ * 
+ * @author Brian Risk
+ *
+ */
 public class ShortNucleotideDigestionThread  implements Runnable {
 	
 	private static final boolean [] strandValues = {true,false};

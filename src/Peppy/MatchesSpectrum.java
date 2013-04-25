@@ -16,7 +16,7 @@ package Peppy;
  * Further, we have the added benefit of not needing a minimum score as every
  * spectrum will have 
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * @author Brian Risk

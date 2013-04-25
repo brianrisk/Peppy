@@ -35,7 +35,7 @@ import Math.MassError;
 
 
 /**
- * 
+ * Copyright 2013, Brian Risk
  * @author Brian Risk 
  *
  */

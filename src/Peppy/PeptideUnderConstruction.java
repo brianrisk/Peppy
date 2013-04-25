@@ -4,7 +4,7 @@ package Peppy;
  * This class is basically a tool to help simplify the whole
  * nucleotide translation / digestion process.
  * 
- * Copyright 2012, Brian Risk
+ * Copyright 2013, Brian Risk
  * 
  * 
  * 
