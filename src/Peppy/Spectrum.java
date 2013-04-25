@@ -26,7 +26,8 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double mass = -1;
 	private double precursorMZ = -1;
 	private int id;
-	private int charge = 0;
+	private int fileLocus;
+	private int charge = 1;
 	private File file;
 	private String title = "";
 	//For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5  
@@ -42,6 +43,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	private double intensity06Percent = -1;
 	private double minimumIntensity = -1; 
 	private double coverage = -1;
+	private double totalIntensity = -1;
 	
 	private int scanCount = -1;
 	private double retentTime = -1;
@@ -98,6 +100,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		intensity12Percent = getPeak((int) (peaks.size() * .875)).getIntensity();
 		intensity06Percent = getPeak((int) (peaks.size() * .9375)).getIntensity();
 		SpectrumLoader.sortPeaksByMass(this);
+		
+		totalIntensity = 0;
+		for (Peak peak: peaks) {
+			totalIntensity += peak.getIntensity();
+		}
 	}//calculateDistributions
 	
 	
@@ -155,6 +162,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public int getCharge() {return charge;}
 	public File getFile() {return file;}
 	public int getId() {return id;}
+	public int getFileLocus() {return fileLocus;}
 	public void setMD5(String md5){MD5 = md5;};
 	public void setPeaks(ArrayList<Peak> peaks){this.peaks = peaks;}
 	public void setFile(File file){this.file = file;}
@@ -225,16 +233,17 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				}
 			}
 //			coverage = covered / (peaks.get(peaks.size() - 1).getMass() - peaks.get(0).getMass());
+			covered /= getMass();
 			coverage = covered;
 		}
 		return coverage;
 	}//getCovereage
 	
+	
 	public void setId(int id) {this.id = id;}
+	public void setFileLocus(int fileLocus) {this.fileLocus = fileLocus;}
 	public static void setSortParameter(int sortParameter) {Spectrum.sortParameter = sortParameter;}
-	
 	public boolean isValid() {return isValid;}
-	
 	public double getMedianIntensity() {if (medianIntensity < 0) calculateDistributions();return medianIntensity;}
 	public double getIntensity25Percent() {if (intensity25Percent < 0) calculateDistributions();return intensity25Percent;}
 	public double getIntensity12Percent() {if (intensity12Percent < 0) calculateDistributions();return intensity12Percent;}
@@ -300,6 +309,10 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		}
 		return 0;
 	}//compareTo
+
+public double getTotalIntensity() {
+	return totalIntensity;
+}
 	
 }//spectrum
 

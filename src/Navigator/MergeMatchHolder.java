@@ -17,6 +17,7 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 	private double topScore = 0;
 	private boolean isModified = true;
 	private String keyName;
+	private double scoreTotal = 0;
 	
 	Hashtable<String, Match> matches = new Hashtable<String, Match>();
 	
@@ -27,6 +28,7 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 	public void put(String key, Match match) {
 		matches.put(key, match);
 		if (match.getScore() > topScore) topScore = match.getScore();
+		scoreTotal += match.getScore();
 		if (key == null) key = match.getString(keyName);
 		if (!match.getBoolean("isModified")) isModified = false;
 	}
@@ -49,6 +51,10 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 		return topScore;
 	}
 	
+	public double getScoreTotal() {
+		return scoreTotal;
+	}
+
 	public int size() {
 		return matches.size();
 	}
@@ -64,6 +70,8 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 		if (size() < other.size()) return 1;
 		if (topScore > other.getTopScore()) return -1;
 		if (topScore < other.getTopScore()) return 1;
+//		if (scoreTotal > other.getScoreTotal()) return -1;
+//		if (scoreTotal < other.getScoreTotal()) return 1;
 		return 0;
 	}
 

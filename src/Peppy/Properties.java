@@ -157,6 +157,9 @@ public class Properties {
 	public static boolean simpleSearch = false;
 	public static boolean expires = true;
 	
+	/* Selenocysteine */
+	public static boolean useSelenocysteine = false;
+	
 	public static void init() {
 		allProperties = new Hashtable<String, Property>();
 		
@@ -167,8 +170,10 @@ public class Properties {
 		scoringMethodName = "Peppy.Match_IMP";
 		matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 
-		//properties for spectral cleaning
-		minimumNumberOfPeaksForAValidSpectrum = 10;
+		/* properties for spectral cleaning */
+		minimumNumberOfPeaksForAValidSpectrum = 2;
+		spectrumBucketSize = 100;
+		spectrumBucketCount = 10;
 		
 		//when it comes to calculating theoretical peptide mass, we can use mono or average
 		useMonoMass = true;
@@ -183,13 +188,20 @@ public class Properties {
 		sequenceRegionStart = 0;
 		sequenceRegionStop = 0;
 		
+		/*
+		 * Cleavage rules
+		 */
 		cleavageAcidList = new ArrayList<Character>();
 		cleavageAtCarboxylSide = true;
+		
+		/* mass spectrometer settings */
+		isITRAQ = false;
+		
 		
 		//Segmenting up job for memory management
 		digestionWindowSize = 10000000;
 		desiredPeptideDatabaseSize = 10000000;
-		maxCombinedProteinLength = 50000;
+		maxCombinedProteinLength = 5000000;
 		
 		//Splicing?
 		useSpliceVariants = false;
@@ -202,6 +214,8 @@ public class Properties {
 		/* ion types */
 		rightIonDifference = 1.0072764668; //x, y, z ion
 		leftIonDifference = 1.0072764668;  //a, b, c ion
+//		rightIonDifference = 1.0; //x, y, z ion
+//		leftIonDifference = 1.0;  //a, b, c ion
 		
 		minimumScore = 12;
 		
@@ -242,17 +256,10 @@ public class Properties {
 		UCSCdatabase = "clade=mammal&org=Human&db=hg19";
 		
 
-		/* for testing purposes */
-		thisIsATest = false;
-//		testSequence;
-		testSequenceIsProtein = true;
-//		testDirectory; 
 		
 		/* for custom jobs... */
 		isYale = false;
 		
-		/* for VCF Files*/
-//		VCFFileString;
 		
 		/* FDR false discovery rate */
 		numberOfSpectraToUseForFDR = 10000;
@@ -270,7 +277,12 @@ public class Properties {
 		methionineOxidation = false;
 		iodoacetamideDerivative = true;
 		
-		isITRAQ = false;
+		smartTolerances = true;
+		
+		/* how we format our percents */
+		percentFormat = NumberFormat.getPercentInstance();
+		
+		useSelenocysteine = false;
 	}
 	
 	
@@ -511,7 +523,8 @@ public class Properties {
 		if (propertyName.equals("smartTolerances")) 
 			smartTolerances = Boolean.valueOf(propertyValue);
 		
-		
+		if (propertyName.equals("useSelenocysteine")) 
+			useSelenocysteine = Boolean.valueOf(propertyValue);
 	}
 
 
@@ -604,6 +617,10 @@ public class Properties {
 			
 			pw.println();
 			pw.println("smartTolerances " + smartTolerances);
+			
+			pw.println();
+			pw.println("useSelenocysteine " + useSelenocysteine);
+			
 			
 			
 			

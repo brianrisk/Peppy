@@ -103,7 +103,7 @@ public class RNA_Digestor {
 			if (codonIndex == 3) {
 				codonIndex = 0;
 				
-				aminoAcid = Definitions.aminoAcidList[indexForCodonArray(codon, isForward)];
+				aminoAcid = AminoAcids.aminoAcidList[indexForCodonArray(codon, isForward)];
 				
 				//if this is the beginning, start a peptide
 				if (nucleotideIndex == startIndexPlusThree) {

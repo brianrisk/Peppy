@@ -1,5 +1,6 @@
 package Navigator;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,6 +23,7 @@ import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
 import Peppy.U;
 import Reports.HTMLPageSpectrum;
+import Reports.MatchSVG;
 import Reports.UCSC;
 
 /**
@@ -57,9 +59,11 @@ public class BestMatches {
 //		yale();
 //		washUPaperOne();
 //		washURegionsOfInterest();
-//		gm12878();
-		compRefUNC();
-		pccCompRefA();
+		gm12878();
+//		compRefUNC();
+//		pccCompRefA();
+//		seleno();
+//		removedNonsense();
 //		carthene();
 //		nonsenseSearch();
 //		compRefUNCRegionsOfInterest();
@@ -75,7 +79,12 @@ public class BestMatches {
 
 
 	public BestMatches(File resultsFolder, int resultsTypeToAccept, ArrayList<String> direcotryTitlesToIgnore) {
-		sampleName = resultsFolder.getName();
+		this( resultsFolder,  resultsTypeToAccept, direcotryTitlesToIgnore, resultsFolder.getName());
+		
+	}
+	 
+	public BestMatches(File resultsFolder, int resultsTypeToAccept, ArrayList<String> direcotryTitlesToIgnore, String sampleName) {
+		this.sampleName = sampleName;
 		
 		/* list all the directories in this folder */
 		File [] reportFolders = resultsFolder.listFiles();
@@ -624,7 +633,14 @@ public class BestMatches {
 	public static void gm12878() {
 		ArrayList<File> reportFolders = new ArrayList<File>();
 
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
+//		reportFolders.add(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM paternal/"));
+//		reportFolders.add(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM maternal/"));
+		
+//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM paternal/"));
+//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
+		
+		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/k662-chr7-region/"));
+		
 		
 		
 		/* a list of our BestMatches */
@@ -635,6 +651,7 @@ public class BestMatches {
 		direcotryTitlesToIgnore.add("varimod");
 		direcotryTitlesToIgnore.add("gencode");
 		direcotryTitlesToIgnore.add("proteome");
+//		direcotryTitlesToIgnore.add("HG19");
 		
 		for (File folder: reportFolders) {
 			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
@@ -679,11 +696,124 @@ public class BestMatches {
 	public static void pccCompRefA() {
 		ArrayList<File> reportFolders = new ArrayList<File>();
 
+
+
+
+		
+//		reportFolders.add(new File("reports/BI-P5"));
+//		reportFolders.add(new File("reports/JHU-P5"));
+//		reportFolders.add(new File("reports/VAND-P5"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P5"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_VU_B1_P5"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_VU_B2_P5"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_VU_B3_P5"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_JHUC_P5AB"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
+		
+//		reportFolders.add(new File("reports/JHU-P6"));
+//		reportFolders.add(new File("reports/VAND-P6"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P6"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_VU_A2_P6"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_VU_A3_P6"));		
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_JHUC_P6ST"));
+		
+		
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_PNNL"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_JHUC_iTRAQ"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_BI"));
+//		reportFolders.add(new File("reports/PNNL"));
+//		reportFolders.add(new File("reports/broad"));
+
+		
+		
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+//		direcotryTitlesToIgnore.add("HG19");
+		direcotryTitlesToIgnore.add("mouse");
+		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("gencode");
+		direcotryTitlesToIgnore.add("personal");
+		direcotryTitlesToIgnore.add("germline");
+		direcotryTitlesToIgnore.add("subject");
+		
+		for (File folder: reportFolders) {
+			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
+			bestMatchesArray.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
+	}
+	
+	public static void seleno() {
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		File parentFolder = new File("reports/seleno2");
+		File [] parentContents = parentFolder.listFiles();
+		for (File file: parentContents) {
+			if (file.isDirectory()) reportFolders.add(file);
+		}
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+//		direcotryTitlesToIgnore.add("HG19");
+		direcotryTitlesToIgnore.add("mouse");
+		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("gencode");
+		direcotryTitlesToIgnore.add("personal");
+		direcotryTitlesToIgnore.add("germline");
+		direcotryTitlesToIgnore.add("subject");
+		
+		for (File folder: reportFolders) {
+			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
+			bestMatchesArray.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
+		
+	}
+	
+	/**
+	 * seeking matches that contain a STOP such as:
+	 * QLQHQ.QQQQQQQQQQQQQPGQGPAEPSQPSGPAVASLEPPVK	
+	 */
+	public static void removedNonsense() {
+		ArrayList<File> reportFolders = new ArrayList<File>();
+
+		reportFolders.add(new File("reports/PNNL"));
 		reportFolders.add(new File("reports/BI-P5"));
 		reportFolders.add(new File("reports/JHU-P5"));
 		reportFolders.add(new File("reports/VAND-P5"));
 		reportFolders.add(new File("reports/JHU-P6"));
 		reportFolders.add(new File("reports/VAND-P6"));
+		reportFolders.add(new File("reports/broad"));
+		
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
+		
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
 		
 		
 		
@@ -695,8 +825,9 @@ public class BestMatches {
 		direcotryTitlesToIgnore.add("varimod");
 		direcotryTitlesToIgnore.add("HG19");
 		direcotryTitlesToIgnore.add("mouse");
-		direcotryTitlesToIgnore.add("germline");
+//		direcotryTitlesToIgnore.add("germline");
 //		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("personal");
 		direcotryTitlesToIgnore.add("gencode");
 		
 		for (File folder: reportFolders) {
@@ -704,8 +835,29 @@ public class BestMatches {
 			bestMatchesArray.add(matches);
 		}
 		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter("matches containing stops.txt")));
+			for (BestMatches bestMatches: bestMatchesArray) {
+				ArrayList<Match> matches = new ArrayList(bestMatches.getBestPeptideMatches().values());
+				for (Match match: matches) {
+					String peptideSequence = match.getString("peptideSequence");
+					if (peptideSequence.indexOf(".") != -1) {
+						pw.println(match.toString());
+					}
+				}
+			}
+			
+			
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
+	
 	
 	
 	public static void compRefUNC() {
@@ -721,11 +873,11 @@ public class BestMatches {
 		/* a list of folders to ignore from our results */
 		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
 		direcotryTitlesToIgnore.add("varimod");
-//		direcotryTitlesToIgnore.add("HG19");
+		direcotryTitlesToIgnore.add("HG19");
 		direcotryTitlesToIgnore.add("mouse");
 		direcotryTitlesToIgnore.add("germline");
 		direcotryTitlesToIgnore.add("xeno");
-		direcotryTitlesToIgnore.add("gencode");
+//		direcotryTitlesToIgnore.add("gencode");
 		
 		for (File folder: reportFolders) {
 			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
@@ -929,7 +1081,13 @@ public class BestMatches {
 		
 		/* write merged table */
 		try {
-			PrintWriter matchWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File("unified samples report.html"))));
+			
+			/* create a BED file as well */
+			PrintWriter bedWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File("unified_bed.txt"))));
+			bedWriter.println("track name=\"Peppy results\" description=\"Peppy results\" visibility=2 itemRgb=\"On\"");
+			
+			/* header */
+			PrintWriter matchWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File("unified_report.html"))));
 			matchWriter.println("<html>");
 			matchWriter.println("<head>");
 			matchWriter.println("" +
@@ -943,31 +1101,243 @@ public class BestMatches {
 					);
 			matchWriter.println("</head>");
 			matchWriter.println("<body>");
+			
+			/* analysis and sample legend */
+			matchWriter.println("<ol>");
+			 for (int i = 0; i < bestMatches.size(); i++) {
+				BestMatches bm = bestMatches.get(i);
+				matchWriter.println("<li>" + bm.getSampleName() + "</li>");
+			}
+			 matchWriter.println("</ol>");
+			
+			/* the table */
 			matchWriter.println("<table class=\"sortable\" id=\"box-table-a\" >");
 			matchWriter.println("<tr>");
 			matchWriter.println("<th>#</th>");
 			matchWriter.println("<th>peptide</th>");
-			for (BestMatches bm: bestMatches) {
-				matchWriter.println("<th>" + bm.getSampleName() + "</th>");
+			matchWriter.println("<th>*</th>");
+			for (int i = 0; i < bestMatches.size(); i++) {
+				matchWriter.println("<th>" + (i + 1) + "</th>");
 			}
-			matchWriter.println("<th>score total</th>");
-			matchWriter.println("<th>NIST</th>");
+			matchWriter.println("<th>set count</th>");
+			matchWriter.println("<th>spectrum count</th>");
+//			matchWriter.println("<th>score total</th>");
+//			matchWriter.println("<th>P5</th>");
+//			matchWriter.println("<th>P6</th>");
+//			matchWriter.println("<th>P5/P6</th>");
+//			matchWriter.println("<th>single WHIM</th>");
+//			matchWriter.println("<th>NIST</th>");
 			matchWriter.println("<th>UCSC</th>");
 			matchWriter.println("<th>unique</th>");
 			matchWriter.println("<th>chr</th>");
 			matchWriter.println("<th>start</th>");
 			matchWriter.println("<th>stop</th>");
 			matchWriter.println("<th>strand</th>");
+			matchWriter.println("<th>notes</th>");
 			
 			matchWriter.println("</tr>");
 			
 			int counter = 0;
 			for (MergeMatchHolder holder: pmmhs) {
-				Match anyMatch;
-				anyMatch = holder.get();
-				if (anyMatch == null) continue;
-					
 				counter++;
+				
+				Match anyMatch = holder.get();
+				if (anyMatch == null) continue;
+				
+				/*
+				 * HACK
+				 * Skipping OPLAH matches or other known proteins
+				 */
+				int start = anyMatch.getInt("start") ;
+				String peptideSequence = anyMatch.getString("peptideSequence");
+				if (anyMatch.getString("sequenceName").equals(">chr8")) {
+					if (start > 145106167 && start < 145115584) {
+						continue;
+					}
+				}
+				if (start == 77771407) continue;
+				if (start == 143767494) continue;
+				if (start == 73959542) continue;
+				if (start == 8926467) continue;
+				if (start == 69349598) continue;
+				if (start == 77711364) continue;
+				if (start == 118948882) continue;
+				if (start == 91033136) continue;
+				if (start == 7479940) continue;
+				if (start == 104335609) continue;
+				if (start == 57108181) continue;
+				if (start == 1571780) continue;
+				if (start == 1571783) continue;
+				if (start == 94800588) continue;
+				if (start == 94800941) continue;
+				if (start == 73958003) continue;
+				if (start == 73958477) continue;
+				if (start == 73958561) continue;
+				if (start == 73959278) continue;
+				if (start == 73959308) continue;
+				if (start == 73959470) continue;
+				if (start == 74689310) continue;
+				if (start == 53321621) continue;
+				if (start == 53326161) continue;
+				if (start == 53326290) continue;
+				if (start == 94294661) continue;
+				if (start == 94294859) continue;
+				if (start == 64099187) continue;
+				if (start == 64099649) continue;
+				if (start == 57038572) continue;
+				if (start == 57033784) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (start == 77771407) continue;
+				if (peptideSequence.equals("ALAEGPGAEGPR")) continue;
+				if (peptideSequence.equals("SMFLQMGTTAGPSGEAGGGAGLAEAPR")) continue;
+				if (peptideSequence.equals("ASQNSFRIEYDTFGELK")) continue;
+				if (peptideSequence.equals("ALQEASEAYLVGLFEDTNLCAIHAK")) continue;
+				if (peptideSequence.equals("AGLGQPLPQEELDAMIR")) continue;
+				if (peptideSequence.equals("MCNEFFEGFPDK")) continue;
+				if (peptideSequence.equals("RSDTMAGGGGSSDGSGR")) continue;
+				if (peptideSequence.equals("VSLGGFEITPPVVLR")) continue;
+				if (peptideSequence.equals("WGAATTSPAASDAR")) continue;
+				if (peptideSequence.equals("MVTGDHPITAK")) continue;
+				if (peptideSequence.equals("MANIQPQMLVAGATSIAR")) continue;
+				if (peptideSequence.equals("TALLDAAGVASLLTTAEVVVTEIPK")) continue;
+				if (peptideSequence.equals("MMDLQHGSLFLR")) continue;
+				if (peptideSequence.equals("MDSGDGVTHTVPIYEGYALPHAILR")) continue;
+				if (peptideSequence.equals("SLASGLVPAAPPK")) continue;
+				if (peptideSequence.equals("MCTCPSGQIAPSCGSR")) continue;
+				if (peptideSequence.equals("AVTFIGNSTAIQELFK")) continue;
+				if (peptideSequence.equals("MVEPIQGEAGVVVPDPGYLMGVR")) continue;
+				if (peptideSequence.equals("LLTPGACSSEVPSAVPSR")) continue;
+				if (peptideSequence.equals("IAQTVTAVAGLTSYPFDTVR")) continue;
+				if (peptideSequence.equals("MVTPGHACTQK")) continue;
+				if (peptideSequence.equals("ALDIEIATYRK")) continue;
+				if (peptideSequence.equals("PVDFTGYWK")) continue;
+				if (peptideSequence.equals("TYELLNCDK")) continue;
+				if (peptideSequence.equals("SSTDSLPGELR")) continue;
+				if (peptideSequence.equals("LPGNISSLNVECR")) continue;
+				if (peptideSequence.equals("GETLAETWTR")) continue;
+				if (peptideSequence.equals("GPGAPAASSPTQK")) continue;
+				if (peptideSequence.equals("HGEQDPSLWEQALSYFAR")) continue;
+				if (peptideSequence.equals("GESDDSILR")) continue;
+				if (peptideSequence.equals("SGFFLFCSEFRPK")) continue;
+				if (peptideSequence.equals("TALLDAAGVASLLTTAEVVVTEIPKEEK")) continue;
+				if (peptideSequence.equals("VTDYFVVAGLTDTSTLLDQEINRLDTK")) continue;
+				if (peptideSequence.equals("APITDIAIIIK")) continue;
+				if (peptideSequence.equals("LIPGCEVILATPYGR")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				
+				String note = "";
+				if (peptideSequence.equals("AGGDLPLQPQPGGAAAR")) note = "frame shift";
+				if (peptideSequence.equals("SGLAACTAPLPGSR")) note = "reverse frame";
+				if (peptideSequence.equals("DAEQEEEVQR")) note = "frame shift";
+				if (peptideSequence.equals("ATPGHTGCLSPGCPDQPAR")) note = "frame shift";
+				if (peptideSequence.equals("AQIASSGLTVEVDAPK")) note = "mutated stop?";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+
+				
+				
+				
+				
+				
+				
+				
+				
+				/*
+				 * Marking matches being reported in methods paper
+				 */
+				boolean earlyEllis = false;
+				if (peptideSequence.equals("DLADERALVDVIEDK")) earlyEllis = true;
+				if (peptideSequence.equals("EQNEAEVASLNR")) earlyEllis = true;
+				if (peptideSequence.equals("GEMMDRQHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("IGGIASVPVGR")) earlyEllis = true;
+				if (peptideSequence.equals("IISNASCTTNCLAPRAK")) earlyEllis = true;
+				if (peptideSequence.equals("IMNMIR")) earlyEllis = true;
+				if (peptideSequence.equals("VETGFLKPGMVVTVAPVNVTTEVK")) earlyEllis = true;
+				if (peptideSequence.equals("ALEMEDSQLCK")) earlyEllis = true;
+				if (peptideSequence.equals("LIDEVLK")) earlyEllis = true;
+				if (peptideSequence.equals("ARALEMEDSQLCK")) earlyEllis = true;
+				if (peptideSequence.equals("ASGVSAAAPGER")) earlyEllis = true;
+				if (peptideSequence.equals("DLADELALVDVNEDK")) earlyEllis = true;
+				if (peptideSequence.equals("DLADELDLVDVIEDK")) earlyEllis = true;
+				if (peptideSequence.equals("EMMDLHHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("GEMMDLEHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("GLDSLRPLR")) earlyEllis = true;
+				if (peptideSequence.equals("GQMMDLQHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("GWMMDLQHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("HIAEEGDR")) earlyEllis = true;
+				if (peptideSequence.equals("ITVVGVGAVGMACANSILMK")) earlyEllis = true;
+				if (peptideSequence.equals("LKGEMMDLEHGSLFLR")) earlyEllis = true;
+				if (peptideSequence.equals("LLIVSDPVDILTYVAWK")) earlyEllis = true;
+				if (peptideSequence.equals("LLIVSNPVDILTYMAWK")) earlyEllis = true;
+				if (peptideSequence.equals("LLIVSNPVDILTYVDWK")) earlyEllis = true;
+				if (peptideSequence.equals("LLIVSNPVDNLTYVAWK")) earlyEllis = true;
+				if (peptideSequence.equals("LLQSIAVK")) earlyEllis = true;
+				if (peptideSequence.equals("LPGAAGNR")) earlyEllis = true;
+				if (peptideSequence.equals("LQGEMMDLQHGSLFLRTPK")) earlyEllis = true;
+				if (peptideSequence.equals("LRIVSNPVDILTYVAWK")) earlyEllis = true;
+				if (peptideSequence.equals("NHVIGSVCNLDSAR")) earlyEllis = true;
+				if (peptideSequence.equals("QGISLLLR")) earlyEllis = true;
+				if (peptideSequence.equals("SMVASGSELGK")) earlyEllis = true;
+				if (peptideSequence.equals("SYHEEFNPPQEPMKDDITGEPLIR")) earlyEllis = true;
+				if (peptideSequence.equals("THINIIVTGHVDSGK")) earlyEllis = true;
+				if (peptideSequence.equals("TQTAAAAAAGGVGGGGGAMGGLASGGDVEPGLPVEVR")) earlyEllis = true;
+				if (peptideSequence.equals("VIGSGSNLDSAR")) earlyEllis = true;
+				if (peptideSequence.equals("AGPNTNGSQFFICTAK")) earlyEllis = true;
+				if (peptideSequence.equals("GIMNSFVNDIFER")) earlyEllis = true;
+				if (peptideSequence.equals("MGIMNSFVNDIFER")) earlyEllis = true;
+				if (peptideSequence.equals("VPCILGQNGISDLVK")) earlyEllis = true;
+				if (peptideSequence.equals("ALEMENSQLCK")) earlyEllis = true;
+				if (peptideSequence.equals("APPATNPLATMSVELEEALPVTTAEGMAK")) earlyEllis = true;
+				if (peptideSequence.equals("AVAGASAMFAGLQDLGVANGEDLK")) earlyEllis = true;
+				if (peptideSequence.equals("DGGLSIPHSTK")) earlyEllis = true;
+				if (peptideSequence.equals("DIPHMDIEALK")) earlyEllis = true;
+				if (peptideSequence.equals("DRLPLAVVGSDIITEVNGK")) earlyEllis = true;
+				if (peptideSequence.equals("GLMTTVHAITATQK")) earlyEllis = true;
+				if (peptideSequence.equals("HTGPGILSMANAGLNTNGSQFFICTAK")) earlyEllis = true;
+				if (peptideSequence.equals("HTGPGILSMANAGSNINGSQFFICTAK")) earlyEllis = true;
+				if (peptideSequence.equals("IEDGNDFGVAIQDK")) earlyEllis = true;
+				if (peptideSequence.equals("KIGYNPDTVAFVPISGWNDDNMLEPSANMPWFK")) earlyEllis = true;
+				if (peptideSequence.equals("KIGYNPDTVAFVPISGWNGNNMLEPSANMPWFK")) earlyEllis = true;
+				if (peptideSequence.equals("KITIANCGQLE")) earlyEllis = true;
+				if (peptideSequence.equals("KLGEMWNDTAADDK")) earlyEllis = true;
+				if (peptideSequence.equals("KLLMMAGINDCYTSAR")) earlyEllis = true;
+				if (peptideSequence.equals("LETEIEALKEELLFMK")) earlyEllis = true;
+				if (peptideSequence.equals("LSAIYGGTYMLNKPIEEIIVQDGK")) earlyEllis = true;
+				if (peptideSequence.equals("MAGIDDCYTSAR")) earlyEllis = true;
+				if (peptideSequence.equals("MELHGEGSSSGK")) earlyEllis = true;
+				if (peptideSequence.equals("MGLYHGQVLCK")) earlyEllis = true;
+				if (peptideSequence.equals("MTTVHAITATQK")) earlyEllis = true;
+				if (peptideSequence.equals("NIELFLNSKIK")) earlyEllis = true;
+				if (peptideSequence.equals("NLDVGANIFNGNLDPEIDEK")) earlyEllis = true;
+				if (peptideSequence.equals("NPALVELLK")) earlyEllis = true;
+				if (peptideSequence.equals("PFIDLNYMVYMFEYDSTHGK")) earlyEllis = true;
+				if (peptideSequence.equals("PIEEIIVQDGK")) earlyEllis = true;
+				if (peptideSequence.equals("QTTHFVEGGDAGNREDQINR")) earlyEllis = true;
+				if (peptideSequence.equals("RSDTMAGGGGSSDGSGR")) earlyEllis = true;
+				if (peptideSequence.equals("RSELEAALQR")) earlyEllis = true;
+				if (peptideSequence.equals("SGGTLVLVGLGSEMTTVPLLHAAIR")) earlyEllis = true;
+				if (peptideSequence.equals("SGLAACTAPLPGSR")) earlyEllis = true;
+				if (peptideSequence.equals("SLSEIHCDK")) earlyEllis = true;
+				if (peptideSequence.equals("VDLMAHMASKE")) earlyEllis = true;
+				if (peptideSequence.equals("VYDVTQHAVGIVVNK")) earlyEllis = true;
+
 				
 				matchWriter.println("<tr>");
 				
@@ -976,19 +1346,58 @@ public class BestMatches {
 				
 				/* acid sequence */
 				matchWriter.println("<td>" + anyMatch.getString("peptideSequence") + "</td>");
+				
+				
+				/*
+				 * HACK
+				 */
+				if (earlyEllis) {
+					matchWriter.println("<td>*</td>");
+				} else {
+					matchWriter.println("<td></td>");
+				}
 									
 				/* links */
 				double scoreTotal = 0;
-				for (BestMatches bm: bestMatches) {
+				int sampleCount = 0;
+				int spectrumCount = 0;
+				int pFiveCount = 0;
+				int pSixCount = 0;
+				int pFiveOrSix = 0;
+				
+				for (int bestMatchIndex = 0; bestMatchIndex < bestMatches.size(); bestMatchIndex++) {
+					BestMatches bm = bestMatches.get(bestMatchIndex);
+//				for (BestMatches bm: bestMatches) {
 					Match match = holder.get(bm.getSampleName());
+					
+					
 					if (match != null) {
-//						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
 						int score = (int) Math.round(match.getDouble("score"));
+						
+						/* if match isn't null, the peptide was present in this sample */
+						sampleCount++;
+						
+						/* write the BED line */
+						int startLocus = anyMatch.getInt("start");
+						int stopLocus = anyMatch.getInt("stop");
+						String sequenceName = anyMatch.getString("sequenceName");
+						if (sequenceName.startsWith(">")) sequenceName = sequenceName.substring(1);
+						Color color = new Color(Color.HSBtoRGB((float) bestMatchIndex / bestMatches.size(), 1.0f, 0.5f));
+						String colorString = color.getRed() + "," + color.getBlue() + "," + color.getGreen();
+						bedWriter.println(sequenceName + "\t" + startLocus + "\t" + stopLocus + "\t" + anyMatch.getString("peptideSequence") + "\t1000\t" + anyMatch.getString("strand") + "\t" + startLocus + "\t" + stopLocus + "\t" + colorString);
+						
+						/*
+						 * HACK
+						 */
+						if (bestMatchIndex < 9) pFiveCount++;
+						if (bestMatchIndex >= 9 && bestMatchIndex < 17) pSixCount++;
+						if (bestMatchIndex >= 17) pFiveOrSix++;
 						
 						/* calculating total for all scores */
 						ArrayList<Match> peptideMatches = bm.getAllPeptides().get(anyMatch.getString("peptideSequence"));
 						for (Match peptideMatch: peptideMatches) {
 							scoreTotal += peptideMatch.getDouble("score");
+							spectrumCount++;
 						}
 						
 						
@@ -1008,14 +1417,16 @@ public class BestMatches {
 							HTMLPageSpectrum spectrumReport = new HTMLPageSpectrum(spectrum, matchesForReport, spectrumReportFile);
 							spectrumReport.makePage();
 							
+							/* save SVG */
+							MatchSVG makeSVG = new MatchSVG(matchForReport, new File(spectrumReportFolder, match.getString("spectrumMD5") + ".svg"));
+							makeSVG.saveSVG();
+							
 							matchWriter.print("<a href=\"spectrumReportFolder/" + spectrumReportFile.getName() + "\">");
 							matchWriter.print( score );
 							matchWriter.print( "</a>" );
-							if (match.getBoolean("isModified")) matchWriter.print(" (M)");
 							
 						} else {
 							matchWriter.print( score );
-							if (match.getBoolean("isModified")) matchWriter.print(" (M)");
 						}
 						matchWriter.print("</td>");
 						
@@ -1024,11 +1435,23 @@ public class BestMatches {
 					}
 				}
 				
+				
+				
 				/* score total */
-				matchWriter.println("<td>" + Math.round(scoreTotal) + "</td>");
+				matchWriter.println("<td>" + sampleCount + "</td>");
+				matchWriter.println("<td>" + spectrumCount + "</td>");
+//				matchWriter.println("<td>" + holder.getScoreTotal() + "</td>");
+				
+				boolean isSingle = ((pFiveCount == 0) || (pSixCount == 0));
+				if ( ((pFiveCount == 0) && (pSixCount == 0))) isSingle = false;
+//				matchWriter.println("<td>" + pFiveCount + "</td>");
+//				matchWriter.println("<td>" + pSixCount + "</td>");
+//				matchWriter.println("<td>" + pFiveOrSix + "</td>");
+				
+//				matchWriter.println("<td>" + isSingle + "</td>");
 				
 				/* NIST link */
-				matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + anyMatch.getString("peptideSequence") + "\">NIST</a></td>");
+//				matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + anyMatch.getString("peptideSequence") + "\">NIST</a></td>");
 				
 				/* sample UCSC link */
 				String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
@@ -1039,14 +1462,19 @@ public class BestMatches {
 				matchWriter.println("<td>" + unique + "</td>");
 				
 				/* locus */
-				matchWriter.println("<td>" + anyMatch.getString("sequenceName")  + "</td>");
+				String sequenceName = anyMatch.getString("sequenceName");
+				if (sequenceName.startsWith(">")) sequenceName = sequenceName.substring(1);
+				matchWriter.println("<td>" +  sequenceName + "</td>");
 				matchWriter.println("<td>" + anyMatch.getInt("start") + "</td>");
 				matchWriter.println("<td>" + anyMatch.getInt("stop") + "</td>");
 
 				/* strand */
 				matchWriter.println("<td>" + anyMatch.getString("strand") + "</td>");
+				matchWriter.println("<td>" + note+ "</td>");
 				
 				matchWriter.println("</tr>");
+				
+				if (counter == 500) break;
 				
 			}
 			
@@ -1054,6 +1482,9 @@ public class BestMatches {
 			matchWriter.println("</table></ul></body></html>");
 			matchWriter.flush();
 			matchWriter.close();
+			
+			bedWriter.flush();
+			bedWriter.close();
 
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
@@ -1416,6 +1847,21 @@ public class BestMatches {
 				matchWriter.println("<th>modMass</th>");
 				matchWriter.println("</tr>");
 				for (Match match: bestArray) {
+					
+					/*
+					 * HACK
+					 * for condensing the SNP_Specific reports
+					 * gets rid of some uninteresting modifications
+					 */
+//					int modMass = (int) Math.round(match.getDouble("modMass"));
+//					char modAcid = match.getString("peptideSequence").charAt(match.getInt("modIndex"));
+//					if (modMass == 0) continue;
+//					if (modMass == 1) continue;
+//					if (modMass == 16) continue;
+//					if (modMass == 144) continue;
+//					if (modMass == 43) continue;
+//					if (modMass == 1 && modAcid == 'N') continue;
+					
 					if (match.get("matchType").equals(resultsCategory)) {
 						File spectrumPage = new File(match.getFile("reportFile").getParent(), "spectra/" + match.getInt("spectrumID") + ".html");
 						matchWriter.println("<td><a href=\"" + spectrumPage.getAbsolutePath() + "\">" + match.getString("peptideSequence") + "</a></td>");

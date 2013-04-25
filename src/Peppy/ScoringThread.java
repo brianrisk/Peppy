@@ -92,7 +92,8 @@ public class ScoringThread implements Runnable {
 				
 			}
 
-			/* return results, get new task */
+			/* return results, get new spectrum to process.  
+			 * If no more spectra, gets null and the loop exits */
 			matchesSpectrum = scoringServer.getNextSpectrumMatches();
 
 		}

@@ -36,7 +36,7 @@ public class Peppy {
 	static long maxMemoryUsed = 0;
 	static String propertyFileString = null;
 	
-	private static final long presentMiliseconds = 1352829336626L;
+	private static final long presentMiliseconds = 1363215298816L;
 	private static final long fourMonthsOfMiliseconds = 1000L * 60L * 60L * 24L * 30L * 4L;
 	private static final long expiration = presentMiliseconds + fourMonthsOfMiliseconds;
 	
@@ -53,6 +53,18 @@ public class Peppy {
 		
 		/* i'm finished! */
 		printFarewell();
+		
+//		File spectraFolder = new File("/Users/risk2/PeppyData/tests/ecoli/peptides/");
+//		File [] spectra = spectraFolder.listFiles();
+//		for (File file: spectra) {
+//			String fileName = file.getName();
+//			if (fileName.endsWith(".dta")) {
+//				String newFileName = spectraFolder + "/" + U.getFileNameWithoutSuffix(file) + ".pkl";
+//				U.p(newFileName);
+//				file.renameTo(new File(newFileName));
+//			}
+//		}
+//		U.p("done");
 	}
 	
 	public static void runPeppy(String [] args) {
@@ -131,7 +143,6 @@ public class Peppy {
 			Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			Properties.searchModifications = false;
 			
-		
 			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
 				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
 				ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
@@ -166,6 +177,20 @@ public class Peppy {
 					
 					/* perform precursor analysis if this is the first sequence */
 					if (sequenceIndex == 0 && Properties.smartTolerances) {
+						
+						/*
+						 * abort if we have not found a sufficient percentage
+						 */
+						if (Properties.maximumFDR >= 0) {
+							int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
+							double percentFound = (double) numberFound / spectra.size();
+//							if (percentFound < 0.05) {
+//								U.p("ERROR: only " + Properties.percentFormat.format(percentFound) + " (" + numberFound + ") spectra identified.");
+//								return;
+//							} else {
+								U.p("initial FDR found " + Properties.percentFormat.format(percentFound));
+//							}
+						}
 						
 						/*
 						 * If we found a valid FDR, then reanalyze
@@ -224,7 +249,7 @@ public class Peppy {
 					
 					/* Calculate score threshold with FDR. 
 					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
-					if (Properties.maximumFDR > 0) {
+					if (Properties.maximumFDR >= 0) {
 						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
 						
 						/* if we will not find any matches with confidence, skip this round */
@@ -279,7 +304,7 @@ public class Peppy {
 					
 						
 					/* remove all spectra that appear in our matches */
-					if (Properties.maximumFDR > 0) {
+					if (Properties.maximumFDR >= 0) {
 						ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>(spectra.size() - spectrumIDs.size());
 						for (Spectrum spectrum: spectra) {
 							if (spectrumIDs.get(spectrum.getId()) == null) {
@@ -331,7 +356,7 @@ public class Peppy {
 					
 					/* Calculate score threshold with FDR. 
 					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
-					if (Properties.maximumFDR > 0) {
+					if (Properties.maximumFDR >= 0) {
 						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
 						
 						/* if we will not find any matches with confidence, skip this round */
@@ -510,11 +535,24 @@ public class Peppy {
 		} else {
 			U.p();
 			U.p("running " + jobFiles.size() + " jobs");
+			U.p();
 			for (int i = 0; i < jobFiles.size(); i++) {
 				U.p("running job " + (i + 1) + "; " + jobFiles.get(i).getName());
 				propertyFileString = jobFiles.get(i).getName();
+				
+				/* 
+				 * this initializes with the default "properties.txt" 
+				 * provides a base so common properties don't need to be
+				 * redefined
+				 */
 				init(args);
+				
+				/* 
+				 * All properties defined in this file override those defined in "properties.txt"
+				 */
 				init(jobFiles.get(i).getAbsolutePath());
+				
+				/* try running Peppy */
 				try {
 					runPeppy(null);
 				}
@@ -524,9 +562,11 @@ public class Peppy {
 					U.p("\r\r");
 					U.p("An error occurred. Continuing with the next job...\r\r");
 				}
+				U.p();
 			}
 		}
 	}
+	
 
 
 	public static void init(String propertiesFile) {
@@ -545,6 +585,11 @@ public class Peppy {
 		System.setProperty("java.awt.headless", "true");
 		
 		Properties.loadProperties(propertiesFile);
+		
+		/*
+		 * AminoAcids needs initializing as some of the properties
+		 * may be fixed modification masses
+		 */
 		AminoAcids.init();
 		
 		/* track memory */
@@ -554,7 +599,13 @@ public class Peppy {
 	
 	
 	public static void init(String [] args) {
+		/*
+		 * Clears properties from previous job
+		 */
+		Properties.init();
+		
 		if (args.length == 0) {
+			/* load in the default file */
 			init("properties.txt");
 		} else {
 			init(args[0]);

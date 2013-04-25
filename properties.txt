@@ -1,13 +1,15 @@
-cleavageAcid K
-cleavageAcid R
+
+smartTolerances true
 
 ##number of spectra to process at once 
 numberOfSpectraPerSegment 5000000
 
 ##error thresholds in PPM
-precursorTolerance 25
-fragmentTolerance 25
+precursorTolerance 50
+fragmentTolerance 50
 
+##False Discovery Rates
+numberOfSpectraToUseForFDR -1
 maximumFDR 0.01
 
 ##Report variables 
@@ -18,16 +20,22 @@ createHTMLReport false
 peptideMassMinimum 400.0
 peptideMassMaximum 10000.0
 
-numberOfMissedCleavages 1
-
-smartTolerances true
-
-##False Discovery Rates
-numberOfSpectraToUseForFDR -1
 
 searchModifications false
 
-minimumNumberOfPeaksForAValidSpectrum 0
+##Digestion rules
+cleavageAcid R
+cleavageAcid K
+numberOfMissedCleavages 1
+
+##modifications
+modificationLowerBound -100
+modificationUpperBound 200.0
+
+## static PTMs
+cysteineCarbamylation false
+methionineOxidation false
+iodoacetamideDerivative true
 
 
 

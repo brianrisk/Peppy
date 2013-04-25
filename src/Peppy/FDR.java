@@ -150,6 +150,16 @@ public class FDR {
 	
 	
 	public double getScoreThreshold(double falseDiscoveryRate) {
+		int bestIndex = getCutoffIndex(falseDiscoveryRate);	
+		
+		if (bestIndex == -1) {
+			return -1;
+		} else {
+			return spectraMatches.get(bestIndex).getScore();
+		}
+	}
+	
+	public int getCutoffIndex(double falseDiscoveryRate) {
 		int bestIndex = -1;
 		int truePositiveCount = 0;
 		int falsePositiveCount = 0;
@@ -170,11 +180,8 @@ public class FDR {
 			if ((1.0 - precision) <= falseDiscoveryRate) bestIndex = matchIndex;
 		}	
 		
-		if (bestIndex == -1) {
-			return -1;
-		} else {
-			return spectraMatches.get(bestIndex).getScore();
-		}
+		return bestIndex;
+		
 	}
 	
 	

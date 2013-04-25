@@ -30,6 +30,11 @@ public class Peak implements Comparable<Peak>{
 		intensity = Float.parseFloat(chunks[1]);
 	}
 	
+	public Peak(float mass, float intensity) {
+		this.mass = mass;
+		this.intensity = intensity;
+	}
+	
 	public float getMass() {return mass;}
 	
 	public float getIntensity() {return intensity;}
@@ -39,6 +44,8 @@ public class Peak implements Comparable<Peak>{
 	public void setCompareByIntensity() {compareBy = COMPARE_INTENSITY;}
 	
 	public void setIntensity(float intensity) {this.intensity = intensity;}
+	
+	public void setMass(float mass) {this.mass = mass;}
 	
 	//@Override
 	public int compareTo(Peak p) {

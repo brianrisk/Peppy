@@ -131,14 +131,34 @@ public class SNP_Specific {
 	}
 	
 	public static void pccSNPSpecific() {
-//		reportFolders.add(new File("reports/BI-P5"));
-//		reportFolders.add(new File("reports/JHU-P5"));
-//		reportFolders.add(new File("reports/VAND-P5"));
-//		reportFolders.add(new File("reports/JHU-P6"));
-//		reportFolders.add(new File("reports/VAND-P6"));
+
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
+		reportFolders.add(new File("reports/CompRef_Proteome_VU_B1_P5"));
+		reportFolders.add(new File("reports/CompRef_Proteome_VU_B2_P5"));
+		reportFolders.add(new File("reports/CompRef_Proteome_VU_B3_P5"));
+		reportFolders.add(new File("reports/CompRef_Proteome_JHUC_P5AB"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
+		
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
+		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
+		reportFolders.add(new File("reports/CompRef_Proteome_VU_A2_P6"));
+		reportFolders.add(new File("reports/CompRef_Proteome_VU_A3_P6"));		
+		reportFolders.add(new File("reports/CompRef_Proteome_JHUC_P6ST"));
+		
+		
+		reportFolders.add(new File("reports/CompRef_Proteome_PNNL"));
+		reportFolders.add(new File("reports/CompRef_Proteome_JHUC_iTRAQ"));
+		reportFolders.add(new File("reports/CompRef_Proteome_BI"));
 		
 		/* a list of folders to ignore from our results */
 		ArrayList<String> direcotryTitlesToIgnoreForNoMods = new ArrayList<String>();
+		direcotryTitlesToIgnoreForNoMods.add("personal");
+//		direcotryTitlesToIgnoreForNoMods.add("subject");
 		direcotryTitlesToIgnoreForNoMods.add("varimod");
 		direcotryTitlesToIgnoreForNoMods.add("HG19");
 		direcotryTitlesToIgnoreForNoMods.add("mouse");
@@ -146,10 +166,12 @@ public class SNP_Specific {
 		direcotryTitlesToIgnoreForNoMods.add("xeno");
 		direcotryTitlesToIgnoreForNoMods.add("gencode");
 		
-		BestMatches matches = new BestMatches(new File("reports/PNNL"), -1, direcotryTitlesToIgnoreForNoMods);
+		BestMatches matches = new BestMatches(new File("reports/broad"), -1, direcotryTitlesToIgnoreForNoMods);
 		
 		/* a list of folders to ignore from our results */
 		ArrayList<String> direcotryTitlesToIgnoreForMods = new ArrayList<String>();
+		direcotryTitlesToIgnoreForMods.add("personal");
+		direcotryTitlesToIgnoreForMods.add("subject");
 //		direcotryTitlesToIgnoreForMods.add("varimod");
 		direcotryTitlesToIgnoreForMods.add("HG19");
 		direcotryTitlesToIgnoreForMods.add("mouse");
@@ -158,11 +180,14 @@ public class SNP_Specific {
 		direcotryTitlesToIgnoreForMods.add("gencode");
 		
 		
-		BestMatches modMatches = new BestMatches(new File("reports/PNNL"), -1, direcotryTitlesToIgnoreForMods);
+		for (File reportFolder: reportFolders) {
+			BestMatches modMatches = new BestMatches(reportFolder, -1, direcotryTitlesToIgnoreForMods);
+			modMatches.intersectBestMatchesPeptide(matches);
+			modMatches.saveReports();
+		}
 		
 		
-		modMatches.intersectBestMatchesPeptide(matches);
-		modMatches.saveReports();
+		
 	}
 	
 	/**
