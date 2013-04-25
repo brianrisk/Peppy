@@ -44,7 +44,7 @@ public class TestSetCharacteristics {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = SpectrumLoader.loadSpectraFromFolder("/Users/risk2/PeppyData/tests/" + testName + "/spectra");
+		spectra = SpectrumLoader.loadSpectra("/Users/risk2/PeppyData/tests/" + testName + "/spectra");
 		
 		//set up correct matches
 		correctMatches = loadCorrectMatches();

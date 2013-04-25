@@ -62,7 +62,7 @@ public class TestSet {
 		this.testName = testName;
 		
 		//load spectra for this test
-		spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + "/" + testName + "/spectra");
+		spectra = SpectrumLoader.loadSpectra(testDirectoryName + "/" + testName + "/spectra");
 		
 		/* set up where we will hold all of the matches for our spectra */
 		spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());

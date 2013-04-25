@@ -55,7 +55,7 @@ public class TestSetReduce {
 			
 			
 			//load spectra
-			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectraFromFolder(testDirectoryName + testName + "/spectra");
+			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra(testDirectoryName + testName + "/spectra");
 			U.p("original spectra size: " + spectra.size());
 			
 			//eliminate duplicate spectra
