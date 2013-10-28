@@ -49,6 +49,17 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 		this(sequence, 0, sequence.length(), -1, -1, true, null, null, false, false, -1, '.');
 	}
 	
+	/**
+	 * This constructor is here so that we can make peptide
+	 * objects that are just mass.  This allows us to use the
+	 * Collections binary search to locate where a peptide of 
+	 * a given mass would be in a list of sorted peptides
+	 * @param mass
+	 */
+	public Peptide (double mass) {
+		this.mass = mass;
+	}
+	
 	public Peptide(String acidSequence, int startIndex, int stopIndex, int intronStartIndex, int intronStopIndex, boolean forward, Sequence parentSequence, boolean isSpliced) {
 		this(acidSequence, startIndex, stopIndex, intronStartIndex, intronStopIndex, forward, parentSequence, null, isSpliced, false, -1, '.');
 	}

@@ -98,6 +98,15 @@ public class ScoringThread implements Runnable {
 
 		}
 	}
+	
+	
+	private int findIndex(double mass) {
+		int index = Collections.binarySearch(peptides, new Peptide(mass));
+		if (index < 0) index = - index - 1;
+		if (index < 0) index = 0;
+		if (index >= peptides.size()) index = peptides.size() - 1;
+		return index;
+	}
 
 	
 	

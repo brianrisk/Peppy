@@ -1,7 +1,8 @@
 package Peppy;
 
+import java.util.ArrayList;
+
 import Math.MassError;
-import Math.MathFunctions;
 
 /**
  * An abstract object which can be extended to implement scoring mechanisms
@@ -22,7 +23,6 @@ public abstract class Match implements Comparable<Match>{
 	
 	protected double score = 0.0;
 
-	protected double impValue = -1;
 	
 	
 	private static int sortTracker = 0;
@@ -37,203 +37,8 @@ public abstract class Match implements Comparable<Match>{
 	private static int sortParameter = SORT_BY_SCORE;
 	
 	
-
 	
 	public abstract void calculateScore();
-	
-	public void recalculateIMP() {
-		impValue = -1;
-		calculateIMP();
-	}
-	
-	public double calculateIMP() {
-		if (impValue < 0) {
-			byte [] acidSequence = peptide.getAcidSequence();
-			
-			int peptideLengthMinusOne = acidSequence.length - 1;
-			if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
-			
-			//will hold our peak boundaries
-			double [] theoreticalPeaksLeft = new double[peptideLengthMinusOne];
-			double [] theoreticalPeaksRight = new double[peptideLengthMinusOne];
-			
-			//find y ions
-			double [] yIonMatchesWithHighestIntensity = findYIons(peptideLengthMinusOne, theoreticalPeaksLeft, theoreticalPeaksRight);
-			
-			//if null is returned, that means no y ions match, which is automatic disqualification
-			if (yIonMatchesWithHighestIntensity == null) {
-				impValue = 1;
-				return impValue;
-			}
-			
-			//find b ions
-			double [] bIonMatchesWithHighestIntensity = findBIons(peptideLengthMinusOne, theoreticalPeaksLeft, theoreticalPeaksRight);
-			
-			calculateIMP(peptideLengthMinusOne, yIonMatchesWithHighestIntensity, bIonMatchesWithHighestIntensity);
-			
-		}
-		return impValue;
-	}
-	
-	public double getIMP() {
-		if (impValue < 0) {
-			calculateIMP();
-		}
-		return impValue;
-	}
-	
-	public void setSpectrumMatches(MatchesSpectrum matchesSpectrum) {
-		this.matchesSpectrum = matchesSpectrum;
-	}
-
-	public void setPeptide(Peptide peptide) {
-		this.peptide = peptide;
-	}
-
-	/**
-	 * Here our y and b ion matches have been found so what remains is to calculate the IMP
-	 * 
-	 * @param peptideLengthMinusOne
-	 * @param yIonMatchesWithHighestIntensity
-	 * @param bIonMatchesWithHighestIntensity
-	 */
-	protected double calculateIMP(int peptideLengthMinusOne, double [] yIonMatchesWithHighestIntensity, double [] bIonMatchesWithHighestIntensity) {
-		//find out ionMatchTally and intensity distributions
-		int totalIonsAbove50 = 0;
-//		int totalIonsAbove25 = 0;
-//		int totalIonsAbove12 = 0;
-//		int totalIonsAbove06 = 0;
-		
-		/* the totalMatchingIntensity variably MIGHT be very 
-		 * useful in the future as an extra probability to incorporate 
-		 * don't get rid of it just yet! */
-//		double totalMatchingIntensity = 0.0;
-		boolean yIonMatch, bIonMatch = false;
-		int appropriateIonIsMoreIntenseTally = 0;
-		int pairCount = 0;
-		int ionMatchTally = 0;
-		for (int i = 0; i < peptideLengthMinusOne; i++) {
-			yIonMatch = yIonMatchesWithHighestIntensity[i] > 0.0;
-			bIonMatch = bIonMatchesWithHighestIntensity[i] > 0.0;
-			if (yIonMatch || bIonMatch) pairCount++;
-			if (yIonMatchesWithHighestIntensity[i] > bIonMatchesWithHighestIntensity[i]) appropriateIonIsMoreIntenseTally++;
-			if (yIonMatch) {
-				ionMatchTally++;
-//				totalMatchingIntensity += yIonMatchesWithHighestIntensity[i];
-				if (yIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getMedianIntensity()) {
-					totalIonsAbove50++;
-//					if (yIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity25Percent()) {
-//						totalIonsAbove25++;
-//						if (yIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity12Percent()) {
-//							totalIonsAbove12++;
-//							if (yIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity06Percent()) {
-//								totalIonsAbove06++;
-//							}
-//						}
-//					}
-				}
-			}
-			if (bIonMatch) {
-				ionMatchTally++;
-//				totalMatchingIntensity += bIonMatchesWithHighestIntensity[i];
-				if (bIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getMedianIntensity()) {
-					totalIonsAbove50++;
-//					if (bIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity25Percent()) {
-//						totalIonsAbove25++;
-//						if (bIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity12Percent()) {
-//							totalIonsAbove12++;
-//							if (bIonMatchesWithHighestIntensity[i] > matchesSpectrum.getSpectrum().getIntensity06Percent()) {
-//								totalIonsAbove06++;
-//							}
-//						}
-//					}
-				}
-			}
-		}
-		/*
-		 * If no ions matched, that's a bad match
-		 */
-		if (ionMatchTally == 0) {
-			impValue = 1;
-			return 1;
-		}
-		
-		//Variables for binomial probabilities
-		int n;
-		int k;
-		double p;
-		
-		/* peak match probability is the binomial distribution */
-		p = matchesSpectrum.getSpectrum().getCoverage();
-//		p = .001;
-//		double targetMass = matchesSpectrum.getSpectrum().getMass() - AminoAcids.getWeightMono(peptide.getAcidSequence()[0]) - AminoAcids.getWeightMono(peptide.getAcidSequence()[peptideLengthMinusOne]);
-//		p /= targetMass;
-
-		
-		/* sometimes p will be unrealistically small due to high accuracy fragment masses */
-//		double minimumP = peptideLengthMinusOne / (matchesSpectrum.getSpectrum().getMass() * 8);
-//		if (p < minimumP) p = minimumP;
-		
-		n = peptideLengthMinusOne * 2;
-		k = ionMatchTally;
-		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
-		
-		//TODO: optimize this.  it is a great place to improve performance
-		//NOTE:  if we end up changing the binomial probability to return the log, this will need to get changed
-		if (peakMatchProbability > 0.25) {
-			impValue = 1;
-			return 1;
-		}
-		
-		//y greater than b probability
-//		n = peptideLengthMinusOne;
-		n = pairCount;
-		k = appropriateIonIsMoreIntenseTally;
-		double appropriateIonIsMoreIntenseProbablity = MathFunctions.getCachedBinomialProbability50(n, k);
-		
-		
-		//probability of ions being above thresholds
-		double intensityProbability = 1;
-		if (ionMatchTally > 0 && totalIonsAbove50 > 0) {
-			n = ionMatchTally;
-			k = totalIonsAbove50;
-			intensityProbability = MathFunctions.getCachedBinomialProbability50(n, k);
-//			if (totalIonsAbove25 > 0) {
-//				n = totalIonsAbove50;
-//				k = totalIonsAbove25;
-//				intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-//				if (totalIonsAbove12 > 0) {
-//					n = totalIonsAbove25;
-//					k = totalIonsAbove12;
-//					intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-//					if (totalIonsAbove06 > 0) {
-//						n = totalIonsAbove12;
-//						k = totalIonsAbove06;
-//						intensityProbability *= MathFunctions.getCachedBinomialProbability50(n, k);
-//					}
-//				}
-//			}
-		}
-
-		
-
-		//finding the probability of the total of the matching peak intensities
-//		int totalPeakCombnations = 100;
-//		double rise = MathFunctions.cachedLog(totalPeakCombnations);
-//		double maxScore = spectrum.getMaxValueForCombination(ionMatchTally);
-//		double minScore = ionMatchTally * spectrum.getMinimumIntensity();
-//		double run = (maxScore - minScore);
-//		double totalMatchingIntensityProbability = -1 * rise  * (totalMatchingIntensity - minScore) / run + rise;
-//		totalMatchingIntensityProbability = Math.exp(totalMatchingIntensityProbability - totalPeakCombnations);
-//		U.p(totalMatchingIntensityProbability);
-		
-		impValue =  peakMatchProbability * intensityProbability * appropriateIonIsMoreIntenseProbablity;
-//		impValue =  peakMatchProbability   * appropriateIonIsMoreIntenseProbablity;
-		
-		
-		if (impValue > 1) impValue = 1;
-		return impValue;
-	}
 	
 	
 	
@@ -286,6 +91,7 @@ public abstract class Match implements Comparable<Match>{
 			
 		return yIonMatchesWithHighestIntensity;
 	}
+	
 
 	protected double [] findBIons(int peptideLengthMinusOne, double [] theoreticalPeaksLeft, double [] theoreticalPeaksRight) {
 		
@@ -321,14 +127,84 @@ public abstract class Match implements Comparable<Match>{
 						bIonMatchesWithHighestIntensity[seqIndex] = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
 					}
 				}
+			} else {
+				/* as we marked peaks finding y-ions, we must now unmark them */
+				matchesSpectrum.getSpectrum().getPeak(peakIndex).used = false;
 			}
 			peakIndex++;
 		}
 		
-		/* as we marked peaks, we must now unmark them */
-		matchesSpectrum.getSpectrum().setAllPeaksToUnused();
 		
 		return bIonMatchesWithHighestIntensity;
+	}
+	
+	public ArrayList<Double> getFragmentErrors() {
+		
+			ArrayList<Double> out = new ArrayList<Double>();
+			
+			byte [] acidSequence = peptide.getAcidSequence();
+			
+			int peptideLengthMinusOne = acidSequence.length - 1;
+			if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
+			
+			//will hold our peak boundaries
+			double [] theoreticalPeaksLeft = new double[peptideLengthMinusOne];
+			double [] theoreticalPeaksRight = new double[peptideLengthMinusOne];
+			
+			int i;
+			double theoreticalPeakMass, peakMass;
+			int peakIndex, seqIndex;
+			
+			double [] yIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
+			double [] theoreticalPeakMasses = new double[peptideLengthMinusOne];
+			
+			/* y-ion  */
+			//computing the left and right boundaries for the ranges where our peaks should land
+			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+			if (Properties.isITRAQ) {
+				theoreticalPeakMass -= Definitions.ITRAQ_REAGENT ;
+			}
+			for (i = 0; i < peptideLengthMinusOne; i++) {
+				theoreticalPeakMass -= peptide.getResidueMass(i);
+				theoreticalPeakMasses[i] = theoreticalPeakMass;
+				theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+				theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
+			}
+			
+			peakIndex = matchesSpectrum.getSpectrum().getPeakCount() - 1;
+			seqIndex = 0;
+			double fragmentError = 0;
+			while (peakIndex >= 0) {
+				peakMass = matchesSpectrum.getSpectrum().getPeak(peakIndex).getMass();
+				while (peakMass < theoreticalPeaksLeft[seqIndex]) {
+					seqIndex++;
+					if (fragmentError != 0) {
+						out.add(fragmentError);
+						fragmentError = 0;
+					}
+					if (seqIndex == peptideLengthMinusOne) break;
+				}
+				if (seqIndex == peptideLengthMinusOne) break;
+				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
+					if (yIonMatchesWithHighestIntensity[seqIndex] < matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity()) {
+						yIonMatchesWithHighestIntensity[seqIndex] = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
+						
+						/* calculate fragment error */
+						fragmentError = MassError.getPPMDifference(theoreticalPeakMasses[seqIndex], peakMass);
+					}
+				}
+				
+				peakIndex--;
+			}
+			
+			if (fragmentError != 0) {
+				out.add(fragmentError);
+				fragmentError = 0;
+			}
+		
+			return out;
+			
+			
 	}
 	
 	
@@ -361,105 +237,6 @@ public abstract class Match implements Comparable<Match>{
 		return ionMatchTally;
 	}
 	
-	/**
-	 * the method name is self explanatory, but why do this?  This metric
-	 * could give us insight into what level of fragment error to expect.
-	 * @return
-	 */
-	public double findMassErrorOfMostIntenseMatchedPeak() {
-		
-		byte [] acidSequence = peptide.getAcidSequence();
-		
-		//we want -1 because most of these spectra will have a match with 
-		//the last theoretical peak
-		int peptideLengthMinusOne = acidSequence.length - 1;
-		if (acidSequence[peptideLengthMinusOne] == AminoAcids.STOP) peptideLengthMinusOne--;
-		
-		//will hold our peak boundaries
-		double [] theoreticalPeaksLeft = new double[peptideLengthMinusOne];
-		double [] theoreticalPeaksRight = new double[peptideLengthMinusOne];
-		double [] theoreticalPeaksExact = new double[peptideLengthMinusOne];
-		
-		/* this is the value of most intense matching peak we have seen so far */
-		double greatestIntensity = 0;
-		double error = 0;
-		
-		
-		//find y ions
-		double theoreticalPeakMass, peakMass, peakIntensity;
-		int peakIndex, seqIndex;
-	
-		
-		/* y-ion  */
-		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
-		if (Properties.isITRAQ) {
-			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT;
-		}
-		for (int i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass -= peptide.getResidueMass(i);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
-			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
-			theoreticalPeaksExact[i] = theoreticalPeakMass;
-		}
-		
-		peakIndex = matchesSpectrum.getSpectrum().getPeakCount() - 1;
-		seqIndex = 0;
-		while (peakIndex >= 0) {
-			peakMass = matchesSpectrum.getSpectrum().getPeak(peakIndex).getMass();
-			matchesSpectrum.getSpectrum().getPeak(peakIndex).used = false;
-			while (peakMass < theoreticalPeaksLeft[seqIndex]) {
-				seqIndex++;
-				if (seqIndex == peptideLengthMinusOne) break;
-			}
-			if (seqIndex == peptideLengthMinusOne) break;
-			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-				peakIntensity = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
-				if (greatestIntensity < peakIntensity) {
-					greatestIntensity = peakIntensity;
-					error = peakMass - theoreticalPeaksExact[seqIndex];
-				}
-			}
-			
-			peakIndex--;
-		}
-		
-		
-		/* b-ion */
-		theoreticalPeakMass = Properties.leftIonDifference;
-		if (Properties.isITRAQ) {
-			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
-		}
-		for (int i = 0; i < peptideLengthMinusOne; i++) {
-			theoreticalPeakMass += peptide.getResidueMass(i);
-			theoreticalPeaksLeft[i] = theoreticalPeakMass - MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
-			theoreticalPeaksRight[i] = theoreticalPeakMass + MassError.getDaltonError(Properties.fragmentTolerance, theoreticalPeakMass);
-			theoreticalPeaksExact[i] = theoreticalPeakMass;
-		}
-		
-		peakIndex = 0;
-		seqIndex = 0;
-		while (peakIndex < matchesSpectrum.getSpectrum().getPeakCount()) {
-			if (!matchesSpectrum.getSpectrum().getPeak(peakIndex).used) {
-				peakMass = matchesSpectrum.getSpectrum().getPeak(peakIndex).getMass();
-				while (peakMass > theoreticalPeaksRight[seqIndex]) {
-					seqIndex++;
-					if (seqIndex == peptideLengthMinusOne) break;
-				}
-				if (seqIndex == peptideLengthMinusOne) break;
-				if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-					peakIntensity = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
-					if (greatestIntensity < peakIntensity) {
-						greatestIntensity = peakIntensity;
-						error = peakMass - theoreticalPeaksExact[seqIndex];
-					}
-				}
-			}
-			peakIndex++;
-		}
-		
-		return error;
-	}
 	
 	
 
@@ -586,7 +363,7 @@ public abstract class Match implements Comparable<Match>{
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(getSpectrum().getId());
+		sb.append(getSpectrum().getFileLocus());
 		sb.append('\t');
 		sb.append(getSpectrum().getFileLocus());
 		sb.append('\t');
@@ -616,7 +393,11 @@ public abstract class Match implements Comparable<Match>{
 					sb.append(U.getFileNameWithoutSuffix(getPeptide().getParentSequence().getSequenceFile()));
 				}
 			} else {
-				sb.append("null");
+				if (getPeptide().getProtein() != null) {
+					sb.append(getPeptide().getProtein().getName());
+				} else {
+					sb.append("null");
+				}
 			}
 			sb.append('\t');
 			sb.append(getPeptide().getIntronStartIndex());
@@ -654,7 +435,6 @@ public abstract class Match implements Comparable<Match>{
 		return sb.toString();
 	}
 	
-
 	public boolean hasModification() {
 		return false;
 	}
@@ -680,19 +460,6 @@ public abstract class Match implements Comparable<Match>{
 		return true;
 	}
 	
-	public ModificationEntry [] getModifications() {
-		return new ModificationEntry [peptide.getLength()];
-	}
-	
-	public int getNumberOfModifications() {
-		int tally = 0;
-		for (ModificationEntry mod: getModifications()) {
-			if (mod == null) continue;
-			if (mod.getMonoMass() == 0) continue;
-			tally++;
-		}
-		return tally;
-	}
 	
 	/**
 	 * 
@@ -700,6 +467,18 @@ public abstract class Match implements Comparable<Match>{
 	 */
 	public double getMassDifference() {
 		return peptide.getMass() - matchesSpectrum.getSpectrum().getMass();
+	}
+
+
+
+	public void setMatchesSpectrum(MatchesSpectrum matchesSpectrum) {
+		this.matchesSpectrum = matchesSpectrum;
+	}
+
+
+
+	public void setPeptide(Peptide peptide) {
+		this.peptide = peptide;
 	}
 
 

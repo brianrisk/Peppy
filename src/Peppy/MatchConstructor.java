@@ -31,7 +31,7 @@ public class MatchConstructor {
 		Match out = null;
 		try {
 			out = match.newInstance();
-			out.setSpectrumMatches(matchesSpectrum);
+			out.setMatchesSpectrum(matchesSpectrum);
 			out.setPeptide(peptide);
 			if (calculateScore) out.calculateScore();
 		} catch (InstantiationException e) {

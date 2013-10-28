@@ -143,10 +143,28 @@ public class Properties {
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
 	
-	/* custom PTMs*/
-	public static boolean cysteineCarbamylation = false;
-	public static boolean methionineOxidation = false;
-	public static boolean iodoacetamideDerivative = true;
+	/* fixed modifications */
+	public static double modA = 0;
+	public static double modR = 0;
+	public static double modN = 0;
+	public static double modD = 0;
+	public static double modC = 0;
+	public static double modE = 0;
+	public static double modQ = 0;
+	public static double modG = 0;
+	public static double modH = 0;
+	public static double modI = 0;
+	public static double modL = 0;
+	public static double modK = 0;
+	public static double modM = 0;
+	public static double modF = 0;
+	public static double modP = 0;
+	public static double modS = 0;
+	public static double modT = 0;
+	public static double modW = 0;
+	public static double modY = 0;
+	public static double modV = 0;
+	public static double modU = 0;
 	
 	public static boolean smartTolerances = true;
 	
@@ -265,6 +283,29 @@ public class Properties {
 		numberOfSpectraToUseForFDR = 10000;
 		maximumFDR = 0.01;
 		
+		/* fixed modifications */
+		 modA = 0;
+		 modR = 0;
+		 modN = 0;
+		 modD = 0;
+		 modC = 0;
+		 modE = 0;
+		 modQ = 0;
+		 modG = 0;
+		 modH = 0;
+		 modI = 0;
+		 modL = 0;
+		 modK = 0;
+		 modM = 0;
+		 modF = 0;
+		 modP = 0;
+		 modU = 0;
+		 modS = 0;
+		 modT = 0;
+		 modW = 0;
+		 modY = 0;
+		 modV = 0;
+		
 		/* PTMs */
 		multipass = false;
 		numberOfRegionsToKeep = 1000;
@@ -272,10 +313,7 @@ public class Properties {
 		modificationLowerBound = -0.3;
 		modificationUpperBound = 100;
 		
-		/* custom PTMs*/
-		cysteineCarbamylation = false;
-		methionineOxidation = false;
-		iodoacetamideDerivative = true;
+		
 		
 		smartTolerances = true;
 		
@@ -511,14 +549,35 @@ public class Properties {
 		if (propertyName.equals("modificationUpperBound")) 
 			modificationUpperBound = Double.valueOf(propertyValue);
 		
-		/* custom PTMs */
-		if (propertyName.equals("cysteineCarbamylation")) 
-			cysteineCarbamylation = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("methionineOxidation")) 
-			methionineOxidation = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("iodoacetamideDerivative")) 
-			iodoacetamideDerivative = Boolean.valueOf(propertyValue);
 		
+		/* fixed modifications */
+		if (propertyName.equals("modA")) modA = Double.valueOf(propertyValue);
+		if (propertyName.equals("modR")) modR = Double.valueOf(propertyValue);
+		if (propertyName.equals("modN")) modN = Double.valueOf(propertyValue);
+		if (propertyName.equals("modD")) modD = Double.valueOf(propertyValue);
+		if (propertyName.equals("modC")) modC = Double.valueOf(propertyValue);
+		if (propertyName.equals("modE")) modE = Double.valueOf(propertyValue);
+		if (propertyName.equals("modQ")) modQ = Double.valueOf(propertyValue);
+		if (propertyName.equals("modG")) modG = Double.valueOf(propertyValue);
+		if (propertyName.equals("modH")) modH = Double.valueOf(propertyValue);
+		if (propertyName.equals("modI")) modI = Double.valueOf(propertyValue);
+		if (propertyName.equals("modL")) modL = Double.valueOf(propertyValue);
+		if (propertyName.equals("modK")) modK = Double.valueOf(propertyValue);
+		if (propertyName.equals("modM")) modM = Double.valueOf(propertyValue);
+		if (propertyName.equals("modF")) modF = Double.valueOf(propertyValue);
+		if (propertyName.equals("modP")) modP = Double.valueOf(propertyValue);
+		if (propertyName.equals("modS")) modS = Double.valueOf(propertyValue);
+		if (propertyName.equals("modT")) modT = Double.valueOf(propertyValue);
+		if (propertyName.equals("modW")) modW = Double.valueOf(propertyValue);
+		if (propertyName.equals("modY")) modY = Double.valueOf(propertyValue);
+		if (propertyName.equals("modV")) modV = Double.valueOf(propertyValue);
+		if (propertyName.equals("modU")) modU = Double.valueOf(propertyValue);
+		
+		/* legacy modification -- might be used if old properties file is employed */
+		if (propertyName.equals("iodoacetamideDerivative"))
+			Properties.modC = 57.021464;
+
+
 		/* smart tolerances */
 		if (propertyName.equals("smartTolerances")) 
 			smartTolerances = Boolean.valueOf(propertyValue);
@@ -608,11 +667,28 @@ public class Properties {
 			pw.println("numberOfRegionsToKeep " + numberOfRegionsToKeep);
 			
 			pw.println();
-			pw.println("## static PTMs");
-			pw.println("cysteineCarbamylation " + cysteineCarbamylation);
-			pw.println("methionineOxidation " + methionineOxidation);
-			pw.println("iodoacetamideDerivative " + iodoacetamideDerivative);
-			
+			pw.println("## static mods");
+			pw.println("modA " + modA);
+			pw.println("modR " + modR);
+			pw.println("modN " + modN);
+			pw.println("modD " + modD);
+			pw.println("modC " + modC);
+			pw.println("modE " + modE);
+			pw.println("modQ " + modQ);
+			pw.println("modG " + modG);
+			pw.println("modH " + modH);
+			pw.println("modI " + modI);
+			pw.println("modL " + modL);
+			pw.println("modK " + modK);
+			pw.println("modM " + modM);
+			pw.println("modF " + modF);
+			pw.println("modP " + modP);
+			pw.println("modS " + modS);
+			pw.println("modT " + modT);
+			pw.println("modW " + modW);
+			pw.println("modY " + modY);
+			pw.println("modV " + modV);
+			pw.println("modU " + modU);
 
 			
 			pw.println();

@@ -166,11 +166,6 @@ public class TestSet {
 		Collections.sort(testedMatches);
 		
 		
-		
-		
-		
-		
-		
 
 		/*account for the fact that these results might have the wrong spectrum ID due to
 		 * Mascot having sorted the spectra by mass
@@ -234,7 +229,6 @@ public class TestSet {
 			for (MatchContainer mc: testedMatches) {
 				if (mc.getMatch().getScore() < mc.getTrueMatch().getScore()) {
 					mc.getMatch().setPeptide(mc.getTrueMatch().getPeptide());
-					mc.getMatch().recalculateIMP();
 					mc.getMatch().calculateScore();
 					mc.validate();
 				}
@@ -248,12 +242,10 @@ public class TestSet {
 		Collections.sort(testedMatches);
 	
 		
-		//count total true
-		double highestIMP = 0;
+		//count total true;
 		for (MatchContainer match: testedMatches) {
 			if (match.isTrue()) {
 				trueTally++;
-				if (match.getMatch().getIMP() > highestIMP) highestIMP = match.getMatch().getIMP();
 			} else {
 				falseTally++;
 			}

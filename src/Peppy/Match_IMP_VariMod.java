@@ -9,7 +9,7 @@ import Math.MassError;
  * @author Brian Risk
  *
  */
-public class Match_IMP_VariMod extends Match {
+public class Match_IMP_VariMod extends Match_IMP {
 	
 	//Peptide/Spectrum difference in mass
 	double modificationMass;
@@ -65,41 +65,40 @@ public class Match_IMP_VariMod extends Match {
 	
 	
 	public double calculateIMP() {
-		if (impValue < 0) {
-			double impValue1 = calculateIMP(modificationMass, 0);
-			double impValue2 = calculateIMP(modificationMass, peptide.getAcidSequence().length - 1);
-			
-			/* if we see some promise, explore further */
-			//TODO: come up with a method for justifying 1.0E-8 
-			if (impValue1 < 1.0E-8 || impValue2 < 1.0E-8) {
-				double bestIMP = impValue1;
-				double tempIMP;
-				for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
-					tempIMP = calculateIMP(modificationMass, i);
-					if (tempIMP < bestIMP) {
-						bestIMP = tempIMP;
-						modificationIndex = i;
-						modificationLocationCertain = true;
-					} else {
-						if (tempIMP == bestIMP) {
-							modificationLocationCertain = false;
-						}
+		double impValue;
+		double impValue1 = calculateIMP(modificationMass, 0);
+		double impValue2 = calculateIMP(modificationMass, peptide.getAcidSequence().length - 1);
+		
+		/* if we see some promise, explore further */
+		//TODO: come up with a method for justifying 1.0E-8 
+		if (impValue1 < 1.0E-8 || impValue2 < 1.0E-8) {
+			double bestIMP = impValue1;
+			double tempIMP;
+			for (int i = 1; i < peptide.getAcidSequence().length - 1; i++) {
+				tempIMP = calculateIMP(modificationMass, i);
+				if (tempIMP < bestIMP) {
+					bestIMP = tempIMP;
+					modificationIndex = i;
+					modificationLocationCertain = true;
+				} else {
+					if (tempIMP == bestIMP) {
+						modificationLocationCertain = false;
 					}
 				}
-				if (impValue2 < bestIMP) {
-					bestIMP = impValue2;
-					modificationIndex =  peptide.getAcidSequence().length - 1;
-					modificationLocationCertain = true;
-				}
-				impValue = bestIMP;
-				
-			/* the score if not initially a good IMP */
+			}
+			if (impValue2 < bestIMP) {
+				bestIMP = impValue2;
+				modificationIndex =  peptide.getAcidSequence().length - 1;
+				modificationLocationCertain = true;
+			}
+			impValue = bestIMP;
+			
+		/* the score if not initially a good IMP */
+		} else {
+			if (impValue2 < impValue1) {
+				impValue = impValue2;
 			} else {
-				if (impValue2 < impValue1) {
-					impValue = impValue2;
-				} else {
-					impValue = impValue1;
-				}
+				impValue = impValue1;
 			}
 		}
 		return impValue;
@@ -168,8 +167,7 @@ public class Match_IMP_VariMod extends Match {
 
 		//if 0 matches so far, just get out.
 		if (!atLeastOneMatch) {
-			impValue = 1;
-			return impValue;
+			return 1;
 		}
 			
 		

@@ -51,5 +51,9 @@ public class PeakLabeled extends Peak {
 		this.yIonNumber = yIonNumber;
 	}
 	
+	
+	public void setMass(float mass) {
+		this.mass = mass;
+	}
 
 }

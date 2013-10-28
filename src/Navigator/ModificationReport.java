@@ -14,6 +14,7 @@ import Peppy.Definitions;
 import Peppy.ModificationEntry;
 import Peppy.Properties;
 import Peppy.U;
+import Reports.HTMLPage;
 
 /**
  * Copyright 2013, Brian Risk
@@ -26,40 +27,43 @@ public class ModificationReport {
 	
 	
 	public static void main(String args[]) {
-//		new ModificationReport();
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/6 WHIM2 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/5 WHIM2 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/5 WHIM2 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/6 WHIM16 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/6 WHIM16 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/5 WHIM16 - varimod/report.txt");
-//		createModSpreadsheet("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/6 WHIM16 - varimod/report.txt");
-		
-		/*
-		 * gm12878
-		 */
-//		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/4 spectra uncompressed - varimod/report.txt");
-		
-		/*
-		 * Carthene
-		 */
-//		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/CartheneBW-enzymeless/2 carthene-bazemore-walker - varimod/report.txt");
-		createModSpreadsheet("/Users/risk2/Documents/workspace/JavaGFS/reports/CartheneBW-enzymeless/");
 		
 		
+		
+		ArrayList<Match> matches = Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/RWA1/4 RWA1 - varimod/report.txt"));
+		
+		
+		
+//		ArrayList<Match> matches = new ArrayList<Match>();
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group1/3 group1 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group2/3 group2 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group3/3 group3 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group4/3 group4 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group5/3 group5 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group6/3 group6 - varimod/report.txt")));
+
+		
+		
+//		ArrayList<Match> matches = new ArrayList<Match>();
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/6 WHIM2 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/5 WHIM2 - varimod/report.txt")));
+//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/5 WHIM2 - varimod/report.txt")));
+		
+		File saveFolder = new File("modification report");
+		findStickyModifications(matches , saveFolder);
+		createModSpreadsheet(matches , saveFolder);
+		createModificationTable(matches , saveFolder);
 		
 		U.p("done");
 	}
 	
-	public static void createModSpreadsheet(String fileName) {
-		File reportFile = new File(fileName);
-		ArrayList<Match> matches;
-			
-		BestMatches bestMatches = new BestMatches(reportFile, -1, null);
-		matches = new ArrayList<Match>(bestMatches.getBestMatches().values());
-		
-
+	public static void createModSpreadsheet(File reportFile, File saveFolder) {
+		ArrayList<Match> matches = Match.loadMatches(reportFile);
+		createModSpreadsheet(matches, saveFolder);
+	}
+	
+	public static void createModSpreadsheet(ArrayList<Match> matches, File saveFolder) {
 
 		
 		try {
@@ -72,7 +76,7 @@ public class ModificationReport {
 				
 				
 				for (Match match: matches) {
-					if (match.getBoolean("isModified") ) {
+					if (match.getBoolean("isModified")  && match.getBoolean("modLocCertain") ) {
 						int modMass = (int) Math.round(match.getDouble("modMass"));
 						if (modMass == targetModMass) {
 							String peptideSequence = match.getString("peptideSequence");
@@ -81,7 +85,7 @@ public class ModificationReport {
 							/*
 							 * skip if n-terminal
 							 */
-							if (modIndex == 0) continue;
+							//if (modIndex == 0) continue;
 							
 							char acid = peptideSequence.charAt(modIndex);
 							
@@ -91,10 +95,6 @@ public class ModificationReport {
 							} else {
 								acidModificationTallies.put(acid, acidTally + 1);
 							}
-							
-//							if(peptideSequence.equals("GVVDSEEIPLNLSR")) {
-//								U.p(modIndex + " (" + acid + ")\t" + modMass + "\t" + reportFile.getParentFile().getParentFile().getName() + "\t" + match.getBoolean("modLocCertain"));
-//							}
 							
 							if (modIndex == 0) nTerminalCount++;
 							if (modIndex == peptideSequence.length() - 1) cTerminalCount++;
@@ -117,7 +117,7 @@ public class ModificationReport {
 				
 //				if (maxRatio < .2) continue;
 				
-				File saveFolder = new File(reportFile.getParentFile().getParentFile().getName() + " mods");
+//				File saveFolder = new File(reportFile.getParentFile().getParentFile().getName() + " mods");
 				saveFolder.mkdir();
 //				PrintWriter pw = new PrintWriter(new FileWriter(new File(saveFolder, targetModMass  + " (" + sum + ") modAcids.txt")));
 				PrintWriter pw = new PrintWriter(new FileWriter(new File(saveFolder, sum  + " (" + targetModMass + ") modAcids.txt")));
@@ -160,6 +160,276 @@ public class ModificationReport {
 		}
 		
 	}
+	
+	
+	public static void createModificationTable(ArrayList<Match> matches, File saveFolder) {
+		
+		/*
+		 * First we must get amino acid frequencies.  This will help us know the
+		 * probability of a modification randomly landing on a given acid.
+		 */
+		int totalAminoAcids = 0;
+		Hashtable<Character, Integer> acidCounts = new Hashtable<Character, Integer>();
+		
+		for (Match match: matches) {
+			String peptideSequence = match.getString("peptideSequence");
+			char [] peptideAcids = peptideSequence.toCharArray();
+			
+			totalAminoAcids += peptideSequence.length();
+			
+			/* add in all acids except the n-terminal*/
+			char acid;
+			for (int i = 1; i < peptideAcids.length; i++) {
+				acid = peptideAcids[i];
+				/* ignore stops */
+				if (acid == '.') continue;
+				
+				Integer acidCount = acidCounts.get(acid);
+				if (acidCount == null) acidCount = 0;
+				acidCount++;
+				acidCounts.put(acid, acidCount);
+			}
+		}
+		
+		/*
+		 * now to find the modification frequencies
+		 */
+		Hashtable<Integer, Integer> massTallies = new Hashtable<Integer, Integer>();
+		Hashtable<String, ModificationType> modificationTypes = new Hashtable<String, ModificationType>();
+		for (Match match: matches) {
+			if (match.getBoolean("isModified")  && match.getBoolean("modLocCertain") ) {
+//			if (match.getBoolean("isModified") ) {
+				int modIndex = match.getInt("modIndex");
+				
+//				if (modIndex == 0) continue; 
+				int modMass = (int) Math.round(match.getDouble("modMass"));
+				String peptideSequence = match.getString("peptideSequence");
+				char acid = peptideSequence.charAt(modIndex);
+				
+				
+				
+				/* keeping track of how many times we have seen a modification of this mass */
+				Integer massTally = massTallies.get(modMass);
+				if (massTally == null) massTally = 0;
+				massTally++;
+				massTallies.put(modMass, massTally);
+				
+				/* tracking how many mods of this mass at the given acid were seen */
+				String hashString = acid + "" + modMass;
+				ModificationType modificationType = modificationTypes.get(hashString);
+				if (modificationType == null) modificationType = new ModificationType(acid, modMass);
+				modificationType.incrementTally();
+				modificationTypes.put(hashString, modificationType);
+				
+			}
+				
+		}
+		
+		/*
+		 * calculate the scores
+		 */
+		ArrayList<ModificationType> modificationTypeArray = new ArrayList<ModificationType>(modificationTypes.values());
+		for (ModificationType modificaitonType: modificationTypeArray) {
+			int totalModOccurrences = massTallies.get(modificaitonType.getMass());
+			double acidPercentage = (double) acidCounts.get(modificaitonType.getAcid()) / totalAminoAcids;
+			modificaitonType.calculateScore(totalModOccurrences, acidPercentage);
+		}
+		
+		Collections.sort(modificationTypeArray);
+		
+		/*
+		 * print results
+		 */
+		saveFolder.mkdirs();
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(saveFolder,"mod score report.txt"))));
+			for (ModificationType modificaitonType: modificationTypeArray) {
+				pw.println(modificaitonType.getAcid() + "\t" + modificaitonType.getMass() + "\t" + modificaitonType.getScore()+ "\t" + modificaitonType.getTally());
+			}
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+
+		
+	}
+	
+	
+	
+	public static void findStickyModifications(ArrayList<Match> matches, File saveFolder) {
+		
+		/*
+		 * Want to count how many peptides contain a given acid.  Counting
+		 * only once as blind modification only accounts for one acid
+		 * being modified.  Counting all the occurrences of an acid will throw off
+		 * the probabilities we are calculating.
+		 */
+		int totalAminoAcids = 0;
+		Hashtable<Character, Integer> acidCounts = new Hashtable<Character, Integer>();
+		
+		for (Match match: matches) {
+			String peptideSequence = match.getString("peptideSequence");
+			char [] peptideAcids = peptideSequence.toCharArray();
+			
+			totalAminoAcids += peptideSequence.length();
+			Hashtable<Character, Character> peptideHashtable = new Hashtable<Character, Character>();
+			for (char acid: peptideAcids) {
+				/* ignore stops */
+				if (acid == '.') continue;
+				peptideHashtable.put(acid, acid);
+			}
+			
+			for (char acid: peptideHashtable.values()) {
+				Integer acidCount = acidCounts.get(acid);
+				if (acidCount == null) acidCount = 0;
+				acidCount++;
+				acidCounts.put(acid, acidCount);
+			}
+		}
+		
+		
+		/*
+		 * now to find the modification frequencies
+		 */
+		Hashtable<Integer, Integer> massTallies = new Hashtable<Integer, Integer>();
+		Hashtable<String, ModificationEvent> modificationEvents = new Hashtable<String, ModificationEvent>();
+		Hashtable<String, ModificationType> modificationTypes = new Hashtable<String, ModificationType>();
+		Hashtable<String, Integer> sequenceModificaitonCounts = new Hashtable<String, Integer>();
+		for (Match match: matches) {
+			if (match.getBoolean("isModified")  && match.getBoolean("modLocCertain") ) {
+				int modIndex = match.getInt("modIndex");
+//				if (modIndex == 0) continue; /* skip if n-terminal */
+				int modMass = (int) Math.round(match.getDouble("modMass"));
+				String peptideSequence = match.getString("peptideSequence");
+				char acid = peptideSequence.charAt(modIndex);
+				if (acid == '.') continue;
+				
+				
+				
+				/* keeping track of how many times we have seen a modification of this mass */
+				Integer massTally = massTallies.get(modMass);
+				if (massTally == null) massTally = 0;
+				massTally++;
+				massTallies.put(modMass, massTally);
+				
+				/* tracking how many mods of this mass at the given acid were seen */
+				String hashString = peptideSequence + "-" + modIndex + "-" + modMass;
+				ModificationEvent modificationEvent = modificationEvents.get(hashString);
+				if (modificationEvent == null) {
+					modificationEvent = new ModificationEvent(peptideSequence, modIndex, modMass, acid, match);
+					
+					/*if this is the first time we're seeing a mod event, incremnt that the sequence was modified */
+					Integer sequenceModCount = sequenceModificaitonCounts.get(match.getString("SequenceName"));
+					if (sequenceModCount == null) sequenceModCount = 0;
+					sequenceModCount++;
+					sequenceModificaitonCounts.put(match.getString("SequenceName"), sequenceModCount);
+				}
+				modificationEvent.incrementCount();
+				modificationEvents.put(hashString, modificationEvent);
+				
+				/* tracking how many mods of this mass at the given acid were seen */
+				String typeHash = acid + "" + modMass;
+				ModificationType modificationType = modificationTypes.get(typeHash);
+				if (modificationType == null) modificationType = new ModificationType(acid, modMass);
+				modificationType.incrementTally();
+				modificationTypes.put(typeHash, modificationType);
+				
+			}
+				
+		}
+		
+		/*
+		 * find statistics:
+		 * the mean for each modification type
+		 */
+		for (ModificationEvent modEvent: modificationEvents.values()) {
+			String typeHash = modEvent.getAcid() + "" + modEvent.getModMass();
+			ModificationType modificationType = modificationTypes.get(typeHash);
+			int peptideWithAcidCount = acidCounts.get(modEvent.getAcid());
+			double probability = (double) modificationType.getTally() / peptideWithAcidCount;
+			modEvent.calculateScore(probability);
+		}
+		
+		/*
+		 * list of substitutions and their masses
+		 */
+		ArrayList<AASubstitution> substitutions = AASubstitution.generateListOfAASubstitutions();
+//		ArrayList<AASubstitution> substitutions = AASubstitution.generateListOfSingleNucleotideAASubstitutions();
+		
+		Hashtable<String, AASubstitution> substitutionHashtable = new Hashtable<String, AASubstitution> (substitutions.size());
+		for (AASubstitution substitution: substitutions) {
+			String subHash = "" + substitution.getPrevious() + (int) Math.round(substitution.getDifference());
+			substitutionHashtable.put(subHash, substitution);
+		}
+		
+		
+		
+		ArrayList<ModificationEvent> modEventErray = new ArrayList<ModificationEvent>(modificationEvents.values()); 
+		Collections.sort(modEventErray);
+		
+		/*
+		 * print results
+		 */
+		saveFolder.mkdirs();
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(saveFolder,"sticky modification report.html"))));
+			pw.println("<html><body><table border=1>");
+			pw.println("<tr>");
+			pw.println("<th>sequence</th>");
+			pw.println("<th>seqModCount</th>");
+			pw.println("<th>peptide</th>");
+			pw.println("<th>acid</th>");
+			pw.println("<th>new acid</th>");
+			pw.println("<th>location</th>");
+			pw.println("<th>mass shift</th>");
+			pw.println("<th>count</th>");
+			pw.println("<th>score</th>");
+			for (ModificationEvent modificationEvent: modEventErray) {
+				/* only want matches of a certain score threshold */
+//				if (modificationEvent.getScore() < 20) break;
+				
+				/* trim the sequence name if it has a pipe character */
+				String sequenceName = modificationEvent.getMatch().getString("SequenceName") ;
+				if (sequenceName.indexOf("|") != -1) {
+					sequenceName = sequenceName.split("\\|")[0];
+				}
+				
+				/* seeing if it is an acid substitution */
+				String subHash = "" + modificationEvent.getAcid() + modificationEvent.getModMass();
+				AASubstitution substitution = substitutionHashtable.get(subHash);
+				if (substitution == null) continue;
+				
+				pw.println("<tr>");
+				
+				pw.println("<td><a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + sequenceName +  "\">" + sequenceName + "</a></td>");
+//				pw.println("<td><a href=\"http://www.uniprot.org/uniprot/" + sequenceName +  "\">" + sequenceName + "</a></td>");
+				pw.println("<td>" + sequenceModificaitonCounts.get(modificationEvent.getMatch().getString("SequenceName")) + "</td>");
+				pw.println("<td>" + modificationEvent.getPeptideSequence() + "</td>");
+				pw.println("<td>" + modificationEvent.getAcid() + "</td>");
+				pw.println("<td>" + substitution.getPresent() + "</td>");
+				pw.println("<td>" + modificationEvent.getLocation() + "</td>");
+				pw.println("<td>" + modificationEvent.getModMass() + "</td>");
+				pw.println("<td>" + modificationEvent.getCount() + "</td>");
+				pw.println("<td>" + modificationEvent.getScore() + "</td>");
+				
+			}
+			pw.println("</table></body></html>");
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+
+		
+	}
+	
+	
+	
 	
 	public ModificationReport() {
 		double matchScoreCutoff = 28.24;

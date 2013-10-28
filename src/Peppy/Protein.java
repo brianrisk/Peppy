@@ -27,6 +27,7 @@ public class Protein {
 	private ArrayList<Peptide> peptides;
 	private Sequence_DNA sequence_DNA;
 	private boolean isDecoy;
+	private double averageMass = -1;
 
 	
 	
@@ -403,6 +404,30 @@ public class Protein {
 
 	private boolean isStop(char aminoAcid) {
 		return (aminoAcid == '.');
+	}
+	
+	
+	
+	public double getAverageMass() {
+		if (averageMass <0 ) calculateAverageMass();
+		return averageMass;
+		
+	}
+	public double calculateAverageMass() {
+		averageMass = 0;
+		for (int index = 0; index < acidString.length(); index++) {
+			averageMass += AminoAcids.getWeightAverage(acidString.charAt(index));
+		}
+		return averageMass;
+	}
+
+
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+	
+	public int getLength() {
+		return acidString.length();
 	}
 	
 

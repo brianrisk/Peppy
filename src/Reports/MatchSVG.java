@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import Math.MassError;
 import Peppy.Match;
+import Peppy.Match_Blank;
 import Peppy.Peak;
 import Peppy.PeakLabeled;
 import Peppy.Peptide;
@@ -66,6 +67,13 @@ public class MatchSVG {
 	Font font = new Font("Helvetica", Font.PLAIN, fontSize);
 	FontMetrics fontMetrics;
 	
+	public static void main(String [] args) {
+		Match_Blank match = new Match_Blank(new Spectrum("/Users/risk2/Documents/Papers/Peppy Hourglass method paper/COBRA1 ASGVSAAAPGER  peptide/Research_302_2984_261_69_2_columns.0718.0718.2.dta"), new Peptide("ASGVSAAAPGER"), 50);
+		MatchSVG msvg = new MatchSVG(match, new File("ASGVSAAAPGER.svg"));
+		msvg.saveSVG();
+		U.p("done");
+	}
+	
 	public MatchSVG(Match match, File outFile) {
 		this.match = match;
 		try {
@@ -97,7 +105,6 @@ public class MatchSVG {
 		/*
 		 * Bit is a hack to sort by intensity for the Peppy figure
 		 */
-//		markMatchingIons();
 //		for (Peak peak: labeledPeaks) {
 //			peak.setCompareByIntensity();
 //		}

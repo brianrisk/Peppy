@@ -56,7 +56,9 @@ public class SixFrameRegion {
 //		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr2.fa"), 178495137, 178528740, "seleno-regions");
 //		
 		
-		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr7.fa"), 48000000, 49000000, "GM-chr7-region");
+		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr7.fa"), 65238304, 65438304, "wei-yang-region");
+		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr1.fa"), 224521963, 224721963, "wei-yang-region");
+		createDatabase(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/chr16.fa"), 11831579, 12031579, "wei-yang-region");
 		
 		
 		U.p("done");

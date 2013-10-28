@@ -92,7 +92,6 @@ public class ValidationReport {
 		/* this needs to happen or the text reports at the end crash */
 		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
 		
-		Properties.iodoacetamideDerivative = false;
 		
 		
 		/* What scoring mechanism? */

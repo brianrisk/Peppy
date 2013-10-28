@@ -43,7 +43,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		spectrumScript.append("var acidSequence = '");
 		spectrumScript.append(theseMatches.get(0).getPeptide().getAcidSequenceString());
 		spectrumScript.append("';");
-		spectrumScript.append("var spectrumMass = " + spectrum.getMass() + ";");
+		spectrumScript.append("var spectrumMass = " + spectrum.getMass()  + ";");
 		spectrumScript.append("var spectrumMaxIntensity = " + spectrum.getMaxIntensity() + ";");
 		spectrumScript.append("var peakMasses = [");
 		ArrayList<Peak> peaks = spectrum.getPeaks();
@@ -89,7 +89,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		//print header
 		printHeader("Spectrum report for " + spectrum.getFile().getName(), spectrumScript.toString());
 		
-		printP("<ul><li>mass: " + spectrum.getMass() + "<li>charge: " + spectrum.getCharge() + "<li>m/z: " + spectrum.getPrecursorMZ() + "</ul>");
+		printP("<ul><li>neutral mass: " + spectrum.getMass() + "<li>charge: " + spectrum.getCharge() + "</ul>");
 		
 		//spectrum
 		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");

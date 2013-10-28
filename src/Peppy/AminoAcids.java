@@ -95,12 +95,6 @@ public class AminoAcids {
 //		weightsMono[U] = 87.032028;
 //		weightsMono[U] -= Definitions.WATER_MONO;
 		
-		/* cysteine */
-//		weightsMono[U]  = 103.00919;
-		if (Properties.iodoacetamideDerivative) weightsMono[U] += 57.021464;
-		
-
-		
 		weightsAverage[STOP] = 0.0;
 		weightsAverage[A] = 71.0788;
 		weightsAverage[C] = 103.1448;
@@ -124,17 +118,30 @@ public class AminoAcids {
 		weightsAverage[Y] = 163.176;
 		weightsAverage[U] = 168.053207;
 		
-//		if(Properties.useIsotopeLabeling) {
-//			U.p("amino acid weights adjusted for labeling");
-//			weightsMono[K] = 136.109159;
-//			weightsAverage[K] = 136.1169;
-//			weightsMono[R] = 166.109379;
-//			weightsAverage[R] = 166.1172;	
-//		}
+		/* adding on the fixed modifications */
+		weightsMono[A] += Properties.modA;
+		weightsMono[R] += Properties.modR;
+		weightsMono[N] += Properties.modN;
+		weightsMono[D] += Properties.modD;
+		weightsMono[C] += Properties.modC;
+		weightsMono[E] += Properties.modE;
+		weightsMono[Q] += Properties.modQ;
+		weightsMono[G] += Properties.modG;
+		weightsMono[H] += Properties.modH;
+		weightsMono[I] += Properties.modI;
+		weightsMono[L] += Properties.modL;
+		weightsMono[K] += Properties.modK;
+		weightsMono[M] += Properties.modM;
+		weightsMono[F] += Properties.modF;
+		weightsMono[P] += Properties.modP;
+		weightsMono[S] += Properties.modS;
+		weightsMono[T] += Properties.modT;
+		weightsMono[W] += Properties.modW;
+		weightsMono[Y] += Properties.modY;
+		weightsMono[V] += Properties.modV;
+		weightsMono[U] += Properties.modU;
 
-		if (Properties.cysteineCarbamylation) weightsMono[C] += 43.005814;
-		if (Properties.methionineOxidation) weightsMono[M] += 15.994915;
-		if (Properties.iodoacetamideDerivative) weightsMono[C] += 57.021464;
+		
 		if (Properties.isITRAQ) {weightsMono[K] += Definitions.ITRAQ_REAGENT;}
 		
 		/*

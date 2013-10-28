@@ -80,7 +80,15 @@ public abstract class Matches implements Comparable<Matches> {
 				score = match.getScore();
 			} else {
 				if (match.getScore() == score) {
+					
+					/* For DNA there may be many, many matches.  This is saying, that, if there
+					 * are more than four matches, then the efficacy of this result is low.
+					 * Therefore, the memory and time to track each match is not necessary.
+					 * 
+					 * This one line of code can save huge amounts of memory.
+					 */
 					if (Properties.isSequenceFileDNA && matches.size() >= 4) return;
+					
 					matches.add(match);
 				}
 			}

@@ -38,10 +38,7 @@ public class FDR {
 	/* set for a given FDR */
 	double falseDiscoveryRate;
 	double scoreThreshold;
-	int minimumNumberOfPeaks;
-	double minimumMass;
-	double maximumMass;
-	double maximumPrecursorError;
+	
 	
 
 	/**
@@ -137,6 +134,7 @@ public class FDR {
 				decoyAssignmentCount++;
 			}
 			falsePositiveCount = 2 * decoyAssignmentCount;
+//			falsePositiveCount = decoyAssignmentCount;
 			truePositiveCount = (i + 1) - falsePositiveCount;
 			
 			precision = (double) truePositiveCount / (truePositiveCount + falsePositiveCount);
@@ -174,6 +172,7 @@ public class FDR {
 				decoyAssignmentCount++;
 			}
 			falsePositiveCount = 2 * decoyAssignmentCount;
+//			falsePositiveCount = decoyAssignmentCount;
 			truePositiveCount = (matchIndex + 1) - falsePositiveCount;
 			
 			precision = (double) truePositiveCount / (truePositiveCount + falsePositiveCount);
@@ -185,60 +184,6 @@ public class FDR {
 	}
 	
 	
-	/**
-	 * This method helps us find, based on what matches we are conjecturing are true positives,
-	 * what a good precursor tolerance is.
-	 * 
-	 * double falseDiscoveryRate;
-	double scoreThreshold;
-	int minimumNumberOfPeaks;
-	double minimumMass;
-	double maximumMass;
-	 * 
-	 * @param percentOfMatchesToRetain
-	 * @param falseDiscoveryRate
-	 * @return
-	 */
-	public double findOptimalTolerances(double percentOfMatchesToRetain, double falseDiscoveryRate) {
-		this.falseDiscoveryRate = falseDiscoveryRate; 
-		scoreThreshold = getScoreThreshold(falseDiscoveryRate);
-		
-		
-		/* if no good confidence at given false discovery rate */
-		if (scoreThreshold < 0) return -1;
-		
-		
-		/* list where we will hold the precursor errors */
-		ArrayList<Double> errors = new ArrayList<Double>();
-		minimumNumberOfPeaks = Integer.MAX_VALUE;
-		minimumMass = Double.MAX_VALUE;
-		maximumMass = 0;
-		
-		for (MatchesSpectrum matchesSpectrum: spectraMatches) {
-			
-			/* test to see if we should count this datum */
-			if (matchesSpectrum.getScore() < scoreThreshold) break;
-			if ( matchesSpectrum.getMatches().size() == 0) break;
-			Match match = matchesSpectrum.getMatches().get(0);
-			if (match.getPeptide().isDecoy()) continue;
-			
-			/* add to our list of errors */
-			double error = MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass());
-			error = Math.abs(error);
-			errors.add(error);
-			
-			if (match.getSpectrum().getPeaks().size() < minimumNumberOfPeaks) minimumNumberOfPeaks = match.getSpectrum().getPeaks().size();
-			if (match.getPeptide().getMass() < minimumMass) minimumMass = match.getPeptide().getMass();
-			if (match.getPeptide().getMass() > maximumMass) maximumMass = match.getPeptide().getMass();
-		}
-		
-		Collections.sort(errors);
-		int cutoffIndex = (int) Math.round((double) errors.size() * percentOfMatchesToRetain);
-		if (cutoffIndex >= errors.size()) cutoffIndex = errors.size() - 1;
-		
-		maximumPrecursorError =  errors.get(cutoffIndex);
-		return maximumPrecursorError;
-	}
 	
 	
 	
@@ -369,22 +314,6 @@ public class FDR {
 		return decoyPeptides;
 	}
 
-	public int getMinimumNumberOfPeaks() {
-		return minimumNumberOfPeaks;
-	}
-
-	public double getMinimumMass() {
-		return minimumMass;
-	}
-
-	public double getMaximumMass() {
-		return maximumMass;
-	}
-
-	public double getMaximumPrecursorError() {
-		return maximumPrecursorError;
-	}
-	
 
 	
 	

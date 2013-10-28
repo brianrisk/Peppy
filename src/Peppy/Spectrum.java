@@ -1,11 +1,16 @@
 package Peppy;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import Experimental.SpectrumSequenceProbability;
 import Math.HasValue;
 import Math.MassError;
 
@@ -23,34 +28,24 @@ import Math.MassError;
  */
 public class Spectrum implements Comparable<Spectrum>, HasValue {
 
-	private ArrayList<Peak> peaks;
-	private double maxMass;
+	protected ArrayList<Peak> peaks;
 	private double mass = -1;
 	private double precursorMZ = -1;
 	private int id;
 	private int fileLocus;
 	private int charge = 1;
 	private File file;
-	private String title = "";
-	//For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5  
 	private String MD5 = null;
 	private boolean isValid = true;
 	
 	//in reality these values should never be less than a positive number
-	private double averageIntensity = -1; 
 	private double maxIntensity = -1; 
 	private double medianIntensity = -1; 
 	private double intensity25Percent = -1;
 	private double intensity12Percent = -1;
 	private double intensity06Percent = -1;
-	private double minimumIntensity = -1; 
 	private double coverage = -1;
 	private double totalIntensity = -1;
-	
-	private int scanCount = -1;
-	private double retentTime = -1;
-	private double scanStartTime = -1;
-	private double scanStopTime = -1;
 	
 	
 	private static int sortTracker = 0;
@@ -107,6 +102,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 		for (Peak peak: peaks) {
 			totalIntensity += peak.getIntensity();
 		}
+		
 	}//calculateDistributions
 	
 	
@@ -150,6 +146,29 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	}
 	
 	
+	/**
+	 * Using the MD5 as the spectrum name, this saves 
+	 * a copy of the spectrum in DTA format
+	 * 
+	 * @param parentDirectory
+	 */
+	public void saveDTA(File parentDirectory) {
+		File outputFile = new File(parentDirectory, MD5 + ".dta");
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+			pw.println((mass + Definitions.HYDROGEN_MONO) + "\t" + charge);
+			for (Peak peak: peaks) {
+				pw.println(peak.mass + "\t" + peak.intensity);
+			}
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	
 	
 	
@@ -168,28 +187,16 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public void setMD5(String md5){MD5 = md5;};
 	public void setPeaks(ArrayList<Peak> peaks){this.peaks = peaks;}
 	public void setFile(File file){this.file = file;}
-	public void setTitle(String title){this.title = title;}
-	public String getTitle(){return this.title;}
 	public void setPrecursorMZ(double m){precursorMZ = m;}
 	public void setMass(double m){mass = m;}
 	public void setCharge(int charge){ this.charge = charge;}
-	public int getScanCount(){return this.scanCount;}
-	public double getRetentTime(){return this.retentTime;}
-	public void setScanCount(int scanCount){this.scanCount = scanCount;}
-	public void setRetentTime(double retentTime){this.retentTime = retentTime;}
-	public double getScanStartTime(){return this.scanStartTime;}
-	public double getScanStopTime(){return this.scanStopTime;}
-	public void setScanStartTime(double scanStartTime){this.scanStartTime = scanStartTime;}
-	public void setScanStopTime(double scanStopTime){this.scanStopTime = scanStopTime;}
+
 	/**
 	 * Gets the MD5 of this object.
-	 * For more information about MD5 cryptographic hash function visit: http://en.wikipedia.org/wiki/MD5
 	 * @return
 	 */
 	public String getMD5() {
-		if (MD5 != null) {
-			return MD5;
-		} else {
+		if (MD5 == null) {
 			String hashtext = null;
 			String spectrumString = toStringForMD5();
 			MessageDigest md5;
@@ -200,7 +207,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				byte[] digest = md5.digest();
 				BigInteger bigInt = new BigInteger(1,digest);
 				hashtext = bigInt.toString(16);
-				// Now we need to zero pad it if you actually want the full 32 chars.
+				/* The string may be less than 32 chars.  This pads with zeros */
 				while(hashtext.length() < 32 ){
 					hashtext = "0"+hashtext;
 				}
@@ -208,9 +215,9 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 				e.printStackTrace();
 			}
 			MD5 = hashtext;
-			return MD5;
 		}
-	}//getMD5
+		return MD5;
+	}
 	
 	/**
 	 * Given a mass window around each peak, the coverage is the percent of a spectrum
@@ -219,27 +226,35 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	 * @return
 	 */
 	public double getCoverage() {
-		if (coverage < 0) {
-			double covered = 0;
-			double upperBound, lowerBound, lastUpperBound = 0;
-			for (Peak peak: peaks) {
-				if (peak.getMass() < mass) {
-					upperBound = peak.getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
-					lowerBound = peak.getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
-					if (lowerBound < lastUpperBound) {
-						covered += upperBound - lastUpperBound;
-					} else {
-						covered += upperBound - lowerBound;
-					}
-					lastUpperBound = upperBound;
-				}
-			}
-//			coverage = covered / (peaks.get(peaks.size() - 1).getMass() - peaks.get(0).getMass());
-			covered /= getMass();
-			coverage = covered;
-		}
+		if (coverage < 0) recalculateCoverage();
 		return coverage;
 	}//getCovereage
+	
+	
+	/**
+	 * coverage changes depending on fragment tolerance.  Now, if fragment tolerance
+	 * is programatically determined, it starts as one large value and ends up a smaller
+	 * value.  This necessitates recalculation.
+	 */
+	public void recalculateCoverage() {
+		double covered = 0;
+		double upperBound, lowerBound, lastUpperBound = 0;
+		for (Peak peak: peaks) {
+			if (peak.getMass() < mass) {
+				upperBound = peak.getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
+				lowerBound = peak.getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peak.getMass());
+				if (lowerBound < lastUpperBound) {
+					covered += upperBound - lastUpperBound;
+				} else {
+					covered += upperBound - lowerBound;
+				}
+				lastUpperBound = upperBound;
+			}
+		}
+//		coverage = covered / (peaks.get(peaks.size() - 1).getMass() - peaks.get(0).getMass());
+		covered /= getMass();
+		coverage = covered;
+	}
 	
 	
 	public void setId(int id) {this.id = id;}
@@ -249,28 +264,11 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	public double getMedianIntensity() {if (medianIntensity < 0) calculateDistributions();return medianIntensity;}
 	public double getIntensity25Percent() {if (intensity25Percent < 0) calculateDistributions();return intensity25Percent;}
 	public double getIntensity12Percent() {if (intensity12Percent < 0) calculateDistributions();return intensity12Percent;}
-	public double getIntensity06Percent() { if (intensity06Percent < 0) calculateDistributions(); return intensity06Percent;}
+	public double getIntensity06Percent() {if (intensity06Percent < 0) calculateDistributions();return intensity06Percent;}
 	
 	
-	public double getMaxMass() {
-		if (maxMass < 0) {
-			for (Peak peak: peaks) {
-				if (peak.getMass() > maxMass) maxMass = peak.getMass();
-			}
-		}
-		return maxMass;
-	}//getMaxMass
 
-	public double getAverageIntensity() {
-		if (averageIntensity < 0) {
-			averageIntensity = 0.0;
-			for (Peak peak: peaks) {
-				averageIntensity += peak.getIntensity();
-			}
-			averageIntensity /= peaks.size();
-		}
-		return averageIntensity;
-	}//getAverageIntensity
+
 	
 	public double getMaxIntensity() {
 		if (maxIntensity < 0) {
@@ -282,18 +280,6 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 	}//getMaxIntensity
 	
 
-	public double getMinimumIntensity() {
-		if (minimumIntensity < 0) {
-			double min = Double.MAX_VALUE;
-			for (Peak peak: peaks) {
-				if (peak.getIntensity() < min) min = peak.getIntensity();
-			}
-			minimumIntensity = min;
-		}
-		return minimumIntensity;
-	}//getMinimumIntensity
-	
-/*End Getters and Setters*/
 	
 /**
 	 * compareTo method for this spectrum.  It will sort by Mass or ID depending on which parameter has been set.
@@ -315,6 +301,7 @@ public class Spectrum implements Comparable<Spectrum>, HasValue {
 public double getTotalIntensity() {
 	return totalIntensity;
 }
+
 	
 }//spectrum
 

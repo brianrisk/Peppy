@@ -69,7 +69,7 @@ public class Sequence_Protein extends Sequence {
 	 * @param isReverse
 	 * @return
 	 */
-	private ArrayList<Protein> getProteinsFromDatabase(boolean isReverse, boolean limitAmount) {
+	public ArrayList<Protein> getProteinsFromDatabase(boolean isReverse, boolean limitAmount) {
 		if (sequenceFile.getName().toLowerCase().endsWith("fa")) return getProteinsFromFASTA(isReverse, limitAmount);
 		if (sequenceFile.getName().toLowerCase().endsWith("fsa")) return getProteinsFromFASTA(isReverse, limitAmount);
 		if (sequenceFile.getName().toLowerCase().endsWith("fasta")) return getProteinsFromFASTA(isReverse, limitAmount);

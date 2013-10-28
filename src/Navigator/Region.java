@@ -11,34 +11,38 @@ import java.util.ArrayList;
  */
 public class Region {
 	
-	String sequenceName;
-	int start;
-	int stop;
-	double score;
+	String name = "";
+	String sequence = "";
+	String description = "";
+	int start = -1;
+	int stop = -1;
+	boolean isForwards = true;
+	double score = 0;
 	
 	ArrayList<Match> matches = new ArrayList<Match>();
 	
 	
-	public Region(String sequenceName, int start, int stop, double score) {
+	public Region(String name, int start, int stop, boolean isForwards) {
 		super();
-		this.sequenceName = sequenceName;
+		this.name = name;
 		this.start = start;
 		this.stop = stop;
-		this.score = score;
 	}
+	
+	public Region(){}
 	
 	public void addMatch(Match match) {
 		matches.add(match);
 	}
 
 
-	public String getSequenceName() {
-		return sequenceName;
+	public String getName() {
+		return name;
 	}
 
 
-	public void setSequenceName(String sequenceName) {
-		this.sequenceName = sequenceName;
+	public void setName(String sequenceName) {
+		this.name = sequenceName;
 	}
 
 
@@ -69,6 +73,30 @@ public class Region {
 
 	public void setScore(double score) {
 		this.score = score;
+	}
+
+	public boolean isForwards() {
+		return isForwards;
+	}
+
+	public void setForwards(boolean isForwards) {
+		this.isForwards = isForwards;
+	}
+
+	public String getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(String sequence) {
+		this.sequence = sequence;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 

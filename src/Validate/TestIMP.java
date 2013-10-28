@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import Peppy.AminoAcids;
+import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.MatchesSpectrum;
@@ -21,11 +23,12 @@ public class TestIMP {
 		
 		Properties.precursorTolerance = 2000;
 		Properties.fragmentTolerance = 300;
-		Properties.iodoacetamideDerivative = true;
 		
 		/* What scoring mechanism? */
 		Properties.scoringMethodName = "Peppy.Match_IMP";
 		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+
+		
 		
 		testIndividuals();
 
@@ -121,39 +124,38 @@ public class TestIMP {
 		Peptide peptide;
 		Match match;
 		
-		/* a great match */
-		spectrum = new Spectrum("/Users/risk2/PeppyData/tests/USP top 10/spectra/USP_std_run1_100504135936.7340.7340.2.dta");
+		
+		/*setting up the fixed mods */
+		Properties.modC =  71.03712;
+		Properties.modK = 6;
+		AminoAcids.init();
+		
+		// setting other score-changing properties
+		Properties.precursorTolerance = 10;
+		
+		/* a great MD anderson match */
+		spectrum = new Spectrum("/Users/risk2/Documents/workspace/JavaGFS/27d3a8ca686a99be732b633971dcec5b.dta");
 		matchesSpectrum = new MatchesSpectrum(spectrum);
-		peptide = new Peptide("AFLEVNEEGSEAAASTAVVIAGR");
+		peptide = new Peptide("AALAATGAASGGGGGGGGAGSR");
 		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
 		U.p("score is: " + match.getScore());
 		
+		/* a good md anderson match not appearing in latest searches */
+		spectrum = new Spectrum("/Users/risk2/Documents/workspace/JavaGFS/18035bf3964c97e617baf8f30dc3a3a6.dta");
+		matchesSpectrum = new MatchesSpectrum(spectrum);
+		peptide = new Peptide("NMFLVGEGDSVITQVLNK");
+		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
+		U.p("score is: " + match.getScore());
 		
-//		spectrum = new Spectrum("/Users/risk2/PeppyData/tests/USP top 10/spectra/USP_std_run1_100504135936.5338.5338.2.dta");
-//		matchesSpectrum = new MatchesSpectrum(spectrum);
-//		peptide = new Peptide("YYTLEEIKK");
-//		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
-//		U.p("score is: " + match.getScore());
-//		
-//		spectrum = new Spectrum("/Users/risk2/PeppyData/tests/USP top 10/spectra/USP_std_run1_100504135936.5338.5338.2.dta");
-//		matchesSpectrum = new MatchesSpectrum(spectrum);
-//		peptide = new Peptide("YYTLEEIQK");
-//		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
-//		U.p("score is: " + match.getScore());
-//		
-//		U.p();
-//		
-//		spectrum = new Spectrum("/Users/risk2/PeppyData/tests/USP top 10/spectra/USP_std_run1_100504135936.4792.4792.2.dta");
-//		matchesSpectrum = new MatchesSpectrum(spectrum);
-//		peptide = new Peptide("FEELLTR");
-//		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
-//		U.p("score is: " + match.getScore());
-//		
-//		spectrum = new Spectrum("/Users/risk2/PeppyData/tests/USP top 10/spectra/USP_std_run1_100504135936.4792.4792.2.dta");
-//		matchesSpectrum = new MatchesSpectrum(spectrum);
-//		peptide = new Peptide("SLGVGFATR");
-//		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
-//		U.p("score is: " + match.getScore());
+		/* another good md anderson match not appearing in latest searches */
+		spectrum = new Spectrum("/Users/risk2/Documents/workspace/JavaGFS/c04bac9bf554fb63eb37a0f49918cd87.dta");
+		matchesSpectrum = new MatchesSpectrum(spectrum);
+		peptide = new Peptide("LENLDSDVVQLR");
+		U.p("mass difference: " + (peptide.getMass() - spectrum.getMass()));
+		match = Properties.matchConstructor.createMatch(matchesSpectrum, peptide);
+		U.p("score is: " + match.getScore());
+		
+
 
 	}
 

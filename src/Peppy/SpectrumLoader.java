@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArray;
 import uk.ac.ebi.jmzml.model.mzml.BinaryDataArrayList;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
-import uk.ac.ebi.jmzml.model.mzml.MzML;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
 import uk.ac.ebi.jmzml.model.mzml.Precursor;
 import uk.ac.ebi.jmzml.model.mzml.PrecursorList;
@@ -88,29 +87,6 @@ public class SpectrumLoader {
 			spectra = loadSpectraFromFolder(inFile);
 		}
 		
-		/* remove spectra with small amount of peaks */
-		int removeTally = 0;
-		for (int i = 0; i < spectra.size(); i++) {
-			if (spectra.get(i).getPeakCount() < Properties.minimumNumberOfPeaksForAValidSpectrum) {
-				//Remove a peak that has to few peaks
-				spectra.remove(i);
-				//Compensate for the newly removed spectra
-				i--;
-				//Keep track of how many are moved
-				removeTally++;
-			}//if
-		}//else
-		
-		//Display how many peaks are removed
-		if (removeTally > 0) {
-			U.p("Removed " + removeTally + " spectra with less than " + Properties.minimumNumberOfPeaksForAValidSpectrum + " peaks.");
-		}//if
-		
-		/* set spectra id */
-		for (int i = 0; i < spectra.size(); i++) {
-			spectra.get(i).setId(i);
-		}//for
-		
 		/*
 		 * Giving each spectrum its own ID.
 		 * For files with only one spectrum, such as a folder
@@ -158,9 +134,9 @@ public class SpectrumLoader {
 				spectra = loadMS2Spectra(inFile);
 			}
 			
-			/* for files that have more than one spectrum */
+			/* tracks the index within a file for files that have more than one spectrum */
 			for (int i = 0; i < spectra.size(); i++) {
-				spectra.get(i).setId(i);
+				spectra.get(i).setFileLocus(i);
 			}
 			
 			return spectra;
@@ -196,7 +172,6 @@ public class SpectrumLoader {
 							
 							spectrum.setPeaks(peaks);
 							cleanPeaks(spectrum);
-							spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 							out.add(spectrum);
 						}
 						//An end of a line has not been reached
@@ -239,7 +214,6 @@ public class SpectrumLoader {
 					if (spectrum.isValid()) {
 						spectrum.setPeaks(peaks);
 						cleanPeaks(spectrum);
-						spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 						spectrum.setFile(inFile);
 						out.add(spectrum);
 					}//if
@@ -281,7 +255,6 @@ public class SpectrumLoader {
 							/* clean peaks also sorts the peaks by mass */
 							spectrum.setPeaks(peaks);
 							cleanPeaks(spectrum);
-							spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 							spectrum.setFile(inFile);
 							out.add(spectrum);
 						}
@@ -303,11 +276,12 @@ public class SpectrumLoader {
 							spectrum = new Spectrum();
 							spectrum.setFile(inFile);
 
-							//Add in precusor infomration
+							//Add in precursor information
 							String [] chunks = line.split("\\s+"); //split on all white space
 							spectrum.setPrecursorMZ(Double.parseDouble(chunks[0]));
 							spectrum.setMass(spectrum.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
 							spectrum.setCharge(Integer.parseInt(chunks[1]));
+
 
 							//Reset the peaks for this spectra
 							peaks = new ArrayList<Peak>();
@@ -324,7 +298,6 @@ public class SpectrumLoader {
 					if (spectrum.isValid()) {
 						spectrum.setPeaks(peaks);
 						cleanPeaks(spectrum);
-						spectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 						out.add(spectrum);
 					}//if
 					
@@ -398,7 +371,6 @@ public class SpectrumLoader {
 				
 				//Create an empty spectrum
 				Spectrum spectrumUnderConstruction = new Spectrum();
-				spectrumUnderConstruction.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 				spectrumUnderConstruction.setFile(inFile);
 				
 				/* retrieve precursor values */
@@ -554,7 +526,6 @@ public class SpectrumLoader {
 					}
 					//Loop through and load up a spectra
 					
-					temp.setTitle(title);
 					temp.setFile(inFile);
 			
 					
@@ -571,22 +542,11 @@ public class SpectrumLoader {
 						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
 					}
 					try{
-						temp.setMass(temp.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
-						temp.setMass(temp.getMass() * temp.getCharge());
+						temp.setMass((temp.getPrecursorMZ() - Definitions.HYDROGEN_MONO) * temp.getCharge());
 					}catch(NumberFormatException e){
 						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
 					}
 
-					try{
-						temp.setScanCount(Integer.parseInt(scans));
-					}catch(NumberFormatException e){
-						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
-					}
-					try{
-						temp.setRetentTime(Double.parseDouble(rtInSeconds));
-					}catch(NumberFormatException e){
-						//Ignore these if they do not fit the format, and let the default value stay in the spectrum object
-					}
 		
 					
 					
@@ -594,8 +554,7 @@ public class SpectrumLoader {
 					temp.setPeaks(peaks);
 					
 					cleanPeaks(temp);
-					
-					temp.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
+
 					temp.setFile(inFile);
 					
 					//Add this spectrum to the output
@@ -682,7 +641,6 @@ public class SpectrumLoader {
 			
 				
 				//Set meta data
-				peppySpectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 				
 				peppySpectrum.setPeaks(peaks);
 				
@@ -765,7 +723,6 @@ public class SpectrumLoader {
 			
 				
 				//Set meta data
-				peppySpectrum.setTitle(inFile.getAbsolutePath().substring(inFile.getAbsolutePath().lastIndexOf('/')));
 				
 				peppySpectrum.setPeaks(peaks);
 				
@@ -847,15 +804,15 @@ public class SpectrumLoader {
 	 */
 	public static void loadSpectraFilesFromFolder(File folder, ArrayList<File> spectraFiles) { 
 		File [] files = folder.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isHidden()) continue;
-			if (files[i].isDirectory()) {
-				loadSpectraFilesFromFolder(files[i], spectraFiles);
+		for (File file: files) {
+			if (file.isHidden()) continue;
+			if (file.isDirectory()) {
+				loadSpectraFilesFromFolder(file, spectraFiles);
 				continue;
 			}
-			String fileName = files[i].getName();
+			String fileName = file.getName();
 			if (isValidFile(fileName)) {
-				spectraFiles.add(files[i]);
+				spectraFiles.add(file);
 			}
 		}
 	}
@@ -863,15 +820,13 @@ public class SpectrumLoader {
 	
 	private static boolean isValidFile(String fileName){
 		
-		File f = new File(fileName);
-		if(f.isDirectory()){
+		File file = new File(fileName);
+		if(file.isDirectory()){
 			return false;
 		}
 		for(int i = 0; i < fileExtensions.length; i++){
 			if(fileName.toLowerCase().endsWith(fileExtensions[i])){
-				
-					return true;
-		
+				return true;
 			}//if
 		}//for
 		
@@ -890,10 +845,8 @@ public class SpectrumLoader {
 		
 		//before we mess with the peak data, let's make sure we have the MD5
 		spectrum.setMD5(spectrum.getMD5());
-		
-		/* also before we mess with the peak data, get the peak intensity distributions */
-//		s.calculateDistributions();
 	
+//		spectrum.calculateDistributions();
 		
 		spectrum.setPeaks(getTopPeaksPerBucket(spectrum, (int) Properties.spectrumBucketSize, Properties.spectrumBucketCount));
 
@@ -978,62 +931,27 @@ public class SpectrumLoader {
 	}//getTopPeaks
 	
 
-	/**
-	 * keepStrongestPeakInRegions sorts the peaks by intensity, and then ensures that know two peaks are within each other by a factor of the fragmentTolerence
-	 * variable from the Properties file.  
-	 */
-	private static ArrayList<Peak> keepStrongestPeakInRegions(Spectrum spectrum) {
-		ArrayList<Peak> peaks = spectrum.getPeaks();
-		sortPeaksByIntensity(spectrum);
-		int start = spectrum.getPeaks().size() - 1;
-		int stop = 0;
-		double lowerBound, upperBound;
-		
-		//note: > stop as we save final one for inside loop
-		for (int i = start; i > stop; i--) {
-			lowerBound = peaks.get(i).getMass() - MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			upperBound = peaks.get(i).getMass() + MassError.getDaltonError(Properties.fragmentTolerance, peaks.get(i).getMass());
-			for (int j = i - 1; j >= stop; j--) {
-				if (peaks.get(j).getMass() > lowerBound) {
-					if (peaks.get(j).getMass() < upperBound) {
-						peaks.remove(j);
-						i--;
-						j--;
-					}//mass < upperBound
-				}//mass > lower bound
-			}//for start to stop
-		}//for start ot stop
-		
-		return peaks;
-	}//keepStrongestPeakInRegions
-/*End methods for cleaning peaks*/
+
 	
-/*Sorting methods*/
+
 	
 	public static void sortPeaksByIntensity(Spectrum s) {
 		ArrayList<Peak> peaks = s.getPeaks();
-		Peak p;
-		for (int i = 0; i < peaks.size(); i++) {
-			p = (Peak) peaks.get(i);
-			p.setCompareByIntensity();
+		for (Peak peak: peaks) {
+			peak.setCompareByIntensity();
 		}
 		Collections.sort(peaks);
-		s.setPeaks(peaks);
-	}//sortPeaksByIntensity
+	}
 	
 	public static void sortPeaksByMass(Spectrum s) {
 		ArrayList<Peak> peaks = s.getPeaks();
-		Peak p;
-		for (int i = 0; i < peaks.size(); i++) {
-			p = (Peak) peaks.get(i);
-			p.setCompareByMass();
+		for (Peak peak: peaks) {
+			peak.setCompareByMass();
 		}
 		Collections.sort(s.getPeaks());
-		s.setPeaks(peaks);
-	}//sortPeaksByMass
+	}
 	
 
 
-/*End Sorting methods*/
 	
 }//SpectrumLoader

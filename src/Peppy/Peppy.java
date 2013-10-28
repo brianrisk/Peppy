@@ -12,6 +12,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import Math.MassError;
+import Navigator.BestMatches;
+import Navigator.ResultsCategory;
 import Reports.HTMLReporter;
 import Reports.SpectrumReport;
 import Reports.TextReporter;
@@ -53,22 +55,11 @@ public class Peppy {
 		
 		/* i'm finished! */
 		printFarewell();
-		
-//		File spectraFolder = new File("/Users/risk2/PeppyData/tests/ecoli/peptides/");
-//		File [] spectra = spectraFolder.listFiles();
-//		for (File file: spectra) {
-//			String fileName = file.getName();
-//			if (fileName.endsWith(".dta")) {
-//				String newFileName = spectraFolder + "/" + U.getFileNameWithoutSuffix(file) + ".pkl";
-//				U.p(newFileName);
-//				file.renameTo(new File(newFileName));
-//			}
-//		}
-//		U.p("done");
 	}
 	
 	public static void runPeppy(String [] args) {
-		if (Properties.simpleSearch) {
+		/* funnel search is meaningless without an established FDR */
+		if (Properties.simpleSearch || Properties.maximumFDR < 0) {
 			runSimplePeppy(args);
 		} else {
 			runFunnelPeppy(args);
@@ -98,6 +89,35 @@ public class Peppy {
 			
 			U.stopStopwatch();
 	}
+	
+	/**
+	 * Stripped down but does FDR
+	 * @param args
+	 */
+	public static void runBasicPeppy(String [] args) {
+			U.startStopwatch();
+			
+			/* where we store the report */
+			File mainReportDir = createReportDirectory();
+			
+			/* Get references to our sequence files -- no nucleotide data is loaded at this point */
+			ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+			
+			/* load spectra */
+			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
+			int originalSpectraSize = spectra.size();
+			U.p("loaded " + originalSpectraSize + " spectra");
+			
+			FDR fdr = new FDR(spectra);
+			int numberFound = fdr.getCutoffIndex(0.01);
+			double percentFound = (double) numberFound / spectra.size();
+			U.p("Found at 1%FDR: " + numberFound + " (" + Properties.percentFormat.format(percentFound) + ")");
+			
+			U.stopStopwatch();
+	}
+	
+	
+	
 	
 	
 	/**
@@ -135,6 +155,8 @@ public class Peppy {
 			int reportIndex = 0;
 			
 			File mainReportDir = createReportDirectory();
+			File savedSpectraDir = new File(mainReportDir, "spectra");
+			savedSpectraDir.mkdirs();
 
 			/* if there re multiple jobs, the latter varimod settings will persist.
 			 * we reset those to normal, modification-less parameters
@@ -160,6 +182,11 @@ public class Peppy {
 				/* we are going to combine all returned match sets here */
 				ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
 				
+				/* group spectra that have been identified  so that
+				 * we can track those that have been identified in a 
+				 * previous level */
+				Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+				
 				/* iterate through all of our peptide sources */
 				for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
 					
@@ -170,82 +197,101 @@ public class Peppy {
 					 * Setting this property will also affect the FDR calculation */
 					Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
 					Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
-					ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);			
+					ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
+					
 					
 					U.p("performing FDR analysis with " + Properties.sequenceDirectoryOrFile.getName());
 					FDR fdr = new FDR(spectra);
 					
-					/* perform precursor analysis if this is the first sequence */
-					if (sequenceIndex == 0 && Properties.smartTolerances) {
+					/* special things to do if this is the first sequence */
+					if (sequenceIndex == 0 ) {
 						
-						/*
-						 * abort if we have not found a sufficient percentage
-						 */
-						if (Properties.maximumFDR >= 0) {
-							int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
-							double percentFound = (double) numberFound / spectra.size();
-//							if (percentFound < 0.05) {
-//								U.p("ERROR: only " + Properties.percentFormat.format(percentFound) + " (" + numberFound + ") spectra identified.");
-//								return;
-//							} else {
-								U.p("initial FDR found " + Properties.percentFormat.format(percentFound));
-//							}
-						}
+						/* getting optimal precursor and fragment tolerances */
+						OptimalTolerances optimalTolerances = new OptimalTolerances(fdr);
+						optimalTolerances.createReport(mainReportDir);
 						
-						/*
-						 * If we found a valid FDR, then reanalyze
-						 */
-						if (fdr.findOptimalTolerances(0.99, 0.01) >= 0) {
+						
+						/* Find optimal tolerance settings if this is the first sequence */
+						if (Properties.smartTolerances) {
 							
-							Properties.precursorTolerance = fdr.getMaximumPrecursorError();
-							U.p ("optimal precursor tolerance is: " + fdr.getMaximumPrecursorError());
-							metricsReport.println("optimal precursor is: " + fdr.getMaximumPrecursorError());
-							
-							Properties.peptideMassMinimum = fdr.getMinimumMass();
-							U.p ("optimal minimum mass is: " + fdr.getMinimumMass());
-							metricsReport.println("optimal minimum mass is: " + fdr.getMinimumMass());
-							
-							Properties.peptideMassMaximum = fdr.getMaximumMass();
-							U.p ("optimal maximum mass is: " + fdr.getMaximumMass());
-							metricsReport.println("optimal maximum mass is: " + fdr.getMaximumMass());
-							
-							Properties.minimumNumberOfPeaksForAValidSpectrum = fdr.getMinimumNumberOfPeaks();
-							U.p ("optimal minimum number of peaks is: " + fdr.getMinimumNumberOfPeaks());
-							metricsReport.println("optimal minimum number of peaks is: " + fdr.getMinimumNumberOfPeaks());
-							
-							
-							/* remove spectra that don't conform to optimal parameters */
-							boolean remove;
-							Spectrum spectrum;
-							for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
-								spectrum = spectra.get(spectrumIndex);
-								remove = false;
-								if (spectrum.getMass() < Properties.peptideMassMinimum) remove = true;
-								if (spectrum.getMass() > Properties.peptideMassMaximum) remove = true;
-								if (spectrum.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
-								if (remove) {
-									spectra.remove(spectrumIndex);
-									spectrumIndex--;
-								}
+							/*
+							 * abort if we have not found a sufficient percentage
+							 */
+							if (Properties.maximumFDR >= 0) {
+								int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
+								double percentFound = (double) numberFound / spectra.size();
+//								if (percentFound < 0.05) {
+//									U.p("ERROR: only " + Properties.percentFormat.format(percentFound) + " (" + numberFound + ") spectra identified.");
+//									return;
+//								} else {
+//									U.p("initial FDR found " + Properties.percentFormat.format(percentFound));
+//								}
+								U.p("initial FDR found " + numberFound + "(" + Properties.percentFormat.format(percentFound) + ")");
 							}
 							
-							U.p ("new spectral set size: " + spectra.size());
-							metricsReport.println("new spectral set size: " + spectra.size());
 							
-							metricsReport.println();
+							/*
+							 * If we found a valid FDR, then adjust parameters and reanalyze
+							 */
+							if (optimalTolerances.isValid()) {
+								
+								Properties.precursorTolerance = optimalTolerances.getOptimalPrecursorError();
+								U.p ("optimal precursor tolerance is: " + optimalTolerances.getOptimalPrecursorError());
+								metricsReport.println("optimal precursor is: " + optimalTolerances.getOptimalPrecursorError());
+								
+								Properties.fragmentTolerance = optimalTolerances.getOptimalFragmentError();
+								U.p ("optimal fragment tolerance is: " + optimalTolerances.getOptimalFragmentError());
+								metricsReport.println("optimal fragment is: " + optimalTolerances.getOptimalFragmentError());
+								
+								Properties.peptideMassMinimum = optimalTolerances.getMinimumMass();
+								U.p ("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
+								metricsReport.println("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
+								
+								Properties.peptideMassMaximum = optimalTolerances.getMaximumMass();
+								U.p ("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
+								metricsReport.println("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
+								
+								Properties.minimumNumberOfPeaksForAValidSpectrum = optimalTolerances.getMinimumNumberOfPeaks();
+								U.p ("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
+								metricsReport.println("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
+								
+								U.p("average fragment error: " + optimalTolerances.getMeanFragmentError());
+								U.p("average precursor error: " + optimalTolerances.getMeanPrecursorError());
+								
+								
+								/* remove spectra that don't conform to optimal parameters */
+								boolean remove;
+								Spectrum spectrumToExamine;
+								for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+									spectrumToExamine = spectra.get(spectrumIndex);
+									remove = false;
+									if (spectrumToExamine.getMass() < Properties.peptideMassMinimum) remove = true;
+									if (spectrumToExamine.getMass() > Properties.peptideMassMaximum) remove = true;
+									if (spectrumToExamine.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
+									if (remove) {
+										spectra.remove(spectrumIndex);
+										spectrumIndex--;
+									}
+								}
+								
+								U.p ("new spectral set size: " + spectra.size());
+								metricsReport.println("new spectral set size: " + spectra.size());
+								
+								metricsReport.println();
+								
+								/* Now that we have different fragment tolerance, we have different coverage */
+								for (Spectrum spectrum: spectra) {
+									spectrum.recalculateCoverage();
+								}
+	
+								/* second-pass FDR analysis */
+								U.p("performing second FDR with new tolerances...");
+								fdr = new FDR(spectra);
+							}
 							
-							
-							/* second-pass FDR analysis */
-							U.p("performing second FDR with new tolerances...");
-							fdr = new FDR(spectra);
 						}
-						
-						/*
-						 * Now we have to load in the spectra again because new fragment tolerances mean
-						 * that the spectra are going to be cleaned differently
-						 */
-//						spectra = SpectrumLoader.loadSpectra();
 					}
+					
 					
 					/* Calculate score threshold with FDR. 
 					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
@@ -264,6 +310,9 @@ public class Peppy {
 					
 					/* if we used all of our spectra to calculate FDR, we take advantage of that
 					 * and harvest those results for these results.  No need to do the work twice!
+					 * 
+					 * Note:  decoys are not getting in.  They are removed in the
+					 * getMatchesFromSpectraMatches method
 					 */
 					if (fdr.usedFullSetOfSpectra) {
 						matchesSpectra = fdr.getSpectraMatches();
@@ -277,8 +326,15 @@ public class Peppy {
 						matches = getMatches(sequences, matchesSpectra);
 					}
 					
-					/* we found now matches */
+					/* we found no matches */
 					if (matches == null) continue;
+					
+					/* if matches are from nucleotide searches, then save the spectra */
+					if (Properties.isSequenceFileDNA) {
+						for (Match match: matches) {
+							match.getSpectrum().saveDTA(savedSpectraDir);
+						}
+					}
 					
 					/* label the identified peptides according to our sequence */
 					for (Match match: matches) {
@@ -289,11 +345,15 @@ public class Peppy {
 					allMatchesForSpectralSet.addAll(matches);
 					
 					/* group spectra that have been identified */
-					Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+					int identifiedSpectraCount = 0;
 					for (Match match: matches) {
-						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+						if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
+							identifiedSpectraCount++;
+							spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+						}
+						
 					}
-					U.p(spectrumIDs.size() + " spectra identified at this step");
+					U.p(identifiedSpectraCount + " spectra identified at this step");
 					
 					/* create the directory where we will hold this report */
 					reportIndex++;
@@ -313,6 +373,7 @@ public class Peppy {
 						}
 						spectra = reducedSpectra;
 					}
+
 					
 					/* generate reports */
 					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
@@ -366,13 +427,7 @@ public class Peppy {
 					}
 					
 					/* create spectra-based containers for matches */
-					ArrayList<MatchesSpectrum> matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-					for (Spectrum spectrum: spectra) {
-						matchesSpectra.add(new MatchesSpectrum(spectrum));
-					}
-					
-
-					
+					ArrayList<MatchesSpectrum> matchesSpectra;					
 					ArrayList<Match> matches = null;
 					if (fdr.usedFullSetOfSpectra) {
 						matchesSpectra = fdr.getSpectraMatches();
@@ -394,11 +449,15 @@ public class Peppy {
 					allMatchesForSpectralSet.addAll(matches);
 					
 					/* group spectra that have been identified */
-					Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+					int identifiedSpectraCount = 0;
 					for (Match match: matches) {
-						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+						if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
+							identifiedSpectraCount++;
+							spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+						}
+						
 					}
-					U.p(spectrumIDs.size() + " spectra identified at this step");
+					U.p(identifiedSpectraCount + " spectra identified at this step");
 					
 					/* create the directory where we will hold this report */
 					reportIndex++;
@@ -417,26 +476,8 @@ public class Peppy {
 					fdr.saveReport(reportDir);
 					createReports(matches, reportDir);
 						
-					/* remove all spectra that appear in our matches */
-					if (Properties.maximumFDR > 0) {
-						Spectrum spectrum;
-						for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
-							spectrum = spectra.get(spectrumIndex);
-							if (spectrumIDs.get(spectrum.getId()) != null) {
-								spectra.remove(spectrumIndex);
-								spectrumIndex--;
-							}
-						}
-					}
 				
 				} /* end modifications if */
-				
-				/* final report on how many spectra were identified */
-//				need to tally.  Since we remove spectra that are not up to snuff this method of subtracting prexent spectra size won't work
-//				int totalSpectraIdentified = originalSpectraSize - spectra.size();
-//				double totalProportionIdentified =  ((double)totalSpectraIdentified / originalSpectraSize);
-//				metricsReport.println();
-//				metricsReport.println("total spectra identified: " + totalSpectraIdentified + " (" +  Properties.percentFormat.format(totalProportionIdentified) + ")");
 				
 				metricsReport.flush();
 				metricsReport.close();
@@ -445,6 +486,11 @@ public class Peppy {
 			} /* end spectrum loop */
 			
 			
+			/* create graphic reports */
+			BestMatches bm = new BestMatches(mainReportDir, ResultsCategory.DNA, null);
+			ArrayList<BestMatches> bmArray = new ArrayList<BestMatches>();
+			bmArray.add(bm);
+			BestMatches.createUnifiedSamplesReport(bmArray, "peptideSequence", mainReportDir);
 		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -570,16 +616,17 @@ public class Peppy {
 
 
 	public static void init(String propertiesFile) {
+		
 		/* check to see if this version is too old */
-		if (Properties.expires && System.currentTimeMillis() > expiration) {
-			try {
-				throw (new Exception("unsynchronized resource"));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.exit(0);
-		}
+//		if (Properties.expires && System.currentTimeMillis() > expiration) {
+//			try {
+//				throw (new Exception("unsynchronized resource"));
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			System.exit(0);
+//		}
 		
 		/* this allows us to do our graphics */
 		System.setProperty("java.awt.headless", "true");
@@ -787,14 +834,6 @@ public class Peppy {
 				
 				/* skip decoy matches */
 				if (match.getPeptide().isDecoy()) continue;
-				
-				/* skip matches that are outside designate PPM */
-				if (Properties.searchModifications == false) {
-					if (Properties.precursorTolerance < Math.abs(MassError.getPPMDifference(match.getPeptide().getMass(), match.getSpectrum().getMass()))) {
-//						continue;
-					}	
-				}
-					
 					
 				out.add(match);
 			}
@@ -942,11 +981,6 @@ public class Peppy {
 		U.p("Protein identification / proteogenomic software.");
 		U.p("Copyright 2013 by Brian Risk");
 		U.p();
-		
-		if (System.currentTimeMillis() > expiration) {
-			U.p("This version of Peppy is out of date.");
-			System.exit(0);
-		}
 		
 		/* print some system statistics */
 		U.p("number of processors available: " + Runtime.getRuntime().availableProcessors());

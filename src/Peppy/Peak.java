@@ -42,10 +42,7 @@ public class Peak implements Comparable<Peak>{
 	public void setCompareByMass() {compareBy = COMPARE_MASS;}
 	
 	public void setCompareByIntensity() {compareBy = COMPARE_INTENSITY;}
-	
-	public void setIntensity(float intensity) {this.intensity = intensity;}
-	
-	public void setMass(float mass) {this.mass = mass;}
+
 	
 	//@Override
 	public int compareTo(Peak p) {

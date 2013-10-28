@@ -2,6 +2,8 @@ package Math;
 
 import java.util.ArrayList;
 
+import Peppy.U;
+
 
 /**
  * Copyright 2013, Brian Risk
@@ -48,6 +50,19 @@ public class MathFunctions {
 				binomialProb50[n][k] = getBinomialProbability(n, k, p);
 			}
 		}
+		
+	}
+	
+	public static void main(String args[]) {
+		int n = 4;
+		int k = 4;
+		double p = .5;
+		
+		double prob = getBinomialProbability(n, k, p);
+		U.p(prob);
+		
+//		 
+		U.p(-Math.log10(3.678753814386667E-14 * 0.019287109375 * 0.0546875 * 0.36328125 * 0.5 * 0.0625));
 		
 	}
 	
@@ -155,7 +170,7 @@ public class MathFunctions {
 			probability *= Math.pow(1 - p, n - i);
 			total += probability;
 		}
-		
+		if (total > 1) return 1;
 		return total;
 	}
 	
