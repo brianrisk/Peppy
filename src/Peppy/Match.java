@@ -53,7 +53,7 @@ public abstract class Match implements Comparable<Match>{
 		
 		/* y-ion  */
 		//computing the left and right boundaries for the ranges where our peaks should land
-		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+		theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference + Properties.modNTerminal + Properties.modCTerminal;
 		if (Properties.isITRAQ) {
 			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT ;
 		}
@@ -102,7 +102,7 @@ public abstract class Match implements Comparable<Match>{
 		double [] bIonMatchesWithHighestIntensity = new double[peptideLengthMinusOne];
 		
 		/* b-ion  */
-		theoreticalPeakMass = Properties.leftIonDifference;
+		theoreticalPeakMass = Properties.leftIonDifference + Properties.modNTerminal;
 		if (Properties.isITRAQ) {
 			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
 		}
@@ -160,7 +160,7 @@ public abstract class Match implements Comparable<Match>{
 			
 			/* y-ion  */
 			//computing the left and right boundaries for the ranges where our peaks should land
-			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference;
+			theoreticalPeakMass = peptide.getMass() + Properties.rightIonDifference + Properties.modNTerminal + Properties.modCTerminal;
 			if (Properties.isITRAQ) {
 				theoreticalPeakMass -= Definitions.ITRAQ_REAGENT ;
 			}

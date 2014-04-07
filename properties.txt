@@ -30,7 +30,7 @@ numberOfMissedCleavages 1
 
 ##modifications
 modificationLowerBound -100
-modificationUpperBound 200.0
+modificationUpperBound 100.0
 
 ## static PTMs
-#modC 57.021464
+modC 57.021464

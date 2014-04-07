@@ -47,6 +47,9 @@ public class Match extends Row implements Comparable<Match>{
 		columns.put("sizeOfORF", Integer.class);
 		columns.put("PrecursorNeutralMass", Double.class);
 		columns.put("RankCount", Integer.class);
+		columns.put("novelDistance", Integer.class);
+		
+		
 		
 	}
 	
@@ -114,6 +117,7 @@ public class Match extends Row implements Comparable<Match>{
 						}
 						catch (Exception e) {
 							U.p("error with property " + propertyNames[i] + " in file " + file.getAbsolutePath());
+							U.p("line: " + line);
 						}
 					}
 				}
@@ -126,6 +130,15 @@ public class Match extends Row implements Comparable<Match>{
 			e.printStackTrace();
 		}
 		return out;
+	}
+	
+	public String toBED() {
+		//chr21; strand:fwd; frame:1; start:33790123; stop:33790225
+		String chr = getString("sequenceName");
+		if (chr.startsWith(">")) chr = chr.substring(1);
+		int start = getInt("start");
+		int stop = getInt("stop");
+		return chr + "\t" + start + "\t" + stop + "\t" + getString("sequence") + "\t" + Math.round(getDouble("score")) + "\t" + getString("strand");
 	}
 	
 

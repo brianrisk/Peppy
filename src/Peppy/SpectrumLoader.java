@@ -55,7 +55,14 @@ public class SpectrumLoader {
 	 * @return An ArrayList of Spectrum objects to loadSpectra
 	 */
 	public static ArrayList<Spectrum> loadSpectra() {
-		return loadSpectra(Properties.spectraDirectoryOrFile);
+		ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
+		for (File spectrumFile: Properties.spectraDirectoryOrFileList) {
+			spectra.addAll(loadSpectra(spectrumFile));
+		}
+		for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+			spectra.get(spectrumIndex).setId(spectrumIndex);
+		}
+		return spectra;
 	
 	}//loadSpectra
 	
@@ -399,27 +406,27 @@ public class SpectrumLoader {
 					continue;
 				}
 		
-//				/* Create mass and intensity list to access for the creation of this spectrum */
-//				BinaryDataArray mass = lbd.get(0);
-//				BinaryDataArray intensity = lbd.get(1);
-//				Number [] massArray =  mass.getBinaryDataAsNumberArray();
-//				Number [] intensityArray =  intensity.getBinaryDataAsNumberArray();
-//				ArrayList<Peak> peaks = new ArrayList<Peak>(massArray.length);
-//				for(int j = 0; j < massArray.length;j++){
-//					Peak p = new Peak(massArray[j].floatValue(), intensityArray[j].floatValue());
-//					peaks.add(p);
-//				}
-//
-//				/* Save the peaks read from the file */
-//				spectrumUnderConstruction.setPeaks(peaks);
-//
-//				spectrumUnderConstruction.setFile(inFile);
-//				
-//				/* clean the peaks */
-//				cleanPeaks(spectrumUnderConstruction);
-//
-//				//Store the spectrum into output
-//				out.add(spectrumUnderConstruction);
+				/* Create mass and intensity list to access for the creation of this spectrum */
+				BinaryDataArray mass = lbd.get(0);
+				BinaryDataArray intensity = lbd.get(1);
+				Number [] massArray =  mass.getBinaryDataAsNumberArray();
+				Number [] intensityArray =  intensity.getBinaryDataAsNumberArray();
+				ArrayList<Peak> peaks = new ArrayList<Peak>(massArray.length);
+				for(int j = 0; j < massArray.length;j++){
+					Peak p = new Peak(massArray[j].floatValue(), intensityArray[j].floatValue());
+					peaks.add(p);
+				}
+
+				/* Save the peaks read from the file */
+				spectrumUnderConstruction.setPeaks(peaks);
+
+				spectrumUnderConstruction.setFile(inFile);
+				
+				/* clean the peaks */
+				cleanPeaks(spectrumUnderConstruction);
+
+				//Store the spectrum into output
+				out.add(spectrumUnderConstruction);
 
 			}//if size == 2
 

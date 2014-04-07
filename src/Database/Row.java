@@ -69,6 +69,9 @@ public class Row {
 	}
 	
 	public int getInt(String name) {
+		if (get(name) == null) {
+			return Integer.MIN_VALUE;
+		}
 		return (Integer) get(name);
 	}
 	

@@ -20,15 +20,21 @@ public class GencodeReducer {
 			File gencodeFile = new File("resources/gencode/gencode.v16.annotation.gtf");
 			BufferedReader gencodeReader = new BufferedReader(new FileReader(gencodeFile));
 			
-			File gencodeReducedFile = new File("gencodeReduced.gtf");
+			File gencodeReducedFile = new File("gencodeUTRReduced.gtf");
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(gencodeReducedFile)));
 			
 			String line = gencodeReader.readLine();
 			while (line != null) {
-				if (line.indexOf("\ttranscript\t") != -1) {
-//					if (line.indexOf("transcript_type \"protein_coding\"") != -1) {
+				
+				//get the full transcript length
+//				if (line.indexOf("\ttranscript\t") != -1) {
+				if (line.indexOf("\tUTR\t") != -1) {
+					
+					//use only protein-coding transcripts
+					if (line.indexOf("transcript_type \"protein_coding\"") != -1) {
+						
 						pw.println(line);
-//					}
+					}
 				}
 				line = gencodeReader.readLine();
 			}
@@ -38,10 +44,8 @@ public class GencodeReducer {
 			pw.close();
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

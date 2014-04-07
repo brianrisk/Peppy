@@ -64,6 +64,14 @@ public class Region {
 	public void setStop(int stop) {
 		this.stop = stop;
 	}
+	
+	/**
+	 * gets the width that this region covers
+	 * @return
+	 */
+	public int getCoverage() {
+		return stop - start;
+	}
 
 
 	public double getScore() {
@@ -97,6 +105,36 @@ public class Region {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	/**
+	 * This method build for the code that will turn a GTF sequence
+	 * into a six-frame translation with some padding around the transcript
+	 * boundaries.
+	 * @param nucleotides
+	 */
+	public void addPadding(int nucleotides) {
+		start -= nucleotides;
+		if (start < 0) start = 0;
+		stop += nucleotides;
+	}
+	
+	public boolean intersects(Region region) {
+		if (region.getSequence().equals(sequence)) {
+			if (region.getStart() >= start && region.getStart() < stop) return true;
+			if (region.getStop() >= start && region.getStop() < stop) return true;
+		}
+		return false;
+	}
+	
+	public boolean addRegion(Region region) {
+		if (intersects(region)) {
+			if (region.start < start) start = region.start;
+			if (region.stop > stop) stop = region.stop;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 

@@ -1,4 +1,5 @@
 package Peppy;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,9 +12,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import Math.MassError;
-import Navigator.BestMatches;
-import Navigator.ResultsCategory;
 import Reports.HTMLReporter;
 import Reports.SpectrumReport;
 import Reports.TextReporter;
@@ -42,6 +40,8 @@ public class Peppy {
 	private static final long fourMonthsOfMiliseconds = 1000L * 60L * 60L * 24L * 30L * 4L;
 	private static final long expiration = presentMiliseconds + fourMonthsOfMiliseconds;
 	
+	private static boolean verbose = true;
+	
 	
 	public static void main(String [] args) {
 		/* set up initial state */
@@ -52,11 +52,262 @@ public class Peppy {
 		
 		/* do the work */
 		runJobs(args);
+//		fuckingMZML();
+//		runDirectory("/Volumes/Research/colorectal-converted/", "jobs/colorectal second.txt", args);
+//		moonShot(args);
+//		moonShotTest(args);
 		
 		/* i'm finished! */
 		printFarewell();
 	}
 	
+	public static void fuckingMZML() {
+		String directoryString = "/Volumes/Research/colorectal/";
+		
+
+		File topDir = new File(directoryString);
+		File [] directories = topDir.listFiles();
+		
+		File convertedDir = new File("/Volumes/Research/colorectal-converted/");
+		convertedDir.mkdirs();
+		
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("bashout.txt")));
+			
+			for(File directory: directories) {
+				if (!directory.isHidden() && directory.isDirectory()) {
+					//make folder in converted
+					File convFolder = new File(convertedDir, directory.getName());
+					convFolder.mkdir();
+					
+					File [] mzmlFiles = directory.listFiles();
+					for (File mzmlFile: mzmlFiles) {
+						if (!mzmlFile.getName().endsWith(".mzML")) continue;
+						
+						String line = "./msconvert -o " + convFolder.getPath() + " " + mzmlFile.getAbsolutePath() + " --mgf";
+						U.p(line);
+						pw.println(line);
+					}
+					
+				}
+			}
+			
+			pw.flush();
+			pw.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public static void runDirectory(String directoryString, String jobFile, String [] args) {
+		init(args);
+		init(jobFile);
+		
+		File topDir = new File(directoryString);
+		File [] directoriesToPotentiallyProcess = topDir.listFiles();
+		
+		//listing existing reports so we don't re-run something we've already done
+		File [] existingReports = (new File("reports")).listFiles();
+		
+		//where we store the list of all directories to process
+		ArrayList<File> directories = new ArrayList<File>();
+		
+		for(File directory: directoriesToPotentiallyProcess) {
+			if (directory.isFile()) continue;
+			if (directory.isHidden()) continue;
+			boolean existsAsReport = false;
+			for (File existingReport: existingReports) {
+				if (existingReport.getName().startsWith(directory.getName())) {
+					existsAsReport = true;
+					break;
+				}
+			}
+			if (existsAsReport) continue;
+			
+			//if we have passed all of the above tests, the directory should be processed
+			directories.add(directory);
+			
+		}
+		
+		U.p("Multi-directory jobs");
+		U.p("found this many directories: " + directories.size());
+		U.p();
+		
+		for(File directory: directories) {
+			
+			if (!directory.isHidden() && directory.isDirectory()) {
+				
+				U.p("running for: " + directory.getName());
+				init(args);
+				init(jobFile);
+				Properties.spectraDirectoryOrFile = directory;
+				Properties.spectraDirectoryOrFileList = new ArrayList<File>();
+				Properties.spectraDirectoryOrFileList.add(directory);
+				
+				/* try running Peppy */
+				try {
+					runPeppy(null);
+				}
+				catch (Exception e) {
+					U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					e.printStackTrace();
+					U.p("\r\r");
+					U.p("An error occurred. Continuing with the next job...\r\r");
+				}
+				U.p();
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * Code to automate moon shot analysis
+	 * @param args
+	 */
+	public static void moonShotTest(String [] args) {
+		U.p ("Moon Shot");
+
+//		File drive = new File("/Volumes/New Volume");
+//		File [] experimentFolders = drive.listFiles();
+//		for (File experimentFolder: experimentFolders) {
+//			if (!experimentFolder.getName().startsWith("3_")) continue;
+//			if (!experimentFolder.isHidden() && experimentFolder.isDirectory() && !experimentFolder.getName().startsWith("$")) {
+//				File [] spectrumFiles = experimentFolder.listFiles();
+//				for (File spectrumFile: spectrumFiles) {
+//					File spectrumFile = new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG66to68.mgf");
+					//
+					//
+					/* 
+					 * this initializes with the default "properties.txt" 
+					 * provides a base so common properties don't need to be
+					 * redefined
+					 */
+					init(args);
+					
+//					if (!name.endsWith(".mgf")) continue;
+					Properties.spectraDirectoryOrFileList.add(new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG69to77.mgf"));
+					Properties.spectraDirectoryOrFileList.add(new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG66to68.mgf"));
+					
+					propertyFileString = "two" + ".txt";
+					U.p("running job " + propertyFileString);
+
+					
+					/* 
+					 * All properties override those defined in "properties.txt"
+					 */
+					Properties.smartTolerances = false;
+					Properties.precursorTolerance = 14;
+					Properties.fragmentTolerance = 500;
+					Properties.modC = 57.02146;
+					Properties.modK = 6.020129;
+					Properties.peptideMassMinimum = 750;
+					Properties.peptideMassMaximum = 3800;
+					
+					//as we are directly setting modification properties, we need to directly init the acid masses
+					AminoAcids.init();
+					
+					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
+					Properties.isSequenceFileDNAList.add(false);
+					
+					try {
+						runPeppy(null);
+					}
+					catch (Exception e) {
+						U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						e.printStackTrace();
+						U.p("\r\r");
+						U.p("An error occurred. Continuing with the next job...\r\r");
+					}
+					U.p();
+//				}
+//			}
+//		}
+	}
+	
+
+	
+	/**
+	 * Code to automate moon shot analysis
+	 * @param args
+	 */
+	public static void moonShot(String [] args) {
+		String [] compartments = {"tce", "surface", "media", "nuclear"};
+		U.p ("Moon Shot");
+
+		File drive = new File("/Volumes/New Volume");
+		File [] experimentFolders = drive.listFiles();
+		for (File experimentFolder: experimentFolders) {
+			if (!experimentFolder.isHidden() && experimentFolder.isDirectory() && !experimentFolder.getName().startsWith("$")) {
+				String experimentName = experimentFolder.getName().toLowerCase();
+				for(String compartment: compartments) {
+					
+					String jobName = experimentName + "_" + compartment;
+					
+					//continue if we've already done this analysis
+					File existingReportFolder = new File("reports/" + jobName);
+					if (existingReportFolder.exists()) continue;
+					
+					propertyFileString =  jobName + ".txt";
+					U.p("running job " + propertyFileString);
+					
+					/* 
+					 * this initializes with the default "properties.txt" 
+					 * provides a base so common properties don't need to be
+					 * redefined
+					 */
+					init(args);
+					
+					// assemble all spectrum files for this compartment;
+					File [] spectrumFiles = experimentFolder.listFiles();
+					for (File spectrumFile: spectrumFiles) {
+						String name = spectrumFile.getName().toLowerCase();
+						if (!name.endsWith(".mgf")) continue;
+						if (name.indexOf(compartment) != -1) {
+							Properties.spectraDirectoryOrFileList.add(spectrumFile);
+						}
+					}
+					if (Properties.spectraDirectoryOrFileList.size() == 0) continue;
+					
+					/* 
+					 * All properties override those defined in "properties.txt"
+					 */
+					Properties.smartTolerances = false;
+					Properties.precursorTolerance = 14;
+					Properties.fragmentTolerance = 500;
+					Properties.modC = 57.02146;
+					Properties.modK = 6.020129;
+					Properties.peptideMassMinimum = 750;
+					Properties.peptideMassMaximum = 3800;
+					
+					//as we are directly setting modification properties, we need to directly init the acid masses
+					AminoAcids.init();
+					
+					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
+					Properties.isSequenceFileDNAList.add(false);
+//					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19"));
+//					Properties.isSequenceFileDNAList.add(true);
+					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/Hanash/sequences/regions/lung28"));
+					Properties.isSequenceFileDNAList.add(false);
+					
+					try {
+						runPeppy(null);
+					}
+					catch (Exception e) {
+						U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						e.printStackTrace();
+						U.p("\r\r");
+						U.p("An error occurred. Continuing with the next job...\r\r");
+					}
+					U.p();
+				}
+			}
+		}
+	}
+
 	public static void runPeppy(String [] args) {
 		/* funnel search is meaningless without an established FDR */
 		if (Properties.simpleSearch || Properties.maximumFDR < 0) {
@@ -117,9 +368,6 @@ public class Peppy {
 	}
 	
 	
-	
-	
-	
 	/**
 	 * There may be a multiplicity of sequence and spectral directories.
 	 * This iterates through them in every combination.
@@ -128,8 +376,8 @@ public class Peppy {
 	public static void runFunnelPeppy(String [] args) {
 		U.startStopwatch();
 		
-		U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
-		U.p("sequence set count: " + Properties.sequenceDirectoryOrFileList.size());
+		if (verbose) U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
+		if (verbose) U.p("sequence set count: " + Properties.sequenceDirectoryOrFileList.size());
 		
 		/* check if our directories exist (no typos...) */
 		boolean fileDoesNotExist = false;
@@ -165,332 +413,329 @@ public class Peppy {
 			Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
 			Properties.searchModifications = false;
 			
-			for (File spectraDirectoryOrFile: Properties.spectraDirectoryOrFileList) {
-				Properties.spectraDirectoryOrFile = spectraDirectoryOrFile;
-				ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
-				int originalSpectraSize = spectra.size();
-				U.p("loaded " + originalSpectraSize + " spectra.");
+			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
+			int originalSpectraSize = spectra.size();
+			if (verbose) U.p("loaded " + originalSpectraSize + " spectra.");
+			
+			/* create a spectrum report */
+			SpectrumReport.spectrumReport(spectra, mainReportDir);
+			
+			/* this will maintain our list of score cutoffs */
+			PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
+			metricsReport.println("spectral count: " + originalSpectraSize);
+			metricsReport.println();
+			
+			/* we are going to combine all returned match sets here */
+			ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
+			
+			/* group spectra that have been identified  so that
+			 * we can track those that have been identified in a 
+			 * previous level */
+			Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+			
+			/* iterate through all of our peptide sources */
+			for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
 				
-				/* create a spectrum report */
-				SpectrumReport.spectrumReport(spectra, mainReportDir);
+				/* if we are out of spectra (not likely), get out of this loop */
+				if (spectra.size() == 0) break;
 				
-				/* this will maintain our list of score cutoffs */
-				PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
-				metricsReport.println("spectral count: " + originalSpectraSize);
-				metricsReport.println();
+				/* set up our sequence data.
+				 * Setting this property will also affect the FDR calculation */
+				Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
+				Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
+				ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
 				
-				/* we are going to combine all returned match sets here */
-				ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
 				
-				/* group spectra that have been identified  so that
-				 * we can track those that have been identified in a 
-				 * previous level */
-				Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+				if (verbose) U.p("performing FDR analysis with " + Properties.sequenceDirectoryOrFile.getName());
+				FDR fdr = new FDR(spectra);
 				
-				/* iterate through all of our peptide sources */
-				for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
+				/* special things to do if this is the first sequence */
+				if (sequenceIndex == 0 ) {
 					
-					/* if we are out of spectra (not likely), get out of this loop */
-					if (spectra.size() == 0) break;
-					
-					/* set up our sequence data.
-					 * Setting this property will also affect the FDR calculation */
-					Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
-					Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
-					ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
+					/* getting optimal precursor and fragment tolerances */
+					OptimalTolerances optimalTolerances = new OptimalTolerances(fdr);
+					optimalTolerances.createReport(mainReportDir);
 					
 					
-					U.p("performing FDR analysis with " + Properties.sequenceDirectoryOrFile.getName());
-					FDR fdr = new FDR(spectra);
-					
-					/* special things to do if this is the first sequence */
-					if (sequenceIndex == 0 ) {
+					/* Find optimal tolerance settings if this is the first sequence */
+					if (Properties.smartTolerances) {
 						
-						/* getting optimal precursor and fragment tolerances */
-						OptimalTolerances optimalTolerances = new OptimalTolerances(fdr);
-						optimalTolerances.createReport(mainReportDir);
-						
-						
-						/* Find optimal tolerance settings if this is the first sequence */
-						if (Properties.smartTolerances) {
-							
-							/*
-							 * abort if we have not found a sufficient percentage
-							 */
-							if (Properties.maximumFDR >= 0) {
-								int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
-								double percentFound = (double) numberFound / spectra.size();
+						/*
+						 * abort if we have not found a sufficient percentage
+						 */
+						if (Properties.maximumFDR >= 0) {
+							int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
+							double percentFound = (double) numberFound / spectra.size();
 //								if (percentFound < 0.05) {
 //									U.p("ERROR: only " + Properties.percentFormat.format(percentFound) + " (" + numberFound + ") spectra identified.");
 //									return;
 //								} else {
 //									U.p("initial FDR found " + Properties.percentFormat.format(percentFound));
 //								}
-								U.p("initial FDR found " + numberFound + "(" + Properties.percentFormat.format(percentFound) + ")");
-							}
+							if (verbose) U.p("initial FDR found " + numberFound + "(" + Properties.percentFormat.format(percentFound) + ")");
+						}
+						
+						
+						/*
+						 * If we found a valid FDR, then adjust parameters and reanalyze
+						 */
+						if (optimalTolerances.isValid()) {
+							
+							Properties.precursorTolerance = optimalTolerances.getOptimalPrecursorError();
+							if (verbose) U.p ("optimal precursor tolerance is: " + optimalTolerances.getOptimalPrecursorError());
+							metricsReport.println("optimal precursor is: " + optimalTolerances.getOptimalPrecursorError());
+							
+							Properties.fragmentTolerance = optimalTolerances.getOptimalFragmentError();
+							if (verbose) U.p ("optimal fragment tolerance is: " + optimalTolerances.getOptimalFragmentError());
+							metricsReport.println("optimal fragment is: " + optimalTolerances.getOptimalFragmentError());
+							
+							Properties.peptideMassMinimum = optimalTolerances.getMinimumMass();
+							if (verbose) U.p ("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
+							metricsReport.println("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
+							
+							Properties.peptideMassMaximum = optimalTolerances.getMaximumMass();
+							if (verbose) U.p ("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
+							metricsReport.println("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
+							
+							Properties.minimumNumberOfPeaksForAValidSpectrum = optimalTolerances.getMinimumNumberOfPeaks();
+							if (verbose) U.p ("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
+							metricsReport.println("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
+							
+							if (verbose) U.p("average fragment error: " + optimalTolerances.getMeanFragmentError());
+							if (verbose) U.p("average precursor error: " + optimalTolerances.getMeanPrecursorError());
 							
 							
-							/*
-							 * If we found a valid FDR, then adjust parameters and reanalyze
-							 */
-							if (optimalTolerances.isValid()) {
-								
-								Properties.precursorTolerance = optimalTolerances.getOptimalPrecursorError();
-								U.p ("optimal precursor tolerance is: " + optimalTolerances.getOptimalPrecursorError());
-								metricsReport.println("optimal precursor is: " + optimalTolerances.getOptimalPrecursorError());
-								
-								Properties.fragmentTolerance = optimalTolerances.getOptimalFragmentError();
-								U.p ("optimal fragment tolerance is: " + optimalTolerances.getOptimalFragmentError());
-								metricsReport.println("optimal fragment is: " + optimalTolerances.getOptimalFragmentError());
-								
-								Properties.peptideMassMinimum = optimalTolerances.getMinimumMass();
-								U.p ("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
-								metricsReport.println("optimal minimum mass is: " + optimalTolerances.getMinimumMass());
-								
-								Properties.peptideMassMaximum = optimalTolerances.getMaximumMass();
-								U.p ("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
-								metricsReport.println("optimal maximum mass is: " + optimalTolerances.getMaximumMass());
-								
-								Properties.minimumNumberOfPeaksForAValidSpectrum = optimalTolerances.getMinimumNumberOfPeaks();
-								U.p ("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
-								metricsReport.println("optimal minimum number of peaks is: " + optimalTolerances.getMinimumNumberOfPeaks());
-								
-								U.p("average fragment error: " + optimalTolerances.getMeanFragmentError());
-								U.p("average precursor error: " + optimalTolerances.getMeanPrecursorError());
-								
-								
-								/* remove spectra that don't conform to optimal parameters */
-								boolean remove;
-								Spectrum spectrumToExamine;
-								for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
-									spectrumToExamine = spectra.get(spectrumIndex);
-									remove = false;
-									if (spectrumToExamine.getMass() < Properties.peptideMassMinimum) remove = true;
-									if (spectrumToExamine.getMass() > Properties.peptideMassMaximum) remove = true;
-									if (spectrumToExamine.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
-									if (remove) {
-										spectra.remove(spectrumIndex);
-										spectrumIndex--;
-									}
+							/* remove spectra that don't conform to optimal parameters */
+							boolean remove;
+							Spectrum spectrumToExamine;
+							for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
+								spectrumToExamine = spectra.get(spectrumIndex);
+								remove = false;
+								if (spectrumToExamine.getMass() < Properties.peptideMassMinimum) remove = true;
+								if (spectrumToExamine.getMass() > Properties.peptideMassMaximum) remove = true;
+								if (spectrumToExamine.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
+								if (remove) {
+									spectra.remove(spectrumIndex);
+									spectrumIndex--;
 								}
-								
-								U.p ("new spectral set size: " + spectra.size());
-								metricsReport.println("new spectral set size: " + spectra.size());
-								
-								metricsReport.println();
-								
-								/* Now that we have different fragment tolerance, we have different coverage */
-								for (Spectrum spectrum: spectra) {
-									spectrum.recalculateCoverage();
-								}
-	
-								/* second-pass FDR analysis */
-								U.p("performing second FDR with new tolerances...");
-								fdr = new FDR(spectra);
 							}
 							
-						}
-					}
-					
-					
-					/* Calculate score threshold with FDR. 
-					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
-					if (Properties.maximumFDR >= 0) {
-						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
-						
-						/* if we will not find any matches with confidence, skip this round */
-						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
-						if (potentialMinimumScore < 0) continue;
-						Properties.minimumScore = potentialMinimumScore;
-					}
-					
-					/* create spectra-based containers for matches */
-					ArrayList<MatchesSpectrum> matchesSpectra;
-					ArrayList<Match> matches = null;
-					
-					/* if we used all of our spectra to calculate FDR, we take advantage of that
-					 * and harvest those results for these results.  No need to do the work twice!
-					 * 
-					 * Note:  decoys are not getting in.  They are removed in the
-					 * getMatchesFromSpectraMatches method
-					 */
-					if (fdr.usedFullSetOfSpectra) {
-						matchesSpectra = fdr.getSpectraMatches();
-						matches = getMatchesFromSpectraMatches(matchesSpectra);
-					} else {
-						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-						for (Spectrum spectrum: spectra) {
-							matchesSpectra.add(new MatchesSpectrum(spectrum));
-						}
-						U.p("getting the matches");
-						matches = getMatches(sequences, matchesSpectra);
-					}
-					
-					/* we found no matches */
-					if (matches == null) continue;
-					
-					/* if matches are from nucleotide searches, then save the spectra */
-					if (Properties.isSequenceFileDNA) {
-						for (Match match: matches) {
-							match.getSpectrum().saveDTA(savedSpectraDir);
-						}
-					}
-					
-					/* label the identified peptides according to our sequence */
-					for (Match match: matches) {
-						match.getPeptide().setTrackingIdentifier(sequenceIndex);
-					}
-					
-					/* add these matches to our large pile of all matches for this spectral set */
-					allMatchesForSpectralSet.addAll(matches);
-					
-					/* group spectra that have been identified */
-					int identifiedSpectraCount = 0;
-					for (Match match: matches) {
-						if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
-							identifiedSpectraCount++;
-							spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
-						}
-						
-					}
-					U.p(identifiedSpectraCount + " spectra identified at this step");
-					
-					/* create the directory where we will hold this report */
-					reportIndex++;
-					String reportDirName = reportIndex + " " + spectraDirectoryOrFile.getName() + " - " + Properties.sequenceDirectoryOrFile.getName();
-					File reportDir = new File (mainReportDir, reportDirName);
-					reportDir.mkdirs();
-					
-					
-						
-					/* remove all spectra that appear in our matches */
-					if (Properties.maximumFDR >= 0) {
-						ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>(spectra.size() - spectrumIDs.size());
-						for (Spectrum spectrum: spectra) {
-							if (spectrumIDs.get(spectrum.getId()) == null) {
-								reducedSpectra.add(spectrum);
+							if (verbose) U.p ("new spectral set size: " + spectra.size());
+							metricsReport.println("new spectral set size: " + spectra.size());
+							
+							metricsReport.println();
+							
+							/* Now that we have different fragment tolerance, we have different coverage */
+							for (Spectrum spectrum: spectra) {
+								spectrum.recalculateCoverage();
 							}
-						}
-						spectra = reducedSpectra;
-					}
 
-					
-					/* generate reports */
-					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
-					U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
-					metricsReport.println(reportDirName);
-					metricsReport.println("score cutoff: " + Properties.minimumScore);
-					metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
-					metricsReport.println();
-					metricsReport.flush();
-					fdr.saveReport(reportDir);
-					createReports(matches, reportDir);
-					
+							/* second-pass FDR analysis */
+							if (verbose) U.p("performing second FDR with new tolerances...");
+							fdr = new FDR(spectra);
+						}
+						
+					}
 				}
 				
-				/* MODIFICATONS
+				
+				/* Calculate score threshold with FDR. 
+				 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
+				if (Properties.maximumFDR >= 0) {
+					double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
+					
+					/* if we will not find any matches with confidence, skip this round */
+					//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
+					if (potentialMinimumScore < 0) continue;
+					Properties.minimumScore = potentialMinimumScore;
+				}
+				
+				/* create spectra-based containers for matches */
+				ArrayList<MatchesSpectrum> matchesSpectra;
+				ArrayList<Match> matches = null;
+				
+				/* if we used all of our spectra to calculate FDR, we take advantage of that
+				 * and harvest those results for these results.  No need to do the work twice!
 				 * 
-				 * Now that we have collected all of our matches from the first pass,
-				 * we can collect all the found peptides and perform varible-mod searches on them
+				 * Note:  decoys are not getting in.  They are removed in the
+				 * getMatchesFromSpectraMatches method
+				 */
+				if (fdr.usedFullSetOfSpectra) {
+					matchesSpectra = fdr.getSpectraMatches();
+					matches = getMatchesFromSpectraMatches(matchesSpectra);
+				} else {
+					matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+					for (Spectrum spectrum: spectra) {
+						matchesSpectra.add(new MatchesSpectrum(spectrum));
+					}
+					if (verbose) U.p("getting the matches");
+					matches = getMatches(sequences, matchesSpectra);
+				}
+				
+				/* we found no matches */
+				if (matches == null) continue;
+				
+				/* if matches are from nucleotide searches, then save the spectra */
+				if (Properties.isSequenceFileDNA) {
+					for (Match match: matches) {
+						match.getSpectrum().saveDTA(savedSpectraDir);
+					}
+				}
+				
+				/* label the identified peptides according to our sequence */
+				for (Match match: matches) {
+					match.getPeptide().setTrackingIdentifier(sequenceIndex);
+				}
+				
+				/* add these matches to our large pile of all matches for this spectral set */
+				allMatchesForSpectralSet.addAll(matches);
+				
+				/* group spectra that have been identified */
+				int identifiedSpectraCount = 0;
+				for (Match match: matches) {
+					if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
+						identifiedSpectraCount++;
+						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+					}
+					
+				}
+				U.p(identifiedSpectraCount + " spectra identified at this step");
+				
+				/* create the directory where we will hold this report */
+				reportIndex++;
+				String reportDirName = reportIndex + " " + Properties.sequenceDirectoryOrFile.getName();
+				File reportDir = new File (mainReportDir, reportDirName);
+				reportDir.mkdirs();
+				
+				
+					
+				/* remove all spectra that appear in our matches */
+				if (Properties.maximumFDR >= 0) {
+					ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>(spectra.size() - spectrumIDs.size());
+					for (Spectrum spectrum: spectra) {
+						if (spectrumIDs.get(spectrum.getId()) == null) {
+							reducedSpectra.add(spectrum);
+						}
+					}
+					spectra = reducedSpectra;
+				}
+
+				
+				/* generate reports */
+				double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
+				U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
+				metricsReport.println(reportDirName);
+				metricsReport.println("score cutoff: " + Properties.minimumScore);
+				metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
+				metricsReport.println();
+				metricsReport.flush();
+				fdr.saveReport(reportDir);
+				createReports(matches, reportDir);
+				
+			}
+			
+			/* MODIFICATONS
+			 * 
+			 * Now that we have collected all of our matches from the first pass,
+			 * we can collect all the found peptides and perform varible-mod searches on them
+			 */
+			
+			/* first, we collect all of the peptides found */
+			Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
+			for (Match match: allMatchesForSpectralSet) {
+				peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
+			}
+			ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
+			
+			/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
+			if (peptidesFound.size() > 0) {
+				
+				Collections.sort(peptidesFound);
+				
+				/* set our scoring method to vari-mod */
+				Properties.scoringMethodName = "Peppy.Match_IMP_VariMod";
+				Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+				Properties.searchModifications = true;
+				
+				/* use this peptide database to perform FDR */
+				if (verbose) U.p("performing FDR analysis for modificaitons using found peptides");
+				FDR fdr = new FDR(spectra, peptidesFound);
+				
+				/* Calculate score threshold with FDR. 
+				 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
+				if (Properties.maximumFDR >= 0) {
+					double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
+					
+					/* if we will not find any matches with confidence, skip this round */
+					//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
+					if (potentialMinimumScore < 0) return;
+					Properties.minimumScore = potentialMinimumScore;
+				}
+				
+				/* create spectra-based containers for matches */
+				ArrayList<MatchesSpectrum> matchesSpectra;					
+				ArrayList<Match> matches = null;
+				if (fdr.usedFullSetOfSpectra) {
+					matchesSpectra = fdr.getSpectraMatches();
+					matches = getMatchesFromSpectraMatches(matchesSpectra);
+				} else {
+					matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+					for (Spectrum spectrum: spectra) {
+						matchesSpectra.add(new MatchesSpectrum(spectrum));
+					}
+					if (verbose) U.p("getting the matches");
+					matches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
+				}
+				
+				/*
+				 * THIS WAS COPIED DIRECTLY FROM ABOVE
 				 */
 				
-				/* first, we collect all of the peptides found */
-				Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
-				for (Match match: allMatchesForSpectralSet) {
-					peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
+				/* add these matches to our large pile of all matches for this spectral set */
+				allMatchesForSpectralSet.addAll(matches);
+				
+				/* group spectra that have been identified */
+				int identifiedSpectraCount = 0;
+				for (Match match: matches) {
+					if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
+						identifiedSpectraCount++;
+						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+					}
+					
 				}
-				ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
+				U.p(identifiedSpectraCount + " spectra identified at this step");
 				
-				/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
-				if (peptidesFound.size() > 0) {
-					
-					Collections.sort(peptidesFound);
-					
-					/* set our scoring method to vari-mod */
-					Properties.scoringMethodName = "Peppy.Match_IMP_VariMod";
-					Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-					Properties.searchModifications = true;
-					
-					/* use this peptide database to perform FDR */
-					U.p("performing FDR analysis for modificaitons using found peptides");
-					FDR fdr = new FDR(spectra, peptidesFound);
-					
-					/* Calculate score threshold with FDR. 
-					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
-					if (Properties.maximumFDR >= 0) {
-						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
-						
-						/* if we will not find any matches with confidence, skip this round */
-						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
-						if (potentialMinimumScore < 0) continue;
-						Properties.minimumScore = potentialMinimumScore;
-					}
-					
-					/* create spectra-based containers for matches */
-					ArrayList<MatchesSpectrum> matchesSpectra;					
-					ArrayList<Match> matches = null;
-					if (fdr.usedFullSetOfSpectra) {
-						matchesSpectra = fdr.getSpectraMatches();
-						matches = getMatchesFromSpectraMatches(matchesSpectra);
-					} else {
-						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-						for (Spectrum spectrum: spectra) {
-							matchesSpectra.add(new MatchesSpectrum(spectrum));
-						}
-						U.p("getting the matches");
-						matches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
-					}
-					
-					/*
-					 * THIS WAS COPIED DIRECTLY FROM ABOVE
-					 */
-					
-					/* add these matches to our large pile of all matches for this spectral set */
-					allMatchesForSpectralSet.addAll(matches);
-					
-					/* group spectra that have been identified */
-					int identifiedSpectraCount = 0;
-					for (Match match: matches) {
-						if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
-							identifiedSpectraCount++;
-							spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
-						}
-						
-					}
-					U.p(identifiedSpectraCount + " spectra identified at this step");
-					
-					/* create the directory where we will hold this report */
-					reportIndex++;
-					String reportDirName = reportIndex + " " + spectraDirectoryOrFile.getName() + " - varimod";
-					File reportDir = new File (mainReportDir, reportDirName);
-					reportDir.mkdirs();
-					
-					/* generate reports */
-					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
-					U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
-					metricsReport.println(reportDirName);
-					metricsReport.println("score cutoff: " + Properties.minimumScore);
-					metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
-					metricsReport.println();
-					metricsReport.flush();
-					fdr.saveReport(reportDir);
-					createReports(matches, reportDir);
-						
+				/* create the directory where we will hold this report */
+				reportIndex++;
+				String reportDirName = reportIndex + " - varimod";
+				File reportDir = new File (mainReportDir, reportDirName);
+				reportDir.mkdirs();
 				
-				} /* end modifications if */
-				
+				/* generate reports */
+				double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
+				U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
+				metricsReport.println(reportDirName);
+				metricsReport.println("score cutoff: " + Properties.minimumScore);
+				metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
+				metricsReport.println();
 				metricsReport.flush();
-				metricsReport.close();
+				fdr.saveReport(reportDir);
+				createReports(matches, reportDir);
+					
+			
+			} /* end modifications if */
+			
+			metricsReport.flush();
+			metricsReport.close();
 				
-				
-			} /* end spectrum loop */
+
 			
 			
 			/* create graphic reports */
-			BestMatches bm = new BestMatches(mainReportDir, ResultsCategory.DNA, null);
-			ArrayList<BestMatches> bmArray = new ArrayList<BestMatches>();
-			bmArray.add(bm);
-			BestMatches.createUnifiedSamplesReport(bmArray, "peptideSequence", mainReportDir);
+//			BestMatches bm = new BestMatches(mainReportDir, ResultsCategory.DNA, null);
+//			ArrayList<BestMatches> bmArray = new ArrayList<BestMatches>();
+//			bmArray.add(bm);
+//			BestMatches.createUnifiedSamplesReport(bmArray, "peptideSequence", mainReportDir);
 		
 		} catch (IOException e) {
 			e.printStackTrace();

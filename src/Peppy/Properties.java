@@ -143,6 +143,9 @@ public class Properties {
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
 	
+	/* when precursors are off by whole daltons */
+	public static boolean useHydrogenOffset = false;
+	
 	/* fixed modifications */
 	public static double modA = 0;
 	public static double modR = 0;
@@ -165,6 +168,8 @@ public class Properties {
 	public static double modY = 0;
 	public static double modV = 0;
 	public static double modU = 0;
+	public static double modNTerminal = 0;
+	public static double modCTerminal = 0;
 	
 	public static boolean smartTolerances = true;
 	
@@ -283,6 +288,9 @@ public class Properties {
 		numberOfSpectraToUseForFDR = 10000;
 		maximumFDR = 0.01;
 		
+		/* when off by whole dalton*/
+		useHydrogenOffset = false;
+		
 		/* fixed modifications */
 		 modA = 0;
 		 modR = 0;
@@ -305,6 +313,8 @@ public class Properties {
 		 modW = 0;
 		 modY = 0;
 		 modV = 0;
+		 modNTerminal = 0;
+		 modCTerminal = 0;
 		
 		/* PTMs */
 		multipass = false;
@@ -549,6 +559,10 @@ public class Properties {
 		if (propertyName.equals("modificationUpperBound")) 
 			modificationUpperBound = Double.valueOf(propertyValue);
 		
+		/* hydrogen offset */
+		if (propertyName.equals("useHydrogenOffset")) 
+			useHydrogenOffset = Boolean.valueOf(propertyValue);
+		
 		
 		/* fixed modifications */
 		if (propertyName.equals("modA")) modA = Double.valueOf(propertyValue);
@@ -572,6 +586,9 @@ public class Properties {
 		if (propertyName.equals("modY")) modY = Double.valueOf(propertyValue);
 		if (propertyName.equals("modV")) modV = Double.valueOf(propertyValue);
 		if (propertyName.equals("modU")) modU = Double.valueOf(propertyValue);
+		if (propertyName.equals("modNTerminal")) modNTerminal = Double.valueOf(propertyValue);
+		if (propertyName.equals("modCTerminal")) modCTerminal = Double.valueOf(propertyValue);
+
 		
 		/* legacy modification -- might be used if old properties file is employed */
 		if (propertyName.equals("iodoacetamideDerivative"))
@@ -614,6 +631,8 @@ public class Properties {
 				pw.println("cleavageAcid " + acid);
 			}	
 			pw.println("cleavageAtCarboxylSide " + Properties.cleavageAtCarboxylSide);
+			pw.println();
+			pw.println("isITRAQ " + Properties.isITRAQ);
 			pw.println();
 			pw.println("##Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
@@ -667,6 +686,8 @@ public class Properties {
 			pw.println("numberOfRegionsToKeep " + numberOfRegionsToKeep);
 			
 			pw.println();
+			pw.println("useHydrogenOffset " + useHydrogenOffset);
+			pw.println();
 			pw.println("## static mods");
 			pw.println("modA " + modA);
 			pw.println("modR " + modR);
@@ -689,6 +710,8 @@ public class Properties {
 			pw.println("modY " + modY);
 			pw.println("modV " + modV);
 			pw.println("modU " + modU);
+			pw.println("modNTerminal " + modNTerminal);
+			pw.println("modCTerminal " + modCTerminal);
 
 			
 			pw.println();

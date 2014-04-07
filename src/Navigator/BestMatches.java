@@ -73,9 +73,58 @@ public class BestMatches {
 //		compRefUNCRegionsOfInterest();
 //		washUPaperOneRegionAnalysis();
 //		yaleEnzymeless();
-		report("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/");
-		
+//		report("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/");
+//		moonShoot();
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/lyris-20131201/");
+		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports");
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/");
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports-complete/MoonShot first pass");
+//		createRegionsFile("alex-kentsis", "2 HG19");
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports-complete/colorectal - first");
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/scott-nicholson");
+//		createRegionsFile("/Users/risk2/PeppyData/CPTAC/reports/", "HG19");
+		U.p("done");
 	}
+	
+	public static void multiSetReport(String reportDir) {
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		
+		File reports = new File(reportDir);
+		File [] allReportFolders = reports.listFiles();
+		for (File reportFolder: allReportFolders) {
+			if (reportFolder.isDirectory() && !reportFolder.isHidden()) {
+				reportFolders.add(reportFolder);
+			}
+		}
+		
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+		direcotryTitlesToIgnore.add("UniProt");
+		//direcotryTitlesToIgnore.add("pseudogenes");
+		direcotryTitlesToIgnore.add("mouse");
+		direcotryTitlesToIgnore.add("UniProt");
+		direcotryTitlesToIgnore.add("xeno");
+		direcotryTitlesToIgnore.add("germline");
+		direcotryTitlesToIgnore.add("gencode");
+		direcotryTitlesToIgnore.add("p5");
+		direcotryTitlesToIgnore.add("p6");
+		
+		for (File folder: reportFolders) {
+//			BestMatches matches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
+			BestMatches matches = new BestMatches(folder, ResultsCategory.PROTEIN, direcotryTitlesToIgnore);
+			bestMatches.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+	}
+	
+	
 	
 	public static void report(String fileName) {
 		ArrayList<File> reportFolders = new ArrayList<File>();
@@ -176,6 +225,108 @@ public class BestMatches {
 		}	
 		process();
 		
+	}
+
+	
+	public static void moonShoot() {
+		
+		ArrayList<File> reportFolders = new ArrayList<File>();
+		
+		File reports = new File("reports");
+		File [] allReportFolders = reports.listFiles();
+		for (File reportFolder: allReportFolders) {
+			if (reportFolder.isDirectory()) {
+				String [] nameChunks = reportFolder.getName().split("_");
+				try {
+					Integer.parseInt(nameChunks[0]);
+					reportFolders.add(reportFolder);
+					
+				} catch(NumberFormatException e) {  
+			    }
+			}
+		}
+		
+		
+		/* a list of our BestMatches */
+		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
+		
+		/* a list of folders to ignore from our results */
+		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
+		direcotryTitlesToIgnore.add("varimod");
+		direcotryTitlesToIgnore.add("UniProt");
+		
+		for (File folder: reportFolders) {
+//			BestMatches matches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
+			BestMatches matches = new BestMatches(folder, ResultsCategory.PROTEIN, direcotryTitlesToIgnore);
+			bestMatches.add(matches);
+		}
+		
+		createUnifiedSamplesReport(bestMatches, "peptideSequence");
+	}
+	
+	/**
+	 * Used with createRegionsFile to find all folders that match, say HG19
+	 */
+	public static void findFolderPatterns(File folder, String filePattern, ArrayList<File> filesWithPattern) {
+		File [] files = folder.listFiles();
+		for (File file: files) {
+			if (file.isDirectory()) {
+				if (file.getName().indexOf(filePattern) != -1) {
+					File reportFile = new File(file, "report.txt");
+					if (reportFile.exists()) filesWithPattern.add(reportFile);
+				} else {
+					findFolderPatterns(file, filePattern, filesWithPattern);
+				}
+			}
+		}
+	}
+	
+	public static void createRegionsFile(String reportsString, String genomeString) {
+		
+		File reports = new File(reportsString);
+		ArrayList<File> filesWithPattern = new ArrayList<File>();
+		findFolderPatterns(reports, genomeString, filesWithPattern);
+
+		ArrayList<Match> allMatches = new ArrayList<Match>();
+		for (File reportFile: filesWithPattern) {
+			allMatches.addAll( Match.loadMatches(reportFile));
+		}
+		
+		
+		/* here we are storing all the potential loci
+		 * This will be used to create our targeted regions
+		 */
+		Hashtable<String, Match> targetedRegions = new Hashtable<String, Match>();
+		
+		for (Match match: allMatches) {
+			double startLocus = match.getInt("start");
+			//we are rounding this to a thousand so that it gets the general regions
+			// thus if three matches are to the same region, it won't produce three regions
+			int roundedLocus = (int) (Math.round(startLocus/1000) * 1000);
+			String sequenceName = match.getString("sequenceName");
+			String targetregion = sequenceName + roundedLocus;
+			targetedRegions.put(targetregion, match);
+		}
+		
+		/* creating targeted regions file */
+		File targetedRegionsFile = new File("targeted regions file.txt");
+		PrintWriter pw;
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(targetedRegionsFile)));
+			for(Match match: targetedRegions.values()) {
+				int startLocus = match.getInt("start");
+				String sequenceName = match.getString("sequenceName");
+				if (sequenceName.startsWith(">")) sequenceName = sequenceName.substring(1);
+				String peptideSequence = match.getString("peptideSequence");
+				pw.println(peptideSequence + "\t" + sequenceName + "\t" + startLocus);
+			}
+			pw.flush();
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 
@@ -503,231 +654,12 @@ public class BestMatches {
 		createUnifiedSamplesReport(bestMatches, "peptideSequence");
 	}
 	
-	public static void yale() {
-		Properties.isYale = true;
-		
-		
-		/* Yale 2011-06 */
-		BestMatches mouse1 = new BestMatches("2011-06");
-		
-		/* contaminant protein */
-		ResultsCategory mouse1Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		mouse1Contaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-mouse 2011-06/yale-mouse 2011-06_report.txt"));
-		mouse1.addMatchType(mouse1Contaminant);
 
-		/* reference genome */
-		ResultsCategory mouse1Genome = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		mouse1Genome.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-genome 2011-06/yale-genome 2011-06_report.txt"));
-		mouse1.addMatchType(mouse1Genome);
-		
-		
-		/* find the best peptides */
-		mouse1.process();
-		mouse1.saveReports();
-		
-		
-		
-		/* Yale 2011-10 */
-		BestMatches mouse2 = new BestMatches("2011-10");
-		
-		/* contaminant protein */
-		ResultsCategory mouse2Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		mouse2Contaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-mouse 2011-10/yale-mouse 2011-10_report.txt"));
-		mouse2.addMatchType(mouse2Contaminant);
-
-		/* reference genome */
-		ResultsCategory mouse2Reference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		mouse2Reference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-genome 2011-10/yale-genome 2011-10_report.txt"));
-		mouse2.addMatchType(mouse2Reference);
-		
-		
-		/* find the best peptides */
-		mouse2.process();
-		mouse2.saveReports();
-		
-		
-		
-		/* Yale 2011-11 */
-		BestMatches mouse3 = new BestMatches("2011-11");
-		
-		/* contaminant protein */
-		ResultsCategory mouse3Contaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		mouse3Contaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-mouse 2011-11/yale-mouse 2011-11_report.txt"));
-		mouse3.addMatchType(mouse3Contaminant);
-
-		/* reference genome */
-		ResultsCategory mouse3Reference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		mouse3Reference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/yale-genome 2011-11/yale-genome 2011-11_report.txt"));
-		mouse3.addMatchType(mouse3Reference);
-		
-		
-		/* find the best peptides */
-		mouse3.process();
-		mouse3.saveReports();
-		
-		
-		
-		
-		
-		/* Yale 2012-04 tryptic*/
-		BestMatches mouse4A = new BestMatches("04 tryptic");
-		
-		/* contaminant protein */
-		ResultsCategory mouse4AContaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		mouse4AContaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/1 trypsin - MOUSE.fasta/report.txt"));
-		mouse4A.addMatchType(mouse4AContaminant);
-
-		/* reference genome */
-		ResultsCategory mouse4AReference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		mouse4AReference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/2 trypsin - mouse/report.txt"));
-		mouse4A.addMatchType(mouse4AReference);
-		
-		
-		/* find the best peptides */
-		mouse4A.process();
-		mouse4A.saveReports();
-		
-		/* Yale 2012-04 chymotryptic*/
-		BestMatches mouse4B = new BestMatches("04 chymo");
-		
-		/* contaminant protein */
-		ResultsCategory mouse4BContaminant = new ResultsCategory("ContaminantProtein", ResultsCategory.PROTEIN);
-		mouse4BContaminant.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/1 chymotrypsin - MOUSE.fasta/report.txt"));
-		mouse4B.addMatchType(mouse4BContaminant);
-
-		/* reference genome */
-		ResultsCategory mouse4BReference = new ResultsCategory("ReferenceGenome", ResultsCategory.DNA);
-		mouse4BReference.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/2 chymotrypsin - mouse/report.txt"));
-		mouse4B.addMatchType(mouse4BReference);
-		
-		
-		/* find the best peptides */
-		mouse4B.process();
-		mouse4B.saveReports();
-		
-		
-
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		bestMatches.add(mouse1);
-		bestMatches.add(mouse2);
-		bestMatches.add(mouse3);
-		bestMatches.add(mouse4A);
-		bestMatches.add(mouse4B);
-		
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-		
-	}
-	
-	
-	public static void yaleEnzymeless() {
-		Properties.isYale = true;
-		
-		
-		/* Yale 2011-06 */
-		BestMatches enzymeless = new BestMatches("2012-04 enzymeless");
-		
-		
-		
-		/* tryp trypsin*/
-		ResultsCategory trypsinTrypsin = new ResultsCategory("trypsinTrypsin", ResultsCategory.PROTEIN);
-		trypsinTrypsin.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 trypsin trypsin/1 trypsin - MOUSE.fasta/report.txt"));
-		enzymeless.addMatchType(trypsinTrypsin);
-
-		/* chymo chymo */
-		ResultsCategory chymoChymo = new ResultsCategory("chymoChymo", ResultsCategory.PROTEIN);
-		chymoChymo.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 chymo chymo/2 chymotrypsin - mouse/report.txt"));
-		enzymeless.addMatchType(chymoChymo);
-		
-		
-		/* enzymeless */
-		ResultsCategory noEnzyeReulsts = new ResultsCategory("enzymeless", ResultsCategory.PROTEIN);
-		noEnzyeReulsts.addFile(new File("/Users/risk2/Sites/research/karen-anderson/2012-06-02/2012-04 a enzymeless/1 2012-04 - MOUSE.fasta/report.txt"));
-		enzymeless.addMatchType(noEnzyeReulsts);
-		
-		
-		
-		
-		
-		/* find the best peptides */
-		enzymeless.process();
-		enzymeless.saveReports();
-	}
-	
-	
-	public static void gm12878() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
-
-//		reportFolders.add(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM paternal/"));
-//		reportFolders.add(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM maternal/"));
-		
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM paternal/"));
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
-		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/k662-chr7-region/"));
-		
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("gencode");
-		direcotryTitlesToIgnore.add("proteome");
-//		direcotryTitlesToIgnore.add("HG19");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
-	
-	
-	public static void nonsenseSearch() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
-
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-xUNC-WHIM2-CompRef/"));
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM2-Ellis043/"));
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM2-Ellis041/"));
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM2-Ellis033/"));
-//		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-UNC-WHIM2-Ellis043/"));
-		
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-xUNC-WHIM16-CompRef/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM16-Ellis043/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM16-Ellis041/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-WHIM16-Ellis033/"));
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/PP-UNC-WHIM16-Ellis043/"));
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
 	
 	
 	
 	public static void pccCompRefA() {
 		ArrayList<File> reportFolders = new ArrayList<File>();
-
-
-
 
 		
 //		reportFolders.add(new File("reports/BI-P5"));
@@ -788,272 +720,19 @@ public class BestMatches {
 		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
 	}
 	
-	public static void seleno() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
-		File parentFolder = new File("reports/seleno2");
-		File [] parentContents = parentFolder.listFiles();
-		for (File file: parentContents) {
-			if (file.isDirectory()) reportFolders.add(file);
-		}
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-//		direcotryTitlesToIgnore.add("HG19");
-		direcotryTitlesToIgnore.add("mouse");
-		direcotryTitlesToIgnore.add("xeno");
-		direcotryTitlesToIgnore.add("gencode");
-		direcotryTitlesToIgnore.add("personal");
-		direcotryTitlesToIgnore.add("germline");
-		direcotryTitlesToIgnore.add("subject");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-		
-	}
-	
-	/**
-	 * seeking matches that contain a STOP such as:
-	 * QLQHQ.QQQQQQQQQQQQQPGQGPAEPSQPSGPAVASLEPPVK	
-	 */
-	public static void removedNonsense() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
 
-		reportFolders.add(new File("reports/PNNL"));
-		reportFolders.add(new File("reports/BI-P5"));
-		reportFolders.add(new File("reports/JHU-P5"));
-		reportFolders.add(new File("reports/VAND-P5"));
-		reportFolders.add(new File("reports/JHU-P6"));
-		reportFolders.add(new File("reports/VAND-P6"));
-		reportFolders.add(new File("reports/broad"));
-		
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
-		
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
-		
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("HG19");
-		direcotryTitlesToIgnore.add("mouse");
-//		direcotryTitlesToIgnore.add("germline");
-//		direcotryTitlesToIgnore.add("xeno");
-		direcotryTitlesToIgnore.add("personal");
-		direcotryTitlesToIgnore.add("gencode");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		PrintWriter pw;
-		try {
-			pw = new PrintWriter(new BufferedWriter(new FileWriter("matches containing stops.txt")));
-			for (BestMatches bestMatches: bestMatchesArray) {
-				ArrayList<Match> matches = new ArrayList(bestMatches.getBestPeptideMatches().values());
-				for (Match match: matches) {
-					String peptideSequence = match.getString("peptideSequence");
-					if (peptideSequence.indexOf(".") != -1) {
-						pw.println(match.toString());
-					}
-				}
-			}
-			
-			
-			pw.flush();
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
 	
 	
 	
-	public static void compRefUNC() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
 
-//		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("HG19");
-		direcotryTitlesToIgnore.add("mouse");
-		direcotryTitlesToIgnore.add("germline");
-		direcotryTitlesToIgnore.add("xeno");
-//		direcotryTitlesToIgnore.add("gencode");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
 	
 	
 	
-	public static void compRefUNCRegionsOfInterest() {
-		ArrayList<File> subtractReportFolders = new ArrayList<File>();
-		
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM2-CompRef/"));
-		
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/"));
-		
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis033/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis041/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM2-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-UNC-WHIM2-Ellis043/"));
-		
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis033/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis041/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-WHIM16-Ellis043/"));
-		subtractReportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/Region-UNC-WHIM16-Ellis043/"));
-		
-		ArrayList<String> subtractDirecotryTitlesToIgnore = new ArrayList<String>();
-		subtractDirecotryTitlesToIgnore.add("varimod");
-		subtractDirecotryTitlesToIgnore.add("mouse");
-		
-		ArrayList<BestMatches> subtractBestMatchesArray = new ArrayList<BestMatches>();
-		for (File folder: subtractReportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, subtractDirecotryTitlesToIgnore);
-			subtractBestMatchesArray.add(matches);
-		}
-		
-		ArrayList<File> reportFolders = new ArrayList<File>();
+	
+	
 
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/RegionsOfInterest/UNC-WHIM16-CompRef/"));
-		reportFolders.add(new File("/Users/risk2/PeppyData/CPTAC/reports/RegionsOfInterest/UNC-WHIM2-CompRef/"));
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("gencode");
-		direcotryTitlesToIgnore.add("subject");
-		direcotryTitlesToIgnore.add("xeno");
-		direcotryTitlesToIgnore.add("mouse");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		for (BestMatches bmKeep: bestMatchesArray) {
-			for (BestMatches bmSubtract: subtractBestMatchesArray) {
-				bmKeep.subtractBestMatchesPeptide(bmSubtract);
-			}
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
 	
-	
-	
-	public static void gmHeterozygosity() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
 
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/GM maternal/"));
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("gencode");
-		direcotryTitlesToIgnore.add("proteome");
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
-	
-	public static void carthene() {
-		ArrayList<File> reportFolders = new ArrayList<File>();
-
-		reportFolders.add(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/CartheneBW-enzymeless/"));
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatchesArray = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		
-		for (File folder: reportFolders) {
-			BestMatches matches = new BestMatches(folder, -1, direcotryTitlesToIgnore);
-			bestMatchesArray.add(matches);
-		}
-		
-		/*
-		 * getting c-terminal amino acid frequency
-		 */
-		int pepsinCount = 0;
-		Hashtable<Character, Integer> cTerminalAAs = new Hashtable<Character, Integer>();
-		ArrayList<Match> matches;
-		matches = new ArrayList<Match>(bestMatchesArray.get(0).getBestMatches().values());
-		for (Match match: matches) {
-			if(match.getFile("FilePath").getAbsolutePath().indexOf("pepsin") == -1) continue;
-			pepsinCount++;
-			
-			String peptide = match.getString("peptideSequence");
-			char AA = peptide.charAt(peptide.length() - 1);
-			Integer count = cTerminalAAs.get(AA);
-			if (count == null) {
-				cTerminalAAs.put(AA, 1);
-			} else {
-				cTerminalAAs.put(AA,count + 1);
-			}
-		}
-		for (char AA: cTerminalAAs.keySet()) {
-			double percent = (double) cTerminalAAs.get(AA) /pepsinCount;
-			percent *= 100;
-			U.p(AA + ": " + percent);
-		}
-		
-		createUnifiedSamplesReport(bestMatchesArray, "peptideSequence");
-	}
 	
 	
 	public static void createUnifiedSamplesReport(ArrayList<BestMatches> bestMatches, String keyName) {
@@ -1065,6 +744,8 @@ public class BestMatches {
 	public static void createUnifiedSamplesReport(ArrayList<BestMatches> bestMatches, String keyName, File parentFolder) {
 		boolean makeSpectrumPage = true;
 		boolean makeGeneReport = true;
+		boolean fullColumns = false;
+		boolean showUCSC = true;
 		
 		/* label the matches for their respective samples */
 		Enumeration<Match> elements;
@@ -1188,12 +869,14 @@ public class BestMatches {
 //			matchWriter.println("<th>*</th>");
 			if (makeGeneReport) {
 				matchWriter.println("<th>Gene</th>");
-				matchWriter.println("<th>GeneType</th>");
+//				matchWriter.println("<th>GeneType</th>");
 				matchWriter.println("<th>onco</th>");
 			}
 			
-			for (int i = 0; i < bestMatches.size(); i++) {
-				matchWriter.println("<th>" + (i + 1) + "</th>");
+			if (fullColumns) {
+				for (int i = 0; i < bestMatches.size(); i++) {
+					matchWriter.println("<th>" + (i + 1) + "</th>");
+				}
 			}
 			matchWriter.println("<th>set count</th>");
 			matchWriter.println("<th>spectrum count</th>");
@@ -1203,9 +886,9 @@ public class BestMatches {
 //			matchWriter.println("<th>P5/P6</th>");
 //			matchWriter.println("<th>single WHIM</th>");
 //			matchWriter.println("<th>NIST</th>");
-			matchWriter.println("<th>UCSC</th>");
-			matchWriter.println("<th>unique</th>");
-			matchWriter.println("<th>chr</th>");
+			if (showUCSC) matchWriter.println("<th>UCSC</th>");
+			matchWriter.println("<th>unique location</th>");
+			matchWriter.println("<th>sequence</th>");
 			matchWriter.println("<th>start</th>");
 			matchWriter.println("<th>stop</th>");
 			matchWriter.println("<th>strand</th>");
@@ -1317,7 +1000,96 @@ public class BestMatches {
 				if (peptideSequence.equals("XXXXXX")) continue;
 				if (peptideSequence.equals("XXXXXX")) continue;
 				
+				
+				//MD Anderson false positives
+				if (peptideSequence.equals("NDDIPEQDSLGLSNLQK")) continue; //NIST
+				if (peptideSequence.equals("GIHETTFNSIMK")) continue; //NIST
+				if (peptideSequence.equals("TEQGPTGVTMTSNPITWGQIK")) continue; //NIST
+				if (peptideSequence.equals("LETEIEALKEELLFMK")) continue; //NIST
+				if (peptideSequence.equals("MTTVHAITATQK")) continue; //NIST
+				if (peptideSequence.equals("LVGLFEDTNLCAIHAK")) continue; //NIST
+				if (peptideSequence.equals("AGPNTNGSQFFICTAK")) continue;
+				if (peptideSequence.equals("EEEEEEEEDQEGDR")) continue;
+				if (peptideSequence.equals("PSAAAAAAAAGR")) continue; //100% blast
+				if (peptideSequence.equals("SCGIHETTFNSIMK")) continue; //100% blast
+				if (peptideSequence.equals("LTADLSAETLQAR")) continue; //NIST
+				if (peptideSequence.equals("GAYGGGYGGYDDYGGYNDGYGFGSDR")) continue; //100% blast
+				if (peptideSequence.equals("ILELAGNAAR")) continue; //NIST
+				if (peptideSequence.equals("PLADAHLTK")) continue; //NIST
+				if (peptideSequence.equals("FIAVGYVDDTEFVR")) continue; //NIST
+				if (peptideSequence.equals("MLNNPLFAGNPQLQEQMR")) continue; //100% blast
+				if (peptideSequence.equals("LENTLQDIIQENFPNLAR")) continue; //NIST
+				if (peptideSequence.equals("QLMSYPLSEGQLDQK")) continue; //100% blast
+				if (peptideSequence.equals("LCYVALDFEQEMATAASSSSLEK")) continue; //NIST
+				if (peptideSequence.equals("EAYLVGLFEDTNLCAIHAK")) continue; //NIST
+				if (peptideSequence.equals("LPDGQVITIGNER	")) continue; //NIST
+				if (peptideSequence.equals("VYAGAGGSGSR")) continue; //semi-tryp of krt18
+				if (peptideSequence.equals("LPDGQVITIGNER")) continue; //NIST semi
+				if (peptideSequence.equals("VQVEGYNYTGMGNSTNK")) continue; //UCSC semi tryp
+				if (peptideSequence.equals("FCGMFCPVEGSSENK")) continue; //fully tryp
+				if (peptideSequence.equals("TIDFDSLSVGR")) continue; // fully tryp
+				if (peptideSequence.equals("VDPNSPVLLEDPVLCALAK")) continue; //UCSC semi tryp
+				if (peptideSequence.equals("VFEFQLTSEEMK")) continue;  //UCSC semi tryp
+				if (peptideSequence.equals("IQAVLLPK")) continue; //blast 100%
+				if (peptideSequence.equals("DDCGDGSDEASCPK")) continue; //UCSC fully tryp
+				if (peptideSequence.equals("KVEEEDEEEEEEEEEEEEEEDE")) continue; //UCSC fully tryp
+				if (peptideSequence.equals("ENEKDLEEAEEYK")) continue; //semi tryptic
+				if (peptideSequence.equals("NPVDILTYVAWK")) continue; //100% blast
+				if (peptideSequence.equals("YLECISCGSSDMSCER")) continue; //UCSC fully tryptic
+				if (peptideSequence.equals("SASSGAEGDVSSEREP")) continue; //UCSC fully tryptic
+				if (peptideSequence.equals("AAEEAFVNDIDESSPGTEWER")) continue; //UCSC fully tryp
+				if (peptideSequence.equals("EQLNGILLHLESELAQTR")) continue; //blast 100%
+				if (peptideSequence.equals("SYSQAGITETEWTSGSSK")) continue;//100% UCSC
+				if (peptideSequence.equals("GLMTTVHAITATQK")) continue; //100% blast
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				if (peptideSequence.equals("XXXXXX")) continue;
+				
+				
+				//blast distance column
+				
+				
+				
+				//MD Anderson notes
 				String note = "";
+				if (peptideSequence.equals("TEQGPTGVTMTSNPITWGQIK")) note = "very unique sequence";
+				if (peptideSequence.equals("NISNASCTTNCIAPLAK")) note = "deamidated, semitryptic IISNAS... from GAPDH";
+				if (peptideSequence.equals("VDNDEDEHQLSLR")) note = "deamidation";
+				if (peptideSequence.equals("DFIMDNCEELIPEYLNFIR")) note = "canonical is VDFIMDN...fully, tryp.  V+Ox = D";
+				if (peptideSequence.equals("MIPILQQIIFR")) note = "blast somewhat similar to Filensin, lense protein";
+				if (peptideSequence.equals("LLEDGEDFNLGDALDSSN")) note = "c-term semitryptic, krt18";
+				if (peptideSequence.equals("WDYPEGTPNGGSTTLPSAPPPASAGLK")) note = "fairly unique sequene; LPSAPPPA matches atrophin";
+				if (peptideSequence.equals("RLLEDGEDFNLGDALDSSN")) note = "100%, but fully non-tryptic, krt18";//keratin 18: http://www.ncbi.nlm.nih.gov/protein/4557888?report=genbank&log$=protalign&blast_rank=2&RID=8FG36HD101R
+				if (peptideSequence.equals("EAAAAAAAAHQQALR")) note = "predicted"; //http://www.ncbi.nlm.nih.gov/protein/530404911?report=genbank&log$=protalign&blast_rank=1&RID=8HN9XYK201R
+				if (peptideSequence.equals("MVVVWSTGEESLR")) note = "cDNA"; //	http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=MVVVWSTGEESLR
+				if (peptideSequence.equals("IAVPIILR")) note = "BLAST 2";
+				if (peptideSequence.equals("NSTLSEPGSGR")) note = "L could be P+Oxy";
+				if (peptideSequence.equals("GGQLHAAGGAGR")) note = "frameshift";
+				if (peptideSequence.equals("AAAAAAAAAAAAAAAK")) note = "ASAAAAAAAAAAAAAK, -16";
+				if (peptideSequence.equals("EAGAGAEAAAGSAR")) note = "BLAST 3";
+				if (peptideSequence.equals("WTQLFILER")) note = "BLAST 2";
+				if (peptideSequence.equals("IDAIIDLSK")) note = "BLAST 1, but weird difference.  primary sequence, SYSQAGITETEWTSGSSK, is known";
+				if (peptideSequence.equals("EANIIFLK")) note = "BLAST 2";
+				if (peptideSequence.equals("GDLSIAAIK")) note = "BLAST 2";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+				if (peptideSequence.equals("XXXXXX")) note = "xxxxxxxxxx";
+
+				
+			
+				
 				if (peptideSequence.equals("AGGDLPLQPQPGGAAAR")) note = "frame shift";
 				if (peptideSequence.equals("SGLAACTAPLPGSR")) note = "reverse frame";
 				if (peptideSequence.equals("DAEQEEEVQR")) note = "frame shift";
@@ -1483,7 +1255,7 @@ public class BestMatches {
 						}
 					}
 					matchWriter.println("</td>");
-					matchWriter.println("<td>" + geneType + "</td>");
+//					matchWriter.println("<td>" + geneType + "</td>");
 					matchWriter.println("<td>" + interest + "</td>");
 				}
 									
@@ -1497,7 +1269,6 @@ public class BestMatches {
 				
 				for (int bestMatchIndex = 0; bestMatchIndex < bestMatches.size(); bestMatchIndex++) {
 					BestMatches bm = bestMatches.get(bestMatchIndex);
-//				for (BestMatches bm: bestMatches) {
 					Match match = holder.get(bm.getSampleName());
 					
 					
@@ -1530,41 +1301,44 @@ public class BestMatches {
 							spectrumCount++;
 						}
 						
-						
-						/* make the spectrum link */
-						matchWriter.print("<td>");
-						if (makeSpectrumPage) {
-//							File spectrumFile = match.getFile("FilePath");
-							File spectrumFile = new File(bm.getResultsFolder(), "spectra/" + match.getString("spectrumMD5") + ".dta");
-							if (spectrumFile.exists()) {
-								Spectrum spectrum = SpectrumLoader.loadSpectra(spectrumFile).get(0);
-								Peptide peptide = new Peptide(match.getString("peptideSequence"));
-								Match_Blank matchForReport = new Match_Blank(spectrum, peptide, score);
-								ArrayList<Peppy.Match> matchesForReport = new ArrayList<Peppy.Match>();
-								matchesForReport.add(matchForReport);
+							if (fullColumns) {
+							/* make the spectrum link */
+							matchWriter.print("<td>");
+							if (makeSpectrumPage) {
+	//							File spectrumFile = match.getFile("FilePath");
+								File spectrumFile = new File(bm.getResultsFolder(), "spectra/" + match.getString("spectrumMD5") + ".dta");
+								if (spectrumFile.exists()) {
+									Spectrum spectrum = SpectrumLoader.loadSpectra(spectrumFile).get(0);
+									Peptide peptide = new Peptide(match.getString("peptideSequence"));
+									Match_Blank matchForReport = new Match_Blank(spectrum, peptide, score);
+									ArrayList<Peppy.Match> matchesForReport = new ArrayList<Peppy.Match>();
+									matchesForReport.add(matchForReport);
+									
+									File spectrumReportFolder = new File(parentFolder, "spectrumReportFolder");
+									spectrumReportFolder.mkdir();
+									File spectrumReportFile = new File(spectrumReportFolder, match.getString("spectrumMD5") + ".html");
+									HTMLPageSpectrum spectrumReport = new HTMLPageSpectrum(spectrum, matchesForReport, spectrumReportFile);
+									spectrumReport.makePage();
+									
+									/* save SVG */
+									MatchSVG makeSVG = new MatchSVG(matchForReport, new File(spectrumReportFolder, match.getString("spectrumMD5") + ".svg"));
+									makeSVG.saveSVG();
+									
+									matchWriter.print("<a href=\"spectrumReportFolder/" + spectrumReportFile.getName() + "\">");
+									matchWriter.print( score );
+									matchWriter.print( "</a>" );
+								}
 								
-								File spectrumReportFolder = new File(parentFolder, "spectrumReportFolder");
-								spectrumReportFolder.mkdir();
-								File spectrumReportFile = new File(spectrumReportFolder, match.getString("spectrumMD5") + ".html");
-								HTMLPageSpectrum spectrumReport = new HTMLPageSpectrum(spectrum, matchesForReport, spectrumReportFile);
-								spectrumReport.makePage();
-								
-								/* save SVG */
-								MatchSVG makeSVG = new MatchSVG(matchForReport, new File(spectrumReportFolder, match.getString("spectrumMD5") + ".svg"));
-								makeSVG.saveSVG();
-								
-								matchWriter.print("<a href=\"spectrumReportFolder/" + spectrumReportFile.getName() + "\">");
+							} else {
 								matchWriter.print( score );
-								matchWriter.print( "</a>" );
 							}
-							
-						} else {
-							matchWriter.print( score );
+							matchWriter.print("</td>");
 						}
-						matchWriter.print("</td>");
 						
 					} else {
-						matchWriter.println("<td></td>");
+						if (fullColumns) {
+							matchWriter.println("<td></td>");
+						}
 					}
 				}
 				
@@ -1588,7 +1362,7 @@ public class BestMatches {
 				
 				/* sample UCSC link */
 				String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
-				matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
+				if (showUCSC) matchWriter.println("<td><a href=\"" + ucsc + "\">UCSC</a></td>");
 				
 				/* unique */
 				boolean unique = anyMatch.getBoolean("uniqueGlobally");
@@ -1613,6 +1387,7 @@ public class BestMatches {
 			
 			U.p("in common for this report: " + counter);
 			matchWriter.println("</table></ul></body></html>");
+
 			
 			/* analysis and sample legend */
 			 for (int i = 0; i < bestMatches.size(); i++) {
@@ -1816,6 +1591,12 @@ public class BestMatches {
 							}
 							catch (Exception e) {
 								U.p("error with property " + propertyNames[i] + " in file " + file.getAbsolutePath());
+								U.p("expected property type: " + propertyType);
+								U.p("expeced property name: " + propertyNames[i]);
+								U.p("column index: " + i);
+								U.p("value: " + chunks[i]);
+								U.p("line: " + line);
+								U.p();
 							}
 						}
 					}
@@ -1844,9 +1625,6 @@ public class BestMatches {
 							match.set("uniqueGlobally",true);
 						} else {
 							if (match.getScore() == bestMatch.getScore()) {
-								if (match.get("amplificationScore") != null) {
-									bestMatch.set("amplificationScore", match.getDouble("amplificationScore"));
-								}
 								bestMatch.set("uniqueGlobally", false);
 								match.set("uniqueGlobally",false);
 							} 

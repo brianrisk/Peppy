@@ -1,5 +1,6 @@
 package Navigator;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 /**
@@ -40,6 +41,10 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 	public Match get() {
 		if (matches.size() == 0) return null;
 		return matches.elements().nextElement();
+	}
+	
+	public ArrayList<Match> getMatches() {
+		return new ArrayList<Match>(matches.values());
 	}
 	
 	public String getPeptideSequence() {
