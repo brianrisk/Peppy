@@ -200,19 +200,7 @@ public class SixFrameRegion {
 		}
 
 	}
-	
-	
-	public static void createDatabaseOfGenome(String sequenceDirectoryString, String destinationFolderName) {
-		/* let the user see which one we're on */
-		U.p(destinationFolderName);
-		
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(sequenceDirectoryString);	
-		for (Sequence sequence: sequences) {
-			U.p(sequence.getSequenceFile().getName());
-			createDatabase(sequence.getSequenceFile(), -1, -1, destinationFolderName);
-		}
-	}
-	
+
 	public static void createDatabase(File sequence, int startPosition, int stopPosition, String destinationFolderName) {
 		boolean wholeSequence = (startPosition == -1);
 		
