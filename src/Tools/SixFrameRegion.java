@@ -44,9 +44,9 @@ public class SixFrameRegion {
 //		createDatabaseFromGTF();
 		
 		createDatabasesFromFile(
-				new File("/Users/risk2/Documents/workspace/JavaGFS/targeted regions file.txt"),
+				new File("/Users/risk2/Dropbox/workspace/Peppy/targeted regions file.txt"),
 				"/Users/risk2/PeppyData/public/sequences/dna/HG19",
-				"CompRef regions");
+				"/Volumes/Research/CPTAC-CompRef/Full CompRef regions");
 		
 		
 		//http://www.bioline.com/calculator/01_13.html
@@ -91,11 +91,14 @@ public class SixFrameRegion {
 				String acidSequence = chunks[0];
 				String chrName = chunks[1];
 				int locus = Integer.parseInt(chunks[2]);
+				String strand = chunks[3];
+				Boolean isForwards = true;
+				if (strand.equals("-")) isForwards = false;
 				File sequenceFile = new File(sequenceDirectory, chrName + ".fa");
 				int startPosition = locus - windowRadius;
 				int stopPosition = locus + windowRadius;
 				U.p(acidSequence);
-				createDatabase(sequenceFile, startPosition, stopPosition, destinationFolderName);
+				createDatabase(sequenceFile, acidSequence, startPosition, stopPosition, destinationFolderName, isForwards);
 				/* read the next line */
 				line = br.readLine();
 			}
@@ -188,7 +191,7 @@ public class SixFrameRegion {
 				//create translations of all regions in this chromosome
 				for(Region region: nonIntersectingRegions) {
 					if (region.getSequence().equals(chrName)) {
-						pw.println(getProteins(chrName, region.getStart(), region.getStop(), sequenceDNA));
+						pw.println(getProteins(chrName, "", region.getStart(), region.getStop(), sequenceDNA));
 					}
 				}
 			}
@@ -201,7 +204,7 @@ public class SixFrameRegion {
 
 	}
 
-	public static void createDatabase(File sequence, int startPosition, int stopPosition, String destinationFolderName) {
+	public static void createDatabase(File sequence, String acidSequence, int startPosition, int stopPosition, String destinationFolderName, Boolean isForwards) {
 		boolean wholeSequence = (startPosition == -1);
 		
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(sequence);
@@ -220,17 +223,21 @@ public class SixFrameRegion {
 		
 		/* produce and write the frames */
 		try {
-			File destinationFolder = new File("sixFrameSequences/" + destinationFolderName);
+			File destinationFolder = new File(destinationFolderName + "/sixFrameSequences/");
 			destinationFolder.mkdirs();
 			String fileName;
 			if (wholeSequence) {
 				fileName = chrName +".fasta";
 			} else {
-				fileName = chrName + " " + startPosition + "-" + stopPosition +".fasta";
+				fileName = chrName + " " + startPosition + "-" + stopPosition + "_" + acidSequence + ".fasta";
 			}
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(destinationFolder, fileName))));
 			
-			pw.println(getProteins(chrName, startPosition, stopPosition, sequenceDNA));
+			if (isForwards != null) {
+				pw.println(getProteins(chrName, acidSequence, startPosition, stopPosition, sequenceDNA, isForwards));
+			} else {
+				pw.println(getProteins(chrName, acidSequence, startPosition, stopPosition, sequenceDNA));
+			}
 			
 			pw.flush();
 			pw.close();
@@ -239,49 +246,50 @@ public class SixFrameRegion {
 		}
 	}
 	
-	
-	private static String getProteins(String chrName, int startPosition, int stopPosition, String sequenceDNA) {
+	/**
+	 * Doing both forwards and reverse
+	 */
+	private static String getProteins(String chrName, String acidSequence, int startPosition, int stopPosition, String sequenceDNA) {
 		StringBuffer out = new StringBuffer();
-		
-		/* do the forwards, then reverse strands */
-		for(int strandIndicator = 0; strandIndicator <= 1; strandIndicator++) {
+		out.append(getProteins(chrName, acidSequence, startPosition, stopPosition, sequenceDNA, true));
+		out.append(getProteins(chrName, acidSequence, startPosition, stopPosition, sequenceDNA, false));
+		return out.toString();
+	}
+	
+	private static String getProteins(String chrName, String acidSequence, int startPosition, int stopPosition, String sequenceDNA, boolean isForwards) {
+		StringBuffer out = new StringBuffer();
 			
-			//specifying which strand
-			boolean isForwards = true;
-			if (strandIndicator == 1) isForwards = false;
+		//loop through our frames for this strand
+		for (int frameNumber = 0; frameNumber < 3; frameNumber++) {
+			String translatedFrame = "";
 			
-			//loop through our frames for this strand
-			for (int frameNumber = 0; frameNumber < 3; frameNumber++) {
-				String translatedFrame = "";
-				
-				if (isForwards) {
-					translatedFrame = getFrame (startPosition + frameNumber, stopPosition, isForwards, sequenceDNA);
-				} else {
-					translatedFrame = getFrame (stopPosition -1 - frameNumber, startPosition - 1, isForwards, sequenceDNA);
-				}
-				
-				/* string buffer and string to hold the protein */
-				StringBuffer sb = new StringBuffer();
-				
-				/* print the proteins */
-				for (int translatedFramePosition = 0; translatedFramePosition < translatedFrame.length(); translatedFramePosition++) {
-					if (translatedFrame.charAt(translatedFramePosition) == '.') {
-						
-						/* append the formatted protein */
-						out.append(getProtein(sb, startPosition, stopPosition, frameNumber, translatedFramePosition, chrName, isForwards));
-						
-						/* clear out the string buffer */
-						sb = new StringBuffer();
-						
-					} else {
-						sb.append(translatedFrame.charAt(translatedFramePosition));
-					}
-				}
-				
-				/* append the final protein protein (as sequence probably did no end with a ".") */
-				out.append(getProtein(sb, startPosition, stopPosition, frameNumber, translatedFrame.length(), chrName, isForwards));
-				
+			if (isForwards) {
+				translatedFrame = getFrame (startPosition + frameNumber, stopPosition, isForwards, sequenceDNA);
+			} else {
+				translatedFrame = getFrame (stopPosition -1 - frameNumber, startPosition - 1, isForwards, sequenceDNA);
 			}
+			
+			/* string buffer and string to hold the protein */
+			StringBuffer sb = new StringBuffer();
+			
+			/* print the proteins */
+			for (int translatedFramePosition = 0; translatedFramePosition < translatedFrame.length(); translatedFramePosition++) {
+				if (translatedFrame.charAt(translatedFramePosition) == '.') {
+					
+					/* append the formatted protein */
+					out.append(getProtein(sb, acidSequence, startPosition, stopPosition, frameNumber, translatedFramePosition, chrName, isForwards));
+					
+					/* clear out the string buffer */
+					sb = new StringBuffer();
+					
+				} else {
+					sb.append(translatedFrame.charAt(translatedFramePosition));
+				}
+			}
+			
+			/* append the final protein protein (as sequence probably did no end with a ".") */
+			out.append(getProtein(sb, acidSequence, startPosition, stopPosition, frameNumber, translatedFrame.length(), chrName, isForwards));
+			
 		}
 		
 		return out.toString();
@@ -289,6 +297,7 @@ public class SixFrameRegion {
 	
 	private static StringBuffer getProtein (
 			StringBuffer sb, 
+			String acidSequence,
 			int startPosition, 
 			int stopPosition, 
 			int frameNumber, 
@@ -315,7 +324,7 @@ public class SixFrameRegion {
 				proteinStop  =  stopPosition - ( frameNumber + (translatedFramePosition * 3) - (sb.length() * 3));
 				proteinStart =  stopPosition - ( frameNumber + (translatedFramePosition * 3));
 			}
-			out.append(">" + chrName + "; strand:" + strand + "; frame:" + frameNumber +"; start:" + proteinStart + "; stop:" + proteinStop + "\r");
+			out.append(">" + chrName + "; strand:" + strand + "; frame:" + frameNumber +"; start:" + proteinStart + "; stop:" + proteinStop +  "; acidSequence:" +  acidSequence + "\r");
 			StringBuffer lineBuffer = new StringBuffer();
 			for (int aaIndex = 0; aaIndex < sb.length(); aaIndex++) {
 				lineBuffer.append(sb.charAt(aaIndex));

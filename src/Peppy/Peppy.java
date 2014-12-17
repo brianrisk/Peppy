@@ -36,9 +36,6 @@ public class Peppy {
 	static long maxMemoryUsed = 0;
 	static String propertyFileString = null;
 	
-	private static final long presentMiliseconds = 1363215298816L;
-	private static final long fourMonthsOfMiliseconds = 1000L * 60L * 60L * 24L * 30L * 4L;
-	private static final long expiration = presentMiliseconds + fourMonthsOfMiliseconds;
 	
 	private static boolean verbose = true;
 	
@@ -52,8 +49,7 @@ public class Peppy {
 		
 		/* do the work */
 		runJobs(args);
-//		fuckingMZML();
-//		runDirectory("/Volumes/Research/colorectal-converted/", "jobs/colorectal second.txt", args);
+//		runDirectory("/Volumes/Research/Breast-converted/", "/Volumes/Research/CPTAC-Breast/jobs/first.txt", args);
 //		moonShot(args);
 //		moonShotTest(args);
 		
@@ -61,46 +57,6 @@ public class Peppy {
 		printFarewell();
 	}
 	
-	public static void fuckingMZML() {
-		String directoryString = "/Volumes/Research/colorectal/";
-		
-
-		File topDir = new File(directoryString);
-		File [] directories = topDir.listFiles();
-		
-		File convertedDir = new File("/Volumes/Research/colorectal-converted/");
-		convertedDir.mkdirs();
-		
-		try {
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("bashout.txt")));
-			
-			for(File directory: directories) {
-				if (!directory.isHidden() && directory.isDirectory()) {
-					//make folder in converted
-					File convFolder = new File(convertedDir, directory.getName());
-					convFolder.mkdir();
-					
-					File [] mzmlFiles = directory.listFiles();
-					for (File mzmlFile: mzmlFiles) {
-						if (!mzmlFile.getName().endsWith(".mzML")) continue;
-						
-						String line = "./msconvert -o " + convFolder.getPath() + " " + mzmlFile.getAbsolutePath() + " --mgf";
-						U.p(line);
-						pw.println(line);
-					}
-					
-				}
-			}
-			
-			pw.flush();
-			pw.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
 	
 	public static void runDirectory(String directoryString, String jobFile, String [] args) {
 		init(args);
@@ -110,7 +66,7 @@ public class Peppy {
 		File [] directoriesToPotentiallyProcess = topDir.listFiles();
 		
 		//listing existing reports so we don't re-run something we've already done
-		File [] existingReports = (new File("reports")).listFiles();
+		File [] existingReports = Properties.reportDirectory.listFiles();
 		
 		//where we store the list of all directories to process
 		ArrayList<File> directories = new ArrayList<File>();
@@ -119,10 +75,12 @@ public class Peppy {
 			if (directory.isFile()) continue;
 			if (directory.isHidden()) continue;
 			boolean existsAsReport = false;
-			for (File existingReport: existingReports) {
-				if (existingReport.getName().startsWith(directory.getName())) {
-					existsAsReport = true;
-					break;
+			if (existingReports != null) {
+				for (File existingReport: existingReports) {
+					if (existingReport.getName().startsWith(directory.getName())) {
+						existsAsReport = true;
+						break;
+					}
 				}
 			}
 			if (existsAsReport) continue;
@@ -397,10 +355,6 @@ public class Peppy {
 		
 		try {
 			
-			/* we shall use this variable to track how many searches we performed.
-			 * this will be used in the labeling of our report directory
-			 */
-			int reportIndex = 0;
 			
 			File mainReportDir = createReportDirectory();
 			File savedSpectraDir = new File(mainReportDir, "spectra");
@@ -602,8 +556,7 @@ public class Peppy {
 				U.p(identifiedSpectraCount + " spectra identified at this step");
 				
 				/* create the directory where we will hold this report */
-				reportIndex++;
-				String reportDirName = reportIndex + " " + Properties.sequenceDirectoryOrFile.getName();
+				String reportDirName = sequenceIndex + " " + Properties.sequenceDirectoryOrFile.getName();
 				File reportDir = new File (mainReportDir, reportDirName);
 				reportDir.mkdirs();
 				
@@ -641,89 +594,90 @@ public class Peppy {
 			 */
 			
 			/* first, we collect all of the peptides found */
-			Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
-			for (Match match: allMatchesForSpectralSet) {
-				peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
+			if (Properties.searchModifications) {
+				Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
+				for (Match match: allMatchesForSpectralSet) {
+					peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
+				}
+				ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
+				
+				/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
+				if (peptidesFound.size() > 0) {
+					
+					Collections.sort(peptidesFound);
+					
+					/* set our scoring method to vari-mod */
+					Properties.scoringMethodName = "Peppy.Match_IMP_VariMod";
+					Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
+					Properties.searchModifications = true;
+					
+					/* use this peptide database to perform FDR */
+					if (verbose) U.p("performing FDR analysis for modificaitons using found peptides");
+					FDR fdr = new FDR(spectra, peptidesFound);
+					
+					/* Calculate score threshold with FDR. 
+					 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
+					if (Properties.maximumFDR >= 0) {
+						double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
+						
+						/* if we will not find any matches with confidence, skip this round */
+						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
+						if (potentialMinimumScore < 0) return;
+						Properties.minimumScore = potentialMinimumScore;
+					}
+					
+					/* create spectra-based containers for matches */
+					ArrayList<MatchesSpectrum> matchesSpectra;					
+					ArrayList<Match> matches = null;
+					if (fdr.usedFullSetOfSpectra) {
+						matchesSpectra = fdr.getSpectraMatches();
+						matches = getMatchesFromSpectraMatches(matchesSpectra);
+					} else {
+						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+						for (Spectrum spectrum: spectra) {
+							matchesSpectra.add(new MatchesSpectrum(spectrum));
+						}
+						if (verbose) U.p("getting the matches");
+						matches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
+					}
+					
+					/*
+					 * THIS WAS COPIED DIRECTLY FROM ABOVE
+					 */
+					
+					/* add these matches to our large pile of all matches for this spectral set */
+					allMatchesForSpectralSet.addAll(matches);
+					
+					/* group spectra that have been identified */
+					int identifiedSpectraCount = 0;
+					for (Match match: matches) {
+						if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
+							identifiedSpectraCount++;
+							spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
+						}
+						
+					}
+					U.p(identifiedSpectraCount + " spectra identified at this step");
+					
+					/* create the directory where we will hold this report */
+					String reportDirName = Properties.sequenceDirectoryOrFileList.size() + " - varimod";
+					File reportDir = new File (mainReportDir, reportDirName);
+					reportDir.mkdirs();
+					
+					/* generate reports */
+					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
+					U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
+					metricsReport.println(reportDirName);
+					metricsReport.println("score cutoff: " + Properties.minimumScore);
+					metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
+					metricsReport.println();
+					metricsReport.flush();
+					fdr.saveReport(reportDir);
+					createReports(matches, reportDir);
+						
+				
+				} /* end modifications if */
 			}
-			ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
-			
-			/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
-			if (peptidesFound.size() > 0) {
-				
-				Collections.sort(peptidesFound);
-				
-				/* set our scoring method to vari-mod */
-				Properties.scoringMethodName = "Peppy.Match_IMP_VariMod";
-				Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-				Properties.searchModifications = true;
-				
-				/* use this peptide database to perform FDR */
-				if (verbose) U.p("performing FDR analysis for modificaitons using found peptides");
-				FDR fdr = new FDR(spectra, peptidesFound);
-				
-				/* Calculate score threshold with FDR. 
-				 * maximumFDR may be negative, indicating we won't use FDR to calculate score cutoff */
-				if (Properties.maximumFDR >= 0) {
-					double potentialMinimumScore = fdr.getScoreThreshold(Properties.maximumFDR);
-					
-					/* if we will not find any matches with confidence, skip this round */
-					//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
-					if (potentialMinimumScore < 0) return;
-					Properties.minimumScore = potentialMinimumScore;
-				}
-				
-				/* create spectra-based containers for matches */
-				ArrayList<MatchesSpectrum> matchesSpectra;					
-				ArrayList<Match> matches = null;
-				if (fdr.usedFullSetOfSpectra) {
-					matchesSpectra = fdr.getSpectraMatches();
-					matches = getMatchesFromSpectraMatches(matchesSpectra);
-				} else {
-					matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
-					for (Spectrum spectrum: spectra) {
-						matchesSpectra.add(new MatchesSpectrum(spectrum));
-					}
-					if (verbose) U.p("getting the matches");
-					matches = getMatchesWithPeptides(peptidesFound, matchesSpectra);
-				}
-				
-				/*
-				 * THIS WAS COPIED DIRECTLY FROM ABOVE
-				 */
-				
-				/* add these matches to our large pile of all matches for this spectral set */
-				allMatchesForSpectralSet.addAll(matches);
-				
-				/* group spectra that have been identified */
-				int identifiedSpectraCount = 0;
-				for (Match match: matches) {
-					if (spectrumIDs.get(match.getSpectrum().getId()) == null) {
-						identifiedSpectraCount++;
-						spectrumIDs.put(match.getSpectrum().getId(), match.getSpectrum().getId());
-					}
-					
-				}
-				U.p(identifiedSpectraCount + " spectra identified at this step");
-				
-				/* create the directory where we will hold this report */
-				reportIndex++;
-				String reportDirName = reportIndex + " - varimod";
-				File reportDir = new File (mainReportDir, reportDirName);
-				reportDir.mkdirs();
-				
-				/* generate reports */
-				double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
-				U.p("spectra identified " + Properties.percentFormat.format(precentReduction));
-				metricsReport.println(reportDirName);
-				metricsReport.println("score cutoff: " + Properties.minimumScore);
-				metricsReport.println("spectra identified: " + spectrumIDs.size() + " (" +  Properties.percentFormat.format(precentReduction) + ")");
-				metricsReport.println();
-				metricsReport.flush();
-				fdr.saveReport(reportDir);
-				createReports(matches, reportDir);
-					
-			
-			} /* end modifications if */
 			
 			metricsReport.flush();
 			metricsReport.close();
