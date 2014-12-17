@@ -33,6 +33,7 @@ public class MoonShotRegion  {
 	Hashtable<String, Integer> cellLineTallies = new Hashtable<String, Integer>();
 	Hashtable<String, Integer> compartmentTallies = new Hashtable<String, Integer>();
 	Hashtable<String, Integer> fractionTallies = new Hashtable<String, Integer>();
+	Hashtable<String, Match> peptides = new Hashtable<String, Match>();
 
 
 	public MoonShotRegion(Match match) {
@@ -71,6 +72,10 @@ public class MoonShotRegion  {
 		if (!match.getString("sequenceName").equals(sequenceName)) return false;
 		
 		String strandString = match.getString("strand");
+		String peptide = match.getString("peptideSequence");
+		int start = match.getInt("start");
+		int stop = match.getInt("stop");
+		
 		boolean newStrand = false;
 		if (strandString.equals("+")) newStrand = true;
 		if (newStrand != strand) return false;
@@ -100,7 +105,7 @@ public class MoonShotRegion  {
 				}
 				
 				//tallying peptides
-				Integer peptideTally = peptideTallies.get(match.getString("peptideSequence"));
+				Integer peptideTally = peptideTallies.get(peptide);
 				if (peptideTally == null) peptideTally = 0;
 				peptideTally = peptideTally + 1;
 				peptideTallies.put(match.getString("peptideSequence"), peptideTally);
@@ -135,10 +140,17 @@ public class MoonShotRegion  {
 //				fractionTally = fractionTally + 1;
 //				fractionTallies.put(fraction, fractionTally);
 				
+				if (start < this.start) this.start = start;
+				if (stop > this.stop) this.stop = stop;
+				
 			}
 			
 			//regardless if we add it here, if already added still flag wasAdded
 			wasAdded = true;
+		}
+		
+		if (wasAdded) {
+			peptides.put(peptide, match);
 		}
 		
 		return wasAdded;
@@ -156,7 +168,7 @@ public class MoonShotRegion  {
 		sb.append(geneName + "\t");
 		
 		//interest
-		sb.append(interest + "\t");
+		//sb.append(interest + "\t");
 		
 		//locus: chr + start
 		sb.append(sequenceName + ":" + start + "\t");
@@ -168,14 +180,18 @@ public class MoonShotRegion  {
 		sb.append(peptideTallies.size() + "\t");
 		
 		//maximum novel distance
-		sb.append(maxNovelDistance + "\t");
+		//sb.append(maxNovelDistance + "\t");
 		
 		//print cell line tally
-		sb.append(cellLineTallies.size() + "\t");
+		//sb.append(cellLineTallies.size() + "\t");
 		
 		//print min unique count
 		sb.append(minUniqueCount + "\t");
 		sb.append(mostSimilarRegionID + "\t");
+		
+		for (String peptide: peptides.keySet()) {
+			sb.append(peptide + "\t");
+		}
 		
 		return sb.toString();
 	}
@@ -190,10 +206,19 @@ public class MoonShotRegion  {
 		sb.append("<td>" + id + "</td>");
 		
 		//gene name
-		sb.append("<td><a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + geneName + "\">" + geneName + "</a></td>");
+		if (geneName == null) {
+			sb.append("<td>" + geneName +  "</td>");
+		} else {
+			if (geneName.indexOf('.') != -1 || geneName.indexOf('-') != -1 || geneName.equals("null")) {
+				sb.append("<td>" + geneName +  "</td>");
+			} else {
+				sb.append("<td><a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + geneName + "\">" + geneName + "</a></td>");
+			}
+		}
+		
 		
 		//interest
-		sb.append("<td>" + interest + "</td>");
+		//sb.append("<td>" + interest + "</td>");
 		
 		//locus: chr + start
 		//http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr10%3A108228413-108228413
@@ -211,10 +236,10 @@ public class MoonShotRegion  {
 		sb.append("<td>" + peptideTallies.size() + "</td>");
 		
 		//maximum novel distance
-		sb.append("<td>" + maxNovelDistance + "</td>");
+		//sb.append("<td>" + maxNovelDistance + "</td>");
 		
 		//print cell line tally
-		sb.append("<td>" + cellLineTallies.size() + "</td>");
+		//sb.append("<td>" + cellLineTallies.size() + "</td>");
 		
 		//print min unique count
 		sb.append("<td>" + minUniqueCount + "</td>");
@@ -258,6 +283,10 @@ public class MoonShotRegion  {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Hashtable<String, Match> getPeptides() {
+		return peptides;
 	}
 
 	

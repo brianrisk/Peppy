@@ -76,10 +76,9 @@ public class BestMatches {
 //		report("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/");
 //		moonShoot();
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/lyris-20131201/");
-		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports");
-//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/");
+//		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports");
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports-complete/MoonShot first pass");
-//		createRegionsFile("alex-kentsis", "2 HG19");
+		createRegionsFile("/Volumes/Research/CPTAC-CompRef/reports", "HG19");
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports-complete/colorectal - first");
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/scott-nicholson");
 //		createRegionsFile("/Users/risk2/PeppyData/CPTAC/reports/", "HG19");
@@ -318,7 +317,8 @@ public class BestMatches {
 				String sequenceName = match.getString("sequenceName");
 				if (sequenceName.startsWith(">")) sequenceName = sequenceName.substring(1);
 				String peptideSequence = match.getString("peptideSequence");
-				pw.println(peptideSequence + "\t" + sequenceName + "\t" + startLocus);
+				String strand = match.getString("strand");
+				pw.println(peptideSequence + "\t" + sequenceName + "\t" + startLocus + "\t" + strand);
 			}
 			pw.flush();
 			pw.close();

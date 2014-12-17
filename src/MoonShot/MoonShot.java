@@ -55,32 +55,26 @@ public class MoonShot {
 		
 		String studyName = "CPTAC compRef";
 		
-		reportsFolder = new File("reports");
-		novelPath = "HG19";
-		getGencode = true;
-		getNovelDistance = true;
-		ArrayList<Match> targetedMatches = getUnifiedMatches(reportsFolder, novelPath, getGencode, getNovelDistance);
-		printMatches(targetedMatches, studyName + " targeted matches.txt");
-		
-//		reportsFolder = new File("reports");
-//		novelPath = "2 kentsisRegions";
+//		reportsFolder = new File("/Volumes/Research/CPTAC-CompRef/reports-second");
+//		novelPath = "sixFrameSequences";
 //		getGencode = true;
 //		getNovelDistance = true;
 //		ArrayList<Match> targetedMatches = getUnifiedMatches(reportsFolder, novelPath, getGencode, getNovelDistance);
-//		printMatches(targetedMatches, "kentsis targeted matches.txt");
+//		printMatches(targetedMatches, studyName + " targeted matches.txt");
+		
+
 		
 		
 //		ArrayList<Match> firstPassMatches = Match.loadMatches(new File("master moon matches.txt"));
 //		assignGencodeAnnotations(firstPassMatches);
 		
-//		ArrayList<Match> targetedMatches =  Match.loadMatches(new File(studyName + " targeted matches.txt"));
+		ArrayList<Match> targetedMatches =  Match.loadMatches(new File(studyName + " targeted matches.txt"));
+		targetedMatches = removeUniprot(targetedMatches);
 		
 		
-		
-//		remapTargetedMatches(targetedMatches);
-//		assignP(targetedMatches);
+		remapTargetedMatches(targetedMatches);
 		assignGencodeAnnotations(targetedMatches);
-//		printMatches(targetedMatches, studyName + " remapped matches.txt");
+		printMatches(targetedMatches, studyName + " remapped matches.txt");
 		
 		ArrayList<Match> unifiedMatches =  new ArrayList<Match>();
 		unifiedMatches.addAll(targetedMatches);
@@ -128,18 +122,28 @@ public class MoonShot {
 			pw.println("<thead><tr>");
 			pw.println("<th>ID</th>");
 			pw.println("<th>Gene</th>");
-			pw.println("<th>Note</th>");
+			//pw.println("<th>Note</th>");
 			pw.println("<th>Location</th>");
 			pw.println("<th>Matches</th>");
 			pw.println("<th>Sequences</th>");
-			pw.println("<th>Distance</th>");
-			pw.println("<th>Samples</th>");
+			//pw.println("<th>Distance</th>");
+			//pw.println("<th>Samples</th>");
 			pw.println("<th>Uniquet</th>");
 			pw.println("<th>Similar</th>");
 			pw.println("</tr></thead>");
 			
 			for (MoonShotRegion region: regions) {
 				pw.println(region.toHTML());
+				
+				//create region file
+				PrintWriter regionWriter = new PrintWriter(new FileWriter(new File(regionsDir, region.getId() + ".txt")));
+				for(String peptide: region.getPeptides().keySet()) {
+					Match match = region.getPeptides().get(peptide);
+					regionWriter.println(peptide);
+				}
+				regionWriter.flush();
+				regionWriter.close();
+				
 			}
 			pw.println("</body></html>");
 			pw.flush();
@@ -165,6 +169,34 @@ public class MoonShot {
 		
 		
 		U.p("done");
+	}
+	
+	public static ArrayList<Match> removeUniprot(ArrayList<Match> matches) {
+		ArrayList<Match> out = new ArrayList<Match>();
+		
+		String uniprot;
+		uniprot = U.readFileToString("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta");
+		uniprot = uniprot.replace("\r", "");
+		Hashtable<String, String> inUniprot = new Hashtable<String, String>();
+		Hashtable<String, String> notInUniprot = new Hashtable<String, String>();
+		
+		for (Match match: matches) {
+			String peptideSequence = match.getString("peptideSequence");
+			if (notInUniprot.get(peptideSequence) != null) {
+				out.add(match);
+			} else {
+				if (inUniprot.get(peptideSequence) == null) {
+					if (uniprot.indexOf(peptideSequence) != -1) {
+						inUniprot.put(peptideSequence, peptideSequence);
+					} else {
+						out.add(match);
+						notInUniprot.put(peptideSequence, peptideSequence);
+					}
+				}
+			}
+		}
+		
+		return out;
 	}
 	
 	public static void assignP(ArrayList<Match> matches) {
@@ -424,8 +456,20 @@ public class MoonShot {
 			U.p("finding novel distance");
 			Sequence_Protein uniProt = new Sequence_Protein(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
 			ArrayList<Protein> proteins = uniProt.getProteinsFromDatabase(false, false);
+			Hashtable<String, Match> matchesDistanceFound = new Hashtable<String, Match>();
 			for(Match match: allMatches) {
 				String peptide = match.getString("peptideSequence");
+				
+				// maybe we've found this already?
+				Match matchDistanceFound = matchesDistanceFound.get(peptide);
+				if (matchDistanceFound != null) {
+					match.set("novelDistance", matchDistanceFound.getInt("novelDistance"));
+					match.set("novelMassDistance", matchDistanceFound.getDouble("novelMassDistance"));
+					match.set("homologousProtein", matchDistanceFound.get("homologousProtein"));
+					match.set("homologousPeptide", matchDistanceFound.get("homologousPeptide"));
+					continue;
+				}
+				
 				int peptideMiddle = peptide.length() / 2;
 				int peptideQuarter = peptide.length() / 4;
 				String halfA = peptide.substring(0, peptideMiddle);
@@ -533,6 +577,8 @@ public class MoonShot {
 				match.set("homologousProtein", proteinHomology);
 				match.set("homologousPeptide", similarPeptide);
 				
+				//Save this if another match with the same peptide comes up
+				matchesDistanceFound.put(peptide, match);
 			}
 		}
 		
@@ -615,7 +661,7 @@ public class MoonShot {
 	
 	
 	public static void assignGencodeAnnotations(ArrayList<Match> allMatches) {
-		ArrayList<Region> geneRegions = loadGeneRegions("resources/gencode/gencodeReduced.gtf");
+		ArrayList<Region> geneRegions = loadGeneRegions("/Volumes/Research/workspace/Peppy/resources/gencode/gencodeReduced.gtf");
 		Hashtable<String, Region> foundRegions = new Hashtable<String, Region>();
 		for (Match match: allMatches) {
 			int startLocus = match.getInt("start");
