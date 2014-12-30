@@ -3,8 +3,14 @@ package Navigator;
 import java.util.ArrayList;
 
 /**
- * A "set" is a collection of matches.  These could be all matches to a particular peptide or 
+ * The MatchesTo superset is a collection of matches.  
+ * These could be all matches to a particular peptide or 
  * all for a given region or protein or so on and so on.
+ * 
+ * The convenience of this superclass is that it treats the
+ * top score for all children matches as the score for the set.
+ * 
+ * This allows sorting of match sets.
  * 
  * Copyright 2013, Brian Risk
  * 

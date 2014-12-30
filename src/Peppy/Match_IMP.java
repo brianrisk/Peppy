@@ -5,6 +5,13 @@ import Math.MathFunctions;
 
 
 /**
+ * 
+ * "IMP" stands for "ion match probability"
+ * 
+ * The algorithm is describe in:
+ * "A peptide-spectrum scoring system based on ion alignment, intensity and pair probabilities." 
+ * Risk BA, Edwards NJ, Giddings MC. Journal of proteome research (July 22, 2013).
+ * 
  * Copyright 2013, Brian Risk
  * 
  * 

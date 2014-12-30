@@ -1,8 +1,10 @@
 package Navigator;
 
 /**
- * Copyright 2013, Brian Risk
  * 
+ * Static methods returning HTML strings
+ * 
+ * Copyright 2013, Brian Risk
  * 
  * @author Brian Risk
  *

@@ -24,21 +24,21 @@ public class AASubstitutionReport {
 	File variModFile;
 	ArrayList<Match> matches;
 	
-	public static void main(String args[]) {
-		new AASubstitutionReport(new File ("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_BI/8 CompRef_Proteome_BI - varimod/report.txt"), new File("AASubstitutions.html"));
-//		new AASubstitutionReport(new File ("/Users/risk2/PeppyData/Mayo/reports/21881_FA_Example1_dta/report.txt"));
-		U.p("done");
-	}
-	
+
+	/**
+	 * 
+	 * Example:
+	 * new AASubstitutionReport(new File ("varimod/report.txt"), new File("AASubstitutions.html"));
+	 * 
+	 * @param variModFile The .txt report file for the variable modifications
+	 * @param saveFile .html file where this will be saved
+	 */
 	public AASubstitutionReport(File variModFile, File saveFile) {
 		this.variModFile = variModFile;
 		ArrayList<AASubstitution> substitutions = AASubstitution.generateListOfAASubstitutions();
 		
-		/* load the sample */
-		Sample whim2Human = new Sample("21881_FA_Example1_dta", Sample.REFERENCE_PROTEIN);
-//		whim2Human.loadResults(new File("/Users/risk2/PeppyData/Mayo/reports/21881_FA_Example1_dta/report.txt"));
-		whim2Human.loadResults(variModFile);
-		
+		/* load the matches */
+		matches = Match.loadMatches(variModFile);	
 		
 		try {
 			PrintWriter matchWriter;
@@ -57,7 +57,6 @@ public class AASubstitutionReport {
 			matchWriter.println("</thead>");
 			matchWriter.println("<tbody>");
 		
-			matches = whim2Human.getMatches();
 			for (Match match: matches) {
 				if (match.getBoolean("isModified") && match.getBoolean("modLocCertain")) {
 					String sequenceName = match.getString("sequenceName");
@@ -72,11 +71,11 @@ public class AASubstitutionReport {
 						sequenceName = sequenceName.split("\\|")[0];
 					}
 					
-					/* ignore oxidations */
+					/* ignore oxidation */
 //					if (AA == 'M' && Math.round(modMass) == 16) continue;
 					if (Math.round(modMass) == 16) continue;
 					
-					/* ignore deamidations */
+					/* ignore deamidation */
 					if (AA == 'N' && Math.round(modMass) == 1) continue;
 					
 					/* ignore carbamylation */

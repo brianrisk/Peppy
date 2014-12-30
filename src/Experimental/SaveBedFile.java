@@ -1,4 +1,4 @@
-package Navigator;
+package Experimental;
 
 import java.awt.Color;
 import java.io.BufferedInputStream;
@@ -16,6 +16,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.zip.GZIPOutputStream;
 
+import Navigator.Match;
+import Navigator.MatchTable;
 import Peppy.U;
 import Reports.UCSC;
 

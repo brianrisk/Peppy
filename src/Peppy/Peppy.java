@@ -21,7 +21,12 @@ import Reports.TextReporter;
  * Designed with the following goals:
  * 1) More simple code to promote open source development
  * 2) Easy proteogenomic mapping
- * 3) better multi-threading
+ * 3) Efficient multi-threading
+ * 
+ * Initial publication:
+ * "Peppy: proteogenomic search software."
+ * Risk BA, Spitzer WJ, Giddings MC. Journal of proteome research (April 24, 2013). 
+ * PMID: 23614390
  * 
  * Copyright 2013, Brian Risk
  * 
@@ -1178,7 +1183,7 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy(TM)");
 		U.p("Protein identification / proteogenomic software.");
-		U.p("Copyright 2013 by Brian Risk");
+		U.p("Copyright 2014 by Brian Risk");
 		U.p();
 		
 		/* print some system statistics */

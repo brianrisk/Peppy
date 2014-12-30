@@ -6,6 +6,10 @@ import java.util.Hashtable;
 
 
 /**
+ * 
+ * For any given peptide acid sequence, there can be a plethora of PSMs.
+ * This data structure allows easy grouping by acid sequence.
+ * 
  * Contains a hashtable where the elements are
  * ArrayList of matches.
  * 

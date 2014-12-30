@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 
+import Experimental.ProteinOverlap;
+
 
 /**
  * Copyright 2013, Brian Risk

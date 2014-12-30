@@ -2,6 +2,12 @@ package Peppy;
 
 import Math.MassError;
 
+/**
+ * Experimental class for DeNovo sequencing
+ * 
+ * @author brianrisk
+ *
+ */
 public class Match_DeNovo extends Match {
 	
 	Peptide peptide;

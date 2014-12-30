@@ -1,7 +1,10 @@
-package Navigator;
+package Experimental;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+
+import Navigator.Match;
+import Navigator.MatchesToProtein;
 
 /**
  * Many proteins contain similar sequences -- especially if they

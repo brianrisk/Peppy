@@ -1,4 +1,4 @@
-package Navigator;
+package Experimental;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,6 +10,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import Navigator.HTML;
+import Navigator.Match;
+import Navigator.MatchTable;
+import Navigator.MatchesToProtein;
+import Navigator.ProteinComparison;
 import Peppy.U;
 
 
