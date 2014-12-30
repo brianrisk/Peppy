@@ -1,4 +1,4 @@
-package Navigator;
+package Experimental;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -18,7 +18,7 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
-import Experimental.AmplifiedPeptide;
+import Navigator.Match;
 import Peppy.U;
 
 /**

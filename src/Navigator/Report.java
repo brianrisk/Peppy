@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * An abstract class that objects that create reports should inherit
+ * An abstract class that objects that reports should inherit
  * 
  * @author Brian Risk
  *
