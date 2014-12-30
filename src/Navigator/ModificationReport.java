@@ -32,8 +32,6 @@ public class ModificationReport {
 		
 		ArrayList<Match> matches = Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/RWA1/4 RWA1 - varimod/report.txt"));
 		
-		
-		
 //		ArrayList<Match> matches = new ArrayList<Match>();
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group1/3 group1 - varimod/report.txt")));
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group2/3 group2 - varimod/report.txt")));
@@ -41,8 +39,6 @@ public class ModificationReport {
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group4/3 group4 - varimod/report.txt")));
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group5/3 group5 - varimod/report.txt")));
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group6/3 group6 - varimod/report.txt")));
-
-		
 		
 //		ArrayList<Match> matches = new ArrayList<Match>();
 //		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt")));

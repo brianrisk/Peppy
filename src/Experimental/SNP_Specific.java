@@ -1,8 +1,11 @@
-package Navigator;
+package Experimental;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import Navigator.BestMatches;
+import Navigator.Match;
+import Navigator.ResultsCategory;
 import Peppy.U;
 
 public class SNP_Specific {

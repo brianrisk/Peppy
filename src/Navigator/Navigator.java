@@ -54,8 +54,8 @@ public class Navigator {
 			direcotryTitlesToIgnore.add("subject");
 			
 			for (File folder: reportFolders) {
-				BestMatches matches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
-				bestMatchesArray.add(matches);
+				BestMatches bestMatches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
+				bestMatchesArray.add(bestMatches);
 				
 				File [] subFolders = folder.listFiles();
 				for (File subFolder: subFolders) {

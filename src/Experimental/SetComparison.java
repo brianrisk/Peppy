@@ -1,7 +1,9 @@
-package Navigator;
+package Experimental;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+
+import Navigator.MatchesTo;
 
 /**
  * Copyright 2013, Brian Risk

@@ -14,7 +14,6 @@ import Navigator.HTML;
 import Navigator.Match;
 import Navigator.MatchTable;
 import Navigator.MatchesToProtein;
-import Navigator.ProteinComparison;
 import Peppy.U;
 
 
