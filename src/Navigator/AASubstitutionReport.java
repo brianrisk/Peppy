@@ -10,7 +10,6 @@ import java.util.Collections;
 
 import Math.MassError;
 import Peppy.Properties;
-import Peppy.U;
 
 /**
  * Copyright 2013, Brian Risk

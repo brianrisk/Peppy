@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import Peppy.AminoAcids;
-import Peppy.Definitions;
 import Peppy.Match;
 import Peppy.MatchConstructor;
 import Peppy.MatchesSpectrum;

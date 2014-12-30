@@ -18,6 +18,7 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
+import Experimental.AmplifiedPeptide;
 import Peppy.U;
 
 /**

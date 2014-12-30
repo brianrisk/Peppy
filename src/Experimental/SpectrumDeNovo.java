@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 import Navigator.Match;
 import Peppy.AminoAcids;
 import Peppy.Definitions;

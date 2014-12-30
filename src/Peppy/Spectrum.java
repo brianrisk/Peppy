@@ -10,7 +10,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import Experimental.SpectrumSequenceProbability;
 import Math.HasValue;
 import Math.MassError;
 

@@ -1,11 +1,8 @@
 package Peppy;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Graphs.HistogramVisualizer;
 import Math.LeastSquares;
 
 /**

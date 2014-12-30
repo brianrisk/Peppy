@@ -5,7 +5,6 @@ import java.util.Hashtable;
 
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.U;
 
 public class IonComparisonThread implements Runnable {
 	

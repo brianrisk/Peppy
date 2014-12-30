@@ -1,7 +1,6 @@
 package Peppy;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import Math.MassError;
 import Math.MathFunctions;

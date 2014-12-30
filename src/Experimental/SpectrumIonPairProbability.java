@@ -10,7 +10,6 @@ import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
-import Peppy.U;
 
 /**
  * Copyright 2013, Brian Risk

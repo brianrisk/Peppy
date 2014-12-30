@@ -19,7 +19,6 @@ import Database.Table;
 import Peppy.Definitions;
 import Peppy.Match_Blank;
 import Peppy.Peptide;
-import Peppy.Properties;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
 import Peppy.U;

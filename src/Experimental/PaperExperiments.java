@@ -12,7 +12,6 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_Protein;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
 import Peppy.U;
