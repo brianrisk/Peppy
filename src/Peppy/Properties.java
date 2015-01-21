@@ -285,7 +285,7 @@ public class Properties {
 		
 		
 		/* FDR false discovery rate */
-		numberOfSpectraToUseForFDR = 10000;
+		numberOfSpectraToUseForFDR = -1;
 		maximumFDR = 0.01;
 		
 		/* when off by whole dalton*/
