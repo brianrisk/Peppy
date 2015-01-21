@@ -1,0 +1,3 @@
+isSequenceFileDNA true
+percursorTolerance 2000
+fragmentTolerance 300
