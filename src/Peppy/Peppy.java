@@ -98,29 +98,25 @@ public class Peppy {
 		U.p("found this many directories: " + directories.size());
 		U.p();
 		
-		for(File directory: directories) {
+		for(File directory: directories) {	
+			U.p("running for: " + directory.getName());
+			init(args);
+			init(jobFile);
+			Properties.spectraDirectoryOrFile = directory;
+			Properties.spectraDirectoryOrFileList = new ArrayList<File>();
+			Properties.spectraDirectoryOrFileList.add(directory);
 			
-			if (!directory.isHidden() && directory.isDirectory()) {
-				
-				U.p("running for: " + directory.getName());
-				init(args);
-				init(jobFile);
-				Properties.spectraDirectoryOrFile = directory;
-				Properties.spectraDirectoryOrFileList = new ArrayList<File>();
-				Properties.spectraDirectoryOrFileList.add(directory);
-				
-				/* try running Peppy */
-				try {
-					runPeppy(null);
-				}
-				catch (Exception e) {
-					U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					e.printStackTrace();
-					U.p("\r\r");
-					U.p("An error occurred. Continuing with the next job...\r\r");
-				}
-				U.p();
+			/* try running Peppy */
+			try {
+				runPeppy(null);
 			}
+			catch (Exception e) {
+				U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				e.printStackTrace();
+				U.p("\r\r");
+				U.p("An error occurred. Continuing with the next job...\r\r");
+			}
+			U.p();
 		}
 		
 		
