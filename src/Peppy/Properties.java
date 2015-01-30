@@ -134,8 +134,6 @@ public class Properties {
 	public static double maximumFDR = 0.01;
 	
 	/* PTMs */
-	public static boolean multipass = false;
-	public static int numberOfRegionsToKeep = 1000;
 	public static boolean searchModifications = true;
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
@@ -305,8 +303,6 @@ public class Properties {
 		 modCTerminal = 0;
 		
 		/* PTMs */
-		multipass = false;
-		numberOfRegionsToKeep = 1000;
 		searchModifications = false;
 		modificationLowerBound = -0.3;
 		modificationUpperBound = 100;
@@ -535,10 +531,6 @@ public class Properties {
 		
 		
 		/* multipass */
-		if (propertyName.equals("multipass")) 
-			multipass = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("numberOfRegionsToKeep"))
-			numberOfRegionsToKeep = Integer.valueOf(propertyValue);	
 		if (propertyName.equals("searchModifications")) 
 			searchModifications = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("modificationLowerBound")) 
@@ -639,11 +631,9 @@ public class Properties {
 			pw.println("maximumFDR " + maximumFDR);
 			pw.println();
 			pw.println("##multipass");
-			pw.println("multipass " + multipass);
 			pw.println("searchModifications " + searchModifications);
 			pw.println("modificationLowerBound " + modificationLowerBound);
 			pw.println("modificationUpperBound " + modificationUpperBound);
-			pw.println("numberOfRegionsToKeep " + numberOfRegionsToKeep);
 			
 			pw.println();
 			pw.println("## static mods");
