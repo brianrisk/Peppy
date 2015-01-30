@@ -174,12 +174,6 @@ public class HTMLPageSpectrum extends HTMLPage {
 		if (match.getPeptide().isForward()) {printTD("+");}
 		else {printTD("-");}
 		
-		//isSpliced
-		if (Properties.useSpliceVariants) {
-			if (match.getPeptide().isSpliced()) {printTD("Y");}
-			else {printTD("N");}
-		}
-		
 		//score
 		printTD("" + match.getScore());
 		

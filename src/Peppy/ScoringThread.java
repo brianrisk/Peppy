@@ -58,14 +58,8 @@ public class ScoringThread implements Runnable {
 	public void run() {
 		
 		while (matchesSpectrum != null) {
-			if (Properties.useHydrogenOffset) {
-				for (int index = 0; index < 3; index++) {
-					searchPeptideRange(index);
-				}
-			} else {
-				searchPeptideRange(0);
-			}
-	
+			searchPeptideRange(0);
+
 			/* return results, get new spectrum to process.  
 			 * If no more spectra, gets null and the loop exits */
 			matchesSpectrum = scoringServer.getNextSpectrumMatches();

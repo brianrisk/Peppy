@@ -67,9 +67,6 @@ public class Properties {
 	public static int desiredPeptideDatabaseSize = 10000000;
 	public static int maxCombinedProteinLength = 5000000;
 	
-	//Splicing?
-	public static boolean useSpliceVariants = false;
-	
 	
 	//mass error tolerances in PPM
 	public static double precursorTolerance = 100;
@@ -143,8 +140,6 @@ public class Properties {
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
 	
-	/* when precursors are off by whole daltons */
-	public static boolean useHydrogenOffset = false;
 	
 	/* fixed modifications */
 	public static double modA = 0;
@@ -283,9 +278,6 @@ public class Properties {
 		/* FDR false discovery rate */
 		numberOfSpectraToUseForFDR = -1;
 		maximumFDR = 0.01;
-		
-		/* when off by whole dalton*/
-		useHydrogenOffset = false;
 		
 		/* fixed modifications */
 		 modA = 0;
@@ -452,12 +444,6 @@ public class Properties {
 		
 		if (propertyName.equals("minimumScore")) 
 			minimumScore = Double.valueOf(propertyValue);
-			
-		
-		//splicing
-		if (propertyName.equals("useSpliceVariants"))
-			useSpliceVariants = Boolean.valueOf(propertyValue);
-		
 		
 		
 		//spectrum cleaning		
@@ -560,10 +546,6 @@ public class Properties {
 		if (propertyName.equals("modificationUpperBound")) 
 			modificationUpperBound = Double.valueOf(propertyValue);
 		
-		/* hydrogen offset */
-		if (propertyName.equals("useHydrogenOffset")) 
-			useHydrogenOffset = Boolean.valueOf(propertyValue);
-		
 		
 		/* fixed modifications */
 		if (propertyName.equals("modA")) modA = Double.valueOf(propertyValue);
@@ -652,9 +634,6 @@ public class Properties {
 			pw.println("##where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);
 			pw.println();
-			pw.println("##VCF");
-			pw.println("VCFFileString " + VCFFileString);
-			pw.println();
 			pw.println("##False Discovery Rates");
 			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println("maximumFDR " + maximumFDR);
@@ -666,8 +645,6 @@ public class Properties {
 			pw.println("modificationUpperBound " + modificationUpperBound);
 			pw.println("numberOfRegionsToKeep " + numberOfRegionsToKeep);
 			
-			pw.println();
-			pw.println("useHydrogenOffset " + useHydrogenOffset);
 			pw.println();
 			pw.println("## static mods");
 			pw.println("modA " + modA);

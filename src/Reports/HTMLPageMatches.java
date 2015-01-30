@@ -55,9 +55,6 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("ID");
 		printTH("acid");
 		printTH("location");
-		if (Properties.useSpliceVariants) {
-			printTH("spliced");
-		}
 		printTH("score");
 		if (Properties.isYale) {
 			printTH("inORF");
