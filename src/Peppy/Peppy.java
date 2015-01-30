@@ -856,21 +856,13 @@ public class Peppy {
 	}
 
 	/**
-	 * Does a normal search, then does multipass
+	 * Does a normal search (sets reverse property false as this is not a decoy search)
 	 * @param sequences
 	 * @param spectra
 	 * @return
 	 */
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
-
-		/* performing our normal search */
-		ArrayList<Match> matches = getMatches(sequences, spectraMatches, false);
-
-		/* performing the multipass search */
-		if (Properties.multipass && Properties.isSequenceFileNucleotide) {
-			matches = multipass(matches, sequences, spectraMatches);
-		}
-		return matches;
+		return getMatches(sequences, spectraMatches, false);
 	}
 
 	/**
@@ -935,18 +927,14 @@ public class Peppy {
 	}
 
 
-
+	/**
+	 * performing our normal search specifying "true" for isReverse
+	 * @param sequences
+	 * @param spectraMatches
+	 * @return
+	 */
 	public static ArrayList<Match> getDecoyMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
-
-		/* performing our normal search specifying "true" for isReverse */
-		ArrayList<Match> matches = getMatches(sequences, spectraMatches, true);
-
-		/* performing the multipass search */
-		if (Properties.multipass && Properties.isSequenceFileNucleotide) {
-			matches = multipass(matches, sequences, spectraMatches);
-		}
-
-		return matches;
+		return getMatches(sequences, spectraMatches, true);
 	}
 
 	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
@@ -967,51 +955,6 @@ public class Peppy {
 		return out;
 	}
 
-
-
-	private static ArrayList<Match> multipass(ArrayList<Match> matches, ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
-		/* regions */
-		Regions regions = new Regions(matches, sequences);
-		U.p("we found this many regions: " + regions.getRegions().size());
-
-		if (regions.getRegions().size() > 0) {
-
-			U.p("performing localized PTM search");
-			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP_VariMod");
-			Properties.searchModifications = true;
-
-			/* first we need to level the playing field and score the original matches as modification matches */
-			//TODO: this can be parallelized
-			ArrayList<Match> rescoredMatches = new ArrayList<Match>(matches.size());
-			for (Match match: matches) {
-				rescoredMatches.add(Properties.matchConstructor.createMatch(match.getSpectrumMatches(), match.getPeptide()));
-			}
-			matches = rescoredMatches;
-
-			/* generating peptides in the regions */
-			ArrayList<Peptide> peptidesInRegions = getPeptidesInRegions(regions.getRegions(), sequences, false);
-			U.p("there are this many peptides in the regions: " + peptidesInRegions.size());
-
-			/* getting matches to the peptides in the regions */
-			ArrayList<Match> modMatches = getMatchesWithPeptides(peptidesInRegions, spectraMatches);
-
-			/* make room for the modified matches and add them to our main set of matches */
-			int matchesNotFoundInUnmodifiedSearchCount = 0;
-			for (Match match: modMatches) {
-				if (match.isFromModificationSearches()) matchesNotFoundInUnmodifiedSearchCount++;
-			}
-			matches.ensureCapacity(matches.size() + matchesNotFoundInUnmodifiedSearchCount);
-			for (Match match: modMatches) {
-				if (match.isFromModificationSearches()) matches.add(match);
-			}
-
-			/* return things to the way they were */
-			Properties.matchConstructor = new MatchConstructor("Peppy.Match_IMP");
-			Properties.searchModifications = false;
-		}
-
-		return matches;
-	}
 
 
 	//TODO this could probably be made much, much faster
