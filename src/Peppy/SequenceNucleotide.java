@@ -210,9 +210,9 @@ public class SequenceNucleotide extends Sequence{
 		/* Create our SequenceDigestionThread ArrayList */
 		ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
 		for (byte frame = 0; frame < 3; frame++) {
-			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+			digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, true, startIndex, stopIndex, isReverse));
 			if (!Properties.useOnlyForwardsFrames) {
-				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex - digestionFrameOverlap, stopIndex, isReverse));
+				digestors.add(new DigestionThread_DNA(nucleotideSequence, frame, false, startIndex, stopIndex, isReverse));
 			}
 		}
 		
@@ -229,7 +229,6 @@ public class SequenceNucleotide extends Sequence{
 			try {
 				thread.join();
 			} catch (InterruptedException e) {
-				U.p("Digestion thread interrupted!  Bad!");
 				e.printStackTrace();
 			}
 		}
