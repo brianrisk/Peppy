@@ -16,11 +16,11 @@ public class HTML {
 					"<head>" +
 					"<style type=\"text/css\">" +
 					"<!--" +
-					"@import url(\"http://peppyresearch.com/css/blue-table/style.css\");" +
+					"@import url(\"http://geneffects.com/files/peppy/css/blue-table/style.css\");" +
 					"-->" +
 					"</style>" +
-					"<script type=\"text/javascript\" src=\"http://peppyresearch.com/js/jquery-1.7.2.min.js\"></script>" +
-					"<script type=\"text/javascript\" src=\"http://peppyresearch.com/js/jquery.tablesorter.min.js\"></script>" +
+					"<script type=\"text/javascript\" src=\"http://geneffects.com/files/peppy/js/jquery-1.7.2.min.js\"></script>" +
+					"<script type=\"text/javascript\" src=\"http://geneffects.com/files/peppy/js/jquery.tablesorter.min.js\"></script>" +
 					"<script type=\"text/javascript\">" +
 					"$(document).ready(function() " +
 					"    { " +

@@ -80,9 +80,9 @@ public class HTMLPageSpectrum extends HTMLPage {
 
 		
 		spectrumScript.append("</script>");
-		spectrumScript.append("<script src=\"http://peppyresearch.com/js/processing-1.1.0.js\"></script>");
+		spectrumScript.append("<script src=\"http://geneffects.com/files/peppy/js/processing-1.1.0.js\"></script>");
 //		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/js/processing.js\"></script>");
-		spectrumScript.append("<script src=\"http://peppyresearch.com/spectrumvisualizer/psv-control.js\"></script>");
+		spectrumScript.append("<script src=\"http://geneffects.com/files/peppy/spectrumvisualizer/psv-control.js\"></script>");
 //		spectrumScript.append("<script src=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/psv-control.js\"></script>");
 
 		
@@ -92,7 +92,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printP("<ul><li>neutral mass: " + spectrum.getMass() + "<li>charge: " + spectrum.getCharge() + "</ul>");
 		
 		//spectrum
-		printP("<canvas data-processing-sources=\"http://peppyresearch.com/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
+		printP("<canvas data-processing-sources=\"http://geneffects.com/files/peppy/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 //		printP("<canvas data-processing-sources=\"http://rrcs-98-101-157-178.midsouth.biz.rr.com/~risk2/spectrumvisualizer/PeppySpectrumVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");
 		
 //		printP("<canvas data-processing-sources=\"ionMatchVisualizer.pjs\" id=\"spectrum\" width=\"800\" height=\"310\"></canvas>");

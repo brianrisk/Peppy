@@ -121,7 +121,7 @@ public abstract class HTMLPage {
 		print("</div>");
 		print("<div id=\"footer\">");
 		print("<div id=\"emphasis-bar\"><p></p></div>");
-		print("<p>Created with <a href=\"http://peppyresearch.com/peppy\">Peppy</a>, protein identification, proteogenomic mapping software ");
+		print("<p>Created with <a href=\"http://geneffects.com/peppy\">Peppy</a>, protein identification, proteogenomic mapping software ");
 //		print("by <a href=\"http://unitedproteomics.com\">United Proteomics</a></p>");
 		print("</div>");
 		print("</div>");

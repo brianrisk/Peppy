@@ -25,7 +25,7 @@ public class HTMLPageRegion extends HTMLPageMatches {
 	@Override
 	public void makePage() {
 		String regionName = region.getSequence().getSequenceFile().getName() + ": " + region.getStartLocation() + " to " + region.getStopLocation();
-		printHeader(regionName, "<script src=\"http://peppyresearch.com/js/processing.js\"></script>");
+		printHeader(regionName, "<script src=\"http://geneffects.com/files/peppy/js/processing.js\"></script>");
 		printP("Sequence: " + region.getSequence().getSequenceFile().getName());
 		
 		/* UCSC link */
