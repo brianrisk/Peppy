@@ -215,7 +215,7 @@ public class Peppy {
 	 * A straight-forward search.  Developed initial for PepArML use.
 	 * @param args
 	 */
-	public static void runSimplePeppy(String [] args) {
+	private static void runSimplePeppy(String [] args) {
 		U.startStopwatch();
 
 		/* where we store the report */
@@ -229,7 +229,34 @@ public class Peppy {
 		int originalSpectraSize = spectra.size();
 		U.p("loaded " + originalSpectraSize + " spectra");
 
-		runSearch(spectra, sequences, mainReportDir);
+		// save our properties
+		Properties.generatePropertiesFile(mainReportDir);
+
+		/* set up where we will hold all of the matches for our spectra */
+		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		for (Spectrum spectrum: spectra) {
+			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
+
+			/* keep only best matches */
+			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_BEST_MATCHES);
+
+			spectraMatches.add(matchesSpectrum);
+		}
+
+		//initialize our ArrayList of matches
+		ArrayList<Match> matches = null;
+
+		if (Properties.useSequenceRegion) {
+			U.p("digesting part of sequence");
+			ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
+			oneSequenceList.add(sequences.get(0));
+			sequences = oneSequenceList;
+		}
+
+		/* nothing weird.  Just do a normal search */
+		matches = getMatches(sequences, spectraMatches);
+
+		createReports(matches, mainReportDir);
 
 		U.stopStopwatch();
 	}
@@ -241,7 +268,7 @@ public class Peppy {
 	 * This iterates through them in every combination.
 	 * @param args
 	 */
-	public static void runFunnelPeppy(String [] args) {
+	private static void runFunnelPeppy(String [] args) {
 		U.startStopwatch();
 
 		if (verbose) U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
@@ -607,49 +634,6 @@ public class Peppy {
 
 		U.stopStopwatch();
 	}
-
-
-	/**
-	 * A "search" is one set of spectra on one peptide database
-	 * @param spectra
-	 * @param sequences
-	 */
-	public static ArrayList<Match> runSearch(ArrayList<Spectrum> spectra, ArrayList<Sequence> sequences, File reportDir) {
-
-		//save our properties
-		Properties.generatePropertiesFile(reportDir);
-
-
-		/* set up where we will hold all of the matches for our spectra */
-		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
-		for (Spectrum spectrum: spectra) {
-			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
-
-			/* keep only best matches */
-			matchesSpectrum.setWhatToKeep(Matches.KEEP_ONLY_BEST_MATCHES);
-
-			spectraMatches.add(matchesSpectrum);
-		}
-
-		//initialize our ArrayList of matches
-		ArrayList<Match> matches = null;
-
-		if (Properties.useSequenceRegion) {
-			U.p("digesting part of sequence");
-			ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
-			oneSequenceList.add(sequences.get(0));
-			sequences = oneSequenceList;
-		}
-
-		/* nothing weird.  Just do a normal search */
-		matches = getMatches(sequences, spectraMatches);
-
-		createReports(matches, reportDir);
-
-		return matches;
-
-	}
-
 
 
 
