@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import Math.MassError;
 import Peppy.Peptide;
 import Peppy.Properties;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceProtein;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
 import Peppy.U;
@@ -32,7 +32,7 @@ public class TestSetReduce {
 		U.p("loading database");
 		Properties.numberOfMissedCleavages = 2;
 		File databaseFile = new File("/Users/risk2/PeppyData/tests/databases/uniprot_sprot.fasta");
-		Sequence_Protein sequence = new Sequence_Protein(databaseFile);
+		SequenceProtein sequence = new SequenceProtein(databaseFile);
 		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 		//specify test set

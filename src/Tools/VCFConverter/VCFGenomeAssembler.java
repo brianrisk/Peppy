@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import Peppy.NucleotideSequence;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
+import Peppy.SequenceNucleotide;
 import Peppy.U;
 
 public class VCFGenomeAssembler {
@@ -21,7 +21,7 @@ public class VCFGenomeAssembler {
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		U.p("we are working with " + sequences.size() + " sequence files");
 				
-		Sequence_DNA sequenceFile;
+		SequenceNucleotide sequenceFile;
 		NucleotideSequence nucleotideSequence;
 		String nucleotideSequenceString;
 		char[] bases;
@@ -51,7 +51,7 @@ public class VCFGenomeAssembler {
 		int numberOfTimesExpectedEqualsNew = 0;
 		
 		for(Sequence s : sequences) {
-			sequenceFile = (Sequence_DNA) s;
+			sequenceFile = (SequenceNucleotide) s;
 			nucleotideSequence = sequenceFile.getNucleotideSequences().get(0);
 			nucleotideSequenceString = nucleotideSequence.getSequence();
 			bases = nucleotideSequenceString.toCharArray();

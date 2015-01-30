@@ -16,7 +16,7 @@ import Peppy.DigestionThread_DNA;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
+import Peppy.SequenceNucleotide;
 import Peppy.U;
 
 /**
@@ -184,7 +184,7 @@ public class SixFrameRegion {
 				//load DNA string for this chromosome
 				File chrFile = new File("/Users/risk2/PeppyData/public/sequences/dna/HG19/" + chrName + ".fa");
 				ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(chrFile);
-				Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
+				SequenceNucleotide sequenceFile = (SequenceNucleotide) sequences.get(0);
 				String sequenceDNA = sequenceFile.getNucleotideSequences().get(0).getSequence();
 				
 				//create translations of all regions in this chromosome
@@ -207,7 +207,7 @@ public class SixFrameRegion {
 		boolean wholeSequence = (startPosition == -1);
 		
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(sequence);
-		Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
+		SequenceNucleotide sequenceFile = (SequenceNucleotide) sequences.get(0);
 		
 		String chrName = U.getFileNameWithoutSuffix(sequenceFile.getSequenceFile());
 		

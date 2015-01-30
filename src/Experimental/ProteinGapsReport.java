@@ -12,7 +12,7 @@ import java.util.Hashtable;
 import Navigator.Match;
 import Peppy.Protein;
 import Peppy.ProteinCoverage;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceProtein;
 import Peppy.U;
 
 /**
@@ -101,7 +101,7 @@ public class ProteinGapsReport {
 		/* load proteins */
 		File proteinFile = new File(proteinFileName);
 		Hashtable<String, ProteinCoverage> proteins = new Hashtable<String,ProteinCoverage>();
-		Sequence_Protein proteinDatabase = new Sequence_Protein(proteinFile);
+		SequenceProtein proteinDatabase = new SequenceProtein(proteinFile);
 		ArrayList<Protein> proteinsLoaded = proteinDatabase.getProteinsFromDatabase(false, false);	
 		for (Protein protein: proteinsLoaded) {	
 			proteins.put(protein.getName(), new ProteinCoverage(protein));

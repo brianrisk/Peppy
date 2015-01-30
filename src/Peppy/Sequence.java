@@ -55,9 +55,9 @@ public abstract class Sequence {
 		ArrayList<Sequence> sequences = new ArrayList<Sequence>();
 		if (folder.isFile()) {
 			if (Properties.isSequenceFileDNA) {
-				sequences.add(new Sequence_DNA(folder));
+				sequences.add(new SequenceNucleotide(folder));
 			} else {
-				sequences.add(new Sequence_Protein(folder));
+				sequences.add(new SequenceProtein(folder));
 			}
 		} else {
 			File [] files = folder.listFiles();
@@ -71,9 +71,9 @@ public abstract class Sequence {
 						fileName.endsWith(".dat") || 
 						fileName.endsWith(".txt")) {
 						if (Properties.isSequenceFileDNA) {
-							sequences.add(new Sequence_DNA(files[i]));
+							sequences.add(new SequenceNucleotide(files[i]));
 						} else {
-							sequences.add(new Sequence_Protein(files[i]));
+							sequences.add(new SequenceProtein(files[i]));
 						}
 				}
 			}

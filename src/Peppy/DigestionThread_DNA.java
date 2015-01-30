@@ -64,7 +64,7 @@ public class DigestionThread_DNA implements Runnable {
 	
 	private ArrayList<Peptide> digest(int startPosition, int stopPosition) {
 		ArrayList<Protein> proteins = translateToProteins(startPosition, stopPosition);
-		peptides = Sequence_Protein.getPeptidesFromListOfProteins(proteins, reverseDatabase);
+		peptides = SequenceProtein.getPeptidesFromListOfProteins(proteins, reverseDatabase);
 		return peptides;
 	}
 	
@@ -81,7 +81,7 @@ public class DigestionThread_DNA implements Runnable {
 		char aminoAcid;
 		int mod = 0;
 		StringBuffer buildingProtein = new StringBuffer();
-		Sequence_DNA sequence_DNA = nucleotideSequence.getParentSequence();
+		SequenceNucleotide sequence_DNA = nucleotideSequence.getParentSequence();
 		String name = nucleotideSequence.getSequenceDescription();
 		int increment = 1;
 		if (!isForwardsStrand) increment = -1;

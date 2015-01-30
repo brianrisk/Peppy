@@ -11,7 +11,7 @@ import java.util.Collections;
 
 import Peppy.Match;
 import Peppy.Properties;
-import Peppy.Sequence_DNA;
+import Peppy.SequenceNucleotide;
 import Peppy.Spectrum;
 import Peppy.U;
 
@@ -32,7 +32,7 @@ public class BEDReporter {
 	
 	ArrayList<Match> matches;
 	ArrayList<Spectrum> spectra;
-	ArrayList<Sequence_DNA> sequence_DNAs;
+	ArrayList<SequenceNucleotide> sequence_DNAs;
 	
 	
 	/**
@@ -41,7 +41,7 @@ public class BEDReporter {
 	 * @param sequence_DNAs
 	 */
 	public BEDReporter(ArrayList<Match> matches,
-			ArrayList<Spectrum> spectra, ArrayList<Sequence_DNA> sequence_DNAs) {
+			ArrayList<Spectrum> spectra, ArrayList<SequenceNucleotide> sequence_DNAs) {
 		this.matches = matches;
 		this.spectra = spectra;
 		this.sequence_DNAs = sequence_DNAs;

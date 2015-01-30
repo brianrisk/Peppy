@@ -17,7 +17,7 @@ import Navigator.Region;
 import Peppy.Definitions;
 import Peppy.Peptide;
 import Peppy.Protein;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceProtein;
 import Peppy.U;
 
 public class MoonShot {
@@ -454,7 +454,7 @@ public class MoonShot {
 		//foreach match, find if the novel distance is 0 or 1
 		if (getNovelDistance) {
 			U.p("finding novel distance");
-			Sequence_Protein uniProt = new Sequence_Protein(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
+			SequenceProtein uniProt = new SequenceProtein(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
 			ArrayList<Protein> proteins = uniProt.getProteinsFromDatabase(false, false);
 			Hashtable<String, Match> matchesDistanceFound = new Hashtable<String, Match>();
 			for(Match match: allMatches) {

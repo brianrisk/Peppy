@@ -636,7 +636,7 @@ public class Peppy {
 
 		if (Properties.useSpliceVariants) {
 			//gets the first nucleotide sequence in the first sequence file
-			Sequence_DNA sequenceFile = (Sequence_DNA) sequences.get(0);
+			SequenceNucleotide sequenceFile = (SequenceNucleotide) sequences.get(0);
 			RNA_Sequence rna = new RNA_Sequence(sequenceFile, sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
 
 			U.p("digesting with splice variants...");
@@ -1043,7 +1043,7 @@ public class Peppy {
 		/* get peptides along regions */
 		Region region;
 		for (Sequence sequence: sequences) {
-			Sequence_DNA dnaSequence = (Sequence_DNA) sequence;
+			SequenceNucleotide dnaSequence = (SequenceNucleotide) sequence;
 			for (int regionIndex = 0; regionIndex < numberOfRegionsToKeep; regionIndex++) {
 				region = regions.get(regionIndex);
 				if (dnaSequence.equals(region.getSequence())) {

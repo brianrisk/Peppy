@@ -25,7 +25,7 @@ public class Protein {
 	private int intronStop = -1;
 	private boolean isForward = true;
 	private ArrayList<Peptide> peptides;
-	private Sequence_DNA sequence_DNA;
+	private SequenceNucleotide sequence_DNA;
 	private boolean isDecoy;
 	private double averageMass = -1;
 
@@ -49,7 +49,7 @@ public class Protein {
 	 * @param isForward
 	 * @param sequence_DNA
 	 */
-	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, Sequence_DNA sequence_DNA, boolean isDecoy) {
+	public Protein(String name, int start, String acidString, boolean isSpliced, int intronStart, int intronStop, boolean isForward, SequenceNucleotide sequence_DNA, boolean isDecoy) {
 		this.name = name;
 		this.start = start;
 		this.acidString = acidString;

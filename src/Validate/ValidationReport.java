@@ -17,8 +17,8 @@ import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceNucleotide;
+import Peppy.SequenceProtein;
 import Peppy.U;
 
 public class ValidationReport {
@@ -122,9 +122,9 @@ public class ValidationReport {
 	public static void searchTestSets() {
 		Sequence sequence;
 		if (Properties.testSequenceIsProtein) {
-			sequence = new Sequence_Protein(Properties.testSequence);	
+			sequence = new SequenceProtein(Properties.testSequence);	
 		} else {
-			sequence = new Sequence_DNA(Properties.testSequence);
+			sequence = new SequenceNucleotide(Properties.testSequence);
 		}
 		
 		/* where we store our peptide chunk */
@@ -165,7 +165,7 @@ public class ValidationReport {
 		U.p("creating list of unfound peptides...");
 		
 //		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
-		Sequence_DNA sequence = new Sequence_DNA(new File("/Users/risk2/PeppyData/sequences/ecoli/ecoli.fasta"));	
+		SequenceNucleotide sequence = new SequenceNucleotide(new File("/Users/risk2/PeppyData/sequences/ecoli/ecoli.fasta"));	
 		
 		/* where we store our peptide chunk */
 		ArrayList<Peptide> peptides = sequence.extractMorePeptides(false);

@@ -12,7 +12,7 @@ import Peppy.Peptide;
 import Peppy.RNA_Digestor;
 import Peppy.RNA_Sequence;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
+import Peppy.SequenceNucleotide;
 import Peppy.U;
 
 /**
@@ -24,7 +24,7 @@ import Peppy.U;
  */
 public class AltSpliceTool {
 	
-	static Sequence_DNA sequence_DNA;
+	static SequenceNucleotide sequence_DNA;
 	static int startIndex;
 	static int stopIndex;
 	
@@ -87,7 +87,7 @@ public class AltSpliceTool {
 		
 		//Now that the values have been checked, s up our variables
 		ArrayList<Sequence> sequence_DNAs = Sequence.loadSequenceFiles(chromosomeFile);
-		sequence_DNA = (Sequence_DNA) sequence_DNAs.get(0);
+		sequence_DNA = (SequenceNucleotide) sequence_DNAs.get(0);
 		String chrName = U.getFileNameWithoutSuffix(chromosomeFile);
 		
 		//stop cannot be bigger than file

@@ -10,7 +10,7 @@ package Peppy;
  */
 public class RNA_Sequence {
 	
-	Sequence_DNA sequenceFile;
+	SequenceNucleotide sequenceFile;
 	NucleotideSequence DNA;
 	byte [] RNA_5to3 = null;
 	byte [] RNA_3to5 = null;
@@ -39,7 +39,7 @@ public class RNA_Sequence {
 	 * @param start
 	 * @param stop
 	 */
-	public RNA_Sequence (Sequence_DNA sequenceFile, NucleotideSequence dna, int start, int stop) {
+	public RNA_Sequence (SequenceNucleotide sequenceFile, NucleotideSequence dna, int start, int stop) {
 		this.sequenceFile = sequenceFile;
 		DNA = dna;
 		this.start = start;
@@ -78,7 +78,7 @@ public class RNA_Sequence {
 		findSpliceLocations();
 	}
 
-	public Sequence_DNA getSequenceFile() {
+	public SequenceNucleotide getSequenceFile() {
 		return sequenceFile;
 	}
 

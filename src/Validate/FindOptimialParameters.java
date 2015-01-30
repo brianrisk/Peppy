@@ -16,8 +16,8 @@ import Peppy.Peppy;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
-import Peppy.Sequence_DNA;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceNucleotide;
+import Peppy.SequenceProtein;
 import Peppy.Spectrum;
 import Peppy.U;
 
@@ -57,7 +57,7 @@ public class FindOptimialParameters {
 		
 		//get our peptides
 		File databaseFile = new File("/Users/risk2/PeppyData/tests/databases/uniprot_sprot.fasta");
-		Sequence_Protein sequence = new Sequence_Protein(databaseFile);	
+		SequenceProtein sequence = new SequenceProtein(databaseFile);	
 		ArrayList<Peptide> peptides = sequence.extractAllPeptides(false);
 		
 		//report thing
@@ -247,7 +247,7 @@ public class FindOptimialParameters {
 
 		
 		//need to initialize things now that we have found matches
-		sequences = Sequence_DNA.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
+		sequences = SequenceNucleotide.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
 		//getting reverse matches -- need to reload the sequences
 		U.p("getting reverse matches");

@@ -16,11 +16,11 @@ import java.util.ArrayList;
  * @author Brian Risk
  *
  */
-public class Sequence_Protein extends Sequence {
+public class SequenceProtein extends Sequence {
 	
 	BufferedReader reader = null;
 	
-	public Sequence_Protein(File proteinFile) {
+	public SequenceProtein(File proteinFile) {
 		this.sequenceFile = proteinFile;
 		try {
 			reader = new BufferedReader(new FileReader(proteinFile));

@@ -55,7 +55,7 @@ public class Regions {
 		
 		/* get all interesting regions from each sequence */
 		for (Sequence sequence: sequences) {
-			ArrayList<Match> sequenceMatches = Matches.getMatchesWithSequence((Sequence_DNA) sequence, matches);
+			ArrayList<Match> sequenceMatches = Matches.getMatchesWithSequence((SequenceNucleotide) sequence, matches);
 			Collections.sort(sequenceMatches);
 			
 			/* tracks which regions we are still building 

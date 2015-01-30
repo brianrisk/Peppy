@@ -21,7 +21,7 @@ import java.util.Hashtable;
  * @author Brian Risk
  *
  */
-public class Sequence_DNA extends Sequence{
+public class SequenceNucleotide extends Sequence{
 
 	private ArrayList<NucleotideSequence> nucleotideSequences = null;
 	private int startIndex = 0;
@@ -32,11 +32,11 @@ public class Sequence_DNA extends Sequence{
 	private final int digestionFrameOverlap = 120
 			; //divisible by three
 	
-	public Sequence_DNA(File sequenceFile) {
+	public SequenceNucleotide(File sequenceFile) {
 		this.sequenceFile = sequenceFile;
 	}
 	
-	public Sequence_DNA(String sequenceFileName) {
+	public SequenceNucleotide(String sequenceFileName) {
 		this(new File(sequenceFileName));
 	}
 	

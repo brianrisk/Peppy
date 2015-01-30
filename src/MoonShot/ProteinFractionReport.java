@@ -8,7 +8,7 @@ import java.util.Hashtable;
 import Navigator.Match;
 import Peppy.Protein;
 import Peppy.ProteinCoverage;
-import Peppy.Sequence_Protein;
+import Peppy.SequenceProtein;
 import Peppy.U;
 
 /**
@@ -25,7 +25,7 @@ public class ProteinFractionReport {
 		/* load protein database */
 		Hashtable<String, ProteinCoverage> proteins = new Hashtable<String,ProteinCoverage>();
 		File proteinFile = new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt_Human_2012_03.fasta");
-		Sequence_Protein proteinDatabase = new Sequence_Protein(proteinFile);
+		SequenceProtein proteinDatabase = new SequenceProtein(proteinFile);
 		ArrayList<Protein> proteinsLoaded = proteinDatabase.getProteinsFromDatabase(false, false);	
 		for (Protein protein: proteinsLoaded) {	
 			proteins.put(protein.getName(), new ProteinCoverage(protein));

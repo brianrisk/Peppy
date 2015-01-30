@@ -46,7 +46,7 @@ public class ShortNucleotideDigestionThread  implements Runnable {
 		char aminoAcid;
 		int mod;
 		StringBuffer buildingProtein;
-		Sequence_DNA sequence_DNA = nucleotideSequence.getParentSequence();
+		SequenceNucleotide sequence_DNA = nucleotideSequence.getParentSequence();
 		String name = nucleotideSequence.getSequenceDescription();
 		int index, increment, startIndex, stopIndex;
 		for (boolean isForwardsStrand: strandValues) {

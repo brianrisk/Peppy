@@ -15,7 +15,7 @@ public class NucleotideSequence {
 	
 	private String sequenceDescription;
 	private String sequence;
-	private Sequence_DNA parentSequence;
+	private SequenceNucleotide parentSequence;
 	
 	public static void main (String args[]) {
 		NucleotideSequence ns = new NucleotideSequence(">test", "ATTTGTCTTCGATGACATCAACAAGAGCAAGTTCATCTGCCAAGGC", null);
@@ -30,7 +30,7 @@ public class NucleotideSequence {
 		}
 	}
 	
-	public NucleotideSequence(String sequenceDescription, String sequence, Sequence_DNA parentSequence) {
+	public NucleotideSequence(String sequenceDescription, String sequence, SequenceNucleotide parentSequence) {
 		this.sequenceDescription = sequenceDescription;
 		this.sequence = sequence;
 		this.parentSequence = parentSequence;
@@ -48,7 +48,7 @@ public class NucleotideSequence {
 		return sequence;
 	}
 	
-	public Sequence_DNA getParentSequence() {
+	public SequenceNucleotide getParentSequence() {
 		return parentSequence;
 	}
 	
