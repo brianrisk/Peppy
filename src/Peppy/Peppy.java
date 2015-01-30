@@ -55,7 +55,6 @@ public class Peppy {
 		runJobs(args);
 		//		runDirectory("/Volumes/Research/Breast-converted/", "/Volumes/Research/CPTAC-Breast/jobs/first.txt", args);
 		//		moonShot(args);
-		//		moonShotTest(args);
 
 		/* i'm finished! */
 		printFarewell();
@@ -120,70 +119,6 @@ public class Peppy {
 		}
 
 
-	}
-
-	/**
-	 * Code to automate moon shot analysis
-	 * @param args
-	 */
-	public static void moonShotTest(String [] args) {
-		U.p ("Moon Shot");
-
-		//		File drive = new File("/Volumes/New Volume");
-		//		File [] experimentFolders = drive.listFiles();
-		//		for (File experimentFolder: experimentFolders) {
-		//			if (!experimentFolder.getName().startsWith("3_")) continue;
-		//			if (!experimentFolder.isHidden() && experimentFolder.isDirectory() && !experimentFolder.getName().startsWith("$")) {
-		//				File [] spectrumFiles = experimentFolder.listFiles();
-		//				for (File spectrumFile: spectrumFiles) {
-		//					File spectrumFile = new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG66to68.mgf");
-		//
-		//
-		/* 
-		 * this initializes with the default "properties.txt" 
-		 * provides a base so common properties don't need to be
-		 * redefined
-		 */
-		init(args);
-
-		//					if (!name.endsWith(".mgf")) continue;
-		Properties.spectraDirectoryOrFileList.add(new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG69to77.mgf"));
-		Properties.spectraDirectoryOrFileList.add(new File("/Volumes/New Volume/3_IPAS388_H1651/LO2_IP0388_TCE_SG66to68.mgf"));
-
-		propertyFileString = "two" + ".txt";
-		U.p("running job " + propertyFileString);
-
-
-		/* 
-		 * All properties override those defined in "properties.txt"
-		 */
-		Properties.smartTolerances = false;
-		Properties.precursorTolerance = 14;
-		Properties.fragmentTolerance = 500;
-		Properties.modC = 57.02146;
-		Properties.modK = 6.020129;
-		Properties.peptideMassMinimum = 750;
-		Properties.peptideMassMaximum = 3800;
-
-		//as we are directly setting modification properties, we need to directly init the acid masses
-		AminoAcids.init();
-
-		Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
-		Properties.isSequenceFileDNAList.add(false);
-
-		try {
-			runPeppy(null);
-		}
-		catch (Exception e) {
-			U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			e.printStackTrace();
-			U.p("\r\r");
-			U.p("An error occurred. Continuing with the next job...\r\r");
-		}
-		U.p();
-		//				}
-		//			}
-		//		}
 	}
 
 
@@ -299,31 +234,6 @@ public class Peppy {
 		U.stopStopwatch();
 	}
 
-	/**
-	 * Stripped down but does FDR
-	 * @param args
-	 */
-	public static void runBasicPeppy(String [] args) {
-		U.startStopwatch();
-
-		/* where we store the report */
-		File mainReportDir = createReportDirectory();
-
-		/* Get references to our sequence files -- no nucleotide data is loaded at this point */
-		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
-
-		/* load spectra */
-		ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
-		int originalSpectraSize = spectra.size();
-		U.p("loaded " + originalSpectraSize + " spectra");
-
-		FDR fdr = new FDR(spectra);
-		int numberFound = fdr.getCutoffIndex(0.01);
-		double percentFound = (double) numberFound / spectra.size();
-		U.p("Found at 1%FDR: " + numberFound + " (" + Properties.percentFormat.format(percentFound) + ")");
-
-		U.stopStopwatch();
-	}
 
 
 	/**
