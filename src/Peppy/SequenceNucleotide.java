@@ -129,8 +129,6 @@ public class SequenceNucleotide extends Sequence{
 				}
 			}
 			
-	//		U.p("digesting from " + startIndex + " to " + stopIndex + " in " + this.getSequenceFile().getName());
-			
 			/* Create our SequenceDigestionThread ArrayList */
 			ArrayList<DigestionThread_DNA> digestors = new ArrayList<DigestionThread_DNA>();
 			for (int frame = 0; frame < 3; frame++) {
