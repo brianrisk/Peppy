@@ -62,6 +62,7 @@ public class ModificationEntry implements Comparable<ModificationEntry>{
 				out.add(new ModificationEntry(line));
 				line = br.readLine();
 			}
+			br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

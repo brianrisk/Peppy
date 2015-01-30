@@ -1,4 +1,4 @@
-package Peppy;
+package Experimental;
 
 /**
  * A class that stores information about fuzzy matches between a peptide

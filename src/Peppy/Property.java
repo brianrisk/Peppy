@@ -13,12 +13,6 @@ public class Property {
 	private String description;
 	private String value;
 	
-	private static int typeValue = 0;
-	private static final int BOOLEAN = typeValue++;
-	private static final int INT = typeValue++;
-	private static final int DOUBLE = typeValue++;
-	private static final int STRING = typeValue++;
-	
 	public Property(String name, String description) {
 		this.name = name;
 		this.description = description;

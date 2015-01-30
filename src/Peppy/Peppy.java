@@ -12,7 +12,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import Reports.HTMLReporter;
-import Reports.SpectrumReport;
 import Reports.TextReporter;
 
 /**
