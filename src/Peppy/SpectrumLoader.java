@@ -7,29 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import uk.ac.ebi.jmzml.model.mzml.BinaryDataArray;
-import uk.ac.ebi.jmzml.model.mzml.BinaryDataArrayList;
-import uk.ac.ebi.jmzml.model.mzml.CVParam;
-import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
-import uk.ac.ebi.jmzml.model.mzml.Precursor;
-import uk.ac.ebi.jmzml.model.mzml.PrecursorList;
-import uk.ac.ebi.jmzml.model.mzml.SelectedIonList;
-import uk.ac.ebi.jmzml.xml.io.MzMLObjectIterator;
-import uk.ac.ebi.jmzml.xml.io.MzMLUnmarshaller;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.ms2_parser.Ms2File;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLFile;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 
 /**
@@ -113,12 +91,6 @@ public class SpectrumLoader {
 		
 			ArrayList<Spectrum> spectra = new ArrayList<Spectrum>();
 			
-		
-			//if the spectra are in a .mzml file, then use a different method and return;
-			if(inFile.getAbsolutePath().toLowerCase().endsWith(".mzml") || inFile.getAbsolutePath().toLowerCase().endsWith(".mzml.xml") ){
-				spectra = loadMZMLSpectra(inFile);
-			}//if
-			
 			if(inFile.getAbsolutePath().toLowerCase().endsWith(".mgf")){
 				spectra = loadMGFSpectra(inFile);
 			}
@@ -131,15 +103,7 @@ public class SpectrumLoader {
 			if(inFile.getAbsolutePath().toLowerCase().endsWith(".pkl")){
 				spectra = loadPKLSpectra(inFile);
 			}
-			if(inFile.getAbsolutePath().toLowerCase().endsWith(".mz.xml") || inFile.getAbsolutePath().toLowerCase().endsWith(".mzxml")
-						|| inFile.getAbsolutePath().toLowerCase().endsWith(".mzxml.xml")){
-				spectra = loadMzXMLSpectra(inFile);
-			}
-			
-			if(inFile.getAbsolutePath().toLowerCase().endsWith(".ms2")){
-				spectra = loadMS2Spectra(inFile);
-			}
-			
+
 			/* tracks the index within a file for files that have more than one spectrum */
 			for (int i = 0; i < spectra.size(); i++) {
 				spectra.get(i).setFileLocus(i);
@@ -320,122 +284,7 @@ public class SpectrumLoader {
 		return out;
 	}//loadDTASpectra
 	
-	/**
-	 * 
-	 * Uses jmzml http://code.google.com/p/jmzml/
-	 * @param inFile
-	 * @return
-	 */
-	private static ArrayList<Spectrum> loadMZMLSpectra(File inFile){
-		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
-
-		/* turning of logging because it is used extensively in the jmzML code  */
-		List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-		loggers.add(LogManager.getRootLogger());
-		for ( Logger logger : loggers ) {
-			logger.setLevel(Level.ERROR);
-		}
-
-		MzMLUnmarshaller unmarshaller = new MzMLUnmarshaller(inFile);	
-//		MzML completeMzML = unmarshaller.unmarshall();
-//		List<uk.ac.ebi.jmzml.model.mzml.Spectrum> allSpectra = completeMzML.getRun().getSpectrumList().getSpectrum();
-		MzMLObjectIterator<uk.ac.ebi.jmzml.model.mzml.Spectrum> spectrumIterator = unmarshaller.unmarshalCollectionFromXpath("/run/spectrumList/spectrum", uk.ac.ebi.jmzml.model.mzml.Spectrum.class);
-
-		
-		System.out.println("Number of spectrum elements: " + unmarshaller.getObjectCountForXpath("/run/spectrumList/spectrum"));
-
-		int spectrumCount = 0;
-		long millisecondsThen = System.currentTimeMillis();
-		long millisecondsNow;
-		int skippedTotal = 0;
-		
-		uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLSpectrum;
-		while (spectrumIterator.hasNext()){
-//		for (uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLSpectrum: allSpectra) {
-
-			spectrumCount++;
-			if (spectrumCount == 10000) {
-//				U.p("skippedTotal: " + skippedTotal);
-//				return out;
-			}
-			if (spectrumCount % 100 == 0) {
-				millisecondsNow = System.currentTimeMillis();
-//				U.p("spectrumCount: " + spectrumCount + ", " + (millisecondsNow - millisecondsThen));
-				millisecondsThen = millisecondsNow;
-			}
-
-			/* read next spectrum from XML file */
-			mzMLSpectrum = spectrumIterator.next();
-
-			/* Create a list to retrieve mass and intensity data */
-			BinaryDataArrayList bdal = mzMLSpectrum.getBinaryDataArrayList();
-			
-			List<BinaryDataArray> lbd = bdal.getBinaryDataArray();
-
-			/* If a spectra has both mass and intensity list add it to the output */
-			if(lbd.size() >= 2){
-				
-				//Create an empty spectrum
-				Spectrum spectrumUnderConstruction = new Spectrum();
-				spectrumUnderConstruction.setFile(inFile);
-				
-				/* retrieve precursor values */
-				PrecursorList precursorList = mzMLSpectrum.getPrecursorList();
-				if(precursorList != null){
-					List<Precursor> lpc = precursorList.getPrecursor();
-					SelectedIonList sil = lpc.get(0).getSelectedIonList();
-					List<ParamGroup> lsi = sil.getSelectedIon();
-					List<CVParam> lcv = lsi.get(0).getCvParam();
-
-					for(int i = 0; i < lcv.size(); i++){
-						if(lcv.get(i).getName().equals("selected ion m/z")){
-							spectrumUnderConstruction.setPrecursorMZ(Double.parseDouble(lcv.get(i).getValue()));
-						}
-						if(lcv.get(i).getName().equals("charge state")){
-							spectrumUnderConstruction.setCharge(Integer.parseInt(lcv.get(i).getValue()));
-						}
-					}
-
-					/* determining mass and setting that property */
-					spectrumUnderConstruction.setMass(spectrumUnderConstruction.getPrecursorMZ() - Definitions.HYDROGEN_MONO);
-					spectrumUnderConstruction.setMass(spectrumUnderConstruction.getMass() * spectrumUnderConstruction.getCharge());
-
-				} else {
-					skippedTotal++;
-					continue;
-				}
-		
-				/* Create mass and intensity list to access for the creation of this spectrum */
-				BinaryDataArray mass = lbd.get(0);
-				BinaryDataArray intensity = lbd.get(1);
-				Number [] massArray =  mass.getBinaryDataAsNumberArray();
-				Number [] intensityArray =  intensity.getBinaryDataAsNumberArray();
-				ArrayList<Peak> peaks = new ArrayList<Peak>(massArray.length);
-				for(int j = 0; j < massArray.length;j++){
-					Peak p = new Peak(massArray[j].floatValue(), intensityArray[j].floatValue());
-					peaks.add(p);
-				}
-
-				/* Save the peaks read from the file */
-				spectrumUnderConstruction.setPeaks(peaks);
-
-				spectrumUnderConstruction.setFile(inFile);
-				
-				/* clean the peaks */
-				cleanPeaks(spectrumUnderConstruction);
-
-				//Store the spectrum into output
-				out.add(spectrumUnderConstruction);
-
-			}//if size == 2
-
-
-		}//While iterator hasNext
-		
-		U.p("finished with mzML file: " + inFile.getName());
-
-		return out;
-	}//loadMZML Spectra
+	
 
 	private static ArrayList<Spectrum> loadMGFSpectra(File inFile){
 		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
@@ -587,168 +436,6 @@ public class SpectrumLoader {
 	}//loadMGFSpectaInFile
 	
 	
-	/**
-	 * Uses jmzReader from: http://code.google.com/p/jmzreader/wiki/Welcome
-	 * @param inFile
-	 * @return
-	 */
-	private static ArrayList<Spectrum> loadMzXMLSpectra(File inFile){
-		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
-		
-		
-		//Upload the MzXML fil using the jmzReader library
-		try {
-			JMzReader mzxmlFile = new MzXMLFile(inFile);
-			
-			
-			Iterator<uk.ac.ebi.pride.tools.jmzreader.model.Spectrum> iter = mzxmlFile.getSpectrumIterator();
-			
-			
-			//Iterate through the spectra information in a file and create Spectrum objects from them.
-			while(iter.hasNext()){
-			
-				Spectrum peppySpectrum = new Spectrum();
-				
-				uk.ac.ebi.pride.tools.jmzreader.model.Spectrum jmzSpec = iter.next();
-				
-				
-				//Get the precursor charge and m/z
-				if(jmzSpec.getPrecursorCharge() != null){
-					peppySpectrum.setCharge(jmzSpec.getPrecursorCharge());
-				}
-				
-				if(jmzSpec.getPrecursorMZ() != null){
-					peppySpectrum.setPrecursorMZ(jmzSpec.getPrecursorMZ());
-				}
-				
-				
-				
-
-				if(jmzSpec.getPrecursorMZ() != null && jmzSpec.getPrecursorCharge() != null){
-					peppySpectrum.setMass((jmzSpec.getPrecursorMZ() - Definitions.HYDROGEN_MONO) * jmzSpec.getPrecursorCharge());
-				}
-				
-
-				
-				ArrayList<Peak> peaks = new ArrayList<Peak>();
-				Map<Double, Double> peakList = jmzSpec.getPeakList();
-			
-				for(Double mz: peakList.keySet()){
-					Double intensity = peakList.get(mz);
-					
-					try {
-						Peak p = new Peak( mz.doubleValue() + " " +  intensity.doubleValue());
-						peaks.add(p);
-					} catch (Exception e) {
-						// Ignore bad peaks
-					}//catch
-					
-				}//Iterate through the peaks and add them to the spectrum object
-			
-				
-				//Set meta data
-				
-				peppySpectrum.setPeaks(peaks);
-				
-				peppySpectrum.setFile(inFile);
-				
-				cleanPeaks(peppySpectrum);
-				
-				out.add(peppySpectrum);
-				
-			}//While going through peaks
-			
-			
-		} catch (MzXMLParsingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//Upload the needed information from the mzXML
-		
-		
-		
-		return out;
-	}//loadMzXMLSpectra
-	
-
-	/**
-	 * 
-	 * Uses jmzreader http://code.google.com/p/jmzreader/
-	 * @param inFile
-	 * @return
-	 */
-	private static ArrayList<Spectrum> loadMS2Spectra(File inFile){
-		ArrayList<Spectrum> out = new ArrayList<Spectrum>();
-		
-		try {
-			JMzReader ms2File = new Ms2File(inFile);
-			
-			Iterator<uk.ac.ebi.pride.tools.jmzreader.model.Spectrum> iter = ms2File.getSpectrumIterator();
-			
-			
-			//Iterate through the spectra information in a file and create Spectrum objects from them.
-			while(iter.hasNext()){
-				
-				Spectrum peppySpectrum = new Spectrum();
-				
-				uk.ac.ebi.pride.tools.jmzreader.model.Spectrum jmzSpec = iter.next();
-			
-				//Get the precursor charge and m/z
-				if(jmzSpec.getPrecursorCharge() != null){
-					peppySpectrum.setCharge(jmzSpec.getPrecursorCharge());
-				}
-				
-				if(jmzSpec.getPrecursorMZ() != null){
-					peppySpectrum.setPrecursorMZ(jmzSpec.getPrecursorMZ());
-				}
-				
-				
-				
-				//I am not sure which of these two methods are correct.  It seems that each file needs its mass calculated in a different way.
-				if(jmzSpec.getPrecursorMZ() != null  && jmzSpec.getPrecursorCharge() != null ){
-					peppySpectrum.setMass((jmzSpec.getPrecursorMZ()  - Definitions.HYDROGEN_MONO ) * jmzSpec.getPrecursorCharge());
-				}
-				
-
-				
-				ArrayList<Peak> peaks = new ArrayList<Peak>();
-				Map<Double, Double> peakList = jmzSpec.getPeakList();
-			
-				for(Double mz: peakList.keySet()){
-					Double intensity = peakList.get(mz);
-					
-					try {
-						Peak p = new Peak( mz.doubleValue() + " " +  intensity.doubleValue());
-						peaks.add(p);
-					} catch (Exception e) {
-						// Ignore bad peaks
-					}//catch
-					
-				}//Iterate through the peaks and add them to the spectrum object
-			
-				
-				//Set meta data
-				
-				peppySpectrum.setPeaks(peaks);
-				
-				peppySpectrum.setFile(inFile);
-				
-				cleanPeaks(peppySpectrum);
-				
-				out.add(peppySpectrum);
-			
-			
-			}//while
-			
-		} catch (JMzReaderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return out;
-		
-	}//loadMS2Spectra
 	
 	
 	
