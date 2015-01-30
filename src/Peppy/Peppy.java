@@ -297,7 +297,7 @@ public class Peppy {
 			File savedSpectraDir = new File(mainReportDir, "spectra");
 			savedSpectraDir.mkdirs();
 
-			/* if there re multiple jobs, the latter varimod settings will persist.
+			/* if there re multiple jobs, the latter blind modification settings will persist.
 			 * we reset those to normal, modification-less parameters
 			 */
 			Properties.scoringMethodName = "Peppy.Match_IMP";
@@ -307,9 +307,6 @@ public class Peppy {
 			ArrayList<Spectrum> spectra = SpectrumLoader.loadSpectra();
 			int originalSpectraSize = spectra.size();
 			if (verbose) U.p("loaded " + originalSpectraSize + " spectra.");
-
-			/* create a spectrum report */
-			SpectrumReport.spectrumReport(spectra, mainReportDir);
 
 			/* this will maintain our list of score cutoffs */
 			PrintWriter metricsReport = new PrintWriter(new FileWriter (new File(mainReportDir, "metrics.txt")));
@@ -357,12 +354,6 @@ public class Peppy {
 						if (Properties.maximumFDR >= 0) {
 							int numberFound = fdr.getCutoffIndex(Properties.maximumFDR);
 							double percentFound = (double) numberFound / spectra.size();
-							//								if (percentFound < 0.05) {
-							//									U.p("ERROR: only " + Properties.percentFormat.format(percentFound) + " (" + numberFound + ") spectra identified.");
-							//									return;
-							//								} else {
-							//									U.p("initial FDR found " + Properties.percentFormat.format(percentFound));
-							//								}
 							if (verbose) U.p("initial FDR found " + numberFound + "(" + Properties.percentFormat.format(percentFound) + ")");
 						}
 
@@ -559,7 +550,11 @@ public class Peppy {
 
 						/* if we will not find any matches with confidence, skip this round */
 						//NOTE:  in the event of "continue" it will produce no report.  Look out for this when assembling reports!
-						if (potentialMinimumScore < 0) return;
+						if (potentialMinimumScore < 0) {
+							metricsReport.flush();
+							metricsReport.close();
+							return;
+						}
 						Properties.minimumScore = potentialMinimumScore;
 					}
 
@@ -618,9 +613,6 @@ public class Peppy {
 
 			metricsReport.flush();
 			metricsReport.close();
-
-
-
 
 			/* create graphic reports */
 			//			BestMatches bm = new BestMatches(mainReportDir, ResultsCategory.DNA, null);
