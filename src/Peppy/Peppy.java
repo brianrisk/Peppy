@@ -969,9 +969,12 @@ public class Peppy {
 			for (int regionIndex = 0; regionIndex < regions.size(); regionIndex++) {
 				region = regions.get(regionIndex);
 				if (dnaSequence.equals(region.getSequence())) {
-
-					//TODO get rid of this 500
-					out.addAll(dnaSequence.extractPeptidesFromRegion(region.getStartLocation() - 200, region.getStopLocation() + 200, isReverse));
+					out.addAll(
+							dnaSequence.extractPeptidesFromRegion(
+									region.getStartLocation() - Properties.targetedSearchRadius, 
+									region.getStopLocation() + Properties.targetedSearchRadius, 
+									isReverse)
+							);
 				}
 			}
 			sequence.reset();
@@ -979,6 +982,7 @@ public class Peppy {
 		Collections.sort(out);
 		return out;
 	}
+	
 
 	private static File createReportDirectory() {
 		/* create new report directory */
