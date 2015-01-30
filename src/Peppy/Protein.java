@@ -82,7 +82,7 @@ public class Protein {
 
 		//setting up the acid indicies
 		int [] acidIndicies = new int[acidString.length()];
-		if (Properties.isSequenceFileDNA) {
+		if (Properties.isSequenceFileNucleotide) {
 			if (isSpliced) {
 				//Setting up nucleotide positions
 				//doing this as divisions at intron start/stop might not be clean; this is just the
@@ -304,7 +304,7 @@ public class Protein {
 		 * allowing peptides with those peptide for the
 		 * DNA searches
 		 */
-		if (Properties.useSelenocysteine && Properties.isSequenceFileDNA) {
+		if (Properties.useSelenocysteine && Properties.isSequenceFileNucleotide) {
 			if (sequenceString.indexOf('U') == -1) return;
 		}
 		
@@ -325,7 +325,7 @@ public class Protein {
 			int intronStop = peptideIntronStopIndex;
 			
 			/* Adjust indicies for DNA and RNA */
-			if (Properties.isSequenceFileDNA) {
+			if (Properties.isSequenceFileNucleotide) {
 				if (isForward) {
 					//2, not 3, because index already at 1
 					stopIndex += 2;

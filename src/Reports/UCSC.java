@@ -33,7 +33,7 @@ public class UCSC {
 	}
 	
 	public static String getLink(int start, int stop, Sequence sequence) {
-		if (Properties.isSequenceFileDNA) {
+		if (Properties.isSequenceFileNucleotide) {
 			String link = "http://genome.ucsc.edu/cgi-bin/hgTracks?hgHubConnect.destUrl=..%2Fcgi-bin%2FhgTracks&" + Properties.UCSCdatabase + "&position=";
 			link += U.getFileNameWithoutSuffix(sequence.getSequenceFile());
 			link += "%3A";

@@ -16,7 +16,7 @@ public class CheckSequences {
 	
 	public static void checkSequences() {
 		U.p("making sure we have the correct start and stop locations");
-		Properties.isSequenceFileDNA = true;
+		Properties.isSequenceFileNucleotide = true;
 		Properties.numberOfMissedCleavages = 1;
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		ArrayList<Peptide> peptides;

@@ -180,11 +180,11 @@ public class Peppy {
 					AminoAcids.init();
 
 					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
-					Properties.isSequenceFileDNAList.add(false);
+					Properties.isSequenceFileNucleotideList.add(false);
 					//					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19"));
 					//					Properties.isSequenceFileDNAList.add(true);
 					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/Hanash/sequences/regions/lung28"));
-					Properties.isSequenceFileDNAList.add(false);
+					Properties.isSequenceFileNucleotideList.add(false);
 
 					try {
 						runPeppy(null);
@@ -306,7 +306,7 @@ public class Peppy {
 				/* set up our sequence data.
 				 * Setting this property will also affect the FDR calculation */
 				Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
-				Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
+				Properties.isSequenceFileNucleotide = Properties.isSequenceFileNucleotideList.get(sequenceIndex);
 				ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
 
 
@@ -440,7 +440,7 @@ public class Peppy {
 				if (matches == null) continue;
 
 				/* if matches are from nucleotide searches, then save the spectra */
-				if (Properties.isSequenceFileDNA) {
+				if (Properties.isSequenceFileNucleotide) {
 					for (Match match: matches) {
 						match.getSpectrum().saveDTA(savedSpectraDir);
 					}
@@ -884,7 +884,7 @@ public class Peppy {
 		ArrayList<Match> matches = getMatches(sequences, spectraMatches, false);
 
 		/* performing the multipass search */
-		if (Properties.multipass && Properties.isSequenceFileDNA) {
+		if (Properties.multipass && Properties.isSequenceFileNucleotide) {
 			matches = multipass(matches, sequences, spectraMatches);
 		}
 		return matches;
@@ -959,7 +959,7 @@ public class Peppy {
 		ArrayList<Match> matches = getMatches(sequences, spectraMatches, true);
 
 		/* performing the multipass search */
-		if (Properties.multipass && Properties.isSequenceFileDNA) {
+		if (Properties.multipass && Properties.isSequenceFileNucleotide) {
 			matches = multipass(matches, sequences, spectraMatches);
 		}
 

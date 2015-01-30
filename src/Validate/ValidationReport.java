@@ -90,7 +90,7 @@ public class ValidationReport {
 		Properties.fragmentTolerance = 300;
 		
 		/* this needs to happen or the text reports at the end crash */
-		Properties.isSequenceFileDNA = !Properties.testSequenceIsProtein;
+		Properties.isSequenceFileNucleotide = !Properties.testSequenceIsProtein;
 		
 		
 		

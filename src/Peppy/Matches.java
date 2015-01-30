@@ -84,7 +84,7 @@ public abstract class Matches implements Comparable<Matches> {
 					 * 
 					 * This one line of code can save huge amounts of memory.
 					 */
-					if (Properties.isSequenceFileDNA && matches.size() >= 4) return;
+					if (Properties.isSequenceFileNucleotide && matches.size() >= 4) return;
 					
 					matches.add(match);
 				}

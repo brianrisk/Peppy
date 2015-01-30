@@ -89,7 +89,7 @@ public class Properties {
 	/* a list of peptide databases that will be iterated through in our search */
 	public static ArrayList<File> sequenceDirectoryOrFileList = new ArrayList<File>();
 	/* an ordered list of the database type (DNA, protein etc) for our peptide sources */
-	public static ArrayList<Boolean> isSequenceFileDNAList = new ArrayList<Boolean>();
+	public static ArrayList<Boolean> isSequenceFileNucleotideList = new ArrayList<Boolean>();
 	/* a list of spectra sources that will be iterated through in our search */
 	public static ArrayList<File> spectraDirectoryOrFileList = new ArrayList<File>();
 	
@@ -97,7 +97,7 @@ public class Properties {
 	public static File spectraDirectoryOrFile = new File("spectra");
 	
 	//FASTA files can be either DNA or amino acid sequences
-	public static boolean isSequenceFileDNA = true;
+	public static boolean isSequenceFileNucleotide = true;
 	
 	//Is the sequence file supposed to be read only in the first frame?
 	public static boolean useOnlyForwardsFrames = false;
@@ -248,7 +248,7 @@ public class Properties {
 		/* a list of peptide databases that will be iterated through in our search */
 		sequenceDirectoryOrFileList = new ArrayList<File>();
 		/* an ordered list of the database type (DNA, protein etc) for our peptide sources */
-		isSequenceFileDNAList = new ArrayList<Boolean>();
+		isSequenceFileNucleotideList = new ArrayList<Boolean>();
 		/* a list of spectra sources that will be iterated through in our search */
 		spectraDirectoryOrFileList = new ArrayList<File>();
 		
@@ -256,7 +256,7 @@ public class Properties {
 		spectraDirectoryOrFile = new File("spectra");
 		
 		//FASTA files can be either DNA or amino acid sequences
-		isSequenceFileDNA = true;
+		isSequenceFileNucleotide = true;
 		
 		//Is the sequence file supposed to be read only in the first frame?
 		useOnlyForwardsFrames = false;
@@ -349,7 +349,7 @@ public class Properties {
 		/* All arrays must be cleared for multiple jobs to work!  clearing out our arrays */
 		/* this means that spectra and sequences must be set in each job file; they cannot be blank */
 		sequenceDirectoryOrFileList = new ArrayList<File>();
-		isSequenceFileDNAList = new ArrayList<Boolean>();
+		isSequenceFileNucleotideList = new ArrayList<Boolean>();
 		spectraDirectoryOrFileList = new ArrayList<File>();
 		cleavageAcidList = new ArrayList<Character>();
 		
@@ -477,9 +477,14 @@ public class Properties {
 			spectraDirectoryOrFile = new File(propertyValue);
 			spectraDirectoryOrFileList.add(spectraDirectoryOrFile);
 		}
+		//here fore legacy reasons as we have renamed this property
 		if (propertyName.equals("isSequenceFileDNA")) {
-			isSequenceFileDNA = Boolean.valueOf(propertyValue);
-			isSequenceFileDNAList.add(isSequenceFileDNA);
+			isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
+			isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
+		}
+		if (propertyName.equals("isSequenceFileNucleotide")) {
+			isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
+			isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
 		}
 		if (propertyName.equals("useOnlyForwardsFrames")) {
 			useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
@@ -616,8 +621,8 @@ public class Properties {
 			for (File file: sequenceDirectoryOrFileList) {
 				pw.println("sequenceDirectoryOrFile " + file.getAbsolutePath());
 			}
-			for (Boolean bool: isSequenceFileDNAList) {
-				pw.println("isSequenceFileDNA " + bool);
+			for (Boolean bool: isSequenceFileNucleotideList) {
+				pw.println("isSequenceFileNucleotide " + bool);
 			}
 			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
 			pw.println();

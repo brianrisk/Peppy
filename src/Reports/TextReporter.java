@@ -53,7 +53,7 @@ public class TextReporter {
 			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
 			pw.println("format version 20");
 			
-			if (Properties.isSequenceFileDNA) {
+			if (Properties.isSequenceFileNucleotide) {
 				pw.println("> analysis-type: nucleotide");
 			} else {
 				pw.println("> analysis-type: protein");
@@ -91,7 +91,7 @@ public class TextReporter {
 			sb.append("stop");
 			sb.append('\t');
 			sb.append("SequenceName");
-			if (Peppy.Properties.isSequenceFileDNA) {
+			if (Peppy.Properties.isSequenceFileNucleotide) {
 				sb.append('\t');
 				sb.append("Strand");
 				sb.append('\t');

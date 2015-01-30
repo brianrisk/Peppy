@@ -152,7 +152,7 @@ public class PaperExperiments {
 				/* set up our sequence data.
 				 * Setting this property will also affect the FDR calculation */
 				Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
-				Properties.isSequenceFileDNA = Properties.isSequenceFileDNAList.get(sequenceIndex);
+				Properties.isSequenceFileNucleotide = Properties.isSequenceFileNucleotideList.get(sequenceIndex);
 				ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);			
 				
 				FDR fdr = new FDR(spectra);

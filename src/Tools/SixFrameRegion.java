@@ -37,7 +37,7 @@ public class SixFrameRegion {
 		Peppy.init(args);
 		
 		/* sequence will always be DNA */
-		Properties.isSequenceFileDNA = true;
+		Properties.isSequenceFileNucleotide = true;
 
 		
 //		createDatabaseFromGTF();

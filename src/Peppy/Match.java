@@ -385,7 +385,7 @@ public abstract class Match implements Comparable<Match>{
 		sb.append('\t');
 		sb.append(getPeptide().getStopIndex());
 		sb.append('\t');
-		if (Properties.isSequenceFileDNA) {
+		if (Properties.isSequenceFileNucleotide) {
 			if (getPeptide().getParentSequence() != null) {
 				if (getPeptide().getProtein() != null) {
 					sb.append(getPeptide().getProtein().getName());

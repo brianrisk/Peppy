@@ -29,7 +29,7 @@ public class Regions {
 		this.sequences = sequences;
 		
 		/* Find interesting regions */
-		if (Properties.isSequenceFileDNA) {
+		if (Properties.isSequenceFileNucleotide) {
 			
 			/* set sort parameter to sort by locus */
 			Match.setSortParameter(Match.SORT_BY_LOCUS);
