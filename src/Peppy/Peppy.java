@@ -962,15 +962,11 @@ public class Peppy {
 		/* our return */
 		ArrayList<Peptide> out = new ArrayList<Peptide>();
 
-		/* determine how many regions we will use to generate our new set of peptides */
-		int numberOfRegionsToKeep = Properties.numberOfRegionsToKeep;
-		if (numberOfRegionsToKeep > regions.size()) numberOfRegionsToKeep = regions.size();
-
 		/* get peptides along regions */
 		Region region;
 		for (Sequence sequence: sequences) {
 			SequenceNucleotide dnaSequence = (SequenceNucleotide) sequence;
-			for (int regionIndex = 0; regionIndex < numberOfRegionsToKeep; regionIndex++) {
+			for (int regionIndex = 0; regionIndex < regions.size(); regionIndex++) {
 				region = regions.get(regionIndex);
 				if (dnaSequence.equals(region.getSequence())) {
 

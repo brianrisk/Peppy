@@ -158,17 +158,6 @@ public class Regions {
 			File regionsHTMLFolder = new File(reportDir, "regions html");
 			regionsHTMLFolder.mkdirs();
 			
-			/* determine how many regions we are reporting */
-			int max = Properties.numberOfRegionsToKeep;
-			if (regions.size() < max) max = regions.size();
-			
-			/* trim down regions to this amount */
-			ArrayList<Region> lessRegions = new ArrayList<Region>(max);
-			for (int i = 0; i < max; i++) {
-				lessRegions.add(regions.get(i));
-			}
-			regions = lessRegions;
-			
 			/* set up the main regions HTML file */
 			HTMLPageRegions indexPage = new HTMLPageRegions(new File(regionsHTMLFolder, "index.html"), regions);
 			indexPage.makePage();
