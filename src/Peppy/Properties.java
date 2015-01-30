@@ -589,7 +589,7 @@ public class Properties {
 		try {
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(ppropertiesFile)));
 			
-			pw.println("##This could be a directory or a file ");
+			pw.println("## This could be a directory or a file ");
 			for (File file: sequenceDirectoryOrFileList) {
 				pw.println("sequenceDirectoryOrFile " + file.getAbsolutePath());
 			}
@@ -598,38 +598,39 @@ public class Properties {
 			}
 			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
 			pw.println();
-			pw.println("##This could be a directory or a file ");
+			pw.println("## This could be a directory or a file ");
 			for (File file: spectraDirectoryOrFileList) {
 				pw.println("spectraDirectoryOrFile " + file.getAbsolutePath());
 			}
 			pw.println();
-			pw.println("##Digestion rules");
+			pw.println("## Digestion rules");
 			for (Character acid: cleavageAcidList) {
 				pw.println("cleavageAcid " + acid);
 			}	
 			pw.println("cleavageAtCarboxylSide " + Properties.cleavageAtCarboxylSide);
 			pw.println();
+			pw.println("## iTRAQ");
 			pw.println("isITRAQ " + Properties.isITRAQ);
 			pw.println("ITRAQ_REAGENT " + Properties.ITRAQ_REAGENT);
 			pw.println();
-			pw.println("##Spectrum cleaning");
+			pw.println("## Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
 			pw.println();
-			pw.println("##error thresholds in PPM");
+			pw.println("## error thresholds in PPM");
 			pw.println("precursorTolerance " + Properties.precursorTolerance);
 			pw.println("fragmentTolerance " + Properties.fragmentTolerance);
 			pw.println();
-			pw.println("##no fragments that weigh less than this will be admitted into the fragment list ");
+			pw.println("## no fragments that weigh less than this will be admitted into the fragment list ");
 			pw.println("##units are daltons. ");
 			pw.println("peptideMassMinimum " + Properties.peptideMassMinimum);
 			pw.println("peptideMassMaximum " + Properties.peptideMassMaximum);
 			pw.println();
 			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
 			pw.println();
-			pw.println("##where we store our reports ");
+			pw.println("## where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);
 			pw.println();
-			pw.println("##False Discovery Rates");
+			pw.println("## False Discovery Rates");
 			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println("maximumFDR " + maximumFDR);
 			pw.println();

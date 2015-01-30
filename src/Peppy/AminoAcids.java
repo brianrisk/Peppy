@@ -53,9 +53,6 @@ public class AminoAcids {
 	public static final byte Y = tracker++;
 	public static final byte U = tracker++;
 	
-	
-	
-	
 	private static double [] weightsMono = new double[acids.length];
 	private static double [] weightsAverage = new double[acids.length];
 	
