@@ -136,7 +136,7 @@ public class Properties {
 	/* PTMs */
 	public static boolean multipass = false;
 	public static int numberOfRegionsToKeep = 1000;
-	public static boolean searchModifications = false;
+	public static boolean searchModifications = true;
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
 	
