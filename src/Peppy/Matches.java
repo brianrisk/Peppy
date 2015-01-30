@@ -283,7 +283,7 @@ public abstract class Matches implements Comparable<Matches> {
 	
 	public void calculateEValues() {
 		calculateHistogramProperties();
-		score = Double.MIN_VALUE;
+		score = Double.NEGATIVE_INFINITY;
 		double eValue;
 		for (Match match: matches) {
 			eValue = calculateEValueOfScore(match.getScore());

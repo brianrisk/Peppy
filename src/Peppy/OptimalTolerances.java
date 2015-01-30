@@ -22,7 +22,7 @@ public class OptimalTolerances {
 	ArrayList<Double> absoluteFragmentErrors = new ArrayList<Double>();
 	int minimumNumberOfPeaks = Integer.MAX_VALUE;
 	double minimumMass = Double.MAX_VALUE;
-	double maximumMass = Double.MIN_VALUE;
+	double maximumMass = Double.NEGATIVE_INFINITY;
 	double optimalPrecursorError;
 	double meanPrecursorError;
 	double optimalFragmentError;
