@@ -47,7 +47,7 @@ public class Match_DeNovo extends Match {
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = nTerminalMass + cTerminalMass + peptide.getMass() + Properties.rightIonDifference;
 		if (Properties.isITRAQ) {
-			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT;
+			theoreticalPeakMass -= Properties.ITRAQ_REAGENT;
 		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= peptide.getResidueMass(i);
@@ -85,7 +85,7 @@ public class Match_DeNovo extends Match {
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		if (Properties.isITRAQ) {
-			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
+			theoreticalPeakMass += Properties.ITRAQ_REAGENT;
 		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += peptide.getResidueMass(i);

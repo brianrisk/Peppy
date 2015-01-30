@@ -60,6 +60,7 @@ public class Properties {
 	
 	/* mass spectrometer settings */
 	public static boolean isITRAQ = false;
+	public static double ITRAQ_REAGENT = 144.1021;
 	
 	
 	//Segmenting up job for memory management
@@ -210,6 +211,7 @@ public class Properties {
 		
 		/* mass spectrometer settings */
 		isITRAQ = false;
+		ITRAQ_REAGENT = 144.1021;
 		
 		
 		//Segmenting up job for memory management
@@ -259,11 +261,8 @@ public class Properties {
 		reportWebSuffix = ".html";
 		UCSCdatabase = "clade=mammal&org=Human&db=hg19";
 		
-
-		
 		/* for custom jobs... */
-		isYale = false;
-		
+		isYale = false;		
 		
 		/* FDR false discovery rate */
 		numberOfSpectraToUseForFDR = -1;
@@ -422,6 +421,8 @@ public class Properties {
 		/* mass spectrometer parameters */
 		if (propertyName.equals("isITRAQ"))
 			isITRAQ = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("ITRAQ_REAGENT"))
+			ITRAQ_REAGENT = Double.valueOf(propertyValue);
 		
 		
 		//job parsing for memory management
@@ -609,6 +610,7 @@ public class Properties {
 			pw.println("cleavageAtCarboxylSide " + Properties.cleavageAtCarboxylSide);
 			pw.println();
 			pw.println("isITRAQ " + Properties.isITRAQ);
+			pw.println("ITRAQ_REAGENT " + Properties.ITRAQ_REAGENT);
 			pw.println();
 			pw.println("##Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);

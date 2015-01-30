@@ -142,7 +142,7 @@ public class AminoAcids {
 		weightsMono[U] += Properties.modU;
 
 		
-		if (Properties.isITRAQ) {weightsMono[K] += Definitions.ITRAQ_REAGENT;}
+		if (Properties.isITRAQ) {weightsMono[K] += Properties.ITRAQ_REAGENT;}
 		
 		/*
 		 * If we're accounting for selenocysteine, we set the "TGA" codon

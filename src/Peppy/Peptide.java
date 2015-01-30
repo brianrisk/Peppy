@@ -274,7 +274,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 			
 			/* add reporter ion masses */
 			if (Properties.isITRAQ) {
-				mass += Definitions.ITRAQ_REAGENT ;
+				mass += Properties.ITRAQ_REAGENT ;
 			}
 			
 		} else {
@@ -290,7 +290,7 @@ public class Peptide implements Comparable<Peptide>, HasValue {
 			
 			/* add reporter ion masses */
 			if (Properties.isITRAQ) {
-				mass += Definitions.ITRAQ_REAGENT ;
+				mass += Properties.ITRAQ_REAGENT ;
 			}
 		}
 		return mass;

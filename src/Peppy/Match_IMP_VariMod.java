@@ -137,7 +137,7 @@ public class Match_IMP_VariMod extends Match_IMP {
 		//computing the left and right boundaries for the ranges where our peaks should land
 		theoreticalPeakMass = modificationMass + peptide.getMass() + Properties.rightIonDifference;
 		if (Properties.isITRAQ) {
-			theoreticalPeakMass -= Definitions.ITRAQ_REAGENT;
+			theoreticalPeakMass -= Properties.ITRAQ_REAGENT;
 		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass -= peptide.getResidueMass(i);
@@ -174,7 +174,7 @@ public class Match_IMP_VariMod extends Match_IMP {
 		/* b-ion  */
 		theoreticalPeakMass = Properties.leftIonDifference;
 		if (Properties.isITRAQ) {
-			theoreticalPeakMass += Definitions.ITRAQ_REAGENT;
+			theoreticalPeakMass += Properties.ITRAQ_REAGENT;
 		}
 		for (i = 0; i < peptideLengthMinusOne; i++) {
 			theoreticalPeakMass += peptide.getResidueMass(i);
