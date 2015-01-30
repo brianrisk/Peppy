@@ -121,9 +121,6 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTH("sequence");
 		printTH("indicies");
 		printTH("F");
-		if (Properties.useSpliceVariants) {
-			printTH("S");
-		}
 		printTH("score");
 		printTH("has mod");
 		printTH("mod index");
@@ -169,11 +166,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTD(peptideLine.toString());
 		
 		//sequence name
-		if (Properties.useSpliceVariants) {
-			printTD("NULL");
-		} else {
-			printTD(match.getPeptide().getProtein().getName());
-		}
+		printTD(match.getPeptide().getProtein().getName());
 		//start / stop
 		printTD( match.getPeptide().getStartIndex() + ", " + match.getPeptide().getStopIndex());
 		

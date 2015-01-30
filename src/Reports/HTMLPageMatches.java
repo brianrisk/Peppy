@@ -104,17 +104,6 @@ public class HTMLPageMatches extends HTMLPage {
 			String link = "http://www.google.com/search?hl=en&q=" + match.getPeptide().getAcidSequenceString();
 			printTD("(<a href=\"" +link + "\">" + peptideMarkup + "</a>)");
 			
-			/* the sequence / protein name */
-			if (!Properties.useSpliceVariants) {
-				printTD(match.getPeptide().getProtein().getName() + " " + match.getPeptide().getStartIndex() + " " + ( match.getPeptide().isForward() ? "+" : "-"));
-			}
-
-			
-			/* is spliced? */
-			if (Properties.useSpliceVariants) {
-				printTD("" + match.getPeptide().isSpliced());
-			}
-			
 			/* score */
 			printTD(nfDecimal.format(match.getScore()));
 			

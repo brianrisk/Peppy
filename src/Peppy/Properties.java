@@ -226,10 +226,6 @@ public class Properties {
 		desiredPeptideDatabaseSize = 10000000;
 		maxCombinedProteinLength = 5000000;
 		
-		//Splicing?
-		useSpliceVariants = false;
-		
-		
 		//mass error tolerances in PPM
 		precursorTolerance = 100;
 		fragmentTolerance = 300;
@@ -642,26 +638,9 @@ public class Properties {
 			pw.println("##Spectrum cleaning");
 			pw.println("minimumNumberOfPeaksForAValidSpectrum " + Properties.minimumNumberOfPeaksForAValidSpectrum);
 			pw.println();
-			pw.println("##Scoring Method ");
-			pw.println("scoringMethodName " + Properties.scoringMethodName);
-			pw.println();
-			pw.println("##digest only part of a sequence ");
-			pw.println("useSequenceRegion " + Properties.useSequenceRegion);
-			pw.println("sequenceRegionStart " + Properties.sequenceRegionStart);
-			pw.println("sequenceRegionStop " + Properties.sequenceRegionStop);
-			pw.println();
-			pw.println("##Memory contols ");
-			pw.println("digestionWindowSize " + Properties.digestionWindowSize);
-			pw.println("desiredPeptideDatabaseSize " + Properties.desiredPeptideDatabaseSize);
-			pw.println("minimumScore " + Properties.minimumScore);
-			pw.println();
 			pw.println("##error thresholds in PPM");
 			pw.println("precursorTolerance " + Properties.precursorTolerance);
 			pw.println("fragmentTolerance " + Properties.fragmentTolerance);
-			pw.println();
-			pw.println("##Report variables ");
-			pw.println("createHTMLReport " + Properties.createHTMLReport);
-			pw.println("UCSCdatabase " + Properties.UCSCdatabase);
 			pw.println();
 			pw.println("##no fragments that weigh less than this will be admitted into the fragment list ");
 			pw.println("##units are daltons. ");
@@ -669,9 +648,6 @@ public class Properties {
 			pw.println("peptideMassMaximum " + Properties.peptideMassMaximum);
 			pw.println();
 			pw.println("numberOfMissedCleavages " + Properties.numberOfMissedCleavages);
-			pw.println();
-			pw.println("##splicing ");
-			pw.println("useSpliceVariants " + Properties.useSpliceVariants);
 			pw.println();
 			pw.println("##where we store our reports ");
 			pw.println("reportDirectory " + Properties.reportDirectory);

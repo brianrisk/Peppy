@@ -634,32 +634,15 @@ public class Peppy {
 		//initialize our ArrayList of matches
 		ArrayList<Match> matches = null;
 
-		if (Properties.useSpliceVariants) {
-			//gets the first nucleotide sequence in the first sequence file
-			SequenceNucleotide sequenceFile = (SequenceNucleotide) sequences.get(0);
-			RNA_Sequence rna = new RNA_Sequence(sequenceFile, sequenceFile.getNucleotideSequences().get(0), Properties.sequenceRegionStart, Properties.sequenceRegionStop);
-
-			U.p("digesting with splice variants...");
-			RNA_Digestor rnaDigestor = new RNA_Digestor(rna);
-			ArrayList<Peptide> peptides  = rnaDigestor.getPeptides();
-			U.p("generated " + peptides.size() + " peptides");
-
-			U.p("getting matches...");
-			//TODO get rid of this getMatches function when this is overhauled
-			matches = getMatchesWithPeptides(peptides, spectraMatches);
-
-		} else {	
-			if (Properties.useSequenceRegion) {
-				U.p("digesting part of sequence");
-				ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
-				oneSequenceList.add(sequences.get(0));
-				sequences = oneSequenceList;
-			}
-
-			/* nothing weird.  Just do a normal search */
-			matches = getMatches(sequences, spectraMatches);
-
+		if (Properties.useSequenceRegion) {
+			U.p("digesting part of sequence");
+			ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
+			oneSequenceList.add(sequences.get(0));
+			sequences = oneSequenceList;
 		}
+
+		/* nothing weird.  Just do a normal search */
+		matches = getMatches(sequences, spectraMatches);
 
 		createReports(matches, reportDir);
 
