@@ -107,13 +107,7 @@ public class Properties {
 	
 	//Report related
 	public static boolean createHTMLReport = true;
-	
 	public static String reportWebSuffix = ".html";
-	public static File reportWebHeaderFile = new File("resources/reports/header.txt");
-	public static File reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
-	public static File reportWebFooterFile = new File("resources/reports/footer.txt");
-	public static File reportWebTableHeader = new File("resources/reports/index-table-header.txt");
-	
 	public static String UCSCdatabase = "clade=mammal&org=Human&db=hg19";
 	
 
@@ -262,13 +256,7 @@ public class Properties {
 		
 		//Report related
 		createHTMLReport = true;
-		
 		reportWebSuffix = ".html";
-		reportWebHeaderFile = new File("resources/reports/header.txt");
-		reportWebHeaderSubFile = new File("resources/reports/header-sub.txt");
-		reportWebFooterFile = new File("resources/reports/footer.txt");
-		reportWebTableHeader = new File("resources/reports/index-table-header.txt");
-		
 		UCSCdatabase = "clade=mammal&org=Human&db=hg19";
 		
 
