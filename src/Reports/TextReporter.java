@@ -51,7 +51,7 @@ public class TextReporter {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
 			
 			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
-			pw.println("format version 19");
+			pw.println("format version 20");
 			
 			if (Properties.isSequenceFileDNA) {
 				pw.println("> analysis-type: nucleotide");
@@ -72,8 +72,8 @@ public class TextReporter {
 			sb.append('\t');
 			sb.append("fileLocus");
 			sb.append('\t');
-			sb.append("spectrumMD5");
-			sb.append('\t');
+//			sb.append("spectrumMD5");
+//			sb.append('\t');
 			sb.append("FilePath");
 			sb.append('\t');
 			sb.append("score");
@@ -93,26 +93,12 @@ public class TextReporter {
 			sb.append("SequenceName");
 			if (Peppy.Properties.isSequenceFileDNA) {
 				sb.append('\t');
-				sb.append("INTRON-START");
-				sb.append('\t');
-				sb.append("INTRON-STOP");
-				sb.append('\t');
 				sb.append("Strand");
 				sb.append('\t');
 				sb.append("Is Spliced");
 			}
 			sb.append('\t');
-			sb.append("RankCount");
-			sb.append('\t');
 			sb.append("Charge");	
-			sb.append('\t');
-			sb.append("inORF");
-			sb.append('\t');
-			sb.append("sizeOfORF");
-			sb.append('\t');
-			sb.append("Hydrophobic");
-			sb.append('\t');
-			sb.append("Hydrophilic");
 			sb.append('\t');
 			sb.append("isModified");
 			sb.append('\t');

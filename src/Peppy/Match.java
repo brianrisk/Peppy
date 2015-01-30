@@ -363,12 +363,12 @@ public abstract class Match implements Comparable<Match>{
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(getSpectrum().getFileLocus());
+		sb.append(getSpectrum().getId());
 		sb.append('\t');
 		sb.append(getSpectrum().getFileLocus());
 		sb.append('\t');
-		sb.append(getSpectrum().getMD5());
-		sb.append('\t');
+//		sb.append(getSpectrum().getMD5());
+//		sb.append('\t');
 		sb.append(getSpectrum().getFile().getAbsolutePath());
 		sb.append('\t');
 		sb.append(getScore());
@@ -400,10 +400,6 @@ public abstract class Match implements Comparable<Match>{
 				}
 			}
 			sb.append('\t');
-			sb.append(getPeptide().getIntronStartIndex());
-			sb.append('\t');
-			sb.append(getPeptide().getIntronStopIndex());
-			sb.append('\t');
 			sb.append(getPeptide().isForward() ? "+" : "-");
 			sb.append('\t');
 			sb.append(getPeptide().isSpliced());
@@ -413,17 +409,7 @@ public abstract class Match implements Comparable<Match>{
 			}
 		}
 		sb.append('\t');
-		sb.append(matchesSpectrum.getMatches().size());
-		sb.append('\t');
 		sb.append(getSpectrum().getCharge());
-		sb.append('\t');
-		sb.append(getPeptide().isInORF());
-		sb.append('\t');
-		sb.append(getPeptide().getORFSize());
-		sb.append('\t');
-		sb.append(getPeptide().getHydrophobicProportion());
-		sb.append('\t');
-		sb.append(getPeptide().getHydrophilicProportion());
 		sb.append('\t');
 		sb.append(hasModification());
 		sb.append('\t');
