@@ -1014,7 +1014,7 @@ public class Peppy {
 	protected static void printGreeting() {
 		U.p("Welcome to Peppy(TM)");
 		U.p("Protein identification / proteogenomic software.");
-		U.p("Copyright 2014 by Brian Risk");
+		U.p("Copyright 2015 by Brian Risk");
 		U.p();
 
 		/* print some system statistics */
@@ -1022,8 +1022,6 @@ public class Peppy {
 		U.p("number of threads allowed: " + Properties.numberOfThreads);
 		U.p("max available memory: " + (double) memoryUsage.getMax() / (1024 * 1024 * 1024) + " gigabytes");
 		U.p();
-
-		//		U.p("This program comes with ABSOLUTELY NO WARRANTY;");
 
 	}
 
