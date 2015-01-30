@@ -133,10 +133,14 @@ public class Properties {
 	public static int numberOfSpectraToUseForFDR = 10000;
 	public static double maximumFDR = 0.01;
 	
-	/* PTMs */
+	/* blind modifications */
 	public static boolean searchModifications = true;
 	public static double modificationLowerBound = -0.3;
 	public static double modificationUpperBound = 100;
+	
+	/* Targeted Search" */
+	public static boolean targetedSearch = true;
+	public static int targetedSearchRadius = 500;
 	
 	
 	/* fixed modifications */
@@ -302,11 +306,14 @@ public class Properties {
 		 modNTerminal = 0;
 		 modCTerminal = 0;
 		
-		/* PTMs */
-		searchModifications = false;
+		/* blind modifications */
+		searchModifications = true;
 		modificationLowerBound = -0.3;
 		modificationUpperBound = 100;
 		
+		/* Targeted Search" */
+		targetedSearch = true;
+		targetedSearchRadius = 500;
 		
 		
 		smartTolerances = true;
@@ -530,13 +537,19 @@ public class Properties {
 		
 		
 		
-		/* multipass */
+		/* blind modifications */
 		if (propertyName.equals("searchModifications")) 
 			searchModifications = Boolean.valueOf(propertyValue);
 		if (propertyName.equals("modificationLowerBound")) 
 			modificationLowerBound = Double.valueOf(propertyValue);
 		if (propertyName.equals("modificationUpperBound")) 
 			modificationUpperBound = Double.valueOf(propertyValue);
+		
+		/* Targeted Search" */
+		if (propertyName.equals("targetedSearch")) 
+			targetedSearch = Boolean.valueOf(propertyValue);
+		if (propertyName.equals("targetedSearchRadius")) 
+			targetedSearchRadius = Integer.valueOf(propertyValue);
 		
 		
 		/* fixed modifications */
@@ -630,10 +643,14 @@ public class Properties {
 			pw.println("numberOfSpectraToUseForFDR " + numberOfSpectraToUseForFDR);
 			pw.println("maximumFDR " + maximumFDR);
 			pw.println();
-			pw.println("##multipass");
+			pw.println("## blind mondifications");
 			pw.println("searchModifications " + searchModifications);
 			pw.println("modificationLowerBound " + modificationLowerBound);
 			pw.println("modificationUpperBound " + modificationUpperBound);
+			pw.println();
+			pw.println("## Targeted Search");
+			pw.println("targetedSearch " + targetedSearch);
+			pw.println("targetedSearchRadius " + targetedSearchRadius);
 			
 			pw.println();
 			pw.println("## static mods");
