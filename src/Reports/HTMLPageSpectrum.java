@@ -125,11 +125,6 @@ public class HTMLPageSpectrum extends HTMLPage {
 		printTH("has mod");
 		printTH("mod index");
 		printTH("mod mass");
-
-		if (Properties.isYale) {
-			printTH("in ORF");
-			printTH("ORF size");
-		}
 		
 		/* print all the rows */
 		for(Match match: theseMatches) {
@@ -186,11 +181,7 @@ public class HTMLPageSpectrum extends HTMLPage {
 			printTD("");
 			printTD("");
 		}
-		
-		if (Properties.isYale) {
-			printTD("" + match.getPeptide().isInORF());
-			printTD("" + match.getPeptide().getORFSize());
-		}
+
 			
 
 	}

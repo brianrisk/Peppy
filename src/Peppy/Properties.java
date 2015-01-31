@@ -118,9 +118,6 @@ public class Properties {
 	public static boolean testSequenceIsProtein = true;
 	public static File testDirectory; 
 	
-	/* for custom jobs... */
-	public static boolean isYale = false;
-	
 	/* for VCF Files*/
 	public static String VCFFileString;
 	
@@ -259,10 +256,7 @@ public class Properties {
 		//Report related
 		createHTMLReport = true;
 		reportWebSuffix = ".html";
-		UCSCdatabase = "clade=mammal&org=Human&db=hg19";
-		
-		/* for custom jobs... */
-		isYale = false;		
+		UCSCdatabase = "clade=mammal&org=Human&db=hg19";	
 		
 		/* FDR false discovery rate */
 		numberOfSpectraToUseForFDR = -1;
@@ -361,10 +355,6 @@ public class Properties {
 		
 	}
 	
-	public static void setAllProperties() {
-		numberOfThreads = allProperties.get("numberOfThreads").getInt();
-	}
-	
 	private static void setPropertyFromString(String line) {
 		line = line.trim();
 		
@@ -381,10 +371,6 @@ public class Properties {
 		/* getting the property name and the property value */
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
-		
-		/* threads */
-		if (propertyName.equals("numberOfThreads")) 
-			numberOfThreads = Integer.valueOf(propertyValue);
 		
 		/* for straight-forward searches (no FDR, no auto parameters, no mod search, etc.) */
 		if (propertyName.equals("simpleSearch"))
@@ -512,11 +498,6 @@ public class Properties {
 		
 		if (propertyName.equals("UCSCdatabase")) 
 			UCSCdatabase = propertyValue;
-		
-		
-		/* custom jobs */
-		if (propertyName.equals("isYale")) 
-			isYale = Boolean.valueOf(propertyValue);
 		
 		/* FDR */
 		if (propertyName.equals("numberOfSpectraToUseForFDR"))

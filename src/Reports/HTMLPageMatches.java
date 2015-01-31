@@ -56,13 +56,6 @@ public class HTMLPageMatches extends HTMLPage {
 		printTH("acid");
 		printTH("location");
 		printTH("score");
-		if (Properties.isYale) {
-			printTH("inORF");
-			printTH("ORF size");
-			printTH("Hydrophobic percentage");
-			printTH("Hydrophilic percentage");
-		}
-		
 		printTH("has mod");
 		printTH("count");
 		
@@ -103,19 +96,6 @@ public class HTMLPageMatches extends HTMLPage {
 			
 			/* score */
 			printTD(nfDecimal.format(match.getScore()));
-			
-			if (Properties.isYale) {
-				/* ORF */
-				printTD("" + match.getPeptide().isInORF());
-				
-				printTD("" + match.getPeptide().getORFSize());
-				
-				/* hydrophobic */
-				printTD(nfDecimal.format(match.getPeptide().getHydrophobicProportion()));
-				
-				/* hydrophilic */
-				printTD(nfDecimal.format(match.getPeptide().getHydrophilicProportion()));
-			}
 			
 			/* modifications */
 			printTD("" + match.hasModification());
