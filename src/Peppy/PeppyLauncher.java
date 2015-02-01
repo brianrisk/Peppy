@@ -3,6 +3,12 @@ package Peppy;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+/**
+ * Launches the main Peppy class and allocates the maximum amount of physical memory possible
+ * 
+ * @author brianrisk
+ *
+ */
 public class PeppyLauncher {
 	
 	public static void main(String [] args) {
