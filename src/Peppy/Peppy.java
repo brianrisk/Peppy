@@ -18,7 +18,7 @@ import Reports.TextReporter;
  * Peppy
  * Designed with the following goals:
  * 1) More simple code to promote open source development
- * 2) Easy proteogenomic mapping
+ * 2) Easy proteogenomic searches
  * 3) Efficient multi-threading
  * 
  * Initial publication:
@@ -26,7 +26,7 @@ import Reports.TextReporter;
  * Risk BA, Spitzer WJ, Giddings MC. Journal of proteome research (April 24, 2013). 
  * PMID: 23614390
  * 
- * Copyright 2013, Brian Risk
+ * Copyright 2015, Brian Risk
  * 
  * 
  * @author Brian Risk
