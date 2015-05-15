@@ -11,7 +11,7 @@ public class UserInterface extends PApplet {
 	}
 
 	public void setup() {
-		size(200,200);
+		size(1024,768);
 		background(0);
 	}
 
@@ -21,4 +21,6 @@ public class UserInterface extends PApplet {
 			line(mouseX,mouseY,pmouseX,pmouseY);
 		}
 	}
+	
+
 }
