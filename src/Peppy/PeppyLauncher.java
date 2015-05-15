@@ -6,6 +6,10 @@ import java.net.URISyntaxException;
 /**
  * Launches the main Peppy class and allocates the maximum amount of physical memory possible
  * 
+ * References:
+ * http://silentdevelopment.blogspot.com/2010/03/how-to-set-or-increase-xmx-heap-memory.html
+ * http://alvinalexander.com/java/java-exec-processbuilder-process-1
+ * 
  * @author brianrisk
  *
  */

@@ -3,6 +3,8 @@ package Peppy;
 /**
  * Copyright 2013, Brian Risk
  * 
+ * Associates colors and text with Peak objects
+ * so that they can be annotated in visual reports.
  * 
  * @author Brian Risk
  *
