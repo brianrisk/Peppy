@@ -1,0 +1,102 @@
+########################################################################
+## DEFINING PROTEOMIC AND GENOMIC DATABASES
+##
+
+## Paths can point to a specific FASTA file or a directory containing FASTA files (useful for full genome searches)
+## The following is a demonstration path pointing to a FASTA generated from version 12 of GENCODE defs
+## Defaults to looking for a directory labeled "sequences" in the same directory as the application
+sequenceDirectoryOrFile /Users/public/sequences/protein/gencode12.fasta
+
+## for each FASTA listed, you need to specify isSequenceFileDNA
+## set to false for protein, true for DNA
+isSequenceFileDNA false
+
+## Here we are setting up the full human genome as a database
+sequenceDirectoryOrFile /Users/public/sequences/dna/HG19
+isSequenceFileDNA true
+
+## The defined databases are searched in the order in which you define them.
+## Spectra of PSMs found within the specified FDR for a database search are not
+## considered for subsequent searches.
+## In this example, the GENCODE proteins are searched before the human genome.
+## Spectra matching to GENCODE will not be used when searching HG19.
+##
+########################################################################
+
+## Spectra
+## Pointing to the directory of spectra we wish to use
+## defaults to looking for a directory labeled "spectra" in the same directory as the application
+spectraDirectoryOrFile spectra
+
+## sets where your report will be saved.  
+## Defaults to "reports" directory in the same directory as the Peppy application
+reportDirectory /Volumes/Research/
+
+## False Discovery Rates
+## maximum allowed FDR
+maximumFDR 0.01
+
+## optimizes precursor tolerance, fragment tolerance and minimum / maximum peptide mass
+smartTolerances true
+
+## error thresholds in PPM
+## These bounds will be optimized if smartTolerances is true in which case should be set liberally
+precursorTolerance 50
+fragmentTolerance 500
+
+## no fragments that weigh less than this will be admitted into the fragment list 
+## units are daltons. 
+## These bounds will be optimized if smartTolerances is true in which case should be set liberally
+peptideMassMinimum 400.0
+peptideMassMaximum 10000.0
+
+## Digestion rules
+cleavageAcid R
+cleavageAcid K
+numberOfMissedCleavages 1
+
+## Blind modifications
+## detects PTMs and other acid mass shifts (e.g. mutations, oxidation, etc.)
+## Setting to true enables detection of one modification with any mass between
+## the defined upper and lower bounds.
+searchModifications true
+modificationLowerBound -100
+modificationUpperBound 100.0
+
+## static mods
+modA 0.0
+modR 0.0
+modN 0.0
+modD 0.0
+modC 57.021464
+modE 0.0
+modQ 0.0
+modG 0.0
+modH 0.0
+modI 0.0
+modL 0.0
+modK 0.0
+modM 0.0
+modF 0.0
+modP 0.0
+modS 0.0
+modT 0.0
+modW 0.0
+modY 0.0
+modV 0.0
+modU 0.0
+modNTerminal 0.0
+modCTerminal 0.0
+
+## iTRAQ data
+## default is false
+isITRAQ false
+
+## mass of the iTRAQ reagent in DA
+## default is 144.1021
+## value ignored if isITRAQ is set to false
+ITRAQ_REAGENT 144.1021
+
+## Selenocysteine searches
+## UGA codons translate to U if set to true
+useSelenocysteine false
