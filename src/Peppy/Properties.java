@@ -7,9 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 
 /**
@@ -24,8 +24,6 @@ import java.util.Hashtable;
  *
  */
 public class Properties {
-	
-	private static Hashtable<String, Property> allProperties = new Hashtable<String, Property>();
 	
 	//how many processors does your computer have?  This number should be that number.
 	public static int numberOfThreads = Runtime.getRuntime().availableProcessors();
@@ -173,7 +171,6 @@ public class Properties {
 	public static boolean useSelenocysteine = false;
 	
 	public static void init() {
-		allProperties = new Hashtable<String, Property>();
 		
 		//how many processors does your computer have?  This number should be that number.
 		numberOfThreads = Runtime.getRuntime().availableProcessors();
@@ -355,6 +352,7 @@ public class Properties {
 		
 	}
 	
+	
 	private static void setPropertyFromString(String line) {
 		line = line.trim();
 		
@@ -372,61 +370,6 @@ public class Properties {
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
 		
-		/* for straight-forward searches (no FDR, no auto parameters, no mod search, etc.) */
-		if (propertyName.equals("simpleSearch"))
-			simpleSearch = Boolean.valueOf(propertyValue);
-		
-		
-		
-		//sequence digestion
-		if (propertyName.equals("numberOfMissedCleavages")) 
-			numberOfMissedCleavages =Integer.valueOf(propertyValue);
-		if (propertyName.equals("peptideMassThreshold")) 
-			peptideMassMinimum = Double.valueOf(propertyValue);
-		if (propertyName.equals("peptideMassMinimum")) 
-			peptideMassMinimum = Double.valueOf(propertyValue);
-		if (propertyName.equals("peptideMassMaximum")) 
-			peptideMassMaximum = Double.valueOf(propertyValue);
-		if (propertyName.equals("useSequenceRegion"))
-			useSequenceRegion = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("sequenceRegionStart")) 
-			sequenceRegionStart =Integer.valueOf(propertyValue);
-		if (propertyName.equals("sequenceRegionStop")) 
-			sequenceRegionStop =Integer.valueOf(propertyValue);
-		if (propertyName.equals("minPeptideLength")) 
-			minPeptideLength =Integer.valueOf(propertyValue);
-		if (propertyName.equals("maxPeptideLength")) 
-			maxPeptideLength =Integer.valueOf(propertyValue);
-		if (propertyName.equals("cleavageAcid"))  {
-			cleavageAcidList.add(propertyValue.toUpperCase().charAt(0));
-		}
-		if (propertyName.equals("cleavageAtCarboxylSide"))
-			cleavageAtCarboxylSide = Boolean.valueOf(propertyValue);
-		
-		
-		/* mass spectrometer parameters */
-		if (propertyName.equals("isITRAQ"))
-			isITRAQ = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("ITRAQ_REAGENT"))
-			ITRAQ_REAGENT = Double.valueOf(propertyValue);
-		
-		
-		//job parsing for memory management
-		if (propertyName.equals("digestionWindowSize")) 
-			digestionWindowSize =Integer.valueOf(propertyValue);
-		if (propertyName.equals("desiredPeptideDatabaseSize")) 
-			desiredPeptideDatabaseSize =Integer.valueOf(propertyValue);
-		if (propertyName.equals("maxCombinedProteinLength")) 
-			maxCombinedProteinLength =Integer.valueOf(propertyValue);
-		
-		
-		if (propertyName.equals("minimumScore")) 
-			minimumScore = Double.valueOf(propertyValue);
-		
-		
-		//spectrum cleaning		
-		if (propertyName.equals("minimumNumberOfPeaksForAValidSpectrum")) 
-			minimumNumberOfPeaksForAValidSpectrum =Integer.valueOf(propertyValue);
 		
 	
 		if (propertyName.equals("sequenceDirectoryOrFile")) {
@@ -451,31 +394,7 @@ public class Properties {
 		}
 		
 		
-		
-		
-		//Scoring method
-		if (propertyName.equals("scoringMethodName")) {
-			scoringMethodName = propertyValue;
-			matchConstructor = new MatchConstructor(scoringMethodName);
-		}
-		
-		if (propertyName.equals("leftIonDifference"))
-			leftIonDifference = Double.valueOf(propertyValue);
-		if (propertyName.equals("rightIonDifference")) 
-			rightIonDifference = Double.valueOf(propertyValue);
-
-		//Ion and precursor threshold values
-		if (propertyName.equals("precursorTolerance")) 
-			precursorTolerance = Double.valueOf(propertyValue);
-		if (propertyName.equals("fragmentTolerance")) 
-			fragmentTolerance = Double.valueOf(propertyValue);
-		
-		//Old ion/precursor value names
-		if (propertyName.equals("spectrumToPeptideMassError")) 
-			precursorTolerance = Double.valueOf(propertyValue);
-		if (propertyName.equals("peakDifferenceThreshold")) 
-			fragmentTolerance = Double.valueOf(propertyValue);
-		
+	
 		
 		//reports
 		if (propertyName.equals("reportDirectory")) 
@@ -559,6 +478,21 @@ public class Properties {
 		
 		if (propertyName.equals("useSelenocysteine")) 
 			useSelenocysteine = Boolean.valueOf(propertyValue);
+	}
+	
+	public static void setProperty(String fieldName, String value) throws NoSuchFieldException, IllegalAccessException {
+		Class<Properties> theClass = Properties.class;
+		Field field = theClass.getDeclaredField(fieldName);
+		if (field.getType() == Character.TYPE) {field.set(theClass, value.charAt(0)); return;}
+		if (field.getType() == Short.TYPE) {field.set(theClass, Short.parseShort(value)); return;}
+		if (field.getType() == Integer.TYPE) {field.set(theClass, Integer.parseInt(value)); return;}
+		if (field.getType() == Long.TYPE) {field.set(theClass, Long.parseLong(value)); return;}
+		if (field.getType() == Float.TYPE) {field.set(theClass, Float.parseFloat(value)); return;}
+		if (field.getType() == Double.TYPE) {field.set(theClass, Double.parseDouble(value)); return;}
+		if (field.getType() == Byte.TYPE) {field.set(theClass, Byte.parseByte(value)); return;}
+		if (field.getType() == Boolean.TYPE) {field.set(theClass, Boolean.parseBoolean(value)); return;}
+		if (field.getType() == File.class) {field.set(theClass, new File(value)); return;}
+		field.set(theClass, value);
 	}
 
 
