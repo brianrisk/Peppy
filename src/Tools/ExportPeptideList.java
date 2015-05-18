@@ -27,10 +27,6 @@ public class ExportPeptideList {
 		//Get references to our sequence files -- no nucleotide data is loaded at this point
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		
-		if (Properties.useOnlyForwardsFrames) {
-			U.p("using only forwards frames");
-		}
-		
 		try {
 			//loop through each sequence in the sequences ArrayList
 			File peptidesFolder = new File ("exported peptides");

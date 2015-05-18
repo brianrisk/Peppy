@@ -97,6 +97,7 @@ public class Properties {
 	
 	//Is the sequence file supposed to be read only in the first frame?
 	public static boolean useOnlyForwardsFrames = false;
+	public static ArrayList<Boolean> useOnlyForwardsFramesList = new ArrayList<Boolean>();
 	
 	//where we store our reports
 	public static File reportDirectory = new File("reports");
@@ -320,6 +321,7 @@ public class Properties {
 		sequenceDirectoryOrFileList = new ArrayList<File>();
 		isSequenceFileNucleotideList = new ArrayList<Boolean>();
 		spectraDirectoryOrFileList = new ArrayList<File>();
+		useOnlyForwardsFramesList = new ArrayList<Boolean>();
 		cleavageAcidList = new ArrayList<Character>();
 		
 		/* loading in the values from the properties file */
@@ -346,9 +348,7 @@ public class Properties {
 		if (cleavageAcidList.size() == 0) {
 			cleavageAcidList.add('R');
 			cleavageAcidList.add('K');
-		}
-		
-		
+		}	
 		
 	}
 	
@@ -370,115 +370,52 @@ public class Properties {
 		String propertyName = line.substring(0, line.indexOf(" "));
 		String propertyValue = line.substring(line.indexOf(" ") + 1, line.length());
 		
-		
-	
-		if (propertyName.equals("sequenceDirectoryOrFile")) {
-			sequenceDirectoryOrFile = new File(propertyValue);
-			sequenceDirectoryOrFileList.add(sequenceDirectoryOrFile);
+		// Some fields need to be specially set
+		if (
+				propertyName.equals("sequenceDirectoryOrFile") ||
+				propertyName.equals("spectraDirectoryOrFile") ||
+				propertyName.equals("isSequenceFileDNA") ||
+				propertyName.equals("isSequenceFileNucleotide") ||
+				propertyName.equals("useOnlyForwardsFrames") ||
+				propertyName.equals("cleavageAcid")
+				) {
+			
+			if (propertyName.equals("sequenceDirectoryOrFile")) {
+				sequenceDirectoryOrFile = new File(propertyValue);
+				sequenceDirectoryOrFileList.add(sequenceDirectoryOrFile);
+			}
+			if (propertyName.equals("spectraDirectoryOrFile")) { 
+				spectraDirectoryOrFile = new File(propertyValue);
+				spectraDirectoryOrFileList.add(spectraDirectoryOrFile);
+			}
+			//here fore legacy reasons as we have renamed this property
+			if (propertyName.equals("isSequenceFileDNA")) {
+				isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
+				isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
+			}
+			if (propertyName.equals("isSequenceFileNucleotide")) {
+				isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
+				isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
+			}
+			if (propertyName.equals("useOnlyForwardsFrames")) {
+				useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
+				useOnlyForwardsFramesList.add(useOnlyForwardsFrames);
+			}
+			if (propertyName.equals("cleavageAcid"))  {
+				cleavageAcidList.add(propertyValue.toUpperCase().charAt(0));
+			}
 		}
-		if (propertyName.equals("spectraDirectoryOrFile")) { 
-			spectraDirectoryOrFile = new File(propertyValue);
-			spectraDirectoryOrFileList.add(spectraDirectoryOrFile);
+		else {
+			try {
+				setProperty(propertyName, propertyValue);
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
-		//here fore legacy reasons as we have renamed this property
-		if (propertyName.equals("isSequenceFileDNA")) {
-			isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
-			isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
-		}
-		if (propertyName.equals("isSequenceFileNucleotide")) {
-			isSequenceFileNucleotide = Boolean.valueOf(propertyValue);
-			isSequenceFileNucleotideList.add(isSequenceFileNucleotide);
-		}
-		if (propertyName.equals("useOnlyForwardsFrames")) {
-			useOnlyForwardsFrames = Boolean.valueOf(propertyValue);
-		}
-		
-		
-	
-		
-		//reports
-		if (propertyName.equals("reportDirectory")) 
-			reportDirectory = new File(propertyValue);
-		if (propertyName.equals("createHTMLReport")) 
-			createHTMLReport = Boolean.valueOf(propertyValue);
-		
-		/* for testing purposes */
-		if (propertyName.equals("thisIsATest")) 
-			thisIsATest = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("testSequence")) 
-			testSequence = new File(propertyValue);
-		if (propertyName.equals("testSequenceIsProtein")) 
-			testSequenceIsProtein = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("testDirectory")) 
-			testDirectory = new File(propertyValue);
-		if (propertyName.equals("VCFFileString")) 
-			VCFFileString = propertyValue;
-		
-		
-		if (propertyName.equals("UCSCdatabase")) 
-			UCSCdatabase = propertyValue;
-		
-		/* FDR */
-		if (propertyName.equals("numberOfSpectraToUseForFDR"))
-			numberOfSpectraToUseForFDR = Integer.valueOf(propertyValue);	
-		if (propertyName.equals("maximumFDR"))
-			maximumFDR = Double.valueOf(propertyValue);	
-		
-		
-		
-		/* blind modifications */
-		if (propertyName.equals("searchModifications")) 
-			searchModifications = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("modificationLowerBound")) 
-			modificationLowerBound = Double.valueOf(propertyValue);
-		if (propertyName.equals("modificationUpperBound")) 
-			modificationUpperBound = Double.valueOf(propertyValue);
-		
-		/* Targeted Search" */
-		if (propertyName.equals("targetedSearch")) 
-			targetedSearch = Boolean.valueOf(propertyValue);
-		if (propertyName.equals("targetedSearchRadius")) 
-			targetedSearchRadius = Integer.valueOf(propertyValue);
-		
-		
-		/* fixed modifications */
-		if (propertyName.equals("modA")) modA = Double.valueOf(propertyValue);
-		if (propertyName.equals("modR")) modR = Double.valueOf(propertyValue);
-		if (propertyName.equals("modN")) modN = Double.valueOf(propertyValue);
-		if (propertyName.equals("modD")) modD = Double.valueOf(propertyValue);
-		if (propertyName.equals("modC")) modC = Double.valueOf(propertyValue);
-		if (propertyName.equals("modE")) modE = Double.valueOf(propertyValue);
-		if (propertyName.equals("modQ")) modQ = Double.valueOf(propertyValue);
-		if (propertyName.equals("modG")) modG = Double.valueOf(propertyValue);
-		if (propertyName.equals("modH")) modH = Double.valueOf(propertyValue);
-		if (propertyName.equals("modI")) modI = Double.valueOf(propertyValue);
-		if (propertyName.equals("modL")) modL = Double.valueOf(propertyValue);
-		if (propertyName.equals("modK")) modK = Double.valueOf(propertyValue);
-		if (propertyName.equals("modM")) modM = Double.valueOf(propertyValue);
-		if (propertyName.equals("modF")) modF = Double.valueOf(propertyValue);
-		if (propertyName.equals("modP")) modP = Double.valueOf(propertyValue);
-		if (propertyName.equals("modS")) modS = Double.valueOf(propertyValue);
-		if (propertyName.equals("modT")) modT = Double.valueOf(propertyValue);
-		if (propertyName.equals("modW")) modW = Double.valueOf(propertyValue);
-		if (propertyName.equals("modY")) modY = Double.valueOf(propertyValue);
-		if (propertyName.equals("modV")) modV = Double.valueOf(propertyValue);
-		if (propertyName.equals("modU")) modU = Double.valueOf(propertyValue);
-		if (propertyName.equals("modNTerminal")) modNTerminal = Double.valueOf(propertyValue);
-		if (propertyName.equals("modCTerminal")) modCTerminal = Double.valueOf(propertyValue);
-
-		
-		/* legacy modification -- might be used if old properties file is employed */
-		if (propertyName.equals("iodoacetamideDerivative"))
-			Properties.modC = 57.021464;
-
-
-		/* smart tolerances */
-		if (propertyName.equals("smartTolerances")) 
-			smartTolerances = Boolean.valueOf(propertyValue);
-		
-		if (propertyName.equals("useSelenocysteine")) 
-			useSelenocysteine = Boolean.valueOf(propertyValue);
 	}
+	
 	
 	public static void setProperty(String fieldName, String value) throws NoSuchFieldException, IllegalAccessException {
 		Class<Properties> theClass = Properties.class;
@@ -511,7 +448,9 @@ public class Properties {
 			for (Boolean bool: isSequenceFileNucleotideList) {
 				pw.println("isSequenceFileNucleotide " + bool);
 			}
-			pw.println("useOnlyForwardsFrames " + Properties.useOnlyForwardsFrames);
+			for (Boolean bool: useOnlyForwardsFramesList) {
+				pw.println("useOnlyForwardsFrames " + bool);
+			}
 			pw.println();
 			pw.println("## This could be a directory or a file ");
 			for (File file: spectraDirectoryOrFileList) {

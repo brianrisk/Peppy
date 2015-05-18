@@ -180,10 +180,12 @@ public class Peppy {
 
 					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
 					Properties.isSequenceFileNucleotideList.add(false);
+					Properties.useOnlyForwardsFramesList.add(false);
 					//					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19"));
 					//					Properties.isSequenceFileDNAList.add(true);
 					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/Hanash/sequences/regions/lung28"));
 					Properties.isSequenceFileNucleotideList.add(false);
+					Properties.useOnlyForwardsFramesList.add(false);
 
 					try {
 						runPeppy(null);
@@ -330,6 +332,9 @@ public class Peppy {
 				 * Setting this property will also affect the FDR calculation */
 				Properties.sequenceDirectoryOrFile = Properties.sequenceDirectoryOrFileList.get(sequenceIndex);
 				Properties.isSequenceFileNucleotide = Properties.isSequenceFileNucleotideList.get(sequenceIndex);
+				if (Properties.useOnlyForwardsFramesList.size() < sequenceIndex) {
+					Properties.useOnlyForwardsFrames = Properties.useOnlyForwardsFramesList.get(sequenceIndex);
+				}
 				ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);		
 
 
