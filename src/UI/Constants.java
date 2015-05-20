@@ -46,9 +46,9 @@ public class Constants {
 	public static int TEXT_COLOR; //#6DA8CC
 
 	/* ALIGNMENT */
-	public static final int LEFT = 0;
-	public static final int CENTER = 1;
-	public static final int RIGHT = 2;
+	public static final int ALIGN_LEFT = 0;
+	public static final int ALIGN_CENTER = 1;
+	public static final int ALIGN_RIGHT = 2;
 
 	//how many points in our pie circle
 	public static final float wedgeRadianInc = PApplet.PI / 50;
@@ -59,6 +59,7 @@ public class Constants {
 		gridX = context.width / 16;
 		gridXHalf = gridX / 2;
 		gridXFourth = gridX / 4;
+		gridY = context.height / 12;
 		gridYHalf = gridY / 2;
 		gridYFourth = gridY / 4;
 		gridMin = PApplet.min(gridY, gridX);
@@ -69,8 +70,8 @@ public class Constants {
 		fontSizeThird = fontSize / 3;
 		
 		/* FONTS */
-		arial = context.loadFont("Arial");
-		arialBold = context.loadFont("Arial Bold");
+		arial = context.createFont("Arial", fontSize);
+		arialBold = context.createFont("Arial-BoldMT", fontSize);
 
 		/* COLORS */
 		BG_COLOR = context.color(31,39,47); //1f272F

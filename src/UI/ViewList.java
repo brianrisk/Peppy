@@ -82,7 +82,7 @@ public class ViewList extends View {
 		slideWidth = viewWidth;
 		slideHeight = Constants.gridY * labels.length;
 		slideYMin =  viewHeight - slideHeight;
-		slide = context.createGraphics(viewWidth, slideHeight, PApplet.P2D);
+		slide = context.createGraphics(viewWidth, slideHeight, PApplet.JAVA2D);
 		slide.beginDraw();
 		renderSlide();
 	}
@@ -154,7 +154,7 @@ public class ViewList extends View {
 				//draw text
 				String label = labels[index];
 				slide.fill(Constants.TEXT_COLOR);
-				Functions.drawTextGraphics(Constants.gridX,index * Constants.gridY, viewWidth, label, Constants.LEFT, slide);
+				Functions.drawTextGraphics(Constants.gridX,index * Constants.gridY, viewWidth, label, Constants.ALIGN_LEFT, slide);
 			}
 		}
 		
@@ -163,7 +163,7 @@ public class ViewList extends View {
 		slide.fill(highlightColor);
 		slide.rect(Constants.gridX,Constants.gridY * selectedIndex, viewWidth - Constants.gridX, Constants.gridY);
 		slide.fill(Constants.WHITE);
-		Functions.drawTextGraphics(Constants.gridX,selectedIndex * Constants.gridY, viewWidth, labels[selectedIndex], Constants.LEFT, slide);
+		Functions.drawTextGraphics(Constants.gridX,selectedIndex * Constants.gridY, viewWidth, labels[selectedIndex], Constants.ALIGN_LEFT, slide);
 	}
 	
 	
@@ -189,10 +189,11 @@ public class ViewList extends View {
 	
 	
 	public void mouseDragged() {
-		slideY = slideYOld + (context.mouseY - mousePressedY);
-		if (slideY > 0) slideY = 0;
-		if (slideY < slideYMin) slideY = slideYMin;
-		
+		if (labels.length * Constants.gridY > viewHeight) {
+			slideY = slideYOld + (context.mouseY - mousePressedY);
+			if (slideY > 0) slideY = 0;
+			if (slideY < slideYMin) slideY = slideYMin;
+		}
 	}
 	
 	public void mouseReleased() {

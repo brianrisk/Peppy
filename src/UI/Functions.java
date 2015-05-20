@@ -92,10 +92,11 @@ public class Functions {
 	 */
 
 	public static void drawText(int xLoc, int yLoc, int pixelWidth, String label) {
-		drawText(xLoc,xLoc,pixelWidth,label,Constants.LEFT);
+		drawText(xLoc,xLoc,pixelWidth,label,Constants.ALIGN_LEFT);
 	}
 
 	public static void drawText(int xLoc, int yLoc, int pixelWidth, String label, int align) {
+		
 		int maxWidth = pixelWidth - Constants.gridXHalf;
 		int labelWidth = (int)(context.textWidth(label));
 
@@ -104,13 +105,13 @@ public class Functions {
 		labelWidth = (int) (context.textWidth(printed));
 
 		//draw text based on how it is aligned
-		if (align == Constants.LEFT) {
+		if (align == Constants.ALIGN_LEFT) {
 			context.text(printed, xLoc + Constants.gridXFourth, yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
-		if (align == Constants.CENTER) {
+		if (align == Constants.ALIGN_CENTER) {
 			context.text(printed, xLoc + (pixelWidth - labelWidth) / 2, yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
-		if (align == Constants.RIGHT) {
+		if (align == Constants.ALIGN_RIGHT) {
 			context.text(printed, xLoc + pixelWidth - (labelWidth + Constants.gridXFourth), yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
 
@@ -125,13 +126,13 @@ public class Functions {
 		labelWidth = (int)(context.textWidth(printed));
 
 		//draw text based on how it is aligned
-		if (align == Constants.LEFT) {
+		if (align == Constants.ALIGN_LEFT) {
 			graphics.text(printed, xLoc + Constants.gridXFourth, yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
-		if (align == Constants.CENTER) {
+		if (align == Constants.ALIGN_CENTER) {
 			graphics.text(printed, xLoc + (pixelWidth - labelWidth) / 2, yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
-		if (align == Constants.RIGHT) {
+		if (align == Constants.ALIGN_RIGHT) {
 			graphics.text(printed, xLoc + pixelWidth - (labelWidth + Constants.gridXFourth), yLoc + Constants.gridYHalf + Constants.fontSizeThird);
 		}
 

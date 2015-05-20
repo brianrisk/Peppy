@@ -32,7 +32,7 @@ public class ViewMenu extends View {
 			} else {
 				context.fill(Constants.TEXT_COLOR);
 			}
-			Functions.drawText(viewX + (index * Constants.gridX * 2), viewY, Constants.gridX * 2, items[index], Constants.CENTER);
+			Functions.drawText(viewX + (index * Constants.gridX * 2), viewY, Constants.gridX * 2, items[index], Constants.ALIGN_CENTER);
 		}
 	}
 	
