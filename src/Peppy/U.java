@@ -36,10 +36,9 @@ public class U {
 	public static final long DAY = HOUR * 24;
 	public static final long YEAR = DAY * 365;
 	
+	public static PrintWriter logWriter = null;
+	
 
-	public static void main (String args[]) {
-		U.p(System.currentTimeMillis());
-	}
 	private static Stack<Long> stopwatchClicks = new Stack<Long>();
 	
 	public static void startStopwatch() {
@@ -144,12 +143,15 @@ public class U {
 		return response;
 	}
 	
-	public static void p(Object o) {System.out.println(o);}
-	public static void p(double o) {System.out.println(o);}
-	public static void p(int o) {System.out.println(o);}
-	public static void p(long o) {System.out.println(o);}
-	public static void p(char o) {System.out.println(o);}
-	public static void p() {System.out.println();}
+	public static void p(Object o) {
+		System.out.println(o);
+		if (logWriter != null) logWriter.println(o);
+	}
+	
+	public static void p() {
+		System.out.println();
+		if (logWriter != null) logWriter.println();
+	}
 	
 	public static String in() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

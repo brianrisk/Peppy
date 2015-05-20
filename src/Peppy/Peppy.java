@@ -59,7 +59,7 @@ public class Peppy {
 		//		moonShot(args);
 
 		/* i'm finished! */
-		printFarewell();
+		finish();
 	}
 
 
@@ -977,6 +977,15 @@ public class Peppy {
 		}
 		File mainReportDir = new File(Properties.reportDirectory, reportDirString);
 		mainReportDir.mkdirs();
+		try {
+			if (U.logWriter != null) {
+				U.logWriter.flush();
+				U.logWriter.close();
+			}
+			U.logWriter = new PrintWriter(new FileWriter(new File(mainReportDir, "log.txt")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return mainReportDir;
 	}
 
@@ -1008,7 +1017,11 @@ public class Peppy {
 
 	}
 
-	protected static void printFarewell() {
+	protected static void finish() {
+		if (U.logWriter != null) {
+			U.logWriter.flush();
+			U.logWriter.close();
+		}
 		U.p("done");
 	}
 
