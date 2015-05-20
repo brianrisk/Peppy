@@ -38,6 +38,9 @@ public class Peppy {
 	static MemoryUsage memoryUsage;
 	static long maxMemoryUsed = 0;
 	static String propertyFileString = null;
+	
+	// where we are saving our current report
+	public static File mainReportDir;
 
 
 	private static boolean verbose = true;
@@ -220,7 +223,7 @@ public class Peppy {
 		U.startStopwatch();
 
 		/* where we store the report */
-		File mainReportDir = createReportDirectory();
+		mainReportDir = createReportDirectory();
 
 		/* Get references to our sequence files -- no nucleotide data is loaded at this point */
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
@@ -294,7 +297,7 @@ public class Peppy {
 		try {
 
 
-			File mainReportDir = createReportDirectory();
+			mainReportDir = createReportDirectory();
 			File savedSpectraDir = new File(mainReportDir, "spectra");
 			savedSpectraDir.mkdirs();
 
