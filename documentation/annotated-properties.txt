@@ -8,8 +8,8 @@
 sequenceDirectoryOrFile /Users/public/sequences/protein/gencode12.fasta
 
 ## for each FASTA listed, you need to specify isSequenceFileDNA
-## set to false for protein, true for DNA
-isSequenceFileDNA false
+## set to false for protein, true for DNA or RNA
+isSequenceFileNucleotide false
 
 ## Here we are setting up the full human genome as a database
 sequenceDirectoryOrFile /Users/public/sequences/dna/HG19
