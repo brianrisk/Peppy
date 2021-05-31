@@ -80,7 +80,7 @@ public class Region implements Comparable<Region> {
 	
 	public double calculateScore() {
 //		score = 0;
-//		for (Match match: matches) {
+//		for (MatchRow match: matches) {
 //			if (match.rank == 1) score += 1.0 / match.rankCount;
 //		}
 //		score = Math.log(score);

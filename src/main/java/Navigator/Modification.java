@@ -18,7 +18,7 @@ public class Modification implements Comparable<Modification> {
 	
 	double score = 0;
 	
-	ArrayList<Match> matches = new ArrayList<Match>();
+	ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
 	
 	ArrayList<ModificationEntry> entries = new ArrayList<ModificationEntry>();
 	
@@ -31,7 +31,7 @@ public class Modification implements Comparable<Modification> {
 		return sample;
 	}
 
-	public void addMatch(Match match) {
+	public void addMatch(MatchRow match) {
 		matches.add(match);
 	}
 	
@@ -39,7 +39,7 @@ public class Modification implements Comparable<Modification> {
 		score += amount;
 	}
 	
-	public  ArrayList<Match> getMatches() {
+	public  ArrayList<MatchRow> getMatches() {
 		return matches;
 	}
 	

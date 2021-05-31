@@ -25,7 +25,7 @@ public abstract class MatchesTo implements Comparable<MatchesTo>{
 	
 	private String name;
 	
-	private ArrayList<Match> matches = new ArrayList<Match>();
+	private ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
 	
 
 
@@ -33,7 +33,7 @@ public abstract class MatchesTo implements Comparable<MatchesTo>{
 		this.name = name;
 	}
 	
-	public void addMatch(Match match) {
+	public void addMatch(MatchRow match) {
 		matches.add(match);	
 	}
 	
@@ -49,7 +49,7 @@ public abstract class MatchesTo implements Comparable<MatchesTo>{
 		return name;
 	}
 
-	public ArrayList<Match> getMatches() {
+	public ArrayList<MatchRow> getMatches() {
 		return matches;
 	}
 	

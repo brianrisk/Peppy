@@ -19,7 +19,7 @@ public class Region {
 	boolean isForwards = true;
 	double score = 0;
 	
-	ArrayList<Match> matches = new ArrayList<Match>();
+	ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
 	
 	
 	public Region(String name, int start, int stop, boolean isForwards) {
@@ -31,7 +31,7 @@ public class Region {
 	
 	public Region(){}
 	
-	public void addMatch(Match match) {
+	public void addMatch(MatchRow match) {
 		matches.add(match);
 	}
 

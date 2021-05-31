@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Peppy.U;
 
 import java.io.File;
@@ -40,20 +40,20 @@ public class CompRefSetAnalysis {
 	public static void createReport() {
 		
 		//load hg19 sequences from first analysis
-		ArrayList<Match> firstMatches = loadMatches("/Volumes/Research/CPTAC-CompRef/reports", "HG19");
+		ArrayList<MatchRow> firstMatches = loadMatches("/Volumes/Research/CPTAC-CompRef/reports", "HG19");
 		U.p("firstMatches " + firstMatches.size());
-		Hashtable<String, Match> firstHash = getMatchHash(firstMatches, "peptideSequence", null);
+		Hashtable<String, MatchRow> firstHash = getMatchHash(firstMatches, "peptideSequence", null);
 		U.p("firstHash " + firstHash.size());
 
-//		Match LETEIEALKEELLFMK = firstHash.get("LETEIEALKEELLFMK");
+//		MatchRow LETEIEALKEELLFMK = firstHash.get("LETEIEALKEELLFMK");
 //		U.p(LETEIEALKEELLFMK.getInt("start") + "\t" + LETEIEALKEELLFMK.getInt("stop") + "\t" + LETEIEALKEELLFMK.getString("sequenceName"));
 		
 		//load secondary sequences
-		ArrayList<Match> secondMatches = loadMatches("/Volumes/Research/CPTAC-CompRef/reports-second", "sixFrameSequences");
+		ArrayList<MatchRow> secondMatches = loadMatches("/Volumes/Research/CPTAC-CompRef/reports-second", "sixFrameSequences");
 		U.p("secondMatches " + secondMatches.size());
-		Hashtable<String, Match> secondMatchesHash = new Hashtable<String, Match>();
-		ArrayList<Match> secondMatchesTrimmed = new ArrayList<Match>();
-		for (Match match: secondMatches) {
+		Hashtable<String, MatchRow> secondMatchesHash = new Hashtable<String, MatchRow>();
+		ArrayList<MatchRow> secondMatchesTrimmed = new ArrayList<MatchRow>();
+		for (MatchRow match: secondMatches) {
 			String peptideSequence = match.getString("peptideSequence");
 			if (firstHash.get(peptideSequence) == null) {
 				secondMatchesHash.put(peptideSequence, match);
@@ -62,7 +62,7 @@ public class CompRefSetAnalysis {
 		}
 		U.p("secondMatchesHash " + secondMatchesHash.size());
 		
-		Hashtable<String, Match> secondMatchesTrimmedHash = getMatchHash(secondMatchesTrimmed, "peptideSequence", null);
+		Hashtable<String, MatchRow> secondMatchesTrimmedHash = getMatchHash(secondMatchesTrimmed, "peptideSequence", null);
 		U.p("secondMatchesTrimmed " + secondMatchesTrimmed.size());
 		U.p("secondMatchesTrimmedHash " + secondMatchesTrimmedHash.size());
 		
@@ -71,7 +71,7 @@ public class CompRefSetAnalysis {
 		
 		//finding support sequences
 		Hashtable<String, Hashtable<String, String>> supportHash = new Hashtable<String, Hashtable<String, String>>();
-		for (Match match: secondMatchesTrimmed) {
+		for (MatchRow match: secondMatchesTrimmed) {
 			String peptideSequence = match.getString("peptideSequence");
 			
 			//getting primary peptide
@@ -94,7 +94,7 @@ public class CompRefSetAnalysis {
 		//finding the proportion more spectra were identified from first stage to second stage
 		Hashtable<String, Integer> firstStageTallies = new Hashtable<String, Integer>();
 		Hashtable<String, Integer> secondStageTallies = new Hashtable<String, Integer>();
-		for (Match match: firstMatches) {
+		for (MatchRow match: firstMatches) {
 			String peptideSequence = match.getString("peptideSequence");
 			Integer tally = firstStageTallies.get(peptideSequence);
 			if (tally == null) {
@@ -103,7 +103,7 @@ public class CompRefSetAnalysis {
 				firstStageTallies.put(peptideSequence, tally + 1);
 			}
 		}
-		for (Match match: secondMatches) {
+		for (MatchRow match: secondMatches) {
 			String peptideSequence = match.getString("peptideSequence");
 			Integer tally = secondStageTallies.get(peptideSequence);
 			if (tally == null) {
@@ -150,7 +150,7 @@ public class CompRefSetAnalysis {
 		//secondary set counts based on the peptide in the targeted sequence name
 		Hashtable<String, Hashtable<String, String>> secondSetAll = new Hashtable<String, Hashtable<String, String>>();
 		Hashtable<String, String> unambiguousSecond = new Hashtable<String, String>();
-		for (Match match: secondMatches) {
+		for (MatchRow match: secondMatches) {
 			String peptideSequence = match.getString("peptideSequence");
 			String path = match.getFile("FilePath").getAbsolutePath();
 			String [] pathChunks = path.split("/");
@@ -188,7 +188,7 @@ public class CompRefSetAnalysis {
 				int secondSize = 0;
 				if (secondSetHash.get(key) != null) secondSize = secondSetHash.get(key).size();
 				
-				Match match = firstHash.get(key);
+				MatchRow match = firstHash.get(key);
 				
 				//number of supports found
 				int supportSize = 0;
@@ -212,7 +212,7 @@ public class CompRefSetAnalysis {
 				
 				if (secondSetAllCount == 0) {
 					U.p("key: " + key);
-//					for (Match m: secondMatches) {
+//					for (MatchRow m: secondMatches) {
 //						if (m.getString("peptideSequence").equals("ATPGHTGCLSPGCPDQPAR")) {
 //							U.p(m.getFile("FilePath").getAbsolutePath());
 //							U.p(m.getString("sequenceName"));
@@ -244,9 +244,9 @@ public class CompRefSetAnalysis {
 		
 	}
 	
-	public static Hashtable<String, Hashtable<String, String>> getSetHash(ArrayList<Match> matches) {
+	public static Hashtable<String, Hashtable<String, String>> getSetHash(ArrayList<MatchRow> matches) {
 		Hashtable<String, Hashtable<String, String>> hash = new Hashtable<String, Hashtable<String, String>>();
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			String peptideSequence = match.getString("peptideSequence");
 			String path = match.getFile("FilePath").getAbsolutePath();
 			String [] pathChunks = path.split("/");
@@ -261,9 +261,9 @@ public class CompRefSetAnalysis {
 		return hash;
 	}
 	
-	public static Hashtable<String, Match> getMatchHash(ArrayList<Match> matches, String matchElement, Hashtable<String, Match> sequencesToIgnore) {
-		Hashtable<String, Match> hash = new Hashtable<String, Match>();
-		for (Match match: matches) {
+	public static Hashtable<String, MatchRow> getMatchHash(ArrayList<MatchRow> matches, String matchElement, Hashtable<String, MatchRow> sequencesToIgnore) {
+		Hashtable<String, MatchRow> hash = new Hashtable<String, MatchRow>();
+		for (MatchRow match: matches) {
 			String peptideSequence = match.getString(matchElement);
 			if (sequencesToIgnore == null) {
 				hash.put(peptideSequence, match);
@@ -276,10 +276,10 @@ public class CompRefSetAnalysis {
 		return hash;
 	}
 	
-	public static ArrayList<Match> loadMatches(String filePath, String folderPattern) {
+	public static ArrayList<MatchRow> loadMatches(String filePath, String folderPattern) {
 		File compref = new File(filePath);
 		File [] reports = compref.listFiles();
-		ArrayList<Match> out = new ArrayList<Match>();
+		ArrayList<MatchRow> out = new ArrayList<MatchRow>();
 		for (File reportFolder: reports) {
 			if (reportFolder.isFile()) continue;
 			if (reportFolder.isHidden()) continue;
@@ -289,9 +289,9 @@ public class CompRefSetAnalysis {
 			for (File subFolder: subFolders) {
 				if (subFolder.getName().indexOf(folderPattern) != -1) {
 					File reportFile = new File(subFolder, "report.txt");
-					ArrayList<Match> matches =  Match.loadMatches(reportFile);
+					ArrayList<MatchRow> matches =  MatchRow.loadMatches(reportFile);
 					if (filter) {
-						for (Match match: matches) {
+						for (MatchRow match: matches) {
 							String peptideSequence = match.getString("peptideSequence");
 							if (notInUniprot.get(peptideSequence) != null) {
 								out.add(match);
@@ -330,8 +330,8 @@ public class CompRefSetAnalysis {
 			if (reportFolder.isHidden()) continue;
 			
 			File reportFile = new File(reportFolder, "1 sixFrameSequences/report.txt");
-			ArrayList<Match> matches =  Match.loadMatches(reportFile);
-			for (Match match: matches) {
+			ArrayList<MatchRow> matches =  MatchRow.loadMatches(reportFile);
+			for (MatchRow match: matches) {
 				String sequence = match.getString("peptideSequence");
 				String sequenceName = match.getString("SequenceName");
 				
@@ -413,8 +413,8 @@ public class CompRefSetAnalysis {
 				if (inHG19 || pastHG19) beforeHG19 = false;
 				if (beforeHG19) continue;
 				
-				ArrayList<Match> matches =  Match.loadMatches(reportFile);
-				for (Match match: matches) {
+				ArrayList<MatchRow> matches =  MatchRow.loadMatches(reportFile);
+				for (MatchRow match: matches) {
 					String sequence = match.getString("peptideSequence");
 					
 					if (beforeHG19) {
@@ -514,8 +514,8 @@ public class CompRefSetAnalysis {
 					//count unique sequences
 					int uniqueSequenceCount = 0;
 					
-					ArrayList<Match> matches =  Match.loadMatches(reportFile);
-					for (Match match: matches) {
+					ArrayList<MatchRow> matches =  MatchRow.loadMatches(reportFile);
+					for (MatchRow match: matches) {
 						String sequence = match.getString("peptideSequence");
 						if (sequences.get(sequence) == null) {
 							sequences.put(sequence, sequence);

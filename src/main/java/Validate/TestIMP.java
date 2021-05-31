@@ -7,7 +7,7 @@ import java.io.*;
 public class TestIMP {
 	
 	public static void main(String args[]) {
-		Peppy.Peppy.init(args);
+		Peppy.init(args);
 		
 		Properties.precursorTolerance = 2000;
 		Properties.fragmentTolerance = 300;

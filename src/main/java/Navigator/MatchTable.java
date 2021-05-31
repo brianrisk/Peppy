@@ -22,7 +22,7 @@ import java.util.Hashtable;
 public class MatchTable { 
 	
 	/* where we store all the matches */
-	private Hashtable<String, ArrayList<Match>> matches = new Hashtable<String, ArrayList<Match>>();
+	private Hashtable<String, ArrayList<MatchRow>> matches = new Hashtable<String, ArrayList<MatchRow>>();
 	
 	/*
 	 * This is a flag that sets if we are to clear out the existing ArrayList of matches if
@@ -43,10 +43,10 @@ public class MatchTable {
 	 * @param key
 	 * @param match
 	 */
-	public void put(String key, Match match) {
-		ArrayList<Match> existingMatches = matches.get(key);
+	public void put(String key, MatchRow match) {
+		ArrayList<MatchRow> existingMatches = matches.get(key);
 		if (existingMatches == null) {
-			existingMatches = new ArrayList<Match>();
+			existingMatches = new ArrayList<MatchRow>();
 			existingMatches.add(match);
 			matches.put(key, existingMatches);
 		} else {
@@ -61,7 +61,7 @@ public class MatchTable {
 				
 				/* If the new match has a higher score then we create a new ArrayList and usurp the existing with it. */
 				if (match.getScore() > existingMatches.get(0).getScore()) {
-					ArrayList<Match> matchArray = new ArrayList<Match>();
+					ArrayList<MatchRow> matchArray = new ArrayList<MatchRow>();
 					matchArray.add(match);
 					matches.put(key, matchArray);
 				}
@@ -83,16 +83,16 @@ public class MatchTable {
 	 * 
 	 * @return
 	 */
-	public ArrayList<Match> getArrayList() {
+	public ArrayList<MatchRow> getArrayList() {
 		/* determining the size of the output */
 		int size = 0;
-		Enumeration<ArrayList<Match>> e = matches.elements();
+		Enumeration<ArrayList<MatchRow>> e = matches.elements();
 		while (e.hasMoreElements()) {
 			size += e.nextElement().size();
 		}
 		
 		/* create the output */
-		ArrayList<Match> out = new ArrayList<Match>(size);
+		ArrayList<MatchRow> out = new ArrayList<MatchRow>(size);
 		e = matches.elements();
 		while (e.hasMoreElements()) {
 			out.addAll(e.nextElement());
@@ -101,11 +101,11 @@ public class MatchTable {
 		return out;
 	}
 	
-	public Hashtable<String, ArrayList<Match>> getHashtable() {
+	public Hashtable<String, ArrayList<MatchRow>> getHashtable() {
 		return matches;
 	}
 	
-	public ArrayList<Match> get(String key) {
+	public ArrayList<MatchRow> get(String key) {
 		return matches.get(key);
 	}
 

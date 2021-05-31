@@ -20,13 +20,13 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 	private String keyName;
 	private double scoreTotal = 0;
 	
-	Hashtable<String, Match> matches = new Hashtable<String, Match>();
+	Hashtable<String, MatchRow> matches = new Hashtable<String, MatchRow>();
 	
 	public MergeMatchHolder(String keyName) {
 		this.keyName = keyName;
 	}
 	
-	public void put(String key, Match match) {
+	public void put(String key, MatchRow match) {
 		matches.put(key, match);
 		if (match.getScore() > topScore) topScore = match.getScore();
 		scoreTotal += match.getScore();
@@ -34,17 +34,17 @@ public class MergeMatchHolder implements Comparable<MergeMatchHolder> {
 		if (!match.getBoolean("isModified")) isModified = false;
 	}
 	
-	public Match get(String key) {
+	public MatchRow get(String key) {
 		return matches.get(key);
 	}
 	
-	public Match get() {
+	public MatchRow get() {
 		if (matches.size() == 0) return null;
 		return matches.elements().nextElement();
 	}
 	
-	public ArrayList<Match> getMatches() {
-		return new ArrayList<Match>(matches.values());
+	public ArrayList<MatchRow> getMatches() {
+		return new ArrayList<MatchRow>(matches.values());
 	}
 	
 	public String getPeptideSequence() {

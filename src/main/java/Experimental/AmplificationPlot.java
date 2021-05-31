@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Peppy.U;
 
 import javax.imageio.ImageIO;
@@ -76,8 +76,8 @@ public class AmplificationPlot {
 	}
 	
 	private static int addMatches(File matchesFile, Hashtable<String, AmplifiedPeptide> hashtable) {
-		ArrayList<Match> fileMatches = Match.loadMatches(matchesFile);
-		for (Match match: fileMatches) {
+		ArrayList<MatchRow> fileMatches = MatchRow.loadMatches(matchesFile);
+		for (MatchRow match: fileMatches) {
 			
 			AmplifiedPeptide amp = new AmplifiedPeptide(match);
 			if (!amp.isValid()) continue;

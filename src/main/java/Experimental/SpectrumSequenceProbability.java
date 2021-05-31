@@ -3,7 +3,7 @@ package Experimental;
 import Graphs.Point;
 import Graphs.Scatter;
 import Graphs.ScatterVisualizer;
-import Navigator.Match;
+import Navigator.MatchRow;
 import Peppy.*;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -88,17 +88,17 @@ public class SpectrumSequenceProbability {
 		 * loading matches
 		 */
 		U.p("loading matches");
-		ArrayList<Match> matches = new ArrayList<Match>();
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/1 WHIM16 - gencode proteome/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/4 WHIM16 - mouse proteome/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/6 WHIM16 - varimod/report.txt")));
+		ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/1 WHIM16 - gencode proteome/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/4 WHIM16 - mouse proteome/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/UNC-WHIM16-CompRef/6 WHIM16 - varimod/report.txt")));
 		
 		
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-ENCODE-WCL/1 UNC-ENCODE-WCL - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-CPTAC-QEXATIVE/1 UNC-CPTAC-QEXATIVE - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-ENCODE-WCL/1 UNC-ENCODE-WCL - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/UNC-CPTAC-QEXATIVE/1 UNC-CPTAC-QEXATIVE - UniProt_Human_2012_03.fasta/report.txt")));
 		
-		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WASHU-CPTAC-TTOF/1 WASHU-CPTAC-TTOF - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/KAPP/1 spectra - UniProt_Human_2012_03.fasta/report.txt")));
+		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/WASHU-CPTAC-TTOF/1 WASHU-CPTAC-TTOF - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/KAPP/1 spectra - UniProt_Human_2012_03.fasta/report.txt")));
 		
 		
 		
@@ -107,8 +107,8 @@ public class SpectrumSequenceProbability {
 		 */
 		U.p("finding spectrum files");
 		
-		Hashtable<String, Match> usedSpectra = new Hashtable<String, Match>();
-		for (Match match: matches) {
+		Hashtable<String, MatchRow> usedSpectra = new Hashtable<String, MatchRow>();
+		for (MatchRow match: matches) {
 			File spectrumFile = match.getFile("FilePath");
 			if (spectrumFile == null) continue;
 			String spectrumMD5 = match.getString("spectrumMD5");

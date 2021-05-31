@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Navigator.MatchesToProtein;
 
 import java.util.Enumeration;
@@ -29,8 +29,8 @@ public class ProteinOverlap implements Comparable<ProteinOverlap> {
 		this.proteinA = proteinA;
 		this.proteinB = proteinB;
 		
-		Hashtable<String, Match> peptidesA = proteinA.getBestPeptides();
-		Hashtable<String, Match> peptidesB = proteinB.getBestPeptides();
+		Hashtable<String, MatchRow> peptidesA = proteinA.getBestPeptides();
+		Hashtable<String, MatchRow> peptidesB = proteinB.getBestPeptides();
 		
 		Enumeration<String> e = peptidesA.keys();
 		while (e.hasMoreElements()) {

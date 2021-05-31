@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Navigator.MatchTable;
 import Peppy.U;
 import Reports.UCSC;
@@ -23,11 +23,11 @@ public class SaveBedFile {
 	
 	String trackName;
 	double scoreCutoff;
-	ArrayList<Match> contaminant_protein = new ArrayList<Match>();
-	ArrayList<Match> reference_protein = new ArrayList<Match>();
-	ArrayList<Match> reference_genome = new ArrayList<Match>();
-	ArrayList<Match> subject_genome = new ArrayList<Match>();
-	ArrayList<Match> disease_genome = new ArrayList<Match>();
+	ArrayList<MatchRow> contaminant_protein = new ArrayList<MatchRow>();
+	ArrayList<MatchRow> reference_protein = new ArrayList<MatchRow>();
+	ArrayList<MatchRow> reference_genome = new ArrayList<MatchRow>();
+	ArrayList<MatchRow> subject_genome = new ArrayList<MatchRow>();
+	ArrayList<MatchRow> disease_genome = new ArrayList<MatchRow>();
 	
 	/* keeping track of how many we find */
 	private int contaminantTotal = 0;
@@ -146,51 +146,51 @@ public class SaveBedFile {
 		this.scoreCutoff = scoreCutoff;
 	}
 	
-	public ArrayList<Match> loadMatches(String fileName) {
-		ArrayList<Match> matches = Match.loadMatches(new File(fileName));
+	public ArrayList<MatchRow> loadMatches(String fileName) {
+		ArrayList<MatchRow> matches = MatchRow.loadMatches(new File(fileName));
 		int passCount = 0;
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			if (match.getScore() >= scoreCutoff) passCount++;
 		}
-		ArrayList<Match> out = new ArrayList<Match>(passCount);
-		for (Match match: matches) {
+		ArrayList<MatchRow> out = new ArrayList<MatchRow>(passCount);
+		for (MatchRow match: matches) {
 			if (match.getScore() >= scoreCutoff) out.add(match);
 		}
 		return out;
 	}
 	
 	public void addContaminantProteinMatches(String fileName) {
-		ArrayList<Match> matches = loadMatches(fileName);
-		for (Match match: matches) match.set("label", CONTAMINANT_PROTEIN);
-		for (Match match: matches) match.set("isProtein", true);
+		ArrayList<MatchRow> matches = loadMatches(fileName);
+		for (MatchRow match: matches) match.set("label", CONTAMINANT_PROTEIN);
+		for (MatchRow match: matches) match.set("isProtein", true);
 		contaminant_protein.addAll(matches);
 	}
 	
 	public void addReferenceProteinMatches(String fileName) {
-		ArrayList<Match> matches = loadMatches(fileName);
-		for (Match match: matches) match.set("label", REFERENCE_PROTEIN);
-		for (Match match: matches) match.set("isProtein", true);
+		ArrayList<MatchRow> matches = loadMatches(fileName);
+		for (MatchRow match: matches) match.set("label", REFERENCE_PROTEIN);
+		for (MatchRow match: matches) match.set("isProtein", true);
 		reference_protein.addAll(matches);
 	}
 	
 	public void addReferenceGenomeMatches(String fileName) {
-		ArrayList<Match> matches = loadMatches(fileName);
-		for (Match match: matches) match.set("label", REFERENCE_GENOME);
-		for (Match match: matches) match.set("isProtein", false);
+		ArrayList<MatchRow> matches = loadMatches(fileName);
+		for (MatchRow match: matches) match.set("label", REFERENCE_GENOME);
+		for (MatchRow match: matches) match.set("isProtein", false);
 		reference_genome.addAll(matches);
 	}
 	
 	public void addSubjectGenomeMatches(String fileName) {
-		ArrayList<Match> matches = loadMatches(fileName);
-		for (Match match: matches) match.set("label", SUBJECT_GENOME);
-		for (Match match: matches) match.set("isProtein", false);
+		ArrayList<MatchRow> matches = loadMatches(fileName);
+		for (MatchRow match: matches) match.set("label", SUBJECT_GENOME);
+		for (MatchRow match: matches) match.set("isProtein", false);
 		subject_genome.addAll(matches);
 	}
 	
 	public void addDiseaseGenomeMatches(String fileName) {
-		ArrayList<Match> matches = loadMatches(fileName);
-		for (Match match: matches) match.set("label", DISEASE_GENOME);
-		for (Match match: matches) match.set("isProtein", false);
+		ArrayList<MatchRow> matches = loadMatches(fileName);
+		for (MatchRow match: matches) match.set("label", DISEASE_GENOME);
+		for (MatchRow match: matches) match.set("isProtein", false);
 		disease_genome.addAll(matches);
 	}
 	
@@ -202,11 +202,11 @@ public class SaveBedFile {
 		
 		/* the best matches */
 		MatchTable best = new MatchTable(true);
-		for (Match match: contaminant_protein) best.put(match.getString("spectrumMD5"), match);
-		for (Match match: reference_protein) best.put(match.getString("spectrumMD5"), match);
-		for (Match match: reference_genome) best.put(match.getString("spectrumMD5"), match);
-		for (Match match: subject_genome) best.put(match.getString("spectrumMD5"), match);
-		for (Match match: disease_genome) best.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: contaminant_protein) best.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: reference_protein) best.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: reference_genome) best.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: subject_genome) best.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: disease_genome) best.put(match.getString("spectrumMD5"), match);
 		
 		U.p("best has this many elements: " + best.getHashtable().size());
 
@@ -229,11 +229,11 @@ public class SaveBedFile {
 			bedWriter.println("track name=\"" + trackName +"\" description=\"" + trackName + "\" visibility=2 itemRgb=\"On\"");
 			
 			/* setting up variables */
-			Hashtable<String, ArrayList<Match>> bestHashtable = best.getHashtable();
+			Hashtable<String, ArrayList<MatchRow>> bestHashtable = best.getHashtable();
 			
 			int label;
 			String md5;
-			ArrayList<Match> spectrumMatches ;
+			ArrayList<MatchRow> spectrumMatches ;
 			
 			
 			Enumeration<String> e = bestHashtable.keys();
@@ -254,7 +254,7 @@ public class SaveBedFile {
 				 * Finding out if the best match can be found in a protein, and
 				 * which specific databases contain it.
 				 */
-				for (Match match: spectrumMatches) {
+				for (MatchRow match: spectrumMatches) {
 					/* is it a protein */
 					if (match.getBoolean("isProtein")) {
 						isInProtein = true;
@@ -317,18 +317,18 @@ public class SaveBedFile {
 				 * 
 				 * Then, we make special exceptions for the subject and disease genomes
 				 */
-				ArrayList<Match> reducedSpectrumMatches = new ArrayList<Match>();
+				ArrayList<MatchRow> reducedSpectrumMatches = new ArrayList<MatchRow>();
 				int keepLabel = REFERENCE_GENOME;
 				if (dominantLabel == SUBJECT_GENOME)  keepLabel = SUBJECT_GENOME;
 				if (dominantLabel == DISEASE_GENOME)  keepLabel = DISEASE_GENOME;
-				for (Match match: spectrumMatches) {
+				for (MatchRow match: spectrumMatches) {
 					if (match.getInt("label") == keepLabel) reducedSpectrumMatches.add(match);
 				}
 				spectrumMatches = reducedSpectrumMatches;
 				
 				
 				/* printing our BED reports */
-				for (Match match: spectrumMatches) {
+				for (MatchRow match: spectrumMatches) {
 					String link = UCSC.getLink(match.getInt("start"), match.getInt("stop"), match.getString("SequenceName"));
 					if (dominantLabel == CONTAMINANT_PROTEIN) {
 						bedWriter.println(getBedLine(match, Color.orange));
@@ -394,7 +394,7 @@ public class SaveBedFile {
 		}
 	}
 	
-	public static String getBedLine(Match match, Color color) {
+	public static String getBedLine(MatchRow match, Color color) {
 		color = getShade(match, color);
 		int thickStart = match.getInt("start");
 		if (match.getBoolean("isModified")) {
@@ -425,7 +425,7 @@ public class SaveBedFile {
 		return line.toString();
 	}
 	
-	private static Color getShade(Match match, Color color) {
+	private static Color getShade(MatchRow match, Color color) {
 
 	
 		int shade = 0;
@@ -457,11 +457,11 @@ public class SaveBedFile {
 	 * @param setB
 	 * @return
 	 */
-	public static ArrayList<Match> minus(ArrayList<Match> setA, ArrayList<Match> setB) {
-		ArrayList<Match> out = new ArrayList<Match>();
-		for (Match setAMatch: setA) {
+	public static ArrayList<MatchRow> minus(ArrayList<MatchRow> setA, ArrayList<MatchRow> setB) {
+		ArrayList<MatchRow> out = new ArrayList<MatchRow>();
+		for (MatchRow setAMatch: setA) {
 			boolean found = false;
-			for (Match setBMatch: setB) {
+			for (MatchRow setBMatch: setB) {
 				if (setAMatch.equals(setBMatch)) {
 					found = true;
 					break;

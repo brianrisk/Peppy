@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Peppy.Protein;
 import Peppy.ProteinCoverage;
 import Peppy.SequenceProtein;
@@ -26,29 +26,29 @@ public class ProteinGapsReport {
 	
 	public static void main(String [] args) {		
 		/* loading matches */
-		ArrayList<Match> matches = new ArrayList<Match>();
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group1/1 group1 - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group2/1 group2 - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group3/1 group3 - UniProt_Human_2012_03.fasta/report.txt")));
+		ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group1/1 group1 - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group2/1 group2 - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group3/1 group3 - UniProt_Human_2012_03.fasta/report.txt")));
 		
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group4/1 group4 - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group5/1 group5 - UniProt_Human_2012_03.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group6/1 group6 - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group4/1 group4 - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group5/1 group5 - UniProt_Human_2012_03.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/MD Anderson/Visit results/group6/1 group6 - UniProt_Human_2012_03.fasta/report.txt")));
 		
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM maternal/1 spectra uncompressed - gencode11.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_BI/1 CompRef_Proteome_BI - gencode12.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_JHUC_P5AB/1 CompRef_Proteome_JHUC_P5AB - gencode12.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/ENCODE/GM12878/reports/GM maternal/1 spectra uncompressed - gencode11.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_BI/1 CompRef_Proteome_BI - gencode12.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_JHUC_P5AB/1 CompRef_Proteome_JHUC_P5AB - gencode12.fasta/report.txt")));
 		
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_PNNL/1 CompRef_Proteome_PNNL - gencode12.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P5/1 WashU_P5 - gencode12.fasta/report.txt")));
-//		matches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P6/1 WashU_P6 - gencode12.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/CompRef_Proteome_PNNL/1 CompRef_Proteome_PNNL - gencode12.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P5/1 WashU_P5 - gencode12.fasta/report.txt")));
+//		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WashU_045_046_P6/1 WashU_P6 - gencode12.fasta/report.txt")));
 		
 		
 		/* loading proteins */
 		
 //		String proteinFileName = "/Users/risk2/PeppyData/public/sequences/protein/gencode12.fasta";
 		String proteinFileName = "/Users/risk2/PeppyData/public/sequences/protein/UniProt_Human_2012_03.fasta";
-		matches.addAll(Match.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/1 spectra - UniProt_Human_2012_03.fasta/report.txt")));
+		matches.addAll(MatchRow.loadMatches(new File("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/1 spectra - UniProt_Human_2012_03.fasta/report.txt")));
 		
 		
 		
@@ -92,7 +92,7 @@ public class ProteinGapsReport {
 		
 	}
 	
-	public ProteinGapsReport(ArrayList<Match> matches, String fraction, String proteinFileName) {
+	public ProteinGapsReport(ArrayList<MatchRow> matches, String fraction, String proteinFileName) {
 		
 		/* load proteins */
 		File proteinFile = new File(proteinFileName);
@@ -106,7 +106,7 @@ public class ProteinGapsReport {
 		/* see which peptides are found in more than one protein form */
 		Hashtable<String, Boolean> uniquePeptides = new Hashtable<String, Boolean>();
 		String spectrumMD5;
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			spectrumMD5 = match.getString("spectrumMD5");
 			Boolean found = uniquePeptides.get(spectrumMD5);
 			if (found == null) {
@@ -119,7 +119,7 @@ public class ProteinGapsReport {
 		/* for each match, get it's protein, then catalog coverage */
 		int start, stop;
 		String proteinName;
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			if (fraction != null) {
 				if (match.getFile("FilePath").getName().indexOf(fraction) == -1) continue;
 			}

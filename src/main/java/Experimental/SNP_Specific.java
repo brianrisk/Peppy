@@ -1,7 +1,7 @@
 package Experimental;
 
 import Navigator.BestMatches;
-import Navigator.Match;
+import Navigator.MatchRow;
 import Navigator.ResultsCategory;
 import Peppy.U;
 
@@ -200,19 +200,19 @@ public class SNP_Specific {
 	 * the nsSNP has removed that mod site.
 	 */
 	public static void snpRemovesModSite(File modResultsFile, File snpResultsFile) {
-		ArrayList<Match> modResults = Match.loadMatches(modResultsFile);
-		modResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt")));
-		modResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/6 WHIM2 - varimod/report.txt")));
-		modResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/5 WHIM2 - varimod/report.txt")));
+		ArrayList<MatchRow> modResults = MatchRow.loadMatches(modResultsFile);
+		modResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis033/5 WHIM2 - varimod/report.txt")));
+		modResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis041/6 WHIM2 - varimod/report.txt")));
+		modResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM2-Ellis043/5 WHIM2 - varimod/report.txt")));
 		
-		ArrayList<Match> snpResults = Match.loadMatches(snpResultsFile);
-		snpResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/2 WHIM16 - subject/report.txt")));
-		snpResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/2 WHIM16 - subject/report.txt")));
-		snpResults.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/2 WHIM16 - subject/report.txt")));
+		ArrayList<MatchRow> snpResults = MatchRow.loadMatches(snpResultsFile);
+		snpResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis033/2 WHIM16 - subject/report.txt")));
+		snpResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis041/2 WHIM16 - subject/report.txt")));
+		snpResults.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/CPTAC/reports/WHIM16-Ellis043/2 WHIM16 - subject/report.txt")));
 		
-//		ArrayList<Match> modResultsThat
+//		ArrayList<MatchRow> modResultsThat
 		int differenceLoc;
-		for (Match modMatch: modResults) {
+		for (MatchRow modMatch: modResults) {
 			int roundedMass = (int) Math.round(modMatch.getDouble("modMass"));
 			
 			/*
@@ -223,7 +223,7 @@ public class SNP_Specific {
 			if (roundedMass == 43) continue; 
 			if (roundedMass == 16) continue;
 			
-			for (Match snpMatch: snpResults) {
+			for (MatchRow snpMatch: snpResults) {
 				differenceLoc = oneDifference(modMatch,snpMatch);
 				if (differenceLoc != -1) {
 					if (modMatch.getInt("modIndex") == differenceLoc) {
@@ -241,7 +241,7 @@ public class SNP_Specific {
 	 * @param matchB
 	 * @return returns -1 if they have more or less than one difference (eg no differences or more than one difference).  else returns the location of the difference
 	 */
-	private static int oneDifference(Match matchA, Match matchB) {
+	private static int oneDifference(MatchRow matchA, MatchRow matchB) {
 		String matchAString = matchA.getString("peptideSequence");
 		String matchBString = matchB.getString("peptideSequence");
 		if (matchAString.length() != matchBString.length()) return -1;

@@ -9,7 +9,7 @@ public class VCFGenomeAssembler {
 
 	public static void main (String[] args) {
 		U.p("Starting...");
-		Peppy.Peppy.init(args);
+		Peppy.init(args);
 		ArrayList<Sequence> sequences = Sequence.loadSequenceFiles(Properties.sequenceDirectoryOrFile);
 		U.p("we are working with " + sequences.size() + " sequence files");
 				

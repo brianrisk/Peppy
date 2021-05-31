@@ -33,7 +33,7 @@ public class Sample {
 	MatchTable bestTable = new MatchTable(true);
 	
 	/* where we hold all of the matches we have loaded */
-	ArrayList<Match> matches = new ArrayList<Match>();
+	ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
 	
 	/* constructor */
 	public Sample(String name, int databaseType) {
@@ -42,7 +42,7 @@ public class Sample {
 	}
 	
 	public void loadResults(File file) {
-		ArrayList<Match> newMatches = Match.loadMatches(file); 
+		ArrayList<MatchRow> newMatches = MatchRow.loadMatches(file);
 		matches.addAll(newMatches);
 		addMatches(newMatches);
 	}
@@ -55,13 +55,13 @@ public class Sample {
 		return databaseType;
 	}
 
-	public ArrayList<Match> getMatches() {
+	public ArrayList<MatchRow> getMatches() {
 		return matches;
 	}
 	
 	/* add a set of matches to our MatchTable */
-	public void addMatches(ArrayList<Match> matches) {
-		for (Match match: matches) match.set("analysisDatabase", databaseType);
+	public void addMatches(ArrayList<MatchRow> matches) {
+		for (MatchRow match: matches) match.set("analysisDatabase", databaseType);
 		
 		/* is this from a protein or genome? */
 		boolean isProtein = true;
@@ -76,23 +76,23 @@ public class Sample {
 		
 		/* label each of the matches what we found above */
 		if (isProtein) {
-			for (Match match: matches) match.set("databaseType", "protein");
+			for (MatchRow match: matches) match.set("databaseType", "protein");
 		} else {
-			for (Match match: matches) match.set("databaseType", "genome");
+			for (MatchRow match: matches) match.set("databaseType", "genome");
 		}
 			
 		
 		/* add all the matches */
-		for (Match match: matches) bestTable.put(match.getString("spectrumMD5"), match);
+		for (MatchRow match: matches) bestTable.put(match.getString("spectrumMD5"), match);
 	}
 	
 	public void reduceMatches(double matchScoreCutoff) {
 		int keepCount = 0;
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			if (match.getScore() >= matchScoreCutoff) keepCount++;
 		}
-		ArrayList<Match> reducedMatches = new ArrayList<Match>(keepCount);
-		for (Match match: matches) {
+		ArrayList<MatchRow> reducedMatches = new ArrayList<MatchRow>(keepCount);
+		for (MatchRow match: matches) {
 			if (match.getScore() >= matchScoreCutoff) reducedMatches.add(match);
 		}
 		matches = reducedMatches;

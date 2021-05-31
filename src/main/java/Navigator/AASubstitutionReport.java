@@ -17,7 +17,7 @@ import java.util.Collections;
 public class AASubstitutionReport {
 	
 	File variModFile;
-	ArrayList<Match> matches;
+	ArrayList<MatchRow> matches;
 	
 
 	/**
@@ -33,7 +33,7 @@ public class AASubstitutionReport {
 		ArrayList<AASubstitution> substitutions = AASubstitution.generateListOfAASubstitutions();
 		
 		/* load the matches */
-		matches = Match.loadMatches(variModFile);	
+		matches = MatchRow.loadMatches(variModFile);
 		
 		try {
 			PrintWriter matchWriter;
@@ -52,7 +52,7 @@ public class AASubstitutionReport {
 			matchWriter.println("</thead>");
 			matchWriter.println("<tbody>");
 		
-			for (Match match: matches) {
+			for (MatchRow match: matches) {
 				if (match.getBoolean("isModified") && match.getBoolean("modLocCertain")) {
 					String sequenceName = match.getString("sequenceName");
 					double modMass = match.getDouble("modMass");
@@ -109,7 +109,7 @@ public class AASubstitutionReport {
 		}
 	}
 
-	public ArrayList<Match> getMatches() {
+	public ArrayList<MatchRow> getMatches() {
 		return matches;
 	}
 

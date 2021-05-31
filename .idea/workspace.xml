@@ -2,95 +2,38 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa6db85b-431d-411c-8947-ccb7d412c4e0" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Database/Row.java" afterPath="$PROJECT_DIR$/src/main/java/Database/Row.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Database/Table.java" afterPath="$PROJECT_DIR$/src/main/java/Database/Table.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/AmplificaitonHistogram.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/AmplificaitonHistogram.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/AmplificationPlot.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/AmplificationPlot.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/CommonIonCount.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/CommonIonCount.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/AmplifiedPeptide.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/AmplifiedPeptide.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/CompRefSetAnalysis.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/CompRefSetAnalysis.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/DrawProbabilityGrid.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/DrawProbabilityGrid.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/IonComparisonServer.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/IonComparisonServer.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/IonComparisonThread.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/IonComparisonThread.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/JoshProbabilityExperiment.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/JoshProbabilityExperiment.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/PaperExperiments.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/PaperExperiments.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/ProteinComparison.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/ProteinComparison.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/ProteinGapsReport.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/ProteinGapsReport.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/ProteinOverlap.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/ProteinOverlap.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/ProteinReport.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/ProteinReport.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/ProteoWizardPathMaker.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/ProteoWizardPathMaker.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SNP_Specific.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SNP_Specific.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SaveBedFile.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SaveBedFile.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SetComparison.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SetComparison.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumDeNovo.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumDeNovo.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumIonPairProbability.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumIonPairProbability.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumScoreStats.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumScoreStats.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumSequenceProbability.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/SpectrumSequenceProbability.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Experimental/psm.java" afterPath="$PROJECT_DIR$/src/main/java/Experimental/psm.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graphs/HilbertCurve.java" afterPath="$PROJECT_DIR$/src/main/java/Graphs/HilbertCurve.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graphs/HistogramVisualizer.java" afterPath="$PROJECT_DIR$/src/main/java/Graphs/HistogramVisualizer.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graphs/PRCurve.java" afterPath="$PROJECT_DIR$/src/main/java/Graphs/PRCurve.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graphs/Scatter.java" afterPath="$PROJECT_DIR$/src/main/java/Graphs/Scatter.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graphs/ScatterVisualizer.java" afterPath="$PROJECT_DIR$/src/main/java/Graphs/ScatterVisualizer.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Math/EValueCalculator.java" afterPath="$PROJECT_DIR$/src/main/java/Math/EValueCalculator.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Math/LeastSquares.java" afterPath="$PROJECT_DIR$/src/main/java/Math/LeastSquares.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Math/MassError.java" afterPath="$PROJECT_DIR$/src/main/java/Math/MassError.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Math/MathFunctions.java" afterPath="$PROJECT_DIR$/src/main/java/Math/MathFunctions.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/AASubstitution.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/AASubstitution.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/AASubstitutionReport.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/AASubstitutionReport.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Match.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Match.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Match.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/MatchTable.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/MatchTable.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/MatchesTo.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/MatchesTo.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/MatchesToProtein.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/MatchesToProtein.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/MergeMatchHolder.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/MergeMatchHolder.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Modification.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Modification.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/ModificationEvent.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/ModificationEvent.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/ModificationReport.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/ModificationReport.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Navigator.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Navigator.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/FDR.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/FDR.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Match.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Match.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Match_Morpheus.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Matches.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Matches.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/ModificationEntry.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/ModificationEntry.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/OptimalTolerances.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/OptimalTolerances.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Peak.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Peak.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Peppy.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Peppy.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Properties.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Properties.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Regions.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Regions.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/ScoringThread.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/ScoringThread.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/SequenceNucleotide.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/SequenceNucleotide.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/SequenceProtein.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/SequenceProtein.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Spectrum.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Spectrum.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/SpectrumLoader.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/SpectrumLoader.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/U.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/U.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/BEDReporter.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/BEDReporter.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLPage.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLPage.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageMatches.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageMatches.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageRegion.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageRegion.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageRegions.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageRegions.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageSpectrum.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLPageSpectrum.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HTMLReporter.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HTMLReporter.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/HistogramVisualizer.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/HistogramVisualizer.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/MatchSVG.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/MatchSVG.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/SpectrumReport.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/SpectrumReport.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/TextReporter.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/TextReporter.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Reports/UCSC.java" afterPath="$PROJECT_DIR$/src/main/java/Reports/UCSC.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/CheckSequences.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/CheckSequences.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/CleanCode.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/CleanCode.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/CountPeptides.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/CountPeptides.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/ExportPeptideList.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/ExportPeptideList.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/GencodeReducer.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/GencodeReducer.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Region.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Region.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Report.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Report.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Navigator/Sample.java" afterPath="$PROJECT_DIR$/src/main/java/Navigator/Sample.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Match_IMP_VariMod.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Match_IMP_VariMod.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/ProteinCoverage.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/ProteinCoverage.java" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Peppy/Region.java" afterPath="$PROJECT_DIR$/src/main/java/Peppy/Region.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Tools/MakeSpectrumSVG.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/MakeSpectrumSVG.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/SixFrameRegion.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/SixFrameRegion.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/SpectrumFileMerge.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/SpectrumFileMerge.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Tools/SpectrumToMGF.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/SpectrumToMGF.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Tools/VCFConverter/VCFGenomeAssembler.java" afterPath="$PROJECT_DIR$/src/main/java/Tools/VCFConverter/VCFGenomeAssembler.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/Adapter.java" afterPath="$PROJECT_DIR$/src/main/java/UI/Adapter.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/UIC.java" afterPath="$PROJECT_DIR$/src/main/java/UI/UIC.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/UI/UserInterface.java" afterPath="$PROJECT_DIR$/src/main/java/UI/UserInterface.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Validate/FindOptimialParameters.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/FindOptimialParameters.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Validate/MatchContainer.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/MatchContainer.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Validate/TestIMP.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/TestIMP.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Validate/TestSet.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/TestSet.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Validate/TestSetCharacteristics.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/TestSetCharacteristics.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Validate/TestSetReduce.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/TestSetReduce.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Validate/ValidationReport.java" afterPath="$PROJECT_DIR$/src/main/java/Validate/ValidationReport.java" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
@@ -104,28 +47,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="FDR.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/FDR.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-621">
-              <caret line="28" column="52" lean-forward="false" selection-start-line="28" selection-start-column="52" selection-end-line="28" selection-end-column="52" />
-              <folding>
-                <element signature="e#722#738#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AASubstitution.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/AASubstitution.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="780">
-              <caret line="57" column="5" lean-forward="false" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="LeastSquares.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Math/LeastSquares.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -161,46 +82,89 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BestMatches.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java">
+      <file leaf-file-name="VCFGenomeAssembler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Tools/VCFConverter/VCFGenomeAssembler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="619" column="51" lean-forward="false" selection-start-line="619" selection-start-column="51" selection-end-line="619" selection-end-column="51" />
+            <state relative-caret-position="30">
+              <caret line="2" column="7" lean-forward="false" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#604#619#0" expanded="true" />
-                <element signature="e#744#759#0" expanded="true" />
-                <element signature="e#20947#20960#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Match.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/Match.java">
+      <file leaf-file-name="ValidationReport.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Validate/ValidationReport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="56">
+            <state relative-caret-position="289">
+              <caret line="34" column="5" lean-forward="false" selection-start-line="34" selection-start-column="5" selection-end-line="34" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestSet.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Validate/TestSet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="398" column="28" lean-forward="false" selection-start-line="398" selection-start-column="28" selection-end-line="398" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MakeSpectrumSVG.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Tools/MakeSpectrumSVG.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="208">
+              <caret line="21" column="62" lean-forward="false" selection-start-line="21" selection-start-column="62" selection-end-line="21" selection-end-column="62" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestIMP.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Validate/TestIMP.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="9" column="8" lean-forward="false" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Region.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/Region.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="21" column="47" lean-forward="false" selection-start-line="21" selection-start-column="47" selection-end-line="21" selection-end-column="47" />
+              <folding>
+                <element signature="e#338#348#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BestMatches.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="9255">
+              <caret line="619" column="86" lean-forward="false" selection-start-line="619" selection-start-column="86" selection-end-line="619" selection-end-column="86" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#607#625#0" expanded="true" />
+                <element signature="e#753#771#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MatchRow.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/MatchRow.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1567">
               <caret line="15" column="18" lean-forward="false" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="32" column="27" lean-forward="false" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -218,9 +182,14 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>getPeptidesInRegions</find>
+      <find>Navigator.MatchRow</find>
     </findStrings>
+    <replaceStrings>
+      <replace>MatchRow</replace>
+    </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/src/main/java</dir>
+      <dir>$PROJECT_DIR$/src/main/java/Navigator</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -245,8 +214,15 @@
         <option value="$PROJECT_DIR$/src/main/java/Peppy/Properties.java" />
         <option value="$PROJECT_DIR$/src/main/java/Peppy/Peak.java" />
         <option value="$PROJECT_DIR$/src/main/java/Peppy/Peppy.java" />
-        <option value="$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java" />
         <option value="$PROJECT_DIR$/src/main/java/Navigator/Match.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Navigator/MatchRow.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Navigator/MatchTable.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Tools/VCFConverter/VCFGenomeAssembler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Validate/ValidationReport.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Validate/TestSet.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Tools/MakeSpectrumSVG.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Validate/TestIMP.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java" />
       </list>
     </option>
   </component>
@@ -481,6 +457,14 @@
             </path>
             <path>
               <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="Validate" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
@@ -653,19 +637,20 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1622409464935</updated>
-      <workItem from="1622409466863" duration="5422000" />
+      <workItem from="1622409466863" duration="5939000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5422000" />
+    <option name="totallyTimeSpent" value="5939000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32889965" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32889965" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -678,7 +663,7 @@
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32889965" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32889965" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -843,7 +828,7 @@
         <state relative-caret-position="-621">
           <caret line="28" column="52" lean-forward="false" selection-start-line="28" selection-start-column="52" selection-end-line="28" selection-end-column="52" />
           <folding>
-            <element signature="e#722#738#0" expanded="true" />
+            <element signature="e#722#738#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -923,6 +908,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/MatchRow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1567">
+          <caret line="15" column="18" lean-forward="false" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/Region.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="21" column="47" lean-forward="false" selection-start-line="21" selection-start-column="47" selection-end-line="21" selection-end-column="47" />
+          <folding>
+            <element signature="e#338#348#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/MatchTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="124">
+          <caret line="42" column="17" lean-forward="true" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+          <folding>
+            <element signature="e#536#565#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/Peppy.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
@@ -946,32 +967,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/Tools/VCFConverter/VCFGenomeAssembler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        <state relative-caret-position="30">
+          <caret line="2" column="7" lean-forward="false" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Validate/ValidationReport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="34" column="5" lean-forward="false" selection-start-line="34" selection-start-column="5" selection-end-line="34" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Validate/TestSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="398" column="28" lean-forward="false" selection-start-line="398" selection-start-column="28" selection-end-line="398" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Tools/MakeSpectrumSVG.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="21" column="62" lean-forward="false" selection-start-line="21" selection-start-column="62" selection-end-line="21" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Validate/TestIMP.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="9" column="8" lean-forward="false" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/BestMatches.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="619" column="51" lean-forward="false" selection-start-line="619" selection-start-column="51" selection-end-line="619" selection-end-column="51" />
+        <state relative-caret-position="9255">
+          <caret line="619" column="86" lean-forward="false" selection-start-line="619" selection-start-column="86" selection-end-line="619" selection-end-column="86" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#604#619#0" expanded="true" />
-            <element signature="e#744#759#0" expanded="true" />
-            <element signature="e#20947#20960#0" expanded="true" />
+            <element signature="e#607#625#0" expanded="true" />
+            <element signature="e#753#771#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Navigator/Match.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="15" column="18" lean-forward="false" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>

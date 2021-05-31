@@ -149,7 +149,7 @@ public class FindOptimialParameters {
 //		int targetAssignmentCount = 0;
 //		double precision, recall;
 //		for (int i = 0; i < allMatches.size(); i++) {
-//			Match match = allMatches.get(i);
+//			MatchRow match = allMatches.get(i);
 //			if (match.isDecoy()) {
 //				decoyAssignmentCount++;
 //			} else {

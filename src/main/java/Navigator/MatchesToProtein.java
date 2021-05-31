@@ -17,7 +17,7 @@ import java.util.Hashtable;
 public class MatchesToProtein extends MatchesTo  {
 	
 	
-	private Hashtable<String, Match> bestPeptides = new Hashtable<String, Match>();
+	private Hashtable<String, MatchRow> bestPeptides = new Hashtable<String, MatchRow>();
 	
 	private int uniquePeptideCount = 0;
 	
@@ -34,10 +34,10 @@ public class MatchesToProtein extends MatchesTo  {
 		super(name);
 	}
 
-	public void addMatch(Match match) {
+	public void addMatch(MatchRow match) {
 		super.addMatch(match);
 		
-		Match bestPeptideMatch = bestPeptides.get(match.getString("peptideSequence"));
+		MatchRow bestPeptideMatch = bestPeptides.get(match.getString("peptideSequence"));
 		if (bestPeptideMatch == null) {
 			bestPeptides.put(match.getString("peptideSequence"), match);
 			if (match.getInt("RankCount") == 1) {
@@ -70,7 +70,7 @@ public class MatchesToProtein extends MatchesTo  {
 		return maxUniquePeptideScore;
 	}
 
-	public Hashtable<String, Match> getBestPeptides() {
+	public Hashtable<String, MatchRow> getBestPeptides() {
 		return bestPeptides;
 	}
 

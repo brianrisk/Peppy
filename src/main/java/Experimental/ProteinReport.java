@@ -1,7 +1,7 @@
 package Experimental;
 
 import Navigator.HTML;
-import Navigator.Match;
+import Navigator.MatchRow;
 import Navigator.MatchTable;
 import Navigator.MatchesToProtein;
 import Peppy.U;
@@ -50,11 +50,11 @@ public class ProteinReport {
 		/* 
 		 * HACK to get protein locations
 		 */
-		ArrayList<Match> genomeMatches = Match.loadMatches(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt"));
-		genomeMatches.addAll(Match.loadMatches(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt")));
+		ArrayList<MatchRow> genomeMatches = MatchRow.loadMatches(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt"));
+		genomeMatches.addAll(MatchRow.loadMatches(new File("/Users/risk2/PeppyData/WashU/reports/43/WHIM16/WashU WHIM16 xeno/report.txt")));
 		MatchTable matchTable = new MatchTable(true);
-		for (Match match: genomeMatches) matchTable.put(match.getString("peptideSequence"), match);
-		Hashtable<String, ArrayList<Match>> genomeHash = matchTable.getHashtable();
+		for (MatchRow match: genomeMatches) matchTable.put(match.getString("peptideSequence"), match);
+		Hashtable<String, ArrayList<MatchRow>> genomeHash = matchTable.getHashtable();
 		
 		/* 33 */
 		addToProteinHash(new File("//Users/risk2/PeppyData/WashU/reports/33/WHIM2/WashU WHIM2 human/report.txt"), whim2);
@@ -148,11 +148,11 @@ public class ProteinReport {
 //				/* So fucking hackey.  This tries to tell if the protein is in chr8 */
 //				boolean in8 = false;
 //				Protein dominant = comparison.getDominantProtein();
-//				ArrayList<Match> dominantMatches = dominant.getMatches();
-//				for (Match match: dominantMatches) {
-//					ArrayList<Match> genomeHits = genomeHash.get(match.getString("peptideSequence"));
+//				ArrayList<MatchRow> dominantMatches = dominant.getMatches();
+//				for (MatchRow match: dominantMatches) {
+//					ArrayList<MatchRow> genomeHits = genomeHash.get(match.getString("peptideSequence"));
 //					if (genomeHits == null) continue;
-//					for (Match hitMatch: genomeHits) {
+//					for (MatchRow hitMatch: genomeHits) {
 //						if (hitMatch.getInt("RankCount") == 1 && hitMatch.getString("sequenceName").equals("chr8")) {
 //							in8 = true;
 //							continue;
@@ -280,8 +280,8 @@ public class ProteinReport {
 	
 	public void addToProteinHash(File resultsFile,  Hashtable<String, MatchesToProtein> matchesToProteins) {
 		/* load in our matches */
-		ArrayList<Match> matches = Match.loadMatches(resultsFile);
-		for (Match match: matches) { 
+		ArrayList<MatchRow> matches = MatchRow.loadMatches(resultsFile);
+		for (MatchRow match: matches) {
 			match.set("reportFile", resultsFile);
 		}
 		for (int i = 0; i < matches.size(); i++) {
@@ -296,12 +296,12 @@ public class ProteinReport {
 		 * it would contribute to any given protein
 		 */
 		MatchTable matchesBySpectrum = new MatchTable(false);
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			matchesBySpectrum.put(match.getString("spectrumMD5"), match);
 		}
 		
 		/* add matches to the proteins, contribute to score */
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			String proteinName = match.getString("SequenceName");
 			MatchesToProtein existingProtein = matchesToProteins.get(proteinName);
 			
@@ -350,8 +350,8 @@ public class ProteinReport {
 		Enumeration<MatchesToProtein> e = matchesToProteins.elements();
 		while (e.hasMoreElements()) {
 			MatchesToProtein matchesToProtein = e.nextElement();
-			ArrayList<Match> matches = matchesToProtein.getMatches();
-			for (Match match: matches) {
+			ArrayList<MatchRow> matches = matchesToProtein.getMatches();
+			for (MatchRow match: matches) {
 				String peptide = match.getString("peptideSequence");
 				ArrayList<MatchesToProtein> proteinsforPeptide = out.get(peptide);
 				if (proteinsforPeptide == null) {
@@ -411,8 +411,8 @@ public class ProteinReport {
 			matchWriter.println("</tr>");
 			matchWriter.println("</thead>");
 			matchWriter.println("<tbody>");
-			ArrayList<Match> matches = matchesToProtein.getMatches();
-			for (Match match: matches) {
+			ArrayList<MatchRow> matches = matchesToProtein.getMatches();
+			for (MatchRow match: matches) {
 				
 				if (match.getString("SequenceName").equals(matchesToProtein.getName())) {
 					matchWriter.println("<tr>");

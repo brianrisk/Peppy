@@ -19,7 +19,7 @@ public class MakeSpectrumSVG {
 			matchForReport.setPeptide(peptide);
 			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
 			matchForReport.setSpectrumMatches(matchesSpectrum);
-			ArrayList<Peppy.Match> matchesForReport = new ArrayList<Peppy.Match>();
+			ArrayList<Match> matchesForReport = new ArrayList<Match>();
 			matchesForReport.add(matchForReport);
 			
 			File spectrumReportFolder = new File("");

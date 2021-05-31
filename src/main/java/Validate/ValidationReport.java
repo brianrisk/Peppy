@@ -24,7 +24,7 @@ public class ValidationReport {
 	 */
 	public static void main(String[] args) {
 		U.startStopwatch();
-		Peppy.Peppy.init(args);
+		Peppy.init(args);
 		setUp();
 		addTests();
 		searchTestSets();
@@ -37,7 +37,6 @@ public class ValidationReport {
 	
 	/**
 	 * If a test set has been previously generated and loaded
-	 * @param testSet
 	 */
 	public ValidationReport(ArrayList<TestSet> testSets) {
 		tests = testSets;

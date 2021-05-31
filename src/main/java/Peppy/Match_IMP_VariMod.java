@@ -106,7 +106,7 @@ public class Match_IMP_VariMod extends Match_IMP {
 	
 	
 	/**
-	 * This eventually calls Match's calculateIMP, but first calculates b and y ions
+	 * This eventually calls MatchRow's calculateIMP, but first calculates b and y ions
 	 * given the modification.
 	 * 
 	 * @param modificationMass

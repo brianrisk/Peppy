@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 
 /**
  * A support class for AmplificationPlot
@@ -20,7 +20,7 @@ public class AmplifiedPeptide {
 //		U.p(test.replace('|', '\t'));
 //	}
 	
-	public AmplifiedPeptide(Match match) {
+	public AmplifiedPeptide(MatchRow match) {
 		String peptideString = match.getString("peptideSequence");
 		peptide = peptideString;
 		

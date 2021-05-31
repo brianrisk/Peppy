@@ -76,7 +76,7 @@ public class TestSet {
 	public void findPositiveMatches(ArrayList<Peptide> peptides) {		
 		/* get the matches and how long it takes */
 		long startTimeMilliseconds = System.currentTimeMillis();
-		ArrayList<Match> matches = Peppy.Peppy.getMatchesWithPeptides(peptides, spectraMatches);
+		ArrayList<Match> matches = Peppy.getMatchesWithPeptides(peptides, spectraMatches);
 		long stopTimeMilliseconds = System.currentTimeMillis();
 		timeElapsed += stopTimeMilliseconds - startTimeMilliseconds;
 		
@@ -396,7 +396,7 @@ public class TestSet {
 		//get the matches
 		ScoringServer scoringServer = new ScoringServer(peptides, spectraMatches);
 		scoringServer.findMatches();
-		topReverseMatches = Peppy.Peppy.getMatchesFromSpectraMatches(spectraMatches);
+		topReverseMatches = Peppy.getMatchesFromSpectraMatches(spectraMatches);
 		
 		//Sort matches by e value	
 		Match.setSortParameter(Match.SORT_BY_SCORE);

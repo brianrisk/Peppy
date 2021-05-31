@@ -1,5 +1,7 @@
 package Peppy;
 
+import Navigator.MatchRow;
+
 import java.util.Hashtable;
 
 public class ProteinCoverage extends Protein implements Comparable<ProteinCoverage> {
@@ -19,7 +21,7 @@ public class ProteinCoverage extends Protein implements Comparable<ProteinCovera
 		coverage = new boolean[getAcidString().length()];
 	}
 	
-	public void addCoverage(Navigator.Match match) {
+	public void addCoverage(MatchRow match) {
 		for (int index = match.getInt("start"); index < match.getInt("stop"); index++) {
 			coverage[index] = true;
 		}

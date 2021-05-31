@@ -27,13 +27,13 @@ public class BestMatches {
 	private String sampleName;
 	
 	/* where we keep the best results */
-	Hashtable<String, Match> bestMatches = new Hashtable<String, Match>();
+	Hashtable<String, MatchRow> bestMatches = new Hashtable<String, MatchRow>();
 	
 	/* the results, reduced to the best example for each peptide */
-	Hashtable<String, Match> bestPeptides = new Hashtable<String, Match>();
+	Hashtable<String, MatchRow> bestPeptides = new Hashtable<String, MatchRow>();
 	
 	/* every match for each identified peptide sequence */
-	Hashtable<String, ArrayList<Match>> allPeptides = new Hashtable<String, ArrayList<Match>>();
+	Hashtable<String, ArrayList<MatchRow>> allPeptides = new Hashtable<String, ArrayList<MatchRow>>();
 	
 	/* match types */
 	ArrayList<ResultsCategory> resultsCategories = new ArrayList<ResultsCategory>();
@@ -273,18 +273,18 @@ public class BestMatches {
 		ArrayList<File> filesWithPattern = new ArrayList<File>();
 		findFolderPatterns(reports, genomeString, filesWithPattern);
 
-		ArrayList<Match> allMatches = new ArrayList<Match>();
+		ArrayList<MatchRow> allMatches = new ArrayList<MatchRow>();
 		for (File reportFile: filesWithPattern) {
-			allMatches.addAll( Match.loadMatches(reportFile));
+			allMatches.addAll( MatchRow.loadMatches(reportFile));
 		}
 		
 		
 		/* here we are storing all the potential loci
 		 * This will be used to create our targeted regions
 		 */
-		Hashtable<String, Match> targetedRegions = new Hashtable<String, Match>();
+		Hashtable<String, MatchRow> targetedRegions = new Hashtable<String, MatchRow>();
 		
-		for (Match match: allMatches) {
+		for (MatchRow match: allMatches) {
 			double startLocus = match.getInt("start");
 			//we are rounding this to a thousand so that it gets the general regions
 			// thus if three matches are to the same region, it won't produce three regions
@@ -299,7 +299,7 @@ public class BestMatches {
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(targetedRegionsFile)));
-			for(Match match: targetedRegions.values()) {
+			for(MatchRow match: targetedRegions.values()) {
 				int startLocus = match.getInt("start");
 				String sequenceName = match.getString("sequenceName");
 				if (sequenceName.startsWith(">")) sequenceName = sequenceName.substring(1);
@@ -337,7 +337,7 @@ public class BestMatches {
 		boolean showUCSC = true;
 		
 		/* label the matches for their respective samples */
-		Enumeration<Match> elements;
+		Enumeration<MatchRow> elements;
 		for (BestMatches bm: bestMatches) {
 			elements = bm.getBestMatches().elements();
 			while (elements.hasMoreElements()) elements.nextElement().set("sampleName", bm.getSampleName());
@@ -370,7 +370,7 @@ public class BestMatches {
 			for (BestMatches bm: bestMatches) {
 				
 				/* change this to getBestMatches when doing spectrumMD5 */
-				Match match = bm.getBestPeptideMatches().get(keyValue);
+				MatchRow match = bm.getBestPeptideMatches().get(keyValue);
 				if (match != null) {
 					holder.put(bm.getSampleName(), match);
 				}
@@ -489,7 +489,7 @@ public class BestMatches {
 			for (MergeMatchHolder holder: pmmhs) {
 				counter++;
 				
-				Match anyMatch = holder.get();
+				MatchRow anyMatch = holder.get();
 				if (anyMatch == null) continue;
 				
 				
@@ -575,7 +575,7 @@ public class BestMatches {
 				
 				for (int bestMatchIndex = 0; bestMatchIndex < bestMatches.size(); bestMatchIndex++) {
 					BestMatches bm = bestMatches.get(bestMatchIndex);
-					Match match = holder.get(bm.getSampleName());
+					MatchRow match = holder.get(bm.getSampleName());
 					
 					
 					if (match != null) {
@@ -601,8 +601,8 @@ public class BestMatches {
 						if (bestMatchIndex >= 17) pFiveOrSix++;
 						
 						/* calculating total for all scores */
-						ArrayList<Match> peptideMatches = bm.getAllPeptides().get(anyMatch.getString("peptideSequence"));
-						for (Match peptideMatch: peptideMatches) {
+						ArrayList<MatchRow> peptideMatches = bm.getAllPeptides().get(anyMatch.getString("peptideSequence"));
+						for (MatchRow peptideMatch: peptideMatches) {
 							scoreTotal += peptideMatch.getDouble("score");
 							spectrumCount++;
 						}
@@ -617,7 +617,7 @@ public class BestMatches {
 									Spectrum spectrum = SpectrumLoader.loadSpectra(spectrumFile).get(0);
 									Peptide peptide = new Peptide(match.getString("peptideSequence"));
 									Match_Blank matchForReport = new Match_Blank(spectrum, peptide, score);
-									ArrayList<Peppy.Match> matchesForReport = new ArrayList<Peppy.Match>();
+									ArrayList<Match> matchesForReport = new ArrayList<Match>();
 									matchesForReport.add(matchForReport);
 									
 									File spectrumReportFolder = new File(parentFolder, "spectrumReportFolder");
@@ -737,22 +737,22 @@ public class BestMatches {
 	 * reduce best matches to best peptides
 	 */
 	public void populateBestPeptides() {
-		bestPeptides = new Hashtable<String, Match>();
+		bestPeptides = new Hashtable<String, MatchRow>();
 		/* reduce the best results down to the best one match for any given peptide */
-		Enumeration<Match> values = bestMatches.elements();
+		Enumeration<MatchRow> values = bestMatches.elements();
 		while (values.hasMoreElements()) {
-			Match match = values.nextElement();
+			MatchRow match = values.nextElement();
 			String peptideSequence = match.getString("peptideSequence");
-			Match bestMatch = bestPeptides.get(peptideSequence);
+			MatchRow bestMatch = bestPeptides.get(peptideSequence);
 			if (bestMatch == null) {
 				bestPeptides.put(peptideSequence, match);
-				ArrayList<Match> peptideMatches = new ArrayList<Match>();
+				ArrayList<MatchRow> peptideMatches = new ArrayList<MatchRow>();
 				peptideMatches.add(match);
 				allPeptides.put(peptideSequence, peptideMatches);
 			} else {
 				
 				/* add to the full list of matches for this peptide */
-				ArrayList<Match> peptideMatches = allPeptides.get(peptideSequence);
+				ArrayList<MatchRow> peptideMatches = allPeptides.get(peptideSequence);
 				peptideMatches.add(match);
 				
 				/* always default to the unmodified form */
@@ -804,7 +804,7 @@ public class BestMatches {
 				int totalSpectraAdded = 0;
 				while (line != null) {
 					String [] chunks = line.split("\t");
-					Match match = new Match();
+					MatchRow match = new MatchRow();
 					for (int i = 0; i < propertyNames.length; i++) {
 						Class<?> propertyType = match.getColumns().get(propertyNames[i]);
 						if (propertyType == null  || propertyType.equals(String.class)) {
@@ -849,7 +849,7 @@ public class BestMatches {
 					match.set("reportFile", file);
 					
 					/* Get the reigning match, if better, add */
-					Match bestMatch = bestMatches.get(match.getString("spectrumMD5"));
+					MatchRow bestMatch = bestMatches.get(match.getString("spectrumMD5"));
 					if (bestMatch == null) {
 						bestMatches.put(match.getString("spectrumMD5"), match);
 						match.set("uniqueGlobally",true);
@@ -884,16 +884,16 @@ public class BestMatches {
 	 * @param otherBM
 	 */
 	public void subtractBestMatchesSpectrum(BestMatches otherBM) {
-		Hashtable<String, Match> otherBestMatchesHash = otherBM.getBestMatches();
+		Hashtable<String, MatchRow> otherBestMatchesHash = otherBM.getBestMatches();
 		ArrayList<String> ourBestMatchKeys = new ArrayList<String>(getBestMatches().keySet());
-		Hashtable<String, Match> reducedBestMatches = new Hashtable<String, Match>();
+		Hashtable<String, MatchRow> reducedBestMatches = new Hashtable<String, MatchRow>();
 		
 		/* go through all of the keys of our best matches
 		 * if the other matches don't have a key, then that means
 		 * we don't lose it from the subtraction
 		 */
 		for (String key: ourBestMatchKeys) {
-			Match otherMatch = otherBestMatchesHash.get(key);
+			MatchRow otherMatch = otherBestMatchesHash.get(key);
 			if (otherMatch == null) {
 				reducedBestMatches.put(key, bestMatches.get(key));
 			}
@@ -908,12 +908,12 @@ public class BestMatches {
 	 */
 	public void subtractBestMatchesPeptide(BestMatches otherBM) {
 		
-		Hashtable<String, Match> reducedBestMatches = new Hashtable<String, Match>();
-		Hashtable<String, Match> otherBestPaptides = otherBM.getBestPeptideMatches();
-		ArrayList<Match> ourBestMatches = new ArrayList<Match>(getBestMatches().values());
+		Hashtable<String, MatchRow> reducedBestMatches = new Hashtable<String, MatchRow>();
+		Hashtable<String, MatchRow> otherBestPaptides = otherBM.getBestPeptideMatches();
+		ArrayList<MatchRow> ourBestMatches = new ArrayList<MatchRow>(getBestMatches().values());
 		
 
-		for (Match match: ourBestMatches) {
+		for (MatchRow match: ourBestMatches) {
 			String peptide = match.getString("peptideSequence");
 			if (otherBestPaptides.get(peptide) == null) {
 				reducedBestMatches.put(match.getString("spectrumMD5"), match);
@@ -930,12 +930,12 @@ public class BestMatches {
 	 */
 	public void intersectBestMatchesPeptide(BestMatches otherBM) {
 		
-		Hashtable<String, Match> reducedBestMatches = new Hashtable<String, Match>();
-		Hashtable<String, Match> otherBestPaptides = otherBM.getBestPeptideMatches();
-		ArrayList<Match> ourBestMatches = new ArrayList<Match>(getBestMatches().values());
+		Hashtable<String, MatchRow> reducedBestMatches = new Hashtable<String, MatchRow>();
+		Hashtable<String, MatchRow> otherBestPaptides = otherBM.getBestPeptideMatches();
+		ArrayList<MatchRow> ourBestMatches = new ArrayList<MatchRow>(getBestMatches().values());
 		
 
-		for (Match match: ourBestMatches) {
+		for (MatchRow match: ourBestMatches) {
 			String peptide = match.getString("peptideSequence");
 			if (otherBestPaptides.get(peptide) != null) {
 				reducedBestMatches.put(match.getString("spectrumMD5"), match);
@@ -947,7 +947,7 @@ public class BestMatches {
 
 
 	public void saveReports() {
-		ArrayList<Match> bestArray = new ArrayList<Match>(bestPeptides.values());
+		ArrayList<MatchRow> bestArray = new ArrayList<MatchRow>(bestPeptides.values());
 		Collections.sort(bestArray);
 		
 		File parentDirectory = new File(sampleName + " analysis");
@@ -956,7 +956,7 @@ public class BestMatches {
 		/* save all matches */
 		try {
 			PrintWriter matchWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File(parentDirectory, "all matches.txt"))));
-			for (Match match: bestArray) {
+			for (MatchRow match: bestArray) {
 				
 				matchWriter.println( match.getString("peptideSequence") + "\t" + ((ResultsCategory) match.get("matchType")).getName() + "\t" + match.getFile("FilePath").getAbsolutePath());
 			}
@@ -1002,7 +1002,7 @@ public class BestMatches {
 				matchWriter.println("<th>modAcid</th>");
 				matchWriter.println("<th>modMass</th>");
 				matchWriter.println("</tr>");
-				for (Match match: bestArray) {
+				for (MatchRow match: bestArray) {
 					
 					/*
 					 * HACK
@@ -1071,12 +1071,12 @@ public class BestMatches {
 	
 	
 	
-	public Hashtable<String, Match> getBestPeptideMatches() {
+	public Hashtable<String, MatchRow> getBestPeptideMatches() {
 		return bestPeptides;
 	}
 	
 	
-	public Hashtable<String, Match> getBestMatches() {
+	public Hashtable<String, MatchRow> getBestMatches() {
 		return bestMatches;
 	}
 
@@ -1092,7 +1092,7 @@ public class BestMatches {
 	}
 
 
-	public Hashtable<String, ArrayList<Match>> getAllPeptides() {
+	public Hashtable<String, ArrayList<MatchRow>> getAllPeptides() {
 		return allPeptides;
 	}
 

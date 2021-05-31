@@ -1,6 +1,6 @@
 package Experimental;
 
-import Navigator.Match;
+import Navigator.MatchRow;
 import Navigator.Report;
 import Peppy.U;
 
@@ -22,16 +22,16 @@ public class AmplificaitonHistogram extends Report {
 	private static int bucketSize = 2000000;
 	private static double maxBarValue = 5;
 	
-	public AmplificaitonHistogram(ArrayList<Match> matches) {
+	public AmplificaitonHistogram(ArrayList<MatchRow> matches) {
 		super(matches);
 	}
 	
 	
 	
-	private static void addMatchesToHistogram(ArrayList<Match> matches, double [] histogram, String sequenceName) {
+	private static void addMatchesToHistogram(ArrayList<MatchRow> matches, double [] histogram, String sequenceName) {
 		int bucketIndex;
 		double increment = 100000.0 / matches.size();
-		for (Match match: matches) {
+		for (MatchRow match: matches) {
 			if (match.getString("sequenceName").equals(sequenceName)) {
 				int matchCount =  match.getInt("RankCount");
 				int start = match.getInt("start");

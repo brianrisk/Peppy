@@ -11,14 +11,14 @@ import java.util.ArrayList;
  *
  */
 public abstract class Report {
-	ArrayList<Match> matches;
+	ArrayList<MatchRow> matches;
 	
 	
 	/**
 	 * all reports are based on matches.  Thus, the constructor takes a set of matches
 	 * @param matches
 	 */
-	public Report(ArrayList<Match> matches) {
+	public Report(ArrayList<MatchRow> matches) {
 		this.matches = matches;
 	}
 	
@@ -34,7 +34,7 @@ public abstract class Report {
 	
 	
 	
-	public void addMatches(ArrayList<Match> matches) {
+	public void addMatches(ArrayList<MatchRow> matches) {
 		this.matches.addAll(matches);
 	}
 
@@ -45,7 +45,7 @@ public abstract class Report {
 	 * @param reportFile
 	 * @return
 	 */
-	public static ArrayList<Match> loadMatches(File reportFile) {
+	public static ArrayList<MatchRow> loadMatches(File reportFile) {
 		return loadMatches(reportFile, -1);
 	}
 
@@ -56,8 +56,8 @@ public abstract class Report {
 	 * @param scoreCutoff
 	 * @return
 	 */
-	public static ArrayList<Match> loadMatches(File reportFile, double scoreCutoff) {
-		ArrayList<Match> matches = Match.loadMatches(reportFile);
+	public static ArrayList<MatchRow> loadMatches(File reportFile, double scoreCutoff) {
+		ArrayList<MatchRow> matches = MatchRow.loadMatches(reportFile);
 		if (scoreCutoff > 0) {
 			matches = filter(matches, scoreCutoff);
 		}
@@ -65,9 +65,9 @@ public abstract class Report {
 	}
 	
 
-	private static ArrayList<Match> filter(ArrayList<Match> matches, double scoreCutoff) {
-		ArrayList<Match> out = new ArrayList<Match>(matches.size());
-		for (Match match: matches) {
+	private static ArrayList<MatchRow> filter(ArrayList<MatchRow> matches, double scoreCutoff) {
+		ArrayList<MatchRow> out = new ArrayList<MatchRow>(matches.size());
+		for (MatchRow match: matches) {
 			if (match.getScore() < scoreCutoff) continue;
 			out.add(match);
 		}

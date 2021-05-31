@@ -16,10 +16,10 @@ public class ModificationEvent implements Comparable<ModificationEvent>{
 	int modMass;
 	int count = 0;
 	double score;
-	Match match;
+	MatchRow match;
 	
 	
-	public ModificationEvent(String peptideSequence, int location, int modMass, char acid, Match match) {
+	public ModificationEvent(String peptideSequence, int location, int modMass, char acid, MatchRow match) {
 		super();
 		this.peptideSequence = peptideSequence;
 		this.location = location;
@@ -79,7 +79,7 @@ public class ModificationEvent implements Comparable<ModificationEvent>{
 		return count;
 	}
 
-	public Match getMatch() {
+	public MatchRow getMatch() {
 		return match;
 	}
 	
