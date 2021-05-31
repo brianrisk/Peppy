@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="aa6db85b-431d-411c-8947-ccb7d412c4e0" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change beforePath="$PROJECT_DIR$/.project" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/commons-math3-3.1.1/LICENSE.txt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/commons-math3-3.1.1/NOTICE.txt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/commons-math3-3.1.1/RELEASE-NOTES.txt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/commons-math3-3.1.1/commons-math3-3.1.1.jar" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/processing/core.jar" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/processing/license.txt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Database/Column.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Database/Row.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Database/Table.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/AmplificaitonHistogram.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/AmplificationPlot.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/AmplifiedPeptide.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/CommonIonCount.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/CompRefSetAnalysis.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/DrawProbabilityGrid.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/FuzzyAlignment.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/IonComparisonServer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/IonComparisonThread.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/JoshProbabilityExperiment.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/PaperExperiments.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/PeptideComparison.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/ProteinComparison.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/ProteinGapsReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/ProteinOverlap.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/ProteinReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/ProteoWizardPathMaker.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/RNA_Sequence.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SNP_Specific.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SaveBedFile.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SetComparison.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SpectrumDeNovo.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SpectrumIonPairProbability.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SpectrumScoreStats.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/SpectrumSequenceProbability.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Experimental/psm.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/HilbertCurve.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/HistogramVisualizer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/PRCurve.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/Point.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/Scatter.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Graphs/ScatterVisualizer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Math/EValueCalculator.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Math/HasValue.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Math/LeastSquares.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Math/MassError.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Math/MathFunctions.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/MoonShot/MoonShot.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/MoonShot/MoonShotRegion.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/MoonShot/ProteinFractionReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/AASubstitution.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/AASubstitutionReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/BestMatches.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/HTML.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Match.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MatchTable.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MatchesFile.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MatchesTo.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MatchesToPeptide.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MatchesToProtein.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/MergeMatchHolder.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Modification.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/ModificationComparison.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/ModificationEvent.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/ModificationReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/ModificationType.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Navigator.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Region.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Report.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/ResultsCategory.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Navigator/Sample.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/AminoAcids.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Definitions.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/DigestionThread_DNA.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/FDR.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Location.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/MatchConstructor.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_Blank.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_DeNovo.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_IMP.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_IMP_VariMod.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_Morpheus.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Match_Squared.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Matches.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/MatchesSpectrum.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ModificationEntry.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ModificationVariable.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/NucleotideSequence.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/OptimalTolerances.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Peak.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/PeakLabeled.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Peppy.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/PeppyLauncher.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Peptide.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/PeptideUnderConstruction.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/PeptideWithModifications.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/PeptideWithModificationsGenerator.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Properties.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Protein.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ProteinCoverage.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ProteinDigestionServer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ProteinDigestionThread.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Region.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Regions.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ScoringServer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ScoringThread.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Sequence.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/SequenceNucleotide.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/SequenceProtein.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ShortNucleotideDigestionServer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/ShortNucleotideDigestionThread.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/Spectrum.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/SpectrumLoader.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/U.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/VariableModificationServer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Peppy/VariableModificationThread.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/BEDReporter.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLPage.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLPageMatches.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLPageRegion.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLPageRegions.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLPageSpectrum.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HTMLReporter.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/HistogramVisualizer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/MatchSVG.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/SpectrumReport.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/TextReporter.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Reports/UCSC.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/CheckSequences.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/CleanCode.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/CountPeptides.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/ExportPeptideList.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/GencodeReducer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/MakeSpectrumSVG.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/PrintMilliseconds.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/SixFrameRegion.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/SpectrumFileMerge.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/SpectrumToMGF.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/VCFConverter/VCFEntry.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/VCFConverter/VCFFile.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Tools/VCFConverter/VCFGenomeAssembler.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Adapter.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Constants.java" afterPath="$PROJECT_DIR$/src/UI/Constants.java" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Functions.java" afterPath="$PROJECT_DIR$/src/UI/Functions.java" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Listener.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/UI/Stack.java" afterPath="$PROJECT_DIR$/src/UI/Stack.java" />
+      <change beforePath="$PROJECT_DIR$/src/UI/UserInterface.java" afterPath="$PROJECT_DIR$/src/UI/UserInterface.java" />
+      <change beforePath="$PROJECT_DIR$/src/UI/View.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/UI/ViewList.java" afterPath="$PROJECT_DIR$/src/UI/ViewList.java" />
+      <change beforePath="$PROJECT_DIR$/src/UI/ViewMenu.java" afterPath="$PROJECT_DIR$/src/UI/ViewMenu.java" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/FindOptimialParameters.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/MatchContainer.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/TestIMP.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/TestSet.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/TestSetCharacteristics.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/TestSetReduce.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/Validate/ValidationReport.java" afterPath="" />
+    </list>
+    <ignored path="$PROJECT_DIR$/bin/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserInterface.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/UI/UserInterface.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="479">
+              <caret line="34" column="116" lean-forward="false" selection-start-line="34" selection-start-column="116" selection-end-line="34" selection-end-column="116" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FDR.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/FDR.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="100">
+              <caret line="33" column="25" lean-forward="false" selection-start-line="33" selection-start-column="25" selection-end-line="33" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="32" column="27" lean-forward="false" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/MoonShot/MoonShot.java" />
+        <option value="$PROJECT_DIR$/src/main/java/UI/UserInterface.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
+  </component>
+  <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="width" value="1440" />
+    <option name="height" value="900" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Android &gt; Lint &gt; Correctness</id>
+          </State>
+          <State>
+            <id>Android &gt; Lint &gt; Usability &gt; Icons</id>
+          </State>
+          <State>
+            <id>Android Lint for Kotlin</id>
+          </State>
+          <State>
+            <id>Ant inspections</id>
+          </State>
+          <State>
+            <id>Application Server Specific Inspections</id>
+          </State>
+          <State>
+            <id>Control flow issuesJava</id>
+          </State>
+          <State>
+            <id>Control flow issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Declaration redundancyJava</id>
+          </State>
+          <State>
+            <id>Faces Model</id>
+          </State>
+          <State>
+            <id>General</id>
+          </State>
+          <State>
+            <id>GeneralJavaScript</id>
+          </State>
+          <State>
+            <id>Groovy</id>
+          </State>
+          <State>
+            <id>Hibernate Issues</id>
+          </State>
+          <State>
+            <id>Initialization issuesJava</id>
+          </State>
+          <State>
+            <id>Internationalization issuesJava</id>
+          </State>
+          <State>
+            <id>JBoss Seam issues</id>
+          </State>
+          <State>
+            <id>JPA issues</id>
+          </State>
+          <State>
+            <id>JSON</id>
+          </State>
+          <State>
+            <id>Java</id>
+          </State>
+          <State>
+            <id>Java EE issues</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>JavaScript validity issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Maven</id>
+          </State>
+          <State>
+            <id>Plugin DevKit</id>
+          </State>
+          <State>
+            <id>Probable bugsJava</id>
+          </State>
+          <State>
+            <id>Properties Files</id>
+          </State>
+          <State>
+            <id>RegExp</id>
+          </State>
+          <State>
+            <id>SQL</id>
+          </State>
+          <State>
+            <id>Scala</id>
+          </State>
+          <State>
+            <id>Spring</id>
+          </State>
+          <State>
+            <id>Spring CoreSpring</id>
+          </State>
+          <State>
+            <id>Struts</id>
+          </State>
+          <State>
+            <id>Struts 1Struts</id>
+          </State>
+          <State>
+            <id>Syntactic SimplificationScala</id>
+          </State>
+          <State>
+            <id>TestNGJava</id>
+          </State>
+          <State>
+            <id>UI Form Problems</id>
+          </State>
+          <State>
+            <id>Validity issuesGroovy</id>
+          </State>
+          <State>
+            <id>Vue</id>
+          </State>
+          <State>
+            <id>XML</id>
+          </State>
+          <State>
+            <id>XMLSpring CoreSpring</id>
+          </State>
+          <State>
+            <id>XSLT</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Duplicates</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Peppy" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="UI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Peppy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+    </configuration>
+  </component>
+  <component name="SbtLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+    <option name="projectSyncType">
+      <map>
+        <entry key="$USER_HOME$/Code/kc-impressions-budget" value="PREVIEW" />
+        <entry key="$USER_HOME$/Code/kc-impressions-redshift" value="PREVIEW" />
+        <entry key="$USER_HOME$/Code/messaging" value="PREVIEW" />
+        <entry key="$USER_HOME$/Code/nn" value="PREVIEW" />
+        <entry key="$USER_HOME$/Code/reports" value="PREVIEW" />
+        <entry key="$USER_HOME$/Downloads/Poem-Generator-master" value="PREVIEW" />
+        <entry key="$USER_HOME$/Downloads/sift-scala" value="PREVIEW" />
+      </map>
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="aa6db85b-431d-411c-8947-ccb7d412c4e0" name="Default" comment="" />
+      <created>1622409464935</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1622409464935</updated>
+      <workItem from="1622409466863" duration="2368000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="2368000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297568" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/MatchesSpectrum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="3" lean-forward="true" selection-start-line="23" selection-start-column="3" selection-end-line="23" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/Location.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="13" lean-forward="false" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Peppy/FDR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="33" column="25" lean-forward="false" selection-start-line="33" selection-start-column="25" selection-end-line="33" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/properties.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" column="27" lean-forward="false" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.classpath">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="83" lean-forward="false" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="83" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.project">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/MoonShot/MoonShot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-9624">
+          <caret line="22" column="13" lean-forward="false" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/MoonShot/MoonShotRegion.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3465">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/MoonShot/ProteinFractionReport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-6">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/UI/Listener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="17" lean-forward="false" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/UI/Stack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="410">
+          <caret line="31" column="4" lean-forward="true" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/UI/View.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/UI/UserInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="479">
+          <caret line="34" column="116" lean-forward="false" selection-start-line="34" selection-start-column="116" selection-end-line="34" selection-end-column="116" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>scala-sdk-2.11.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>Peppy</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
