@@ -14,116 +14,113 @@ import java.util.Collections;
  * I'll tell you now what.  You want to see them presented in
  * a nice, easy and intuitive manner.  That's what this
  * class does.
- * 
+ * <p>
  * Copyright 2013, Brian Risk
- * 
- * 
- * @author Brian Risk
  *
+ * @author Brian Risk
  */
 public class TextReporter {
-	
-	ArrayList<Match> matches;
-	File reportDir;
-	
-	
-	/**
-	 * @param matches
-	 * @param spectra
-	 * @param sequence_DNAs
-	 */
-	public TextReporter(ArrayList<Match> matches, File reportDir) {
-		this.matches = matches;
-		this.reportDir = reportDir;
-	}
 
-	public void generateFullReport() {	
-		reportDir.mkdirs();
-		//set up our main index file
-		File reportFile = new File(reportDir, "report.txt");
-		try {	
-			
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
-			
-			/* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
-			pw.println("format version 20");
-			
-			if (Properties.isSequenceFileNucleotide) {
-				pw.println("> analysis-type: nucleotide");
-			} else {
-				pw.println("> analysis-type: protein");
-			}
-			pw.println("> scoring method:" + Properties.scoringMethodName);
-			
-			//sorting our matches by spectrum then score
-			Match.setSortParameter(Match.SORT_BY_SCORE);
-			Collections.sort(matches);
-			
-			
-			StringBuffer sb;
-			//print header
-			sb = new StringBuffer();
-			sb.append("spectrumID");
-			sb.append('\t');
-			sb.append("fileLocus");
-			sb.append('\t');
+    ArrayList<Match> matches;
+    File reportDir;
+
+
+    /**
+     * @param matches
+     * @param spectra
+     * @param sequence_DNAs
+     */
+    public TextReporter(ArrayList<Match> matches, File reportDir) {
+        this.matches = matches;
+        this.reportDir = reportDir;
+    }
+
+    public void generateFullReport() {
+        reportDir.mkdirs();
+        //set up our main index file
+        File reportFile = new File(reportDir, "report.txt");
+        try {
+
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(reportFile)));
+
+            /* CHANGE THIS WITH EACH ADJUSTMENT TO FILE FORMAT */
+            pw.println("format version 20");
+
+            if (Properties.isSequenceFileNucleotide) {
+                pw.println("> analysis-type: nucleotide");
+            } else {
+                pw.println("> analysis-type: protein");
+            }
+            pw.println("> scoring method:" + Properties.scoringMethodName);
+
+            //sorting our matches by spectrum then score
+            Match.setSortParameter(Match.SORT_BY_SCORE);
+            Collections.sort(matches);
+
+
+            StringBuffer sb;
+            //print header
+            sb = new StringBuffer();
+            sb.append("spectrumID");
+            sb.append('\t');
+            sb.append("fileLocus");
+            sb.append('\t');
 //			sb.append("spectrumMD5");
 //			sb.append('\t');
-			sb.append("FilePath");
-			sb.append('\t');
-			sb.append("score");
-			sb.append('\t');
-			sb.append("peptideMass");
-			sb.append('\t');
-			sb.append("PrecursorNeutralMass");
-			sb.append('\t');
-			sb.append("peptideSequence");
-			sb.append('\t');
-			sb.append("previousAminoAcid");
-			sb.append('\t');
-			sb.append("start");
-			sb.append('\t');
-			sb.append("stop");
-			sb.append('\t');
-			sb.append("SequenceName");
-			if (Peppy.Properties.isSequenceFileNucleotide) {
-				sb.append('\t');
-				sb.append("Strand");
-				sb.append('\t');
-				sb.append("Is Spliced");
-			}
-			sb.append('\t');
-			sb.append("Charge");	
-			sb.append('\t');
-			sb.append("isModified");
-			sb.append('\t');
-			sb.append("modMass");
-			sb.append('\t');
-			sb.append("modIndex");
-			sb.append('\t');
-			sb.append("modLocCertain");
-			pw.println(sb);		
-			
-			//print rows
-			for (Match match: matches) {
-				pw.println(match.toString());
-			}
-			
+            sb.append("FilePath");
+            sb.append('\t');
+            sb.append("score");
+            sb.append('\t');
+            sb.append("peptideMass");
+            sb.append('\t');
+            sb.append("PrecursorNeutralMass");
+            sb.append('\t');
+            sb.append("peptideSequence");
+            sb.append('\t');
+            sb.append("previousAminoAcid");
+            sb.append('\t');
+            sb.append("start");
+            sb.append('\t');
+            sb.append("stop");
+            sb.append('\t');
+            sb.append("SequenceName");
+            if (Peppy.Properties.isSequenceFileNucleotide) {
+                sb.append('\t');
+                sb.append("Strand");
+                sb.append('\t');
+                sb.append("Is Spliced");
+            }
+            sb.append('\t');
+            sb.append("Charge");
+            sb.append('\t');
+            sb.append("isModified");
+            sb.append('\t');
+            sb.append("modMass");
+            sb.append('\t');
+            sb.append("modIndex");
+            sb.append('\t');
+            sb.append("modLocCertain");
+            pw.println(sb);
 
-			pw.flush();
-			pw.close();
+            //print rows
+            for (Match match : matches) {
+                pw.println(match.toString());
+            }
 
-			
-		} catch (FileNotFoundException e) {
-			U.p("could not find file: " + reportFile.getName());
-			e.printStackTrace();
-		} catch (IOException e) {
-			U.p("could not read file: " + reportFile.getName());
-			e.printStackTrace();
-		}
-		
-	}
-	
-	
+
+            pw.flush();
+            pw.close();
+
+
+        } catch (FileNotFoundException e) {
+            U.p("could not find file: " + reportFile.getName());
+            e.printStackTrace();
+        } catch (IOException e) {
+            U.p("could not read file: " + reportFile.getName());
+            e.printStackTrace();
+        }
+
+    }
+
 
 }

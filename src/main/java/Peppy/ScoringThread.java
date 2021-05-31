@@ -7,36 +7,34 @@ import java.util.ArrayList;
 
 /**
  * Copyright 2013, Brian Risk
- * 
- * 
- * @author Brian Risk
  *
+ * @author Brian Risk
  */
 public class ScoringThread implements Runnable {
-	
-	/* this holds the full list of peptides (sorted by mass), though we will only be using a section for the given spectrum */
-	ArrayList<Peptide> peptides;
-	
-	/* Where we will be holding our matches */
-	MatchesSpectrum matchesSpectrum;
-	
-	/* our commanding server; results get reported back to this and new spectra to search come from here */
-	ScoringServer scoringServer;
-	
-	/* due to the imperfections of my binary search, we need this extra margin */
-	private static int extraMargin = 0;
-	
-	/**
-	 * @param peptides
-	 * @param spectrum
-	 */
-	public ScoringThread(MatchesSpectrum matchesSpectrum, ArrayList<Peptide> peptides, ScoringServer scoringServer) {
-		this.matchesSpectrum = matchesSpectrum;
-		this.peptides = peptides;
-		this.scoringServer = scoringServer;
-	}
-	
-	
+
+    /* this holds the full list of peptides (sorted by mass), though we will only be using a section for the given spectrum */
+    ArrayList<Peptide> peptides;
+
+    /* Where we will be holding our matches */
+    MatchesSpectrum matchesSpectrum;
+
+    /* our commanding server; results get reported back to this and new spectra to search come from here */
+    ScoringServer scoringServer;
+
+    /* due to the imperfections of my binary search, we need this extra margin */
+    private static int extraMargin = 0;
+
+    /**
+     * @param peptides
+     * @param spectrum
+     */
+    public ScoringThread(MatchesSpectrum matchesSpectrum, ArrayList<Peptide> peptides, ScoringServer scoringServer) {
+        this.matchesSpectrum = matchesSpectrum;
+        this.peptides = peptides;
+        this.scoringServer = scoringServer;
+    }
+
+
 //	public static void main(String args[] ) {
 //		Random random = new Random();
 //		ArrayList<Double> numbers = new ArrayList<Double>();
@@ -54,56 +52,55 @@ public class ScoringThread implements Runnable {
 //		U.p(numbers.get(location));
 //		U.p(numbers.get(location + 1));
 //	}
-	
-	public void run() {
-		
-		while (matchesSpectrum != null) {
-			searchPeptideRange(0);
 
-			/* return results, get new spectrum to process.  
-			 * If no more spectra, gets null and the loop exits */
-			matchesSpectrum = scoringServer.getNextSpectrumMatches();
-	
-		}
-	}
+    public void run() {
+
+        while (matchesSpectrum != null) {
+            searchPeptideRange(0);
+
+            /* return results, get new spectrum to process.
+             * If no more spectra, gets null and the loop exits */
+            matchesSpectrum = scoringServer.getNextSpectrumMatches();
+
+        }
+    }
 
 
-	private void searchPeptideRange(int hydrogenOffset) {
-		
-		//find the first index of the peptide with mass greater than lowestPeptideMassToConsider
-		double lowestPeptideMassToConsider = matchesSpectrum.getSpectrum().getMass() - MassError.getDaltonError(Properties.precursorTolerance, matchesSpectrum.getSpectrum().getMass());
-		lowestPeptideMassToConsider -= Definitions.HYDROGEN_MONO * hydrogenOffset;
-		if (Properties.searchModifications) {
-			/* I know subtracting the upper bound seems backwards, but since a 
-			 * modification on the peptide makes the spectrum heavier, this is the
-			 * order things should be*/
-			lowestPeptideMassToConsider -= Properties.modificationUpperBound;
-		}
-		int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
-		firstPeptideIndex -= extraMargin;
-		if (firstPeptideIndex < 0) firstPeptideIndex = 0;
-		
-		
-		//find the last index, compensate for rounding error
-		double highestPeptideMassToConsider = matchesSpectrum.getSpectrum().getMass() + MassError.getDaltonError(Properties.precursorTolerance, matchesSpectrum.getSpectrum().getMass());
-		highestPeptideMassToConsider -= Definitions.HYDROGEN_MONO * hydrogenOffset;
-		if (Properties.searchModifications) {
-			/* ditto above */
-			highestPeptideMassToConsider -= Properties.modificationLowerBound;
-		}
-		int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
-		lastPeptideIndex += extraMargin;
-		if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
-					
-		/* examine only peptides in our designated mass range */
-		for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
-			
-			Match match = Properties.matchConstructor.createMatch(matchesSpectrum, peptides.get(peptideIndex));
-			matchesSpectrum.addMatch(match);
-			
-		}
-	}
-	
-	
+    private void searchPeptideRange(int hydrogenOffset) {
+
+        //find the first index of the peptide with mass greater than lowestPeptideMassToConsider
+        double lowestPeptideMassToConsider = matchesSpectrum.getSpectrum().getMass() - MassError.getDaltonError(Properties.precursorTolerance, matchesSpectrum.getSpectrum().getMass());
+        lowestPeptideMassToConsider -= Definitions.HYDROGEN_MONO * hydrogenOffset;
+        if (Properties.searchModifications) {
+            /* I know subtracting the upper bound seems backwards, but since a
+             * modification on the peptide makes the spectrum heavier, this is the
+             * order things should be*/
+            lowestPeptideMassToConsider -= Properties.modificationUpperBound;
+        }
+        int firstPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, lowestPeptideMassToConsider);
+        firstPeptideIndex -= extraMargin;
+        if (firstPeptideIndex < 0) firstPeptideIndex = 0;
+
+
+        //find the last index, compensate for rounding error
+        double highestPeptideMassToConsider = matchesSpectrum.getSpectrum().getMass() + MassError.getDaltonError(Properties.precursorTolerance, matchesSpectrum.getSpectrum().getMass());
+        highestPeptideMassToConsider -= Definitions.HYDROGEN_MONO * hydrogenOffset;
+        if (Properties.searchModifications) {
+            /* ditto above */
+            highestPeptideMassToConsider -= Properties.modificationLowerBound;
+        }
+        int lastPeptideIndex = MathFunctions.findFirstIndexGreater(peptides, highestPeptideMassToConsider);
+        lastPeptideIndex += extraMargin;
+        if (lastPeptideIndex >= peptides.size()) lastPeptideIndex = peptides.size() - 1;
+
+        /* examine only peptides in our designated mass range */
+        for (int peptideIndex = firstPeptideIndex; peptideIndex < lastPeptideIndex; peptideIndex++) {
+
+            Match match = Properties.matchConstructor.createMatch(matchesSpectrum, peptides.get(peptideIndex));
+            matchesSpectrum.addMatch(match);
+
+        }
+    }
+
 
 }
