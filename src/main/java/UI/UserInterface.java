@@ -18,12 +18,12 @@ public class UserInterface extends PApplet {
 
 	public void settings() {
 		size(1024, 768, "processing.awt.PGraphicsJava2D");
+		// TODO: commenting pixelDensity for now as it clips the menu items
+//		pixelDensity(2);
 	}
 
 	public void setup() {
-//		hint(ENABLE_RETINA_PIXELS);
-//		smooth(8)
-		
+//		smooth(8);
 		UIC.init(this);
 		UIF.init(this);
 		frameRate(200);
@@ -35,10 +35,9 @@ public class UserInterface extends PApplet {
 	public void draw() {
 		stack.render();
 		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-		// TODO: commenting the below as it won't compile.
-//		double load = operatingSystemMXBean.getSystemLoadAverage() / operatingSystemMXBean.getAvailableProcessors();
+		double load = operatingSystemMXBean.getSystemLoadAverage() / operatingSystemMXBean.getAvailableProcessors();
 		fill(255,255,255,255);
-		UIF.drawText(UIC.gridX * 14, UIC.gridY * 0, UIC.gridX * 2, "CPU: ?", UIC.ALIGN_RIGHT);
+		UIF.drawText(UIC.gridX * 14, UIC.gridY * 0, UIC.gridX * 2, "CPU: " + load, UIC.ALIGN_RIGHT);
 	}
 	
 

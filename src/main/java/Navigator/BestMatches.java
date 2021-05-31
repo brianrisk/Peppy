@@ -27,41 +27,21 @@ public class BestMatches {
 	private String sampleName;
 	
 	/* where we keep the best results */
-	Hashtable<String, MatchRow> bestMatches = new Hashtable<String, MatchRow>();
+	private Hashtable<String, MatchRow> bestMatches = new Hashtable<>();
 	
 	/* the results, reduced to the best example for each peptide */
-	Hashtable<String, MatchRow> bestPeptides = new Hashtable<String, MatchRow>();
+	private Hashtable<String, MatchRow> bestPeptides = new Hashtable<>();
 	
 	/* every match for each identified peptide sequence */
-	Hashtable<String, ArrayList<MatchRow>> allPeptides = new Hashtable<String, ArrayList<MatchRow>>();
+	private Hashtable<String, ArrayList<MatchRow>> allPeptides = new Hashtable<>();
 	
 	/* match types */
-	ArrayList<ResultsCategory> resultsCategories = new ArrayList<ResultsCategory>();
+	private ArrayList<ResultsCategory> resultsCategories = new ArrayList<>();
 	
 	/* where the peppy results are stored */
-	File resultsFolder;
+	private File resultsFolder;
 	
 	public static void main(String args[]) {
-//		washu();
-//		washuChr8();
-//		pandey();
-//		mayo();
-//		ucla();
-//		yale();
-//		washUPaperOne();
-//		washURegionsOfInterest();
-//		gm12878();
-//		compRefUNC();
-//		pccCompRefA();
-//		seleno();
-//		removedNonsense();
-//		carthene();
-//		nonsenseSearch();
-//		compRefUNCRegionsOfInterest();
-//		washUPaperOneRegionAnalysis();
-//		yaleEnzymeless();
-//		report("/Users/risk2/Documents/workspace/JavaGFS/reports/wei-yang/");
-//		moonShoot();
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports/lyris-20131201/");
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports");
 //		multiSetReport("/Users/risk2/Documents/workspace/JavaGFS/reports-complete/MoonShot first pass");
@@ -192,8 +172,6 @@ public class BestMatches {
 				if (line.endsWith("nucleotide")) {resultsType = ResultsCategory.DNA;}
 				if (line.endsWith("protein")) {resultsType = ResultsCategory.PROTEIN;}
 				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -213,51 +191,17 @@ public class BestMatches {
 		
 	}
 
-	
-	public static void moonShoot() {
-		
-		ArrayList<File> reportFolders = new ArrayList<File>();
-		
-		File reports = new File("reports");
-		File [] allReportFolders = reports.listFiles();
-		for (File reportFolder: allReportFolders) {
-			if (reportFolder.isDirectory()) {
-				String [] nameChunks = reportFolder.getName().split("_");
-				try {
-					Integer.parseInt(nameChunks[0]);
-					reportFolders.add(reportFolder);
-					
-				} catch(NumberFormatException e) {  
-			    }
-			}
-		}
-		
-		
-		/* a list of our BestMatches */
-		ArrayList<BestMatches> bestMatches = new ArrayList<BestMatches>();
-		
-		/* a list of folders to ignore from our results */
-		ArrayList<String> direcotryTitlesToIgnore = new ArrayList<String>();
-		direcotryTitlesToIgnore.add("varimod");
-		direcotryTitlesToIgnore.add("UniProt");
-		
-		for (File folder: reportFolders) {
-//			BestMatches matches = new BestMatches(folder, ResultsCategory.DNA, direcotryTitlesToIgnore);
-			BestMatches matches = new BestMatches(folder, ResultsCategory.PROTEIN, direcotryTitlesToIgnore);
-			bestMatches.add(matches);
-		}
-		
-		createUnifiedSamplesReport(bestMatches, "peptideSequence");
-	}
+
 	
 	/**
 	 * Used with createRegionsFile to find all folders that match, say HG19
 	 */
-	public static void findFolderPatterns(File folder, String filePattern, ArrayList<File> filesWithPattern) {
+	private static void findFolderPatterns(File folder, String filePattern, ArrayList<File> filesWithPattern) {
 		File [] files = folder.listFiles();
+		assert files != null;
 		for (File file: files) {
 			if (file.isDirectory()) {
-				if (file.getName().indexOf(filePattern) != -1) {
+				if (file.getName().contains(filePattern)) {
 					File reportFile = new File(file, "report.txt");
 					if (reportFile.exists()) filesWithPattern.add(reportFile);
 				} else {
@@ -266,8 +210,8 @@ public class BestMatches {
 			}
 		}
 	}
-	
-	public static void createRegionsFile(String reportsString, String genomeString) {
+
+	private static void createRegionsFile(String reportsString, String genomeString) {
 		
 		File reports = new File(reportsString);
 		ArrayList<File> filesWithPattern = new ArrayList<File>();
@@ -317,14 +261,8 @@ public class BestMatches {
 	}
 
 
-	
-	
-	
-	
 
-	
-	
-	public static void createUnifiedSamplesReport(ArrayList<BestMatches> bestMatches, String keyName) {
+	private static void createUnifiedSamplesReport(ArrayList<BestMatches> bestMatches, String keyName) {
 		File unifiedReportsDir = new File("unifiedReports");
 		unifiedReportsDir.mkdir();
 		createUnifiedSamplesReport(bestMatches, keyName, unifiedReportsDir);
@@ -423,8 +361,7 @@ public class BestMatches {
 				e.printStackTrace();
 			}
 		}
-		
-		
+
 		/* write merged table */
 		try {
 			
@@ -455,10 +392,8 @@ public class BestMatches {
 			matchWriter.println("<tr>");
 			matchWriter.println("<th>#</th>");
 			matchWriter.println("<th>peptide</th>");
-//			matchWriter.println("<th>*</th>");
 			if (makeGeneReport) {
 				matchWriter.println("<th>Gene</th>");
-//				matchWriter.println("<th>GeneType</th>");
 				matchWriter.println("<th>onco</th>");
 			}
 			
@@ -469,12 +404,6 @@ public class BestMatches {
 			}
 			matchWriter.println("<th>set count</th>");
 			matchWriter.println("<th>spectrum count</th>");
-//			matchWriter.println("<th>score total</th>");
-//			matchWriter.println("<th>P5</th>");
-//			matchWriter.println("<th>P6</th>");
-//			matchWriter.println("<th>P5/P6</th>");
-//			matchWriter.println("<th>single WHIM</th>");
-//			matchWriter.println("<th>NIST</th>");
 			if (showUCSC) matchWriter.println("<th>UCSC</th>");
 			matchWriter.println("<th>unique location</th>");
 			matchWriter.println("<th>sequence</th>");
@@ -500,16 +429,6 @@ public class BestMatches {
 				
 				/* acid sequence */
 				matchWriter.println("<td>" + anyMatch.getString("peptideSequence") + "</td>");
-				
-				
-				/*
-				 * HACK
-				 */
-//				if (earlyEllis) {
-//					matchWriter.println("<td>*</td>");
-//				} else {
-//					matchWriter.println("<td></td>");
-//				}
 				
 				/* Gene name column */
 				if (makeGeneReport) {
@@ -561,7 +480,6 @@ public class BestMatches {
 						}
 					}
 					matchWriter.println("</td>");
-//					matchWriter.println("<td>" + geneType + "</td>");
 					matchWriter.println("<td>" + interest + "</td>");
 				}
 									
@@ -657,14 +575,6 @@ public class BestMatches {
 				
 				boolean isSingle = ((pFiveCount == 0) || (pSixCount == 0));
 				if ( ((pFiveCount == 0) && (pSixCount == 0))) isSingle = false;
-//				matchWriter.println("<td>" + pFiveCount + "</td>");
-//				matchWriter.println("<td>" + pSixCount + "</td>");
-//				matchWriter.println("<td>" + pFiveOrSix + "</td>");
-				
-//				matchWriter.println("<td>" + isSingle + "</td>");
-				
-				/* NIST link */
-//				matchWriter.println("<td><a href=\"http://peptide.nist.gov/browser/peptide_stat.php?description=IT&organism=human&pep_seq=" + anyMatch.getString("peptideSequence") + "\">NIST</a></td>");
 				
 				/* sample UCSC link */
 				String ucsc = UCSC.getLink(anyMatch.getInt("start"), anyMatch.getInt("stop"), anyMatch.getString("sequenceName"));
@@ -838,12 +748,6 @@ public class BestMatches {
 					line = br.readLine();
 					
 					/* we now have our match */
-					
-					/*
-					 * EXPERIMENTAL
-					 */
-//					if (match.getString("SequenceName").indexOf("HasPrematureStop: false") != -1) continue;
-					
 					/* first associate the match with this match type */
 					match.set("matchType", resultsCategory);
 					match.set("reportFile", file);
@@ -1071,33 +975,23 @@ public class BestMatches {
 	
 	
 	
-	public Hashtable<String, MatchRow> getBestPeptideMatches() {
+	private Hashtable<String, MatchRow> getBestPeptideMatches() {
 		return bestPeptides;
 	}
-	
-	
-	public Hashtable<String, MatchRow> getBestMatches() {
+
+	private Hashtable<String, MatchRow> getBestMatches() {
 		return bestMatches;
 	}
 
-
-	
-	public String getSampleName() {
+	private String getSampleName() {
 		return sampleName;
 	}
 
-	
-	public ArrayList<ResultsCategory> getResultsCategories() {
-		return resultsCategories;
-	}
-
-
-	public Hashtable<String, ArrayList<MatchRow>> getAllPeptides() {
+	private Hashtable<String, ArrayList<MatchRow>> getAllPeptides() {
 		return allPeptides;
 	}
 
-
-	public File getResultsFolder() {
+	private File getResultsFolder() {
 		return resultsFolder;
 	}
 

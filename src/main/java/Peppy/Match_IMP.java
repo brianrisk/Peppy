@@ -132,7 +132,7 @@ public class Match_IMP extends Match {
 			return 1;
 		}
 		
-		//Variables for binomial probabilities
+		// Variables for binomial probabilities
 		int n;
 		int k;
 		double p;
@@ -143,23 +143,19 @@ public class Match_IMP extends Match {
 		k = ionMatchTally;
 		double peakMatchProbability = MathFunctions.getBinomialProbability(n, k, p);
 		
-		//NOTE:  if we end up changing the binomial probability to return the log, this will need to get changed
+		// NOTE:  if we end up changing the binomial probability to return the log, this will need to get changed
 		if (peakMatchProbability > 0.01) {
 			return 1;
 		}
 		
-		//y greater than b probability
-//		n = peptideLengthMinusOne;
+		// y greater than b probability
 		n = pairCount;
 		k = appropriateIonIsMoreIntenseTally;
 		double appropriateIonIsMoreIntenseProbablity = MathFunctions.getCachedBinomialProbability50(n, k);
-		
-//		n = peptideLengthMinusOne;
-//		k = pairCount;
-//		double pairProbability = MathFunctions.getBinomialProbability(n, k, p);
+
 		
 		
-		//probability of ions being above thresholds
+		// probability of ions being above thresholds
 		double intensityProbability = 1;
 		if (totalIonsAbove50 > 0) {
 			n = ionMatchTally;
@@ -187,25 +183,9 @@ public class Match_IMP extends Match {
 			}
 		}
 
-		
 
-		
-		double impValue = 1;
-		
-		/* which score factors are used depends on the fragment tolerance */
-//		if (Properties.fragmentTolerance < 100 ) {
-//			impValue = peakMatchProbability * appropriateIonIsMoreIntenseProbablity;
-//		} else {
-			impValue = peakMatchProbability * intensityProbability * appropriateIonIsMoreIntenseProbablity;
-//		}
-		
-		//impValue =  intensityProbability;// * intensityProbability * appropriateIonIsMoreIntenseProbablity;
-		
-//		if (PaperExperiments.p1) impValue *= peakMatchProbability;
-//		if (PaperExperiments.p2) impValue *= intensityProbability;
-//		if (PaperExperiments.p3) impValue *= appropriateIonIsMoreIntenseProbablity;
-//		
-		
+		double impValue  = peakMatchProbability * intensityProbability * appropriateIonIsMoreIntenseProbablity;
+
 		if (impValue > 1) impValue = 1;
 		
 		score = -Math.log10(impValue);

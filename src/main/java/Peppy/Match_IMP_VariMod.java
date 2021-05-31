@@ -193,7 +193,6 @@ public class Match_IMP_VariMod extends Match_IMP {
 			}
 			if (seqIndex == peptideLengthMinusOne) break;
 			if (peakMass >= theoreticalPeaksLeft[seqIndex] && peakMass <= theoreticalPeaksRight[seqIndex]) {
-				atLeastOneMatch = true;
 				if (bIonMatchesWithHighestIntensity[seqIndex] < matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity()) {
 					bIonMatchesWithHighestIntensity[seqIndex] = matchesSpectrum.getSpectrum().getPeak(peakIndex).getIntensity();
 				}
@@ -225,28 +224,5 @@ public class Match_IMP_VariMod extends Match_IMP {
 	}
 
 
-
-
-	public int getNumberOfModifications() {
-		if (hasModification()) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	
-//	public String toString() {
-//		String out = super.toString();
-//		StringBuffer sb = new StringBuffer(out);
-//		if (Properties.searchModifications) {
-//			sb.append('\t');
-//			sb.append(hasModification());
-//			sb.append('\t');
-//			sb.append(getMoificationdMass());
-//			sb.append('\t');
-//			sb.append(getModificationIndex() + 1);
-//		}
-//		return sb.toString();
-//	}
 
 }

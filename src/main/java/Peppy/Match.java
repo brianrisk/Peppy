@@ -23,8 +23,6 @@ public abstract class Match implements Comparable<Match>{
 	
 	protected double score = 0.0;
 
-	
-	
 	private static int sortTracker = 0;
 	public final static int SORT_BY_SCORE = sortTracker++;
 	public final static int SORT_BY_SPECTRUM_ID_THEN_SCORE = sortTracker++;
@@ -199,7 +197,6 @@ public abstract class Match implements Comparable<Match>{
 			
 			if (fragmentError != 0) {
 				out.add(fragmentError);
-				fragmentError = 0;
 			}
 		
 			return out;

@@ -74,8 +74,9 @@ public class Peppy {
 		File [] existingReports = Properties.reportDirectory.listFiles();
 
 		//where we store the list of all directories to process
-		ArrayList<File> directories = new ArrayList<File>();
+		ArrayList<File> directories = new ArrayList<>();
 
+		assert directoriesToPotentiallyProcess != null;
 		for(File directory: directoriesToPotentiallyProcess) {
 			if (directory.isFile()) continue;
 			if (directory.isHidden()) continue;
@@ -104,7 +105,7 @@ public class Peppy {
 			init(args);
 			init(jobFile);
 			Properties.spectraDirectoryOrFile = directory;
-			Properties.spectraDirectoryOrFileList = new ArrayList<File>();
+			Properties.spectraDirectoryOrFileList = new ArrayList<>();
 			Properties.spectraDirectoryOrFileList.add(directory);
 
 			/* try running Peppy */
@@ -135,7 +136,7 @@ public class Peppy {
 
 
 	/**
-	 * A straight-forward search.  Developed initial for PepArML use.
+	 * A straight-forward search.  Developed initially for PepArML use.
 	 */
 	private static void runSimplePeppy() {
 		U.startStopwatch();
@@ -155,7 +156,7 @@ public class Peppy {
 		Properties.generatePropertiesFile(mainReportDir);
 
 		/* set up where we will hold all of the matches for our spectra */
-		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<MatchesSpectrum>(spectra.size());
+		ArrayList<MatchesSpectrum> spectraMatches = new ArrayList<>(spectra.size());
 		for (Spectrum spectrum: spectra) {
 			MatchesSpectrum matchesSpectrum = new MatchesSpectrum(spectrum);
 
@@ -170,7 +171,7 @@ public class Peppy {
 
 		if (Properties.useSequenceRegion) {
 			U.p("digesting part of sequence");
-			ArrayList<Sequence> oneSequenceList = new ArrayList<Sequence>();
+			ArrayList<Sequence> oneSequenceList = new ArrayList<>();
 			oneSequenceList.add(sequences.get(0));
 			sequences = oneSequenceList;
 		}
@@ -212,12 +213,10 @@ public class Peppy {
 		if (fileDoesNotExist) throw new Error("Search file not found");
 
 		try {
-
-
 			mainReportDir = createReportDirectory();
 			File savedSpectraDir = new File(mainReportDir, "spectra");
 			if (!savedSpectraDir.mkdirs()) {
-				U.p("Could not create directories");
+				U.p("Could not create directories for saved spectra");
 			}
 
 			/* if there re multiple jobs, the latter blind modification settings will persist.
@@ -237,12 +236,12 @@ public class Peppy {
 			metricsReport.println();
 
 			/* we are going to combine all returned match sets here */
-			ArrayList<Match> allMatchesForSpectralSet = new ArrayList<Match>();
+			ArrayList<Match> allMatchesForSpectralSet = new ArrayList<>();
 
 			/* group spectra that have been identified  so that
 			 * we can track those that have been identified in a 
 			 * previous level */
-			Hashtable<Integer, Integer> spectrumIDs = new Hashtable<Integer, Integer>(spectra.size());
+			Hashtable<Integer, Integer> spectrumIDs = new Hashtable<>(spectra.size());
 
 			/* iterate through all of our peptide sources */
 			for (int sequenceIndex = 0; sequenceIndex < Properties.sequenceDirectoryOrFileList.size(); sequenceIndex++) {
@@ -371,7 +370,7 @@ public class Peppy {
 					matchesSpectra = fdr.getSpectraMatches();
 					matches = getMatchesFromSpectraMatches(matchesSpectra);
 				} else {
-					matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+					matchesSpectra = new ArrayList<>(spectra.size());
 					for (Spectrum spectrum: spectra) {
 						matchesSpectra.add(new MatchesSpectrum(spectrum));
 					}
@@ -419,7 +418,7 @@ public class Peppy {
 
 				/* remove all spectra that appear in our matches */
 				if (Properties.maximumFDR >= 0) {
-					ArrayList<Spectrum> reducedSpectra = new ArrayList<Spectrum>(spectra.size() - spectrumIDs.size());
+					ArrayList<Spectrum> reducedSpectra = new ArrayList<>(spectra.size() - spectrumIDs.size());
 					for (Spectrum spectrum: spectra) {
 						if (spectrumIDs.get(spectrum.getId()) == null) {
 							reducedSpectra.add(spectrum);
@@ -450,11 +449,11 @@ public class Peppy {
 
 			/* first, we collect all of the peptides found */
 			if (Properties.searchModifications) {
-				Hashtable<String, Peptide> peptideHash = new Hashtable<String, Peptide>();
+				Hashtable<String, Peptide> peptideHash = new Hashtable<>();
 				for (Match match: allMatchesForSpectralSet) {
 					peptideHash.put(match.getPeptide().getAcidSequenceString(), match.getPeptide());
 				}
-				ArrayList<Peptide> peptidesFound = new ArrayList<Peptide>(peptideHash.values());
+				ArrayList<Peptide> peptidesFound = new ArrayList<>(peptideHash.values());
 
 				/* a big IF -- were there any peptides at all identified from above.  We hope so!  */
 				if (peptidesFound.size() > 0) {
@@ -492,7 +491,7 @@ public class Peppy {
 						matchesSpectra = fdr.getSpectraMatches();
 						matches = getMatchesFromSpectraMatches(matchesSpectra);
 					} else {
-						matchesSpectra = new ArrayList<MatchesSpectrum>(spectra.size());
+						matchesSpectra = new ArrayList<>(spectra.size());
 						for (Spectrum spectrum: spectra) {
 							matchesSpectra.add(new MatchesSpectrum(spectrum));
 						}
@@ -562,7 +561,7 @@ public class Peppy {
 		/* see if we have jobs in the jobs folder */
 		File jobsDir = new File("jobs");
 		File[] potentialJobsFiles = jobsDir.listFiles();
-		ArrayList<File> jobFiles = new ArrayList<File>();
+		ArrayList<File> jobFiles = new ArrayList<>();
 		if (potentialJobsFiles != null) {
 			for (File potentialJobsFile : potentialJobsFiles) {
 				if (potentialJobsFile.getName().toLowerCase().endsWith(".txt")) {
@@ -686,11 +685,11 @@ public class Peppy {
 			 */
 
 			/*  Initialize our list of peptides */
-			ArrayList<Peptide> peptides = new ArrayList<Peptide>(Properties.desiredPeptideDatabaseSize);
+			ArrayList<Peptide> peptides = new ArrayList<>(Properties.desiredPeptideDatabaseSize);
 			peptides.ensureCapacity(Properties.desiredPeptideDatabaseSize);
 
 			/* This is where we get a chunk of peptides */
-			ArrayList<Peptide> peptideSegment = new ArrayList<Peptide>();
+			ArrayList<Peptide> peptideSegment = new ArrayList<>();
 
 			/* if we use a region, extract that region, else go through all sequences getting a chunk at a time. */
 			if (Properties.useSequenceRegion) {
@@ -801,7 +800,7 @@ public class Peppy {
 		}
 
 		/* combine matches into result and return */
-		ArrayList<Match> out = new ArrayList<Match>(size);
+		ArrayList<Match> out = new ArrayList<>(size);
 		for (MatchesSpectrum spectrumMatches: spectraMatches) {
 			/* make sure there are matches for this spectrum */
 			if (spectrumMatches.getMatches().size() == 0) continue;
@@ -831,7 +830,7 @@ public class Peppy {
 	}
 
 	public static ArrayList<Match> reduceMatchesToOnePerSpectrum(ArrayList<Match> matches) {
-		Hashtable<String, Match> oneMatchPerSpectrum = new Hashtable<String, Match>(matches.size());
+		Hashtable<String, Match> oneMatchPerSpectrum = new Hashtable<>(matches.size());
 		for (Match match: matches) {
 			Match existing = oneMatchPerSpectrum.get(match.getSpectrum().getMD5());
 			if (existing == null) {
@@ -842,7 +841,7 @@ public class Peppy {
 				}
 			}
 		}
-		ArrayList<Match> out = new ArrayList<Match>(oneMatchPerSpectrum.size());
+		ArrayList<Match> out = new ArrayList<>(oneMatchPerSpectrum.size());
 		Enumeration<Match> e = oneMatchPerSpectrum.elements();
 		while (e.hasMoreElements()) out.add(e.nextElement());
 		return out;

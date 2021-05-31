@@ -79,14 +79,7 @@ public class ValidationReport {
 		
 		/* this needs to happen or the text reports at the end crash */
 		Properties.isSequenceFileNucleotide = !Properties.testSequenceIsProtein;
-		
-		
-		
-		/* What scoring mechanism? */
-//		Properties.scoringMethodName = "Peppy.Match_IMP";
-//		Properties.matchConstructor = new MatchConstructor(Properties.scoringMethodName);
-			
-		
+
 		/* save our properties */
 		Properties.generatePropertiesFile(reportFolder);
 		

@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class SequenceProtein extends Sequence {
 	
-	BufferedReader reader = null;
+	private BufferedReader reader = null;
 	
 	public SequenceProtein(File proteinFile) {
 		this.sequenceFile = proteinFile;
@@ -36,12 +36,12 @@ public class SequenceProtein extends Sequence {
 	
 	public  ArrayList<Peptide> extractAllPeptides(boolean isReverse) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, false);
-		return getPeptidesFromListOfProteins(proteins, isReverse);	
+		return getPeptidesFromListOfProteins(proteins);
 	}
 	
 	public  ArrayList<Peptide> extractMorePeptides(boolean isReverse) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(isReverse, true);
-		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins, isReverse);
+		ArrayList<Peptide> peptides = getPeptidesFromListOfProteins(proteins);
 		if (peptides.size() == 0) return null; //TODO fix.  there is the (small) possibility that this may return null and there are still proteins left to digest.
 		return peptides;
 	}
@@ -57,12 +57,11 @@ public class SequenceProtein extends Sequence {
 	 */
 	public  ArrayList<Peptide> getAllPeptidesFromReverseDatabase(File proteinFile) {
 		ArrayList<Protein> proteins = getProteinsFromDatabase(true, false);
-		return getPeptidesFromListOfProteins(proteins, true);	
+		return getPeptidesFromListOfProteins(proteins);
 	}
 	
 	/**
 	 * Depending on the file suffix of the protein file it chooses how to extract the proteins
-	 * @param proteinFile a FASTA or DAT formatted file
 	 * @param isReverse
 	 * @return
 	 */
@@ -75,8 +74,8 @@ public class SequenceProtein extends Sequence {
 		return null;
 	}
 	
-	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins, boolean isReverse) {
-		ArrayList<Peptide> peptides = new ArrayList<Peptide>();
+	public static ArrayList<Peptide> getPeptidesFromListOfProteins(ArrayList<Protein> proteins) {
+		ArrayList<Peptide> peptides = new ArrayList<>();
 		if (proteins.size() != 0) {
 			ProteinDigestionServer pds = new ProteinDigestionServer(proteins);
 			peptides = pds.getPeptides();
@@ -85,7 +84,7 @@ public class SequenceProtein extends Sequence {
 	}
 	
 	private ArrayList<Protein> getProteinsFromFASTA( boolean isReverse, boolean limitAmount) {
-		ArrayList<Protein> proteins = new ArrayList<Protein>();
+		ArrayList<Protein> proteins = new ArrayList<>();
 		int combinedLength = 0;
 		try {
 			String line = reader.readLine();
@@ -138,9 +137,6 @@ public class SequenceProtein extends Sequence {
 	
 	/**
 	 * Takes a string buffer and adds it to our list of proteins with the appropriate name
-	 * @param buffy
-	 * @param proteinName
-	 * @param isReverse
 	 */
 	private void addProtein(StringBuffer buffy, String proteinName, ArrayList<Protein> proteins, boolean isReverse) {
 		if (buffy.length() > 0) {
@@ -157,20 +153,18 @@ public class SequenceProtein extends Sequence {
 			proteinChunks = buffy.toString().toUpperCase().split("\\*");
 			
 			/* go through each of our chunks and add them as proteins */
-			for (int i = 0; i < proteinChunks.length; i++) {
-				if (proteinChunks[i].length() < Properties.minPeptideLength) continue;
-				proteins.add(new Protein(proteinName, proteinChunks[i], isReverse));
+			for (String proteinChunk : proteinChunks) {
+				if (proteinChunk.length() < Properties.minPeptideLength) continue;
+				proteins.add(new Protein(proteinName, proteinChunk, isReverse));
 			}
 		}
 	}
 	
 	/**
 	 * Uniprot has its own format!  Yes!
-	 * @param proteinFile
-	 * @return
 	 */
 	private ArrayList<Protein> getProteinsFromUniprotDAT(boolean isDecoy, boolean limitAmount) {
-		ArrayList<Protein> proteins = new ArrayList<Protein>();
+		ArrayList<Protein> proteins = new ArrayList<>();
 		try {
 			String line;
 			line = reader.readLine();

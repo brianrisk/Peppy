@@ -21,14 +21,6 @@ public class Region {
 	
 	ArrayList<MatchRow> matches = new ArrayList<MatchRow>();
 	
-	
-	public Region(String name, int start, int stop, boolean isForwards) {
-		super();
-		this.name = name;
-		this.start = start;
-		this.stop = stop;
-	}
-	
 	public Region(){}
 	
 	public void addMatch(MatchRow match) {
