@@ -1,19 +1,15 @@
 package Navigator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-
 import Math.MassError;
 import Peppy.Definitions;
 import Peppy.ModificationEntry;
 import Peppy.Properties;
 import Peppy.U;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
 
 /**
  * Copyright 2013, Brian Risk

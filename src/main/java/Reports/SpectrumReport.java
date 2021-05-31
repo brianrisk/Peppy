@@ -1,14 +1,14 @@
 package Reports;
 
+import Peppy.Spectrum;
+import Peppy.SpectrumLoader;
+import Peppy.U;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
 
 /**
  * to be further developed!

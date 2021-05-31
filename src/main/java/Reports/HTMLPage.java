@@ -1,11 +1,7 @@
 package Reports;
 
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.awt.*;
+import java.io.*;
 
 /**
  * Copyright 2013, Brian Risk

@@ -1,8 +1,8 @@
 package Navigator;
 
-import java.util.ArrayList;
-
 import Peppy.ModificationEntry;
+
+import java.util.ArrayList;
 
 /**
  * Copyright 2013, Brian Risk

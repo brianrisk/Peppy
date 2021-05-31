@@ -1,10 +1,10 @@
 package Experimental;
 
-import java.util.ArrayList;
-
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.U;
+
+import java.util.ArrayList;
 
 public class IonComparisonServer {
 	

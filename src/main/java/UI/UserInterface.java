@@ -1,11 +1,11 @@
 package UI;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-
+import Peppy.U;
 import processing.core.PApplet;
 import processing.core.PFont;
-import Peppy.U;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 
 public class UserInterface extends PApplet {
 
@@ -16,10 +16,13 @@ public class UserInterface extends PApplet {
 		PApplet.main(new String[] {"UI.UserInterface" });	
 	}
 
+	public void settings() {
+		size(1024, 768, "processing.awt.PGraphicsJava2D");
+	}
+
 	public void setup() {
 //		hint(ENABLE_RETINA_PIXELS);
-//		smooth(8);
-		size(1024,768,JAVA2D);
+//		smooth(8)
 		
 		UIC.init(this);
 		UIF.init(this);
@@ -32,9 +35,10 @@ public class UserInterface extends PApplet {
 	public void draw() {
 		stack.render();
 		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-		double load = operatingSystemMXBean.getSystemLoadAverage() / operatingSystemMXBean.getAvailableProcessors();
+		// TODO: commenting the below as it won't compile.
+//		double load = operatingSystemMXBean.getSystemLoadAverage() / operatingSystemMXBean.getAvailableProcessors();
 		fill(255,255,255,255);
-		UIF.drawText(UIC.gridX * 14, UIC.gridY * 0, UIC.gridX * 2, "CPU: " + load, UIC.ALIGN_RIGHT);
+		UIF.drawText(UIC.gridX * 14, UIC.gridY * 0, UIC.gridX * 2, "CPU: ?", UIC.ALIGN_RIGHT);
 	}
 	
 

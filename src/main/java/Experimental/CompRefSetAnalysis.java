@@ -1,5 +1,8 @@
 package Experimental;
 
+import Navigator.Match;
+import Peppy.U;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,9 +10,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import Navigator.Match;
-import Peppy.U;
 
 /*
  * Goals:

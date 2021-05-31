@@ -1,8 +1,8 @@
 package UI;
 
-import java.util.ArrayList;
-
 import processing.core.PApplet;
+
+import java.util.ArrayList;
 
 public abstract class Adapter {
 

@@ -1,17 +1,13 @@
 package Peppy;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Math.HasValue;
+import Math.MassError;
+
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-
-import Math.HasValue;
-import Math.MassError;
 
 /**
  * Holds peaks and meta-data for a MS/MS peak file.

@@ -17,9 +17,9 @@ public class Peak implements Comparable<Peak>{
 	public boolean used = false;
 	
 	private static int tracker = 0;
-	final int COMPARE_MASS = tracker++;
-	final int COMPARE_INTENSITY = tracker++;
-	int compareBy = COMPARE_MASS;
+	private final int COMPARE_MASS = tracker++;
+	private final int COMPARE_INTENSITY = tracker++;
+	private int compareBy = COMPARE_MASS;
 	
 	public Peak(String s) throws Exception {
 		String [] chunks = s.split(" |\t");

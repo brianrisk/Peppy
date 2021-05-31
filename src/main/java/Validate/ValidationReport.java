@@ -1,25 +1,14 @@
 package Validate;
 
+import Math.MathFunctions;
+import Peppy.*;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import javax.imageio.ImageIO;
-
-import Math.MathFunctions;
-import Peppy.Match;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.SequenceNucleotide;
-import Peppy.SequenceProtein;
-import Peppy.U;
 
 public class ValidationReport {
 	

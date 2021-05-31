@@ -1,9 +1,9 @@
 package Experimental;
 
+import Peppy.U;
+
 import java.util.Hashtable;
 import java.util.Random;
-
-import Peppy.U;
 
 public class JoshProbabilityExperiment {
 	

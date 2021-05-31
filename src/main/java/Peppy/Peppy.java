@@ -1,4 +1,8 @@
 package Peppy;
+
+import Reports.HTMLReporter;
+import Reports.TextReporter;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import Reports.HTMLReporter;
-import Reports.TextReporter;
 
 /**
  * Peppy
@@ -35,12 +36,12 @@ import Reports.TextReporter;
 public class Peppy {
 
 	/* track how much memory we have used */
-	static MemoryUsage memoryUsage;
-	static long maxMemoryUsed = 0;
-	static String propertyFileString = null;
+	private static MemoryUsage memoryUsage;
+	private static long maxMemoryUsed = 0;
+	private static String propertyFileString = null;
 	
 	// where we are saving our current report
-	public static File mainReportDir;
+	private static File mainReportDir;
 
 
 	private static boolean verbose = true;
@@ -56,7 +57,6 @@ public class Peppy {
 		/* do the work */
 		runJobs(args);
 		//		runDirectory("/Volumes/Research/Breast-converted/", "/Volumes/Research/CPTAC-Breast/jobs/first.txt", args);
-		//		moonShot(args);
 
 		/* i'm finished! */
 		finish();
@@ -109,7 +109,7 @@ public class Peppy {
 
 			/* try running Peppy */
 			try {
-				runPeppy(null);
+				runPeppy();
 			}
 			catch (Exception e) {
 				U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -124,102 +124,20 @@ public class Peppy {
 	}
 
 
-
-	/**
-	 * Code to automate moon shot analysis
-	 * @param args
-	 */
-	public static void moonShot(String [] args) {
-		String [] compartments = {"tce", "surface", "media", "nuclear"};
-		U.p ("Moon Shot");
-
-		File drive = new File("/Volumes/New Volume");
-		File [] experimentFolders = drive.listFiles();
-		for (File experimentFolder: experimentFolders) {
-			if (!experimentFolder.isHidden() && experimentFolder.isDirectory() && !experimentFolder.getName().startsWith("$")) {
-				String experimentName = experimentFolder.getName().toLowerCase();
-				for(String compartment: compartments) {
-
-					String jobName = experimentName + "_" + compartment;
-
-					//continue if we've already done this analysis
-					File existingReportFolder = new File("reports/" + jobName);
-					if (existingReportFolder.exists()) continue;
-
-					propertyFileString =  jobName + ".txt";
-					U.p("running job " + propertyFileString);
-
-					/* 
-					 * this initializes with the default "properties.txt" 
-					 * provides a base so common properties don't need to be
-					 * redefined
-					 */
-					init(args);
-
-					// assemble all spectrum files for this compartment;
-					File [] spectrumFiles = experimentFolder.listFiles();
-					for (File spectrumFile: spectrumFiles) {
-						String name = spectrumFile.getName().toLowerCase();
-						if (!name.endsWith(".mgf")) continue;
-						if (name.indexOf(compartment) != -1) {
-							Properties.spectraDirectoryOrFileList.add(spectrumFile);
-						}
-					}
-					if (Properties.spectraDirectoryOrFileList.size() == 0) continue;
-
-					/* 
-					 * All properties override those defined in "properties.txt"
-					 */
-					Properties.smartTolerances = false;
-					Properties.precursorTolerance = 14;
-					Properties.fragmentTolerance = 500;
-					Properties.modC = 57.02146;
-					Properties.modK = 6.020129;
-					Properties.peptideMassMinimum = 750;
-					Properties.peptideMassMaximum = 3800;
-
-					//as we are directly setting modification properties, we need to directly init the acid masses
-					AminoAcids.init();
-
-					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/protein/UniProt-HUMAN-20130918.fasta"));
-					Properties.isSequenceFileNucleotideList.add(false);
-					Properties.useOnlyForwardsFramesList.add(false);
-					//					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/public/sequences/dna/HG19"));
-					//					Properties.isSequenceFileDNAList.add(true);
-					Properties.sequenceDirectoryOrFileList.add(new File("/Users/risk2/PeppyData/Hanash/sequences/regions/lung28"));
-					Properties.isSequenceFileNucleotideList.add(false);
-					Properties.useOnlyForwardsFramesList.add(false);
-
-					try {
-						runPeppy(null);
-					}
-					catch (Exception e) {
-						U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-						e.printStackTrace();
-						U.p("\r\r");
-						U.p("An error occurred. Continuing with the next job...\r\r");
-					}
-					U.p();
-				}
-			}
-		}
-	}
-
-	public static void runPeppy(String [] args) {
+	private static void runPeppy() {
 		/* funnel search is meaningless without an established FDR */
 		if (Properties.simpleSearch || Properties.maximumFDR < 0) {
-			runSimplePeppy(args);
+			runSimplePeppy();
 		} else {
-			runFunnelPeppy(args);
+			runFunnelPeppy();
 		}
 	}
 
 
 	/**
 	 * A straight-forward search.  Developed initial for PepArML use.
-	 * @param args
 	 */
-	private static void runSimplePeppy(String [] args) {
+	private static void runSimplePeppy() {
 		U.startStopwatch();
 
 		/* where we store the report */
@@ -248,7 +166,7 @@ public class Peppy {
 		}
 
 		//initialize our ArrayList of matches
-		ArrayList<Match> matches = null;
+		ArrayList<Match> matches;
 
 		if (Properties.useSequenceRegion) {
 			U.p("digesting part of sequence");
@@ -270,9 +188,8 @@ public class Peppy {
 	/**
 	 * There may be a multiplicity of sequence and spectral directories.
 	 * This iterates through them in every combination.
-	 * @param args
 	 */
-	private static void runFunnelPeppy(String [] args) {
+	private static void runFunnelPeppy() {
 		U.startStopwatch();
 
 		if (verbose) U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
@@ -299,7 +216,9 @@ public class Peppy {
 
 			mainReportDir = createReportDirectory();
 			File savedSpectraDir = new File(mainReportDir, "spectra");
-			savedSpectraDir.mkdirs();
+			if (!savedSpectraDir.mkdirs()) {
+				U.p("Could not create directories");
+			}
 
 			/* if there re multiple jobs, the latter blind modification settings will persist.
 			 * we reset those to normal, modification-less parameters
@@ -399,8 +318,7 @@ public class Peppy {
 							Spectrum spectrumToExamine;
 							for (int spectrumIndex = 0; spectrumIndex < spectra.size(); spectrumIndex++) {
 								spectrumToExamine = spectra.get(spectrumIndex);
-								remove = false;
-								if (spectrumToExamine.getMass() < Properties.peptideMassMinimum) remove = true;
+								remove = spectrumToExamine.getMass() < Properties.peptideMassMinimum;
 								if (spectrumToExamine.getMass() > Properties.peptideMassMaximum) remove = true;
 								if (spectrumToExamine.getPeaks().size() < Properties.minimumNumberOfPeaksForAValidSpectrum) remove = true;
 								if (remove) {
@@ -441,7 +359,7 @@ public class Peppy {
 
 				/* create spectra-based containers for matches */
 				ArrayList<MatchesSpectrum> matchesSpectra;
-				ArrayList<Match> matches = null;
+				ArrayList<Match> matches;
 
 				/* if we used all of our spectra to calculate FDR, we take advantage of that
 				 * and harvest those results for these results.  No need to do the work twice!
@@ -493,7 +411,9 @@ public class Peppy {
 				/* create the directory where we will hold this report */
 				String reportDirName = sequenceIndex + " " + Properties.sequenceDirectoryOrFile.getName();
 				File reportDir = new File (mainReportDir, reportDirName);
-				reportDir.mkdirs();
+				if (!reportDir.mkdirs()) {
+					U.p("Could not create directories");
+				}
 
 
 
@@ -567,7 +487,7 @@ public class Peppy {
 
 					/* create spectra-based containers for matches */
 					ArrayList<MatchesSpectrum> matchesSpectra;					
-					ArrayList<Match> matches = null;
+					ArrayList<Match> matches;
 					if (fdr.usedFullSetOfSpectra) {
 						matchesSpectra = fdr.getSpectraMatches();
 						matches = getMatchesFromSpectraMatches(matchesSpectra);
@@ -601,7 +521,9 @@ public class Peppy {
 					/* create the directory where we will hold this report */
 					String reportDirName = Properties.sequenceDirectoryOrFileList.size() + " - varimod";
 					File reportDir = new File (mainReportDir, reportDirName);
-					reportDir.mkdirs();
+					if (!reportDir.mkdirs()) {
+						U.p("Could not create directories");
+					}
 
 					/* generate reports */
 					double precentReduction =  ((double)spectrumIDs.size() / originalSpectraSize);
@@ -636,23 +558,23 @@ public class Peppy {
 
 
 
-	public static void runJobs(String [] args) {
+	 private static void runJobs(String [] args) {
 		/* see if we have jobs in the jobs folder */
 		File jobsDir = new File("jobs");
 		File[] potentialJobsFiles = jobsDir.listFiles();
 		ArrayList<File> jobFiles = new ArrayList<File>();
 		if (potentialJobsFiles != null) {
-			for (int i = 0; i < potentialJobsFiles.length; i++) {
-				if (potentialJobsFiles[i].getName().toLowerCase().endsWith(".txt")) {
-					jobFiles.add(potentialJobsFiles[i]);
-				}	
+			for (File potentialJobsFile : potentialJobsFiles) {
+				if (potentialJobsFile.getName().toLowerCase().endsWith(".txt")) {
+					jobFiles.add(potentialJobsFile);
+				}
 			}
 		}
 
 		/* run the jobs */
 		if (jobFiles.size() == 0) {
 			U.p("no jobs in jobs folder.  running according to main properties file");
-			runPeppy(null);
+			runPeppy();
 		} else {
 			U.p();
 			U.p("running " + jobFiles.size() + " jobs");
@@ -675,7 +597,7 @@ public class Peppy {
 
 				/* try running Peppy */
 				try {
-					runPeppy(null);
+					runPeppy();
 				}
 				catch (Exception e) {
 					U.p("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -740,9 +662,8 @@ public class Peppy {
 	 * This is the heart of Peppy where the grand symphony takes place.
 	 * 
 	 * @param sequences our list of sequences where we will be getting our peptides
-	 * @param spectra our list of spectra
+	 * @param spectraMatches our list of spectra
 	 * @param isReverse if we are doing a normal, forwards search or if this is a null, reverse search
-	 * @return
 	 */
 	private static ArrayList<Match> getMatches(
 			ArrayList<Sequence> sequences, 
@@ -840,9 +761,6 @@ public class Peppy {
 
 	/**
 	 * Does a normal search (sets reverse property false as this is not a decoy search)
-	 * @param sequences
-	 * @param spectra
-	 * @return
 	 */
 	public static ArrayList<Match> getMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
 		return getMatches(sequences, spectraMatches, false);
@@ -850,10 +768,6 @@ public class Peppy {
 
 	/**
 	 * Gets matches where a list of peptides is already derived
-	 * @param peptides
-	 * @param spectra
-	 * @param sequence_DNA
-	 * @return
 	 */
 	public static ArrayList<Match> getMatchesWithPeptides(
 			ArrayList<Peptide> peptides, 
@@ -867,9 +781,8 @@ public class Peppy {
 		//			spectrumMatches.calculateEValues();
 		//		}
 
-		ArrayList<Match> matches = getMatchesFromSpectraMatches(spectraMatches);
 
-		return matches;
+		return getMatchesFromSpectraMatches(spectraMatches);
 	}
 
 
@@ -912,9 +825,6 @@ public class Peppy {
 
 	/**
 	 * performing our normal search specifying "true" for isReverse
-	 * @param sequences
-	 * @param spectraMatches
-	 * @return
 	 */
 	public static ArrayList<Match> getDecoyMatches(ArrayList<Sequence> sequences, ArrayList<MatchesSpectrum> spectraMatches) {
 		return getMatches(sequences, spectraMatches, true);
@@ -937,34 +847,6 @@ public class Peppy {
 		while (e.hasMoreElements()) out.add(e.nextElement());
 		return out;
 	}
-
-
-
-	//TODO this could probably be made much, much faster
-	private static ArrayList<Peptide> getPeptidesInRegions(ArrayList<Region> regions, ArrayList<Sequence> sequences, boolean isReverse) {
-		/* our return */
-		ArrayList<Peptide> out = new ArrayList<Peptide>();
-
-		/* get peptides along regions */
-		Region region;
-		for (Sequence sequence: sequences) {
-			SequenceNucleotide dnaSequence = (SequenceNucleotide) sequence;
-			for (int regionIndex = 0; regionIndex < regions.size(); regionIndex++) {
-				region = regions.get(regionIndex);
-				if (dnaSequence.equals(region.getSequence())) {
-					out.addAll(
-							dnaSequence.extractPeptidesFromRegion(
-									region.getStartLocation() - Properties.targetedSearchRadius, 
-									region.getStopLocation() + Properties.targetedSearchRadius, 
-									isReverse)
-							);
-				}
-			}
-			sequence.reset();
-		}
-		Collections.sort(out);
-		return out;
-	}
 	
 
 	private static File createReportDirectory() {
@@ -976,7 +858,9 @@ public class Peppy {
 			reportDirString = Properties.spectraDirectoryOrFile.getName() + "_" + System.currentTimeMillis();
 		}
 		File mainReportDir = new File(Properties.reportDirectory, reportDirString);
-		mainReportDir.mkdirs();
+		if(!mainReportDir.mkdirs()) {
+			U.p("could not create report directories");
+		}
 		try {
 			if (U.logWriter != null) {
 				U.logWriter.flush();
@@ -1003,7 +887,7 @@ public class Peppy {
 		}	
 	}
 
-	protected static void printGreeting() {
+	private static void printGreeting() {
 		U.p("Welcome to Peppy(TM)");
 		U.p("Protein identification / proteogenomic software.");
 		U.p("Copyright 2015 by Brian Risk");
@@ -1017,7 +901,7 @@ public class Peppy {
 
 	}
 
-	protected static void finish() {
+	private static void finish() {
 		if (U.logWriter != null) {
 			U.logWriter.flush();
 			U.logWriter.close();

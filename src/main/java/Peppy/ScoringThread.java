@@ -1,8 +1,9 @@
 package Peppy;
-import java.util.ArrayList;
 
 import Math.MassError;
 import Math.MathFunctions;
+
+import java.util.ArrayList;
 
 /**
  * Copyright 2013, Brian Risk

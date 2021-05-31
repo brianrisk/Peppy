@@ -1,15 +1,11 @@
 package Validate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import Peppy.Match;
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.U;
+
+import java.io.*;
 
 /**
  * This is a place which will hold a SpecatrumPeptideMatch

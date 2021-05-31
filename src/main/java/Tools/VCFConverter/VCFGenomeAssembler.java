@@ -1,17 +1,9 @@
 package Tools.VCFConverter;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+import Peppy.*;
 
-import Peppy.NucleotideSequence;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.SequenceNucleotide;
-import Peppy.U;
+import java.io.*;
+import java.util.ArrayList;
 
 public class VCFGenomeAssembler {
 

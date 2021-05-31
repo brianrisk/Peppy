@@ -1,19 +1,15 @@
 package Experimental;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-
 import Navigator.Match;
 import Peppy.Protein;
 import Peppy.ProteinCoverage;
 import Peppy.SequenceProtein;
 import Peppy.U;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
 
 /**
  * Finds proteins that have the following characteristics:

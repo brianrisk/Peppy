@@ -1,12 +1,8 @@
 package Reports;
 
-import java.util.ArrayList;
+import Peppy.*;
 
-import Peppy.Match;
-import Peppy.Matches;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.U;
+import java.util.ArrayList;
 
 
 /** an object to help construct UCSC links

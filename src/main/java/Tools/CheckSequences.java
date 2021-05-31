@@ -1,11 +1,11 @@
 package Tools;
 
-import java.util.ArrayList;
-
 import Peppy.Peptide;
 import Peppy.Properties;
 import Peppy.Sequence;
 import Peppy.U;
+
+import java.util.ArrayList;
 
 /**
  * This is a little tool to see if a certain peptide is appearing in the digested database

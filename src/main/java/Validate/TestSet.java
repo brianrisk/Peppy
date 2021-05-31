@@ -1,25 +1,14 @@
 package Validate;
 
+import Graphs.PRCurve;
+import Peppy.*;
+
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import Graphs.PRCurve;
-import Peppy.Match;
-import Peppy.MatchesSpectrum;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.ScoringServer;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
 
 public class TestSet {
 	

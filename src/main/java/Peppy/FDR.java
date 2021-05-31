@@ -1,17 +1,13 @@
 package Peppy;
 
+import Graphs.PRCurve;
+
 import java.awt.geom.Point2D;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-
-import Graphs.PRCurve;
 
 
 /**

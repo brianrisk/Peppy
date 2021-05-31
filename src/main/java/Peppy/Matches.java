@@ -1,9 +1,9 @@
 package Peppy;
 
+import Math.LeastSquares;
+
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Math.LeastSquares;
 
 /**
  * We want to hold collections of matches for various things.  All matches for a given peptide,

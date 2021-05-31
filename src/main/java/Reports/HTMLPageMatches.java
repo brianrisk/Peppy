@@ -1,12 +1,12 @@
 package Reports;
 
-import java.io.File;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-
 import Peppy.Match;
 import Peppy.Matches;
 import Peppy.Properties;
+
+import java.io.File;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 /**
  * Copyright 2013, Brian Risk

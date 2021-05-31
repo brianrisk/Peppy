@@ -1,16 +1,10 @@
 package Tools;
 
+import Peppy.*;
+import Reports.MatchSVG;
+
 import java.io.File;
 import java.util.ArrayList;
-
-import Peppy.Match_IMP;
-import Peppy.MatchesSpectrum;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
-import Reports.MatchSVG;
 
 public class MakeSpectrumSVG {
 

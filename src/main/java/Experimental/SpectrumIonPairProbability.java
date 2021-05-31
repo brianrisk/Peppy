@@ -1,15 +1,14 @@
 package Experimental;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import org.apache.commons.math3.distribution.NormalDistribution;
-
 import Peppy.Definitions;
 import Peppy.Peak;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
+import org.apache.commons.math3.distribution.NormalDistribution;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Copyright 2013, Brian Risk

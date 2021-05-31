@@ -1,12 +1,8 @@
 package Tools;
 
-import java.util.ArrayList;
+import Peppy.*;
 
-import Peppy.Peppy;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.U;
+import java.util.ArrayList;
 
 public class CountPeptides {
 	

@@ -1,23 +1,11 @@
 package Validate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import Math.MassError;
+import Peppy.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Math.MassError;
-import Peppy.AminoAcids;
-import Peppy.Match;
-import Peppy.MatchesSpectrum;
-import Peppy.Peak;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
 
 /**
  * Test set's have some basic properties which would be cool to know

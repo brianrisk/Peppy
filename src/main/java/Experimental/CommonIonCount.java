@@ -1,18 +1,13 @@
 package Experimental;
 
+import Peppy.*;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import Peppy.AminoAcids;
-import Peppy.Peppy;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.U;
 
 public class CommonIonCount {
 	

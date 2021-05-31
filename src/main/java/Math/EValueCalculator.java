@@ -1,8 +1,8 @@
 package Math;
 
-import java.util.ArrayList;
-
 import Peppy.Match;
+
+import java.util.ArrayList;
 
 /**
  * For the calculation and storing of E Values.

@@ -1,11 +1,11 @@
 package Peppy;
 
+import Math.MathFunctions;
+import Reports.HTMLPageRegions;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Math.MathFunctions;
-import Reports.HTMLPageRegions;
 
 /**
  * Copyright 2013, Brian Risk

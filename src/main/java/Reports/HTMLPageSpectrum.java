@@ -1,19 +1,11 @@
 package Reports;
 
+import Math.MassError;
+import Peppy.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Math.MassError;
-import Peppy.Definitions;
-import Peppy.Match;
-import Peppy.Match_Blank;
-import Peppy.Match_IMP_VariMod;
-import Peppy.Matches;
-import Peppy.ModificationEntry;
-import Peppy.Peak;
-import Peppy.Properties;
-import Peppy.Spectrum;
 
 /**
  * Copyright 2013, Brian Risk

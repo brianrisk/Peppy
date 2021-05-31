@@ -1,21 +1,14 @@
 package Experimental;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import Peppy.AminoAcids;
 import Peppy.Peppy;
 import Peppy.Properties;
 import Peppy.U;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 public class DrawProbabilityGrid {
 	

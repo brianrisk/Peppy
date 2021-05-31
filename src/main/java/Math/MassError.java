@@ -19,7 +19,6 @@ public class MassError {
 	 */
 	public static double getDaltonError(double PPM, double mass) {
 		return mass * PPM / 1000000;
-//		return 1000 * PPM / 1000000; 
 	}
 	
 	

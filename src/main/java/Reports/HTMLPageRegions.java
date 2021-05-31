@@ -1,9 +1,9 @@
 package Reports;
 
+import Peppy.Region;
+
 import java.io.File;
 import java.util.ArrayList;
-
-import Peppy.Region;
 
 /**
  * Copyright 2013, Brian Risk

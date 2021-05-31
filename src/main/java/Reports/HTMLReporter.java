@@ -1,13 +1,13 @@
 package Reports;
 
+import Peppy.Match;
+import Peppy.Properties;
+import Peppy.Spectrum;
+
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Peppy.Match;
-import Peppy.Properties;
-import Peppy.Spectrum;
 
 
 /**

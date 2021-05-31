@@ -1,5 +1,7 @@
 package Validate;
 
+import Peppy.*;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,18 +10,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import Peppy.Match;
-import Peppy.MatchConstructor;
-import Peppy.MatchesSpectrum;
-import Peppy.Peppy;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.SequenceNucleotide;
-import Peppy.SequenceProtein;
-import Peppy.Spectrum;
-import Peppy.U;
 
 /**
  * IMPORTANT NOTE:  When running this, be sure to turn all peak cleaning of spectra off.

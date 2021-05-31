@@ -1,24 +1,15 @@
 package Reports;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import Math.MassError;
+import Peppy.*;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-
-import Math.MassError;
-import Peppy.Match;
-import Peppy.Match_Blank;
-import Peppy.Peak;
-import Peppy.PeakLabeled;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Spectrum;
-import Peppy.U;
 
 public class MatchSVG {
 	

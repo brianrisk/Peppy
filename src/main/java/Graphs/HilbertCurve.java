@@ -1,21 +1,14 @@
 package Graphs;
 
-import java.awt.Color;
+import Peppy.*;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
-
-import Peppy.AminoAcids;
-import Peppy.DigestionThread_DNA;
-import Peppy.NucleotideSequence;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.SequenceNucleotide;
-import Peppy.U;
 
 /**
  * Copyright 2013, Brian Risk

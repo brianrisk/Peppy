@@ -1,30 +1,18 @@
 package Navigator;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Database.Column;
+import Database.Table;
+import Peppy.*;
+import Reports.HTMLPageSpectrum;
+import Reports.MatchSVG;
+import Reports.UCSC;
+
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import Database.Column;
-import Database.Table;
-import Peppy.Definitions;
-import Peppy.Match_Blank;
-import Peppy.Peptide;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
-import Reports.HTMLPageSpectrum;
-import Reports.MatchSVG;
-import Reports.UCSC;
 
 /**
  * Copyright 2013, Brian Risk

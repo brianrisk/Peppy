@@ -1,9 +1,9 @@
 package Experimental;
 
-import java.util.Enumeration;
-
 import Navigator.MatchesTo;
 import Navigator.MatchesToProtein;
+
+import java.util.Enumeration;
 
 /**
  * Copyright 2013, Brian Risk

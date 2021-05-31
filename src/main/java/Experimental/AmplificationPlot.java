@@ -1,25 +1,15 @@
 package Experimental;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.imageio.ImageIO;
-
 import Navigator.Match;
 import Peppy.U;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * I am interested in how amplification as measured by aCGH affects expression levels.

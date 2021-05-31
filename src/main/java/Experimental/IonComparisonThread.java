@@ -1,10 +1,10 @@
 package Experimental;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
 import Peppy.Peptide;
 import Peppy.Properties;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class IonComparisonThread implements Runnable {
 	

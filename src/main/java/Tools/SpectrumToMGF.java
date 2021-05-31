@@ -1,16 +1,12 @@
 package Tools;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
 import Peppy.Peak;
 import Peppy.Spectrum;
 import Peppy.SpectrumLoader;
 import Peppy.U;
+
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * How many format conversion tools will I write in my lifetime?

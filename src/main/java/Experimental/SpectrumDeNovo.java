@@ -1,19 +1,12 @@
 package Experimental;
 
+import Navigator.Match;
+import Peppy.*;
+import Reports.MatchSVG;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Navigator.Match;
-import Peppy.AminoAcids;
-import Peppy.Definitions;
-import Peppy.Match_Blank;
-import Peppy.Peak;
-import Peppy.Peptide;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
-import Reports.MatchSVG;
 
 public class SpectrumDeNovo {
 	

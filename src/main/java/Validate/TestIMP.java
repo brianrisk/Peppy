@@ -1,19 +1,8 @@
 package Validate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import Peppy.*;
 
-import Peppy.AminoAcids;
-import Peppy.Match;
-import Peppy.MatchConstructor;
-import Peppy.MatchesSpectrum;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Spectrum;
-import Peppy.U;
+import java.io.*;
 
 public class TestIMP {
 	

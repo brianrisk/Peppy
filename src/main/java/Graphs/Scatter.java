@@ -1,8 +1,8 @@
 package Graphs;
 
-import java.util.ArrayList;
-
 import Peppy.U;
+
+import java.util.ArrayList;
 
 /**
  * Contains static methods for calculating least squares

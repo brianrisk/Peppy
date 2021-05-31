@@ -1,5 +1,12 @@
 package Experimental;
 
+import Graphs.Point;
+import Graphs.Scatter;
+import Graphs.ScatterVisualizer;
+import Navigator.Match;
+import Peppy.*;
+import org.apache.commons.math3.distribution.NormalDistribution;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,18 +14,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import org.apache.commons.math3.distribution.NormalDistribution;
-
-import Graphs.Point;
-import Graphs.Scatter;
-import Graphs.ScatterVisualizer;
-import Navigator.Match;
-import Peppy.AminoAcids;
-import Peppy.Peak;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
 
 /**
  * Given an MS/MS spectrum, what is the probability

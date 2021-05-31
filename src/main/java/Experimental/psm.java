@@ -1,11 +1,6 @@
 package Experimental;
 
-import Peppy.Match;
-import Peppy.MatchesSpectrum;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Spectrum;
-import Peppy.U;
+import Peppy.*;
 
 public class psm {
 	

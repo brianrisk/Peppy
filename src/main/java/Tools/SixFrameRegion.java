@@ -1,23 +1,10 @@
 package Tools;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
 import Navigator.Region;
-import Peppy.AminoAcids;
-import Peppy.DigestionThread_DNA;
-import Peppy.Peppy;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.SequenceNucleotide;
-import Peppy.U;
+import Peppy.*;
+
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * A tool which lets you specify a region in a sequence and it comes up with

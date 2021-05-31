@@ -2,8 +2,6 @@ package Math;
 
 import java.util.ArrayList;
 
-import Peppy.U;
-
 
 /**
  * Copyright 2013, Brian Risk
@@ -52,39 +50,11 @@ public class MathFunctions {
 		}
 		
 	}
-	
-	public static void main(String args[]) {
-		int n = 4;
-		int k = 4;
-		double p = .5;
-		
-		double prob = getBinomialProbability(n, k, p);
-		U.p(prob);
-		
-//		 
-		U.p(-Math.log10(3.678753814386667E-14 * 0.019287109375 * 0.0546875 * 0.36328125 * 0.5 * 0.0625));
-		
-	}
-	
-	
-	public static double cachedLog(int n) {
-		return logs[n];
-	}
-	
-	public static double cachedNChooseK(int n, int k) {
+
+	private static double cachedNChooseK(int n, int k) {
 		return nChooseK[n][k];
 	}
-	
-	public static double approximateNChooseK(int n, int k) {
-		return approximateFactorial(n) / (approximateFactorial(k) * approximateFactorial(n - k));
-	}
-	
-	public static double approximateFactorial(int n) {
-		if (n == 0) return 1;
-		double out = Math.sqrt(2.0 * Math.PI * n);
-		out *= Math.pow((double) n / Math.E, n);
-		return out;
-	}
+
 	
 	/**
 	 * Assumes Gaussian distribution is a decent approximation
@@ -104,20 +74,7 @@ public class MathFunctions {
 		}
 		return total;
 	}
-	
-	/**
-	 * Uses the approximation found here:
-	 * http://en.wikipedia.org/wiki/Binomial_probability#Binomial_approximation
-	 * @param n
-	 * @param k
-	 * @param p
-	 * @return
-	 */
-	public static double approximateSingleBinomialProbability(int n, int k, double p) {
-		double mu = n * p;
-		double sigma = Math.sqrt(mu * ( 1.0 - p));
-		return (k - mu) / sigma;
-	}
+
 	
 	/**
 	 * I took the natural log of this

@@ -1,10 +1,10 @@
 package Navigator;
 
+import Experimental.ProteinOverlap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
-
-import Experimental.ProteinOverlap;
 
 
 /**

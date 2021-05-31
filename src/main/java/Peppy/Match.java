@@ -1,8 +1,8 @@
 package Peppy;
 
-import java.util.ArrayList;
-
 import Math.MassError;
+
+import java.util.ArrayList;
 
 /**
  * An abstract object which can be extended to implement scoring mechanisms

@@ -2,7 +2,6 @@ package UI;
 
 import processing.core.PApplet;
 import processing.core.PFont;
-import Peppy.U;
 
 /**
  * Constants

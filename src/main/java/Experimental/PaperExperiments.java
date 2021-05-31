@@ -1,20 +1,10 @@
 package Experimental;
 
+import Peppy.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-import Peppy.FDR;
-import Peppy.Match;
-import Peppy.MatchConstructor;
-import Peppy.MatchesSpectrum;
-import Peppy.Peppy;
-import Peppy.Peptide;
-import Peppy.Properties;
-import Peppy.Sequence;
-import Peppy.Spectrum;
-import Peppy.SpectrumLoader;
-import Peppy.U;
 
 /**
  * Methods used to get data for the peppy score paper

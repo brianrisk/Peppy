@@ -1,19 +1,10 @@
 package Reports;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Peppy.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Peppy.Match;
-import Peppy.Properties;
-import Peppy.SequenceNucleotide;
-import Peppy.Spectrum;
-import Peppy.U;
 
 
 /**

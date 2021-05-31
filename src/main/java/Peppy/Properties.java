@@ -1,12 +1,6 @@
 package Peppy;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import java.io.*;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -309,12 +303,8 @@ public class Properties {
 		loadProperties(propertiesFile);
 	}
 	
-	
-	/**
-	 * 
-	 * @param fileName the name of our properties file
-	 */
-	public static void loadProperties(File propertiesFile) {
+
+	 static void loadProperties(File propertiesFile) {
 		
 		/* All arrays must be cleared for multiple jobs to work!  clearing out our arrays */
 		/* this means that spectra and sequences must be set in each job file; they cannot be blank */
