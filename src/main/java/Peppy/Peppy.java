@@ -47,6 +47,7 @@ public class Peppy {
 
     public static void main(String[] args) {
         /* set up initial state */
+        U.startStopwatch();
         init(args);
 
         /*  hello! */
@@ -63,7 +64,6 @@ public class Peppy {
         /* i'm finished! */
         finish();
     }
-
 
     public static void runDirectory(String directoryString, String jobFile, String[] args) {
         init(args);
@@ -140,8 +140,6 @@ public class Peppy {
      * A straight-forward search.  Developed initially for PepArML use.
      */
     private static void runSimplePeppy() {
-        U.startStopwatch();
-
         /* where we store the report */
         mainReportDir = createReportDirectory();
 
@@ -181,8 +179,6 @@ public class Peppy {
         matches = getMatches(sequences, spectraMatches);
 
         createReports(matches, mainReportDir);
-
-        U.stopStopwatch();
     }
 
 
@@ -191,26 +187,9 @@ public class Peppy {
      * This iterates through them in every combination.
      */
     private static void runFunnelPeppy() throws Exception {
-        U.startStopwatch();
-
-        if (verbose) U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
-        if (verbose) U.p("sequence set count: " + Properties.sequenceDirectoryOrFileList.size());
 
         /* check if our directories exist (no typos...) */
-        boolean fileDoesNotExist = false;
-        for (File spectraDirectoryOrFile : Properties.spectraDirectoryOrFileList) {
-            if (!spectraDirectoryOrFile.exists()) {
-                U.p("ERROR!  This spectrum file does not exist: " + spectraDirectoryOrFile.getAbsolutePath());
-                fileDoesNotExist = true;
-            }
-        }
-        for (File sequenceDirectoryOrFile : Properties.sequenceDirectoryOrFileList) {
-            if (!sequenceDirectoryOrFile.exists()) {
-                U.p("ERROR!  This sequence file does not exist: " + sequenceDirectoryOrFile.getAbsolutePath());
-                fileDoesNotExist = true;
-            }
-        }
-        if (fileDoesNotExist) throw new Error("Search file not found");
+        if (!checkDirectoriesExist()) throw new Error("Search files not found");
 
         mainReportDir = createReportDirectory();
         File savedSpectraDir = new File(mainReportDir, "spectra");
@@ -218,7 +197,7 @@ public class Peppy {
             U.p("Could not create directories for saved spectra");
         }
 
-        /* if there re multiple jobs, the latter blind modification settings will persist.
+        /* if there are multiple jobs, the latter blind modification settings will persist.
          * we reset those to normal, modification-less parameters
          */
         Properties.scoringMethodName = "Peppy.Match_IMP";
@@ -462,6 +441,7 @@ public class Peppy {
             /* a big IF -- were there any peptides at all identified from above.  We hope so!  */
             if (peptidesFound.size() > 0) {
 
+                /* sorting for faster searching */
                 Collections.sort(peptidesFound);
 
                 /* set our scoring method to vari-mod */
@@ -552,8 +532,6 @@ public class Peppy {
         //			bmArray.add(bm);
         //			BestMatches.createUnifiedSamplesReport(bmArray, "peptideSequence", mainReportDir);
 
-
-        U.stopStopwatch();
     }
 
 
@@ -610,17 +588,6 @@ public class Peppy {
 
 
     public static void init(String propertiesFile) {
-
-        /* check to see if this version is too old */
-        //		if (Properties.expires && System.currentTimeMillis() > expiration) {
-        //			try {
-        //				throw (new Exception("unsynchronized resource"));
-        //			} catch (Exception e) {
-        //				// TODO Auto-generated catch block
-        //				e.printStackTrace();
-        //			}
-        //			System.exit(0);
-        //		}
 
         /* this allows us to do our graphics */
         System.setProperty("java.awt.headless", "true");
@@ -870,6 +837,26 @@ public class Peppy {
         return mainReportDir;
     }
 
+    private static boolean checkDirectoriesExist() {
+        if (verbose) U.p("spectral set count: " + Properties.spectraDirectoryOrFileList.size());
+        if (verbose) U.p("sequence set count: " + Properties.sequenceDirectoryOrFileList.size());
+
+        boolean exist = true;
+        for (File spectraDirectoryOrFile : Properties.spectraDirectoryOrFileList) {
+            if (!spectraDirectoryOrFile.exists()) {
+                U.p("ERROR!  This spectrum file does not exist: " + spectraDirectoryOrFile.getAbsolutePath());
+                exist = false;
+            }
+        }
+        for (File sequenceDirectoryOrFile : Properties.sequenceDirectoryOrFileList) {
+            if (!sequenceDirectoryOrFile.exists()) {
+                U.p("ERROR!  This sequence file does not exist: " + sequenceDirectoryOrFile.getAbsolutePath());
+                exist = false;
+            }
+        }
+        return exist;
+    }
+
 
     private static void createReports(ArrayList<Match> matches, File reportDir) {
         Properties.generatePropertiesFile(reportDir);
@@ -903,6 +890,7 @@ public class Peppy {
             U.logWriter.flush();
             U.logWriter.close();
         }
+        U.stopStopwatch();
         U.p("done");
     }
 

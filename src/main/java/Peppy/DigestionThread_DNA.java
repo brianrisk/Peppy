@@ -14,21 +14,23 @@ import java.util.ArrayList;
  */
 public class DigestionThread_DNA implements Runnable {
 
-    ArrayList<Peptide> peptides = new ArrayList<Peptide>();
-    NucleotideSequence nucleotideSequence;
-    int frame;
-    boolean isForwardsStrand;
-    int startIndex;
-    int stopIndex;
-    boolean reverseDatabase;
+    ArrayList<Peptide> peptides = new ArrayList<>();
+    private NucleotideSequence nucleotideSequence;
+    private int frame;
+    private boolean isForwardsStrand;
+    private int startIndex;
+    private int stopIndex;
+    private boolean reverseDatabase;
 
-    /**
-     * @param nucleotideSequence
-     * @param frame
-     * @param forwardsStrand
-     */
-    public DigestionThread_DNA(NucleotideSequence nucleotideSequence,
-                               int frame, boolean forwardsStrand, int startIndex, int stopIndex, boolean reverseDatabase) {
+
+    DigestionThread_DNA(
+            NucleotideSequence nucleotideSequence,
+            int frame,
+            boolean forwardsStrand,
+            int startIndex,
+            int stopIndex,
+            boolean reverseDatabase
+    ) {
 
         /* because of the digestion window overlap, sometimes this will be < 0 */
         if (startIndex < 0) startIndex = 0;
@@ -48,35 +50,31 @@ public class DigestionThread_DNA implements Runnable {
     }
 
 
-    public ArrayList<Peptide> digest() {
+    private void digest() {
         /* go through each character in the line, skipping ahead "frame" characters */
         if (isForwardsStrand) {
-            return digest(startIndex + frame, stopIndex);
+            digest(startIndex + frame, stopIndex);
         } else {
             /* the "startIndex -1" is because we go while our
              * index does not equal to that number.  Therefore it goes
              * right up to startIndex  */
-            return digest(stopIndex - frame - 1, startIndex - 1);
+            digest(stopIndex - frame - 1, startIndex - 1);
         }
     }
 
 
-    private ArrayList<Peptide> digest(int startPosition, int stopPosition) {
+    private void digest(int startPosition, int stopPosition) {
         ArrayList<Protein> proteins = translateToProteins(startPosition, stopPosition);
         peptides = SequenceProtein.getPeptidesFromListOfProteins(proteins);
-        return peptides;
     }
 
 
     /**
      * creates an ArrayList of Proteins where STOPs mark the end
      * of each protein
-     *
-     * @param startPosition
-     * @param stopPosition
      */
-    public ArrayList<Protein> translateToProteins(int startPosition, int stopPosition) {
-        ArrayList<Protein> proteins = new ArrayList<Protein>();
+    private ArrayList<Protein> translateToProteins(int startPosition, int stopPosition) {
+        ArrayList<Protein> proteins = new ArrayList<>();
         char[] codon = new char[3];
         char aminoAcid;
         int mod = 0;
@@ -138,11 +136,8 @@ public class DigestionThread_DNA implements Runnable {
 
     /**
      * Same as other, but assumes that the direction is "forwards"
-     *
-     * @param codon
-     * @return
      */
-    public static int indexForCodonArray(char[] codon) {
+    private static int indexForCodonArray(char[] codon) {
         if (codon[0] == 'A') {
             if (codon[1] == 'A') {
                 if (codon[2] == 'A') {

@@ -35,7 +35,7 @@ public class Regions {
             /* finds forwards strand and reverse strand regions */
             ArrayList<Region> forwardRegions = findRegions(true);
             ArrayList<Region> reverseRegions = findRegions(false);
-            regions = new ArrayList<Region>(forwardRegions.size() + reverseRegions.size());
+            regions = new ArrayList<>(forwardRegions.size() + reverseRegions.size());
             regions.addAll(forwardRegions);
             regions.addAll(reverseRegions);
             Collections.sort(regions);
@@ -50,7 +50,7 @@ public class Regions {
      */
     private ArrayList<Region> findRegions(boolean isForward) {
 
-        ArrayList<Region> returnedRegions = new ArrayList<Region>();
+        ArrayList<Region> returnedRegions = new ArrayList<>();
 
         /* get all interesting regions from each sequence */
         for (Sequence sequence : sequences) {
@@ -64,7 +64,7 @@ public class Regions {
             int activeRegionIndex = returnedRegions.size();
 
             int previousLocus = -1;
-            int locus = -1;
+            int locus;
             for (Match match : sequenceMatches) {
                 if (match.getPeptide().isForward() != isForward) continue;
                 locus = match.getPeptide().getStartIndex();
@@ -114,7 +114,7 @@ public class Regions {
         }
 
         /* pull out the non-flagged regions */
-        ArrayList<Region> nonOverlapping = new ArrayList<Region>();
+        ArrayList<Region> nonOverlapping = new ArrayList<>();
         for (Region region : returnedRegions) {
             if (region.isUnFlagged()) {
                 nonOverlapping.add(region);
