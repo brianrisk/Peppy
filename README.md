@@ -6,6 +6,7 @@ A User’s Quick Start Guide**
   <a href="https://geneffects.com/peppy">
     <img src="http://www.geneffects.com/wp-content/uploads/2012/03/Screen-Shot-2013-05-28-at-12.31.59-AM.png" alt="Peppy result example">
   </a>
+[above: example output of discovered of peptide from non-canonical gene expression]
 </div>
 
 ## Introduction
