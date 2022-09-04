@@ -2,6 +2,12 @@
 **Peppy: Proteogenomic and Protein Identification Software
 A User’s Quick Start Guide**
 
+<div align="center">
+  <a href="https://geneffects.com/peppy">
+    <img src="http://www.geneffects.com/wp-content/uploads/2012/03/Screen-Shot-2013-05-28-at-12.31.59-AM.png" alt="Peppy result example">
+  </a>
+</div>
+
 ## Introduction
 Welcome! You are probably using Peppy because you have a protein identification or
 proteogenomic project that you want to complete with good accuracy and you need it done fast.
