@@ -11,13 +11,13 @@ import java.util.Collections;
  */
 public class ModificationEntry implements Comparable<ModificationEntry> {
 
-    int accessionNumber;
-    String PSI_MSname;
-    String interimName;
-    String description;
-    double monoMass;
-    double averageMass;
-    String compositioin;
+    private int accessionNumber;
+    private String PSI_MSname;
+    private String interimName;
+    private String description;
+    private double monoMass;
+    private double averageMass;
+    private String compositioin;
 
     //no modification
     public ModificationEntry() {
@@ -58,8 +58,6 @@ public class ModificationEntry implements Comparable<ModificationEntry> {
                 line = br.readLine();
             }
             br.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

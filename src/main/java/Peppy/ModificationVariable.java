@@ -9,7 +9,7 @@ package Peppy;
  */
 public class ModificationVariable {
 
-    byte AminoAcid;
+    private byte AminoAcid;
     double mass;
 
     public ModificationVariable(byte aminoAcid, double mass) {

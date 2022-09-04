@@ -24,12 +24,6 @@ public class TextReporter {
     ArrayList<Match> matches;
     File reportDir;
 
-
-    /**
-     * @param matches
-     * @param spectra
-     * @param sequence_DNAs
-     */
     public TextReporter(ArrayList<Match> matches, File reportDir) {
         this.matches = matches;
         this.reportDir = reportDir;
